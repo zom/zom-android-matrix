@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/llRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+
+    >
+
+
+            <ViewFlipper
+                android:id="@+id/viewFlipper1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inAnimation="@anim/push_right_in"
+                android:layout_margin="0dp"
+                >
+
+                <include android:id="@+id/flipViewMain" layout="@layout/awesome_onboarding_splash"/>
+
+                <include android:id="@+id/flipViewRegister" layout="@layout/awesome_onboarding_register"/>
+
+                <include android:id="@+id/flipViewCreateNew" layout="@layout/awesome_onboarding_create"/>
+
+                <include android:id="@+id/flipViewLogin" layout="@layout/awesome_onboarding_login"/>
+
+                <include android:id="@+id/flipViewAdvanced" layout="@layout/awesome_onboarding_advanced"/>
+
+                <include android:id="@+id/flipViewInviteFriends" layout="@layout/awesome_onboarding_invite"/>
+
+
+            </ViewFlipper>
+
+            
+
+</LinearLayout>

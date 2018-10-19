@@ -1,0 +1,618 @@
+<?xml version='1.0' encoding='UTF-8'?><!--
+/*
+ * Copyright (C) 2007-2008 Esmertec AG.
+ * Copyright (C) 2007-2008 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- General: Names -->
+    <string name="ic_launcher_name">Keanu</string>
+    <string name="app_name">Keanu</string>
+    <string name="im_label">Keanu</string>
+
+    <!-- General: Permissions -->
+    <string name="ro_perm_label">read instant messages</string>
+    <string name="ro_perm_desc">Allows applications to read data from the IM content provider.</string>
+    <string name="wo_perm_label">write instant messages</string>
+    <string name="wo_perm_desc">Allows applications to write data to the IM content provider.</string>
+    <string name="perm_label">start IM service</string>
+    <string name="perm_desc">Allows applications to start IM service via intent.</string>
+
+    <!-- General: Actions -->
+    <string name="confirm">Confirm</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="yes">OK</string>
+    <string name="no">Cancel</string>
+    <string name="connect">Connect</string>
+    <!-- Views -->
+    <string name="title_activity_lock_screen">App Locked</string>
+    <string name="lock_screen_create_passphrase">Set Password</string>
+    <string name="lock_screen_confirm_passphrase">Confirm Password</string>
+    <string name="lock_screen_passphrase_hint">Password</string>
+    <string name="lock_screen_passphrase_not_set_enter">Please set a passphrase to lock the app</string>
+    <string name="lock_screen_passphrase_not_set_confirm">Confirm New Password</string>
+    <string name="lock_screen_passphrases_not_matching">Password did not match, please try again</string>
+    <string name="lock_screen_skip">Skip &gt;&gt;</string>
+    <!-- Views: Setup -->
+    <string name="add_account">Add <xliff:g id="account">%1$s</xliff:g> account</string>
+    <string name="menu_about">About</string>
+
+    <string name="signed_out_prompt_with_error">You have been signed out of <xliff:g id="account">%1$s</xliff:g> because <xliff:g id="reason">%2$s</xliff:g></string>
+
+
+    <string name="pass_err_length">Your passphrase was not long enough</string>
+    <!-- Views: About: Welcome -->
+    <!-- Views: About: OTR -->
+    <!-- Views: About: Security -->
+    <!-- Views: Account list -->
+    <!-- Views: Setup: Account -->
+    <string name="sign_in">Sign in</string>
+    <string name="account_setup_example_email_address">user@domain</string>
+    <string name="account_setup_new_username">new username</string>
+    <string name="account_setup_password">password</string>
+    <string name="account_setup_password_confirm">confirm password</string>
+    <string name="btn_create_new_account">Register Account</string>
+
+    <string name="account_setup_pers_now_title">Sign In Now</string>
+    <string name="select_domain_new_account">Chat service domain</string>
+    <string name="registering_new_account_">Registering new account…</string>
+
+    <string name="signing_in_wait">Signing in\u2026</string>
+    <string name="signing_out_wait">Signing out\u2026</string>
+
+    <!-- Views: Settings: Account -->
+    <string name="do_srv_lookup">Do SRV Lookup</string>
+    <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">Use DNS SRV to find actual XMPP server from domain name</string>
+    <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Allow the username and password to be sent as plain text when using an unencrypted transport</string>
+    <string name="allow_plain_text_auth">Allow Plain Text Auth</string>
+    <string name="require_tls_ssl_connection">Require TLS Connection</string>
+    <string name="transport_encryption">Transport Encryption</string>
+    <string name="how_encrypted_chats_are_started">How encrypted chats are started</string>
+    <string name="the_server_to_connect_to_if_needed">The server to connect to, if needed</string>
+    <string name="connect_server">Connect Server</string>
+    <string name="tcp_port_for_xmpp_server">TCP Port for XMPP Server</string>
+    <string name="server_port">Server Port</string>
+    <string name="xmpp_resource">XMPP Resource</string>
+    <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">to distinguish this connection from other clients that are also logged in</string>
+    <string name="xmpp_resource_prio_title">XMPP Resource Priority</string>
+    <string name="xmpp_resource_prio_summary">Messages to clients with multiple active resources will be sent to the resource with the highest priority</string>
+
+    <!-- Views: Contact list -->
+    <string name="title_chats">Conversations</string>
+    <string name="empty_account_message">You have no\naccounts configured.\n\nTap here to add one!</string>
+    <string name="menu_remove_contact">Delete Contact</string>
+    <string name="menu_contact_nickname">Contact nickname</string>
+    <string name="menu_view_blocked">Blocked</string>
+    <string name="nickname">Nickname</string>
+
+    <string name="confirm_delete_contact">The contact \"<xliff:g id="user">%1$s</xliff:g>\" will be deleted.</string>
+    <string name="confirm_block_contact">The contact \"<xliff:g id="user">%1$s</xliff:g>\" will be blocked.</string>
+    <string name="add_contact_success">Contact \"<xliff:g id="user">%1$s</xliff:g>\" added.</string>
+    <string name="delete_contact_success">Contact \"<xliff:g id="user">%1$s</xliff:g>\" deleted.</string>
+    <string name="block_contact_success">Contact \"<xliff:g id="user">%1$s</xliff:g>\" blocked.</string>
+    <string name="unblock_contact_success">Contact \"<xliff:g id="user">%1$s</xliff:g>\" unblocked.</string>
+
+    <string name="menu_verify">Verify Contact</string>
+
+    <string name="empty_conversation_group">No conversations open\n\nTap to start chatting!</string>
+
+    <string name="search_label">Contact</string>
+    <string name="search_hint">type the name of a contact to chat with</string>
+    <string name="input_contact_label">Enter your friend\'s full username here:</string>
+    <!-- Views: Chat: Single -->
+    <string name="contact_online"><xliff:g id="user">%1$s</xliff:g> is online</string>
+    <string name="contact_away"><xliff:g id="user">%1$s</xliff:g> is away</string>
+    <string name="contact_busy"><xliff:g id="user">%1$s</xliff:g> is busy</string>
+    <string name="contact_offline"><xliff:g id="user">%1$s</xliff:g> is offline</string>
+    <string name="contact_joined"><xliff:g id="user">%1$s</xliff:g> has joined</string>
+    <string name="contact_left"><xliff:g id="user">%1$s</xliff:g> has left</string>
+
+    <string name="file_transfer">File Transfer</string>
+    <string name="accept_transfer_">Accept transfer?</string>
+    <string name="wants_to_send_you_the_file">wants to send you the file</string>
+    <string name="no_connection_for_sending">No connection available for sending your share!</string>
+
+    <string name="compose_hint">Send a message</string>
+    <string name="compose_hint_secure">Send private message</string>
+    <string name="menu_end_conversation">End chat</string>
+    <string name="select_link_title">Select link</string>
+
+    <string name="delete">Delete</string>
+    <string name="export_media">Export Media File?</string>
+    <!-- Views: Chat: Group -->
+    <string name="invitation_prompt"><xliff:g id="user">%1$s</xliff:g> has invited you to join a group chat.</string>
+    <string name="accept_invitation">Accept</string>
+    <string name="decline_invitation">Decline</string>
+    <string name="connecting_to_group_chat_">Connecting to group chat…</string>
+
+    <string name="empty_contact_list">No contacts found.\n\nTap to invite.</string>
+
+    <string name="subscription_prompt">Add <xliff:g id="USER">%1$s</xliff:g>?</string>
+    <string name="approve_subscription">Yes</string>
+    <string name="decline_subscription">No</string>
+    <string name="approve_subscription_error">Unable to approve subscription. Please try again later.</string>
+    <string name="decline_subscription_error">Unable to decline subscription. Please try again later.</string>
+
+    <!-- Security: OTR -->
+    <string name="otr_session_status_finished">Your contact has stopped the encrypted chat.</string>
+    <string name="otr_mode_force">Force / Require</string>
+    <string name="otr_mode_auto">Automatically Attempt</string>
+    <string name="otr_mode_requested">As Requested</string>
+    <string name="otr_mode_disabled">Disabled / Never</string>
+
+    <!-- Security: OTR: Keyring -->
+    <string name="detected_Otr_keystore_import">We have detected an OTR keystore to import. Would you like to scan the QR password now?</string>
+    <!-- Security: OTR: Verification -->
+    <!-- Security: OTR: Verification: QA -->
+    <string name="smp_question_title">Authentication</string>
+    <string name="smp_question_summary">Enter a question to send to your contact, and the answer you expect them to give, in order to verify they are who they claim to be.</string>
+    <string name="smp_question_hint">the question to ask</string>
+    <string name="qmp_answer_hint">the expected answer</string>
+    <string name="remote_verified_us">Your contact has successfully authenticated you.  Now authenticate your contact by asking your own question.</string>
+    <string name="otr_qa_title">OTR Q&amp;A Verification</string>
+    <string name="chat_encryption_title">One-to-one Chat Encryption</string>
+    <string name="otr_qa_send">Send</string>
+    <string name="otr_qa_cancel">Cancel</string>
+
+    <!-- Views: VoIP -->
+    <!-- Views: Settings: General -->
+    <!-- Actions: Settings: General: Chat Privacy -->
+    <string name="pref_group_security_title">Chat Privacy</string>
+    <string name="encryption_and_anonymity_title">Network Privacy</string>
+    <!-- Actions: Settings: General: User Interface -->
+    <string name="pref_linkify_on_tor_title">Clickable links</string>
+    <string name="pref_linkify_on_tor_summary">Make the links in chats clickable (WARNING, possible privacy leak!)</string>
+    <string name="menu_locale">Language</string>
+    <string name="KEY_PREF_LANGUAGE_TITLE">Languages</string>
+    <string name="use_system_default">Use system default</string>
+
+    <string name="button_yes_accept_all">Yes, Accept All</string>
+    <string name="pref_delete_unsecured_media_title">Delete Insecure Media</string>
+    <string name="pref_delete_unsecured_media_summary">After sharing a photo or file, automatically delete it from the original, insecure storage after import</string>
+
+    <!-- Actions: Settings: General: Other Tuning -->
+    <string name="pref_group_tuning_title">Other Tuning</string>
+    <string name="start_on_boot">Start Automatically</string>
+    <string name="start_on_boot_summary">Always start and automatically sign into previously logged in accounts</string>
+    <string name="hide_offline_contacts">Hide offline contacts</string>
+    <string name="foreground_service_title">Use foreground priority</string>
+    <string name="foreground_service_summary">Reduce the chance that Android will restart our connection service.  This will place a notification in the notification area.</string>
+    <string name="heartbeat_interval_title">Heartbeat interval</string>
+    <string name="heartbeat_interval_summary">Use a higher value (in minutes) to save battery.  A high value may cause the provider to close your connection due to inactivity.</string>
+
+    <!-- Actions: Settings: General: Notifications -->
+    <string name="notification_group_title">Notification settings</string>
+    <string name="notification_enabled_title">IM notifications</string>
+    <string name="notification_enabled_summary">Notify in status bar when IM arrives</string>
+    <string name="notification_vibrate_title">Vibrate</string>
+    <string name="notification_vibrate_summary">Also vibrate when IM arrives</string>
+    <string name="notification_sound_title">Sound</string>
+    <string name="notification_sound_summary">Also play ringtone when IM arrives</string>
+    <string name="notification_ringtone_title">Select Custom Ringtone</string>
+
+    <!-- Actions: Settings: General: Developer -->
+    <string name="pref_debug_title">Enable Debug Logs</string>
+    <string name="pref_debug_summary">Output app log data to standard out / logcat for debugging</string>
+
+    <!-- Alerts: Dialogs -->
+    <string name="bg_data_prompt_message">Network data connectivity (including background data) is needed for the app to login.</string>
+    <string name="prompt_create_new_account_">Create new account?</string>
+    <string name="allow_s_to_create_a_new_chat_account_for_s_">Create a new chat account for username \'%1$s\'?</string>
+    <!-- Alerts: Notifications -->
+    <string name="subscription_notify_text">New friend invitation from <xliff:g id="user">%s</xliff:g></string>
+    <string name="file_notify_text">New <xliff:g id="filename">%1$s</xliff:g> received</string>
+    <string name="notify_groupchat_label">Group chat invitation</string>
+    <string name="group_chat_invite_notify_text">New group chat invitation from <xliff:g id="user">%s</xliff:g></string>
+    <string name="new_messages_notify">New message(s) from</string>
+    <string name="starting_the_chatsecure_service_">Starting the service…</string>
+    <string name="app_unlocked">App is running</string>
+    <!-- Alerts: Exceptions -->
+    <string name="error">Attention</string>
+    <string name="error_prefix">Error: </string>
+    <string name="general_error">Error code <xliff:g id="code">%1$d</xliff:g></string>
+    <string name="login_service_failed">Unable to sign in to the <xliff:g id="service">%1$s</xliff:g> service. Please try again later.\n(Detail: <xliff:g id="description">%2$s</xliff:g>)</string>
+    <string name="add_list_failed">The list was not added.</string>
+    <string name="block_contact_failed">Contact was not blocked.</string>
+    <string name="unblock_contact_failed">Contact was not unblocked.</string>
+    <string name="load_contact_list_failed">Contact list did not load.</string>
+    <string name="cant_connect_to_server">Cannot connect to server. Please check your connection.</string>
+    <string name="contact_already_exist">"<xliff:g id="user">%1$s</xliff:g>" already exists in your Contact list.</string>
+    <string name="contact_blocked">Contact \"<xliff:g id="user">%1$s</xliff:g>\" has been blocked.</string>
+    <string name="contact_not_loaded">Please wait while your Contact list loads.</string>
+    <string name="network_error">A network error occurred.</string>
+    <string name="wifi_not_connected_error">WiFi is required for this connection.</string>
+    <string name="service_not_support">The server does not support this functionality.</string>
+    <string name="invalid_password">The password you entered is not valid.</string>
+    <string name="internal_server_error">The server encountered an error.</string>
+    <string name="not_implemented">The server does not support this functionality.</string>
+    <string name="service_unavaiable">The server is currently unavailable.</string>
+    <string name="timeout">The server has timed out.</string>
+    <string name="version_not_supported">The server does not support the current version.</string>
+    <string name="message_queue_full">The message queue is full.</string>
+    <string name="domain_not_supported">The server does not support forwarding to the domain.</string>
+    <string name="unknown_user">The username you entered is not recognized.</string>
+    <string name="recipient_blocked_the_user">Sorry, you are blocked by the user.</string>
+    <string name="session_expired">The session has expired, please sign in again.</string>
+    <string name="forced_logout">you have signed in from another client.</string>
+    <string name="already_logged_in">you have signed in from another client.</string>
+    <string name="msisdn_error">Sorry, the phone number cannot be read from your SIM card. Please contact your operator for help.</string>
+    <string name="not_signed_in">You are currently not signed in.</string>
+    <string name="account_setup_error_server">An error occurred while connecting to the chat server - please check your configuration and try again.</string>
+    <string name="error_suspended_connection">Network is offline</string>
+    <string name="unable_to_create_or_join_group_chat">Unable to create or join group chat</string>
+    <string name="unsupported_incoming_data">Unsupported incoming data, cannot share!</string>
+    <string name="swipe_alert">The app detected that a request was made to remove its task.  It will likely crash.  Please use the Sign out all menu item from the account list screen instead.</string>
+    <string name="there_is_no_viewer_available_for_this_file_format">There is no viewer available for this file format</string>
+    <string name="otr_keysync_warning_message">Please copy the \'otr_keystore.ofcaes\' file from the desktop OtrFileConverter tool to the root directory of your device storage</string>
+    <string name="msg_sent_failed">This message could not be sent.</string>
+    <string name="disconnected_warning">You are disconnected. Messages will be sent when you reconnect.</string>
+    <string name="error_account_password_mismatch">Your passwords do not match</string>
+    <string name="error_account_settings_priority">Priority must be a number in the range [0 .. 127]</string>
+    <string name="error_account_settings_port">Port number must be a number</string>
+    <string name="error_welcome_database">Major Error: Unable to unlock or load app database. Please re-install the app or clear data.</string>
+    <string name="account_settings_title">Account Settings</string>
+
+    <string name="pref_group_protect_data_title">Protect My Data</string>
+    <string name="panic_trigger_app">Panic Trigger App</string>
+    <string name="panic_trigger_app_summary">A panic app can trigger the app to lock, send a message, delete data, etc.</string>
+    <string name="panic_setup">Panic Setup</string>
+    <string name="panic_setup_summary">Set up how the app reacts to a panic notification.</string>
+    <string name="panic_app_none">None</string>
+    <string name="panic_app_none_summary">No Panic Trigger App, ignore all incoming panic triggers.</string>
+    <string name="panic_app_default">Default</string>
+    <string name="protect_data">Protect My Data</string>
+    <string name="action_done">Done</string>
+    <string name="lock_app">Lock the app</string>
+    <string name="clear_app_data">Clear all data within the app</string>
+    <string name="uninstall_app">Uninstall the app</string>
+    <string name="include_location">Include my location</string>
+    <!--  added 2011/09/01 -->
+    <string name="menu_view_groups">Groups</string>
+
+    <string name="buddies">Buddies</string>
+
+    <string name="contacts">Contacts</string>
+
+
+    <string name="mtm_accept_cert">Accept Server Certificate?</string>
+
+
+    <string name="loading">loading…</string>
+    <!-- Other -->
+
+    <!-- Other: Slide Menu -->
+    <string name="menu_all">All</string>
+    <string name="menu_archive">Archive</string>
+
+    <string name="menu_settings">Settings</string>
+    <string name="menu_sign_out">Sign out</string>
+    <!-- Other: Provider -->
+    <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+    <!-- Other: Development Strings [Do not localize!] -->
+    <!-- Other: Presence States -->
+    <string name="presence_available">Online</string>
+    <string name="presence_busy">Busy</string>
+    <string name="presence_away">Away</string>
+    <string name="presence_idle">Idle</string>
+    <string name="presence_offline">Offline</string>
+    <string name="presence_invisible">Appear Offline</string>
+
+    <!-- Other: Smileys -->
+    <string-array name="default_smiley_names">
+        <item>Happy</item>
+        <item>Sad</item>
+        <item>Winking</item>
+        <item>Tongue sticking out</item>
+        <item>Surprised</item>
+        <item>Kissing</item>
+        <item>Yelling</item>
+        <item>Cool</item>
+        <item>Money mouth</item>
+        <item>Foot in mouth</item>
+        <item>Embarrassed</item>
+        <item>Angel</item>
+        <item>Undecided</item>
+        <item>Crying</item>
+        <item>Lips are sealed</item>
+        <item>Laughing</item>
+        <item>Confused</item>
+    </string-array>
+
+    <!-- [Do not localize!] -->
+    <string-array name="default_smiley_texts" translatable="false">
+        <item>:-)</item>
+        <item>:-(</item>
+        <item>;-)</item>
+        <item>:-P</item>
+        <item>=-O</item>
+        <item>:-*</item>
+        <item>:O</item>
+        <item>B-)</item>
+        <item>:-$</item>
+        <item>:-!</item>
+        <item>:-[</item>
+        <item>O:-)</item>
+        <item>:-\\</item>
+        <item>:\'(</item>
+        <item>:-X</item>
+        <item>:-D</item>
+        <item>o_O</item>
+    </string-array>
+
+    <string-array name="smiley_names">
+        <item>Happy</item>
+        <item>Sad</item>
+        <item>Winking</item>
+        <item>Tongue sticking out</item>
+        <item>Surprised</item>
+        <item>Kissing</item>
+        <item>Yelling</item>
+        <item>Cool</item>
+        <item>Money mouth</item>
+        <item>Foot in mouth</item>
+        <item>Embarrassed</item>
+        <item>Angel</item>
+        <item>Undecided</item>
+        <item>Crying</item>
+        <item>Lips are sealed</item>
+        <item>Laughing</item>
+        <item>Confused</item>
+    </string-array>
+
+    <string-array name="smiley_texts">
+        <item>:-)</item>
+        <item>:-(</item>
+        <item>;-)</item>
+        <item>:-P</item>
+        <item>=-O</item>
+        <item>:-*</item>
+        <item>:O</item>
+        <item>B-)</item>
+        <item>:-$</item>
+        <item>:-!</item>
+        <item>:-[</item>
+        <item>O:-)</item>
+        <item>:-\\</item>
+        <item>:\'(</item>
+        <item>:-X</item>
+        <item>:-D</item>
+        <item>o_O</item>
+    </string-array>
+    <string name="this_is_a_group_chat">Send a group message</string>
+
+    <string name="unable_to_securely_share_this_file">Unable to securely share this file</string>
+
+    <string name="your_keystore_is_corrupted_please_re_install_chatsecure_or_clear_data_for_the_app">Your keystore is corrupted. Please re-install the app or \'clear data\' for the app</string>
+    <string name="swipe_hint">&lt; swipe left and right for more options &gt;</string>
+
+    <string name="no_convos">Time to start connecting!</string>
+
+    <string name="title_more">Discover</string>
+    <string name="title_me">Me</string>
+    <string name="no_photos">Shared and received photos will appear here</string>
+    <string name="group_admin">admin</string>
+    <string name="group_you">(you)</string>
+    <string name="copy_message">Copy Message</string>
+    <string name="action_copied">Copied!</string>
+    <string name="group_encryption_title">Group Encryption</string>
+    <string name="group_encryption_summary">Encryption must also be manually enabled for each group.</string>
+    <string name="action_forward">Forward</string>
+    <string name="action_resend">Resend</string>
+    <string name="title_activity_nearby">Nearby</string>
+    <string name="nearby_not_supported">Nearby sharing not supported on this device</string>
+    <string name="battery_opt_title">Battery Optimization</string>
+    <string name="battery_opt_message">Ensure app receives messages in the background, by disabling battery optimizations</string>
+
+    <string name="create_an_account">Create an Account</string>
+    <string name="create_id">Create an ID</string>
+    <string name="advanced">Advanced</string>
+    <string name="account_congrats">Congratulations, you are ready to connect!</string>
+    <string name="account_congrats_details">You can find your password and account details on your profile page.</string>
+    <string name="invite_friends">Add Friends!</string>
+    <string name="invite_sms">SMS</string>
+    <string name="invite_share">Share</string>
+    <string name="invite_scan_qr">Scan</string>
+    <string name="sign_in_message">Sign into an existing account</string>
+    <string name="invite_action">Invite</string>
+    <string name="friends">Friends</string>
+    <string name="add_friends">Add Friends</string>
+    <string name="search_by_id">Search by ID</string>
+    <string name="invite_accepted">You are now friends</string>
+    <string name="chats">Chats</string>
+    <string name="choose_friend">Choose a Friend</string>
+    <string name="send_message">Send a message</string>
+    <string name="push_to_talk">Push to talk</string>
+    <string name="recording_release">Recording… Release to send</string>
+    <string name="recording_delete">Recording… Release to delete</string>
+    <string name="swipe_up_delete">Swipe up to delete</string>
+    <string name="create_group">Create a Group</string>
+    <string name="members">Members</string>
+    <string name="group_name">Group Name</string>
+    <string name="search_history">Search History</string>
+    <string name="photo_gallery">Photo Stream</string>
+    <string name="me_title">Me</string>
+    <string name="accounts">My Accounts</string>
+    <string name="select_avatar">Select or Create an Avatar</string>
+    <string name="delete_account">Delete Account</string>
+    <string name="add_account_action">Add Account</string>
+    <string name="choose_photos">Choose from Photos</string>
+    <string name="choose_language">Switch Language</string>
+    <string name="welcome_message">WELCOME!</string>
+    <string name="onboarding_generate">(this is how people will find you)</string>
+    <string name="grant_perms">You must grant permission to use the camera</string>
+
+    <string name="menu_refresh">Refresh Session</string>
+
+    <string name="action_archived">Archived</string>
+    <string name="action_unarchived">Unarchived</string>
+
+    <string name="action_verified">Verified</string>
+
+    <string name="action_theme">Change Theme</string>
+    <string name="action_stickers">Sticker Share</string>
+
+    <string name="pref_block_screenshots_title">Block Screenshots</string>
+    <string name="pref_block_screenshots_summary">Block attempts for other apps to take screenshots of this app</string>
+
+    <string name="pref_enable_tibetan_dictionary_title">Enable Tibetan Dictionary</string>
+    <string name="pref_enable_tibetan_dictionary_summary">If present, suggest Tibetan matching words from the Monlam Tibetan Dictionary app</string>
+
+    <string name="color_category_title">Custom Colors</string>
+    <string name="color_reset_title">Reset Colors</string>
+    <string name="color_reset_summary">Reset colors to default values</string>
+
+    <string name="color_header_title">Header Colors</string>
+    <string name="color_header_summary">Color of headers, actionbars and toolbars</string>
+
+    <string name="color_text_title">Text Color</string>
+    <string name="color_text_summary">Color of text in messages and lists</string>
+
+
+    <string name="color_bg_title">Background Color</string>
+    <string name="color_bg_summary">Color of chat backgrounds and lists</string>
+
+    <string name="menu_approve_friend">Approve Friend?</string>
+
+    <string name="header_got_invited">GOT INVITED?</string>
+    <string name="action_tap_invite">Tap the invite link from your friend or scan their QR code now</string>
+
+    <string name="action_invite_new_friends">Send an invite link to your friends via SMS or SHARE through any app</string>
+
+    <string name="not_verified">Please verify your friend\'s Secure Identity to be safe!</string>
+
+    <string name="security_code">Secure Identity</string>
+
+    <string name="reset_passphrase">Reset Lock</string>
+
+    <string name="action_services">Services</string>
+
+    <string name="migrate_menu">Migrate Account</string>
+    <string name="migrate_message">"I’ve upgraded my account. Find me at </string>
+
+    <string name="migrate_notification">Your account is expiring soon. Open the app to upgrade.</string>
+
+    <string name="action_undo">Undo</string>
+
+    <string name="message_upgrade">We need to upgrade your account to a new server. We can automatically upgrade you to provide the best performance.</string>
+
+    <string name="message_upgrade_more">We need to upgrade your account to a new server. We can automatically upgrade you to provide the best performance. If you are an advanced user, you can also choose your own server.</string>
+
+    <string name="upgrade_desc">We\'re making improvements around here.\nGet your free upgrade!</string>
+
+    <string name="upgrade_action">Upgrade Now</string>
+
+    <string name="upgrade_complete">Upgrade Complete! Waiting for your friends to approve your upgraded account.</string>
+
+    <string name="upgrade_complete_action">Done</string>
+
+    <string name="upgrade_progress_action">Working on it…</string>
+
+    <string name="upgrade_failed">The upgrade failed. Please try again later! You can also select \"Migrate Account\" from the account settings menu.</string>
+
+    <string name="contact_migration_notice">Your friend has upgraded. Chat with them at</string>
+
+    <string name="contact_migration_action">Chat Now</string>
+
+
+    <string name="upgrade_old_chats">Your old chats from before you upgraded are stored here</string>
+
+    <string name="message_waiting_for_friend">Waiting for your friend</string>
+
+
+    <string name="message_archive">Some of your friends are upgrading their accounts. Expired accounts will be stored here.</string>
+
+
+    <string name="one_moment_please_privacy">One moment please! We’re preparing your private room.</string>
+
+
+
+    <string name="action_got_it">Got it</string>
+
+
+    <string name="action_inbox">Inbox</string>
+
+    <string name="action_active">Active</string>
+
+    <string name="action_archive">Archive</string>
+
+
+    <string name="title_pending">Pending Approval</string>
+
+
+    <string name="title_advanced">Advanced</string>
+
+    <string name="action_upgrade_now">Upgrade now</string>
+
+
+    <string name="action_chat_now">Chat now</string>
+
+
+    <string name="action_add_buddy">Add friend</string>
+    <string name="action_leave">Leave</string>
+    <string name="add_people">Add People</string>
+    <string name="notifications">Notifications</string>
+    <string name="is_already_in_your_group">%1$s ✔️</string>
+
+    <string name="confirm_leave_group_title">Leave Group?</string>
+    <string name="confirm_leave_group">Your group chat history will be wiped away. To keep these chats, archive the group instead.</string>
+
+    <string name="pref_enable_advanced_network_features">Advanced Networking</string>
+    <string name="pref_enable_advanced_network_features_summary">Enable advanced protection against network threats</string>
+
+    <string name="pref_proxy_server_host_title">Proxy Server Host</string>
+    <string name="pref_proxy_server_host_summary">Host or domain name of SOCKS proxy</string>
+
+    <string name="pref_proxy_server_port_title">Proxy Server Port</string>
+    <string name="pref_proxy_server_port_summary">Port of SOCKS proxy</string>
+
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="photo_x_of_y">Photo %1$d of %2$d</string>
+
+    <string name="mtm_trust_anchor">The server certificate is not signed by a known Certificate Authority.</string>
+    <string name="mtm_cert_expired">The server certificate is expired.</string>
+    <string name="mtm_hostname_mismatch">Server could not authenticate as \&quot;%s\&quot;. The certificate is only valid for:</string>
+
+    <string name="mtm_connect_anyway">Do you want to connect anyway?</string>
+    <string name="mtm_cert_details">Certificate details:</string>
+
+    <string name="mtm_decision_always">Always</string>
+    <string name="mtm_decision_once">Once</string>
+    <string name="mtm_decision_abort">Abort</string>
+
+    <string name="mtm_notification">Certificate Verification</string>
+
+    <string name="add_x_as_friend">Add %s as Friend</string>
+    <string name="add_x_as_friend_question">Add %s as friend?</string>
+    <string name="no_thanks">No thanks</string>
+    <string name="added">Added</string>
+    <string name="room_invited">You have been invited to the \´%s\´ group.</string>
+    <string name="room_join">Join</string>
+    <string name="room_dont_join">No thanks</string>
+    <string name="make_group_admin">Make group admin</string>
+    <string name="view_profile">View profile</string>
+    <string name="kickout">Kickout</string>
+    <string name="find_your_friend">Find your friend</string>
+    <string name="hint_add_friend" translatable="false"><font size="12">username@domain.com</font></string>
+    <string name="enter_your_friends_account">Enter your friend\'s full account. Yours is %s</string>
+    <string name="send_your_invite_link">Send your invite link</string>
+    <string name="standing_next_to_them">Standing next to them?</string>
+
+    <string name="pref_enable_proof_mode_title">Photo Verification</string>
+    <string name="pref_enable_proof_mode_summary">Add extra proof data to your photos to make it easier for people to verify the authenticity</string>
+    <string name="login_info">You can use an existing account on any server you would like.</string>
+    <string name="is_inviting_you">is inviting you to Zom:</string>
+
+</resources>

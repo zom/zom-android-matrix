@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:layout_margin="0dp"
+android:padding="10dp"
+android:gravity="center_horizontal"
+android:orientation="vertical"
+
+
+    >
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:id="@+id/viewCreate"
+    >
+
+    <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="@string/create_id"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="?colorPrimary"
+
+        />
+    <info.guardianproject.keanuapp.type.CustomTypefaceEditText android:id="@+id/edtNewName"
+        android:selectAllOnFocus="true"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:gravity="center_horizontal"
+        android:autoLink="none"
+        android:cursorVisible="true"
+        android:inputType="textFilter|textNoSuggestions"
+        android:layout_margin="0dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:textSize="24dp"
+        android:padding="6dp"
+        android:background="@drawable/rounded_rect"
+        android:textColor="?messageTextPrimary"
+
+        />
+    <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="@string/onboarding_generate"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:gravity="center"
+        />
+
+    <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        android:id="@+id/statusError"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text=""
+        android:textSize="16dp"
+        android:textColor="?colorPrimary"
+        />
+</LinearLayout>
+
+    <include layout="@layout/awesome_onboarding_progress"/>
+
+    <include layout="@layout/awesome_onboarding_success"/>
+
+
+    <info.guardianproject.keanuapp.type.CustomTypefaceButton android:id="@+id/btnAdvanced"
+        android:text="@string/advanced"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dip"
+        android:layout_width="match_parent"
+        android:layout_gravity="bottom|center"
+
+        android:background="@android:color/transparent"
+        android:textColor="?colorPrimary"
+        android:gravity="center"
+
+        />
+
+
+</FrameLayout>

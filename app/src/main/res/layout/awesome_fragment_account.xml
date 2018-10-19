@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Copyright (C) 2008 Esmertec AG.
+ * Copyright (C) 2008 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	>
+
+
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="vertical"
+		android:padding="0dp"
+		android:gravity="center_horizontal"
+		>
+
+
+        <com.theartofdev.edmodo.cropper.CropImageView
+            android:id="@+id/CropImageView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:visibility="gone"
+            />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="198dp"
+            android:src="@drawable/avatar_unknown"
+            android:id="@+id/imageAvatar"
+            android:scaleType="centerCrop"
+            android:layout_margin="0dp"
+            />
+
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:padding="10dp">
+
+			<RelativeLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				>
+			<info.guardianproject.keanuapp.type.CustomTypefaceTextView android:id="@+id/tvNickname"
+				android:selectAllOnFocus="true"
+				android:layout_width="wrap_content"
+				android:ellipsize="end"
+				android:maxWidth="200dp"
+				android:layout_height="wrap_content"
+				android:hint="@string/account_setup_example_email_address"
+				android:autoLink="none"
+				android:cursorVisible="true"
+				android:inputType="textEmailAddress"
+				android:text="user person"
+				android:textAppearance="?android:attr/textAppearanceLarge"
+				/>
+				<ImageView
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:src="@drawable/ic_mode_edit_black_18dp"
+					android:id="@+id/edit_account_nickname"
+					android:padding="6dp"
+					android:layout_toRightOf="@+id/tvNickname"
+					/>
+
+
+</RelativeLayout>
+
+
+			<RelativeLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				>
+			<info.guardianproject.keanuapp.type.CustomTypefaceTextView android:id="@+id/edtName"
+			                               android:selectAllOnFocus="true"
+			                               android:layout_width="wrap_content"
+			                               android:layout_height="wrap_content"
+			                               android:hint="@string/account_setup_example_email_address"
+			                               android:autoLink="none"
+			                               android:cursorVisible="true"
+			                               android:inputType="textEmailAddress"
+			                               android:text="user@domain.com"
+			                               android:textAppearance="?android:attr/textAppearanceMedium"
+			                               android:textColor="?contactTextSecondary"
+			
+			                               />
+
+				</RelativeLayout>
+			
+			                       <RelativeLayout
+			                               android:layout_width="match_parent"
+			                               android:layout_height="wrap_content"
+			                               android:orientation="horizontal"
+			                           >
+			                       <TextView android:id="@+id/edtPass"
+			                               android:layout_width="wrap_content"
+			                               android:layout_height="wrap_content"
+			                               android:selectAllOnFocus="true"
+			                               android:text="*************"
+			                               android:textAppearance="?android:attr/textAppearanceMedium"
+			                               />
+			                               <ImageView
+			                                       android:layout_width="wrap_content"
+			                                       android:layout_height="20dp"
+			                                       android:id="@+id/btnShowPass"
+			                                       android:src="@drawable/ic_visibility_black_24dp"
+			                                       android:background="@android:color/transparent"
+											   android:layout_alignParentRight="true"
+
+											   />
+									   <ImageView
+										   android:layout_width="wrap_content"
+										   android:layout_height="wrap_content"
+										   android:src="@drawable/ic_mode_edit_black_18dp"
+										   android:layout_toStartOf="@+id/btnShowPass"
+										   android:layout_toLeftOf="@+id/btnShowPass"
+										   android:id="@+id/edit_account_password"
+										   android:layout_marginRight="6dp"
+
+										   />
+			                               </RelativeLayout>
+
+
+
+
+
+        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="none"
+            android:text="@string/security_code"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?contactTextSecondary"
+            android:layout_gravity="start"
+            />
+
+			<!--
+	<RelativeLayout
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:gravity="left"
+		>
+
+
+
+			<ImageView
+				android:layout_width="64dp"
+				android:layout_height="64dp"
+				android:id="@+id/qrcode"
+				android:background="#dddddd"
+				android:src="@drawable/qr"
+				android:layout_alignParentLeft="true"
+				/>
+
+		<info.guardianproject.keanuapp.type.CustomTypefaceTextView android:id="@+id/tvFingerprint"
+		                       android:selectAllOnFocus="true"
+		                       android:layout_width="200dp"
+		                       android:layout_height="wrap_content"
+								android:layout_marginLeft="6dp"
+		                       android:autoLink="none"
+		                       android:text=""
+		                       android:textAppearance="?android:attr/textAppearanceSmall"
+		                       android:textColor="?contactTextSecondary"
+
+			android:layout_toRightOf="@+id/qrcode"
+			android:layout_centerVertical="true"
+			/>
+		<ImageView
+			android:layout_width="48dp"
+			android:layout_height="48dp"
+			android:id="@+id/qrshare"
+			android:layout_centerVertical="true"
+
+			android:layout_alignParentRight="true"
+			android:src="@android:drawable/ic_menu_share"
+			/>
+
+	</RelativeLayout>
+	-->
+
+		<RelativeLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="horizontal"
+			android:gravity="left"
+            android:id="@+id/omemodisplay"
+            android:layout_marginTop="6dp"
+			>
+
+
+			<ImageView
+				android:layout_width="64dp"
+				android:layout_height="64dp"
+				android:id="@+id/omemoqrcode"
+				android:background="#dddddd"
+				android:src="@drawable/qr"
+				android:layout_alignParentLeft="true"
+				/>
+
+			<info.guardianproject.keanuapp.type.CustomTypefaceTextView android:id="@+id/omemoFingerprint"
+				android:selectAllOnFocus="true"
+				android:layout_width="200dp"
+				android:layout_height="wrap_content"
+				android:layout_marginLeft="6dp"
+				android:autoLink="none"
+				android:text=""
+				android:textAppearance="?android:attr/textAppearanceSmall"
+				android:textColor="?contactTextSecondary"
+
+				android:layout_toRightOf="@+id/omemoqrcode"
+				android:layout_centerVertical="true"
+				/>
+			<ImageView
+				android:layout_width="48dp"
+				android:layout_height="48dp"
+				android:id="@+id/omemoqrshare"
+				android:layout_centerVertical="true"
+
+				android:layout_alignParentRight="true"
+				android:src="@android:drawable/ic_menu_share"
+				/>
+
+		</RelativeLayout>
+
+		<!--
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:layout_marginTop="5dp"
+            android:layout_margin="10dp"
+			>
+		<Button android:id="@+id/btnLock"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:text="@string/lock_app"
+			android:drawableLeft="@drawable/ic_menu_encrypt"
+			android:textAppearance="?android:attr/textAppearanceMediumInverse"
+			android:background="?toolbarBackground"
+			android:padding="6dp"
+            android:layout_margin="1dp"
+
+			/>
+
+		</LinearLayout>
+-->
+
+        </LinearLayout>
+	</LinearLayout>
+</ScrollView>

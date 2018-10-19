@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+/*
+ * Copyright (C) 2007 Esmertec AG.
+ * Copyright (C) 2007 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/llRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/layoutGroupSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <info.guardianproject.keanuapp.ui.widgets.FlowLayout
+            android:id="@+id/flSelectedContacts"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_margin="10dp"
+            android:scrollbarAlwaysDrawVerticalTrack="true"
+            app:itemHeightPadding="4dp"
+            app:itemWidthPadding="4dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginBottom="10dp"
+            android:background="#959595" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutContactSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/btnCreateGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="3dp">
+
+            <info.guardianproject.keanuapp.ui.CircleColorImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_margin="3dp"
+                android:padding="6dp"
+                android:src="@drawable/ic_group_add_white_36dp"
+                app:circleColor="@android:color/holo_green_light" />
+
+            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginLeft="8dp"
+                android:gravity="center_vertical"
+                android:text="@string/create_group"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+
+                android:textColor="?contactTextSecondary"
+
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/btnAddFriend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="3dp">
+
+            <info.guardianproject.keanuapp.ui.CircleColorImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_margin="3dp"
+                android:padding="6dp"
+                android:src="@drawable/ic_person_add_white_36dp"
+                app:circleColor="@color/app_primary" />
+
+            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_marginLeft="8dp"
+                android:gravity="center_vertical"
+                android:text="@string/action_add_buddy"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+
+                android:textColor="?contactTextSecondary"
+
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/contactsList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@null"
+        android:padding="0dp" />
+
+    <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        android:id="@android:id/empty"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:focusable="false"
+        android:gravity="top|center_horizontal"
+        android:text="@string/empty_contact_list"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:visibility="gone" />
+
+</LinearLayout>

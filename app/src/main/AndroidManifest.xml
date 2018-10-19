@@ -1,0 +1,476 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="info.guardianproject.keanuapp"
+    android:installLocation="auto"
+    android:sharedUserLabel="@string/perm_label"
+    android:usesCleartextTraffic="false">
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
+
+    <uses-permission android:name="info.guardianproject.keanuapp.permission.READ_ONLY" />
+    <uses-permission android:name="info.guardianproject.keanuapp.permission.WRITE_ONLY" />
+    <uses-permission android:name="info.guardianproject.keanuapp.permission.IM_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission
+        android:name="android.permission.READ_PHONE_STATE"
+        android:required="false" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+
+
+    <!-- Required for Nearby Connections -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+
+    <!--
+     Some Chromebooks don't support touch. Although not essential,
+     it's a good idea to explicitly include this declaration.
+    -->
+    <uses-feature
+        android:name="android.hardware.touchscreen"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.microphone"
+        android:required="false" />
+    <!--
+         Some Chromebooks don't support touch. Although not essential,
+            it's a good idea to explicitly include this declaration.
+    -->
+
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
+
+    <permission
+        android:name="info.guardianproject.keanuapp.permission.IM_SERVICE"
+        android:description="@string/perm_desc"
+        android:label="@string/perm_label"
+        android:permissionGroup="android.permission-group.MESSAGES"
+        android:protectionLevel="dangerous" />
+    <permission
+        android:name="info.guardianproject.keanuapp.permission.READ_ONLY"
+        android:description="@string/ro_perm_desc"
+        android:label="@string/ro_perm_label"
+        android:permissionGroup="android.permission-group.MESSAGES"
+        android:protectionLevel="dangerous" />
+    <permission
+        android:name="info.guardianproject.keanuapp.permission.WRITE_ONLY"
+        android:description="@string/wo_perm_desc"
+        android:label="@string/wo_perm_label"
+        android:permissionGroup="android.permission-group.MESSAGES"
+        android:protectionLevel="dangerous" />
+
+    <application
+        android:name=".ImApp"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/ic_launcher_name"
+        android:theme="@style/AppTheme"
+        tools:replace="android:icon,android:allowBackup,android:label">
+        <meta-data
+            android:name="com.google.android.nearby.messages.API_KEY"
+            android:value="AIzaSyAIyP2Qqn7NdWNk3oll8I3ThRKADfmQv8g" />
+
+        <activity
+            android:name=".RouterActivity"
+            android:theme="@style/InviteDialog">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="info.guardianproject.panic.action.TRIGGER" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SENDTO" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="info.guardianproject.otr.app.im.category.XMPP" />
+
+                <data android:scheme="im" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SENDTO" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="xmpp"
+                    android:scheme="imto" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SENDTO" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data
+                    android:host="jabber"
+                    android:scheme="imto" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SENDTO" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="immu" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.INSERT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="ima" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SENDTO" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="otr-in-band" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.ALTERNATIVE" />
+                <category android:name="android.intent.category.SELECTED_ALTERNATIVE" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="xmpp" />
+                <data android:scheme="im" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="matrix.org"
+                    android:pathPrefix="/i/"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name=".util.SoundService"
+            android:exported="false" />
+
+        <!-- android:process="info.guardianproject.otr.app.process.im" -->
+        <service
+            android:name=".service.RemoteImService"
+            android:exported="false"
+            android:permission="info.guardianproject.keanuapp.permission.IM_SERVICE"
+            >
+            <intent-filter>
+                <action android:name="info.guardianproject.otr.app.im.IRemoteImService" />
+                <action android:name="info.guardianproject.otr.app.im.SERVICE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".service.HeartbeatService"
+            android:exported="false" />
+
+        <provider
+            android:name="info.guardianproject.keanuapp.provider.ImpsProvider"
+            android:authorities="info.guardianproject.keanuapp.provider.Imps"
+            android:directBootAware="true"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            android:readPermission="info.guardianproject.keanuapp.permission.READ_ONLY"
+            android:writePermission="info.guardianproject.keanuapp.permission.WRITE_ONLY" />
+
+        <activity
+            android:name=".ImUrlActivity"
+            android:theme="@style/InviteDialog" />
+        <activity
+            android:name=".ui.legacy.SignoutActivity"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.AddContactActivity"
+            android:exported="false"
+            android:label="@string/add_friends" />
+        <activity
+            android:name=".ui.ContactsPickerActivity"
+            android:exported="false"
+            android:label="@string/choose_friend">
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="vnd.android.cursor.dir/imps-contacts" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="vnd.android.cursor.dir/imps-chats" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.AccountActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateUnchanged">
+            <intent-filter>
+                <action android:name="android.intent.action.EDIT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="info.guardianproject.keanuapp.service.IMPS_CATEGORY" />
+
+                <data android:mimeType="vnd.android.cursor.item/imps-accounts" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.INSERT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="info.guardianproject.keanuapp.service.IMPS_CATEGORY" />
+
+                <data android:mimeType="vnd.android.cursor.item/imps-providers" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.AccountSettingsActivity"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+
+                <category android:name="info.guardianproject.otr.app.im.IMPS_CATEGORY" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="vnd.android-dir/imps-providersettings" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.legacy.SettingActivity"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+
+                <category android:name="info.guardianproject.otr.app.im.IMPS_CATEGORY" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="vnd.android-dir/imps-providerSettings" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ssl.MemorizingActivity"
+            android:configChanges="orientation|locale"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <receiver
+            android:name="info.guardianproject.keanuapp.service.NetworkConnectivityReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".service.BootCompletedReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <activity
+            android:name=".ui.LockScreenActivity"
+            android:label="@string/title_activity_lock_screen" />
+        <activity
+            android:name=".ui.onboarding.OnboardingActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTask" />
+        <activity
+            android:name=".ui.qr.QrScanActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.qr.QrDisplayActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
+        <activity
+            android:name=".ui.legacy.DummyActivity"
+            android:allowTaskReparenting="true"
+            android:alwaysRetainTaskState="false"
+            android:clearTaskOnLaunch="true"
+            android:enabled="true"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:noHistory="true"
+            android:stateNotNeeded="true"
+            android:theme="@android:style/Theme.NoDisplay" />
+        <activity
+            android:name=".ui.widgets.ImageViewActivity"
+            android:theme="@style/AppTheme.Transparent" />
+        <activity android:name=".ui.widgets.SecureCameraActivity" />
+        <activity
+            android:name="info.guardianproject.keanuapp.MainActivity"
+            android:exported="true"
+            android:theme="@style/AppThemeNoAction">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="info.guardianproject.otr.app.im.IMPS_CATEGORY" />
+
+                <data android:mimeType="vnd.android.cursor.item/imps-chats" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="vnd.android.cursor.item/imps-invitations" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.IM_MANAGE_SUBSCRIPTION" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="vnd.android.cursor.item/imps-contacts" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.ConversationDetailActivity"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@style/AppThemeNoAction"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
+            android:name=".ui.ContactListActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.GalleryActivity"
+            android:exported="false"
+            android:title="@string/photo_gallery" />
+        <activity
+            android:name=".ui.StickerActivity"
+            android:exported="false"
+            android:title="@string/action_stickers" />
+        <activity
+            android:name=".ui.ServicesActivity"
+            android:exported="false"
+            android:title="@string/action_services" />
+        <activity
+            android:name=".ui.PanicSetupActivity"
+            android:label="@string/panic_trigger_app"
+            android:theme="@style/AppThemeNoAction">
+            <intent-filter>
+                <action android:name="info.guardianproject.panic.action.CONNECT" />
+                <action android:name="info.guardianproject.panic.action.DISCONNECT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".ui.ContactDisplayActivity"
+            android:exported="false"
+            android:theme="@style/AppThemeNoAction" />
+        <activity android:name=".ui.GroupDisplayActivity" />
+        <activity
+            android:name=".ui.AccountsActivity"
+            android:label="@string/accounts"
+            android:exported="false"
+            />
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths" />
+        </provider>
+
+        <service
+            android:name=".service.NetworkSchedulerService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".service.GeneralJobIntentService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <activity
+            android:name=".nearby.NearbyAddContactActivity"
+            android:label="@string/title_activity_nearby"
+            android:exported="false"
+            />
+
+        <activity
+            android:name=".nearby.NearbyShareActivity"
+            android:label="@string/title_activity_nearby"
+            android:exported="false"
+            />
+        <activity
+            android:name=".ui.camera.CameraActivity"
+            android:label=""
+            android:screenOrientation="portrait"
+            android:exported="false"
+            />
+
+        <service
+            android:name="info.guardianproject.keanuapp.plugin.matrix.MatrixImPlugin"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="info.guardianproject.keanuapp.plugin" />
+            </intent-filter>
+
+            <meta-data
+                android:name="info.guardianproject.keanuapp.plugin.provider_name"
+                android:value="MATRIX" />
+            <meta-data
+                android:name="info.guardianproject.keanuapp.plugin.provider_full_name"
+                android:value="Matrix" />
+            <meta-data
+                android:name="info.guardianproject.keanuapp.plugin.signup_url"
+                android:value="https://matrix.org" />
+        </service>
+
+    </application>
+
+</manifest>
