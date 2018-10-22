@@ -11,6 +11,7 @@ import org.jxmpp.jid.impl.JidCreate;
 import org.matrix.androidsdk.HomeServerConnectionConfig;
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
+import org.matrix.androidsdk.data.RoomMediaMessage;
 import org.matrix.androidsdk.data.store.IMXStore;
 import org.matrix.androidsdk.data.store.MXMemoryStore;
 import org.matrix.androidsdk.listeners.IMXNetworkEventListener;
@@ -53,6 +54,11 @@ public class MatrixConnection extends ImConnection {
     private long mProviderId = -1;
     private long mAccountId = -1;
     private Contact mUser = null;
+
+    private HashMap<String,String> mSessionContext = new HashMap<>();
+    private MatrixChatSessionManager mChatSessionManager = new MatrixChatSessionManager();
+    private MatrixContactListManager mContactListManager = new MatrixContactListManager();
+    private MatrixChatGroupManager mChatGroupManager = new MatrixChatGroupManager();
 
     private final static String TAG = "MATRIX";
 
@@ -134,12 +140,14 @@ public class MatrixConnection extends ImConnection {
                 String initialToken = "";
                 mCredentials = credentials;
                 mStore = new MXMemoryStore(mCredentials,mContext);
-                mDataHandler = new MXDataHandler(mStore, credentials);
+                mDataHandler = new MXDataHandler(mStore, mCredentials);
+                mConfig.setCredentials(mCredentials);
 
                 mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
                         .build();
 
                 mSession.startEventStream(initialToken);
+
             }
 
             @Override
@@ -191,11 +199,6 @@ public class MatrixConnection extends ImConnection {
     public void suspend() {
 
     }
-
-    private HashMap<String,String> mSessionContext = new HashMap<>();
-    private MatrixChatSessionManager mChatSessionManager = new MatrixChatSessionManager();
-    private MatrixContactListManager mContactListManager = new MatrixContactListManager();
-    private MatrixChatGroupManager mChatGroupManager = new MatrixChatGroupManager();
 
     @Override
     public Map<String, String> getSessionContext() {
