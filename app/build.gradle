@@ -90,22 +90,18 @@ dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
 
     /************* Matrix SDK management **************/
-    // update settings.gradle
     // use the matrix SDK as external lib
     implementation(name: 'matrix-sdk', ext: 'aar')
-    // use the matrix SDK as a sub project
-    // you have to uncomment some lines in settings.gradle
-    //implementation project(':matrix-sdk')
-  //  implementation(name: 'olm-sdk', ext: 'aar')
+    implementation(name: 'olm-sdk', ext: 'aar')
 
     // Network
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'com.google.code.gson:gson:2.8.2'
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
     implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.10.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
     implementation 'com.facebook.stetho:stetho:1.5.0'
     implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
-    implementation 'com.squareup.okio:okio:1.13.0'
+    implementation 'com.squareup.okio:okio:1.14.0'
 }
