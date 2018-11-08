@@ -1,0 +1,85 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="info.guardianproject.keanu.core" >
+
+
+    <uses-permission android:name="info.guardianproject.keanuapp.permission.READ_ONLY" />
+    <uses-permission android:name="info.guardianproject.keanuapp.permission.WRITE_ONLY" />
+    <uses-permission android:name="info.guardianproject.keanuapp.permission.IM_SERVICE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <application>
+
+
+        <activity
+            android:name=".ui.DummyActivity"
+            android:allowTaskReparenting="true"
+            android:alwaysRetainTaskState="false"
+            android:clearTaskOnLaunch="true"
+            android:enabled="true"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:noHistory="true"
+            android:stateNotNeeded="true"
+            android:theme="@android:style/Theme.NoDisplay" />
+
+        <service
+            android:name=".util.SoundService"
+            android:exported="false" />
+
+        <!-- android:process="info.guardianproject.otr.app.process.im" -->
+        <service
+            android:name=".service.RemoteImService"
+            android:exported="false"
+            android:permission="info.guardianproject.keanuapp.permission.IM_SERVICE"
+            >
+            <intent-filter>
+                <action android:name="info.guardianproject.otr.app.im.IRemoteImService" />
+                <action android:name="info.guardianproject.otr.app.im.SERVICE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".service.HeartbeatService"
+            android:exported="false" />
+
+        <provider
+            android:name=".provider.ImpsProvider"
+            android:authorities="info.guardianproject.keanuapp.provider.Imps"
+            android:directBootAware="true"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            android:readPermission="info.guardianproject.keanuapp.permission.READ_ONLY"
+            android:writePermission="info.guardianproject.keanuapp.permission.WRITE_ONLY" />
+
+
+        <receiver
+            android:name=".service.NetworkConnectivityReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:name=".service.BootCompletedReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".service.NetworkSchedulerService"
+            android:exported="true"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".service.GeneralJobIntentService"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+    </application>
+</manifest>
