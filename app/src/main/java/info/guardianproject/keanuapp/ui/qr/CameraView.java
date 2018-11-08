@@ -2,6 +2,7 @@ package info.guardianproject.keanuapp.ui.qr;
 
 import static android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT;
 import static android.view.SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS;
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,7 +17,6 @@ import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import info.guardianproject.keanuapp.ImApp;
 
 @SuppressWarnings("deprecation")
 public class CameraView extends SurfaceView implements SurfaceHolder.Callback,
@@ -61,7 +61,7 @@ AutoFocusCallback {
 					}
 					catch (Exception e)
 					{
-						Log.w(ImApp.LOG_TAG,"qr code scanning not working: " + e.toString());
+						Log.w(LOG_TAG,"qr code scanning not working: " + e.toString());
 					}
 
 				}

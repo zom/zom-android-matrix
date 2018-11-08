@@ -25,23 +25,23 @@ import com.google.android.gms.nearby.Nearby;
 import com.google.android.gms.nearby.messages.Message;
 import com.google.android.gms.nearby.messages.MessageListener;
 
-import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.model.Contact;
-import info.guardianproject.keanuapp.model.Presence;
-import info.guardianproject.keanuapp.plugin.xmpp.XmppAddress;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
-import info.guardianproject.keanuapp.ui.ContactListItem;
-import info.guardianproject.keanuapp.ui.ContactViewHolder;
-import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
+import info.guardianproject.keanu.core.model.Contact;
+import info.guardianproject.keanu.core.model.Presence;
+import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
+import info.guardianproject.keanu.core.provider.Imps;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ImApp;
+import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
+import info.guardianproject.keanuapp.ui.contacts.ContactListItem;
+import info.guardianproject.keanuapp.ui.contacts.ContactViewHolder;
+import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
 
 import static android.content.Intent.EXTRA_TEXT;
-import static info.guardianproject.keanuapp.ui.AccountViewFragment.TAG;
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 public class NearbyAddContactActivity extends AppCompatActivity {
 
@@ -106,7 +106,7 @@ public class NearbyAddContactActivity extends AppCompatActivity {
                 apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST)
                         .show();
             } else {
-                Log.i(TAG, "This device is not supported.");
+                Log.i(LOG_TAG, "This device is not supported.");
                 finish();
             }
             return false;
@@ -130,7 +130,7 @@ public class NearbyAddContactActivity extends AppCompatActivity {
 
             @Override
             public void onLost(Message message) {
-                Log.d(TAG, "Lost sight of message: " + new String(message.getContent()));
+                Log.d(LOG_TAG, "Lost sight of message: " + new String(message.getContent()));
             }
         };
 
@@ -157,7 +157,7 @@ public class NearbyAddContactActivity extends AppCompatActivity {
 
     private static void confirmContact (Contact contact)
     {
-        new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId(), mApp).execute(contact.getAddress().getAddress(), "", contact.getName());
+        new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(contact.getAddress().getAddress(), "", contact.getName());
         contact.setSubscriptionType(Imps.ContactsColumns.SUBSCRIPTION_TYPE_BOTH);
         contactList.remove(contact);
         refreshList();

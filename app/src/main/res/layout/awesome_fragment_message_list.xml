@@ -38,7 +38,7 @@
 
             />
 
-        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
             android:id="@+id/upgrade_view_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,7 +48,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:gravity="center"
             />
-        <info.guardianproject.keanuapp.type.CustomTypefaceButton
+        <info.guardianproject.keanu.core.type.CustomTypefaceButton
             android:layout_width="200dp"
             android:layout_height="40dp"
             android:gravity="center"

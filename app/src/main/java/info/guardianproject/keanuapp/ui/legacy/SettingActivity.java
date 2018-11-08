@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Color;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,15 +33,15 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
-import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.Preferences;
-import info.guardianproject.keanuapp.service.RemoteImService;
-import info.guardianproject.keanuapp.ui.PanicSetupActivity;
-import info.guardianproject.keanuapp.util.Languages;
+import info.guardianproject.keanu.core.Preferences;
+import info.guardianproject.keanu.core.service.RemoteImService;
+import info.guardianproject.keanu.core.util.Languages;
 
 import java.util.ArrayList;
 
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ImApp;
+import info.guardianproject.keanuapp.ui.PanicSetupActivity;
 import info.guardianproject.panic.Panic;
 import info.guardianproject.panic.PanicResponder;
 
@@ -108,7 +107,7 @@ public class SettingActivity extends PreferenceActivity {
         pm = getPackageManager();
 
         mOtrMode = (ListPreference) findPreference("pref_security_otr_mode");
-        mOtrMode.setEntries(Preferences.getOtrModeNames());
+    //    mOtrMode.setEntries(Preferences.getOtrModeNames());
         mOtrMode.setEntryValues(Preferences.getOtrModeValues());
         mOtrMode.setDefaultValue(Preferences.DEFAULT_OTR_MODE);
 

@@ -19,8 +19,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import info.guardianproject.keanuapp.R;
-import info.guardianproject.keanuapp.zxing.encode.Contents;
-import info.guardianproject.keanuapp.zxing.encode.QRCodeEncoder;
+import info.guardianproject.keanuapp.ui.qr.zxing.encode.Contents;
+import info.guardianproject.keanuapp.ui.qr.zxing.encode.QRCodeEncoder;
 
 public class QrShareAsyncTask extends AsyncTask<String, Void, Bitmap> {
     private static final String TAG = "QrGenAsyncTask";

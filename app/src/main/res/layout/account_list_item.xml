@@ -17,7 +17,7 @@
  */
 -->
 
-<info.guardianproject.keanuapp.ui.AccountListItem
+<info.guardianproject.keanu.core.ui.accounts.AccountListItem
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <info.guardianproject.keanuapp.type.CustomTypefaceTextView android:id="@+id/providerName"
+                <info.guardianproject.keanu.core.type.CustomTypefaceTextView android:id="@+id/providerName"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:textStyle="bold"
                     android:singleLine="true"
@@ -50,7 +50,7 @@
                     />
             </LinearLayout>
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceTextView android:id="@+id/loginName"
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView android:id="@+id/loginName"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:ellipsize="marquee"
                 android:singleLine="true"
@@ -68,4 +68,4 @@
             />
            
 
-</info.guardianproject.keanuapp.ui.AccountListItem>
+</info.guardianproject.keanu.core.ui.accounts.AccountListItem>

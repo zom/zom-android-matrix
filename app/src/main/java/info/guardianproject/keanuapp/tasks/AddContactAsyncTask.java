@@ -8,11 +8,13 @@ import android.util.Log;
 
 import java.util.List;
 
-import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.model.ImErrorInfo;
-import info.guardianproject.keanuapp.service.IContactList;
-import info.guardianproject.keanuapp.service.IContactListManager;
-import info.guardianproject.keanuapp.service.IImConnection;
+import info.guardianproject.keanu.core.model.ImErrorInfo;
+import info.guardianproject.keanu.core.service.IContactList;
+import info.guardianproject.keanu.core.service.IContactListManager;
+import info.guardianproject.keanu.core.service.IImConnection;
+import info.guardianproject.keanu.core.service.RemoteImService;
+
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 /**
  * Created by n8fr8 on 6/9/15.
@@ -21,14 +23,12 @@ public class AddContactAsyncTask extends AsyncTask<String, Void, Integer> {
 
     long mProviderId;
     long mAccountId;
-    ImApp mApp;
 
-    public AddContactAsyncTask(long providerId, long accountId, ImApp app)
+    public AddContactAsyncTask(long providerId, long accountId)
     {
         mProviderId = providerId;
         mAccountId = accountId;
 
-        mApp = app;
     }
 
     @Override
@@ -55,9 +55,9 @@ public class AddContactAsyncTask extends AsyncTask<String, Void, Integer> {
         int res = -1;
 
         try {
-            IImConnection conn = mApp.getConnection(mProviderId,mAccountId);
+            IImConnection conn = RemoteImService.getConnection(mProviderId,mAccountId);
             if (conn == null)
-               conn = mApp.createConnection(mProviderId,mAccountId);
+               conn = RemoteImService.createConnection(mProviderId,mAccountId);
 
             IContactList list = getContactList(conn);
 
@@ -74,7 +74,7 @@ public class AddContactAsyncTask extends AsyncTask<String, Void, Integer> {
             }
 
         } catch (RemoteException re) {
-            Log.e(ImApp.LOG_TAG, "error adding contact", re);
+            Log.e(LOG_TAG, "error adding contact", re);
         }
 
         return res;

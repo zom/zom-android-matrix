@@ -15,9 +15,10 @@ import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
-import info.guardianproject.keanuapp.MainActivity;
 
+import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ui.gallery.GalleryActivity;
 
 public class MoreFragment extends Fragment {
 

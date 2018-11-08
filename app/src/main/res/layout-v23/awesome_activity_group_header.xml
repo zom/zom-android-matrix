@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:id="@+id/tvGroupName"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -58,7 +58,7 @@
                 />
         </LinearLayout>
 
-        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
             android:id="@+id/tvGroupAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -70,7 +70,7 @@
             />
     </LinearLayout>
 
-    <info.guardianproject.keanuapp.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <info.guardianproject.keanu.core.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/tvActionShare"
         style="@style/GroupInfoAction"
         android:layout_width="match_parent"
@@ -81,7 +81,7 @@
         android:visibility="gone"
         />
 
-    <info.guardianproject.keanuapp.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <info.guardianproject.keanu.core.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/tvActionAddFriends"
         style="@style/GroupInfoAction"
         android:layout_width="match_parent"
@@ -98,7 +98,7 @@
         android:orientation="horizontal"
         android:id="@+id/tvActionEncryption"
         >
-        <info.guardianproject.keanuapp.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
             style="@style/GroupInfoAction"
             android:focusable="false"
             android:focusableInTouchMode="false"
@@ -125,7 +125,7 @@
         android:orientation="horizontal"
         android:id="@+id/tvActionNotifications"
         >
-    <info.guardianproject.keanuapp.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <info.guardianproject.keanu.core.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
         style="@style/GroupInfoAction"
         android:focusable="false"
         android:focusableInTouchMode="false"
@@ -146,7 +146,7 @@
             />
     </LinearLayout>
 
-    <info.guardianproject.keanuapp.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
+    <info.guardianproject.keanu.core.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:autoLink="none"

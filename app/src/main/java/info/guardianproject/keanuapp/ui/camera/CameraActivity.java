@@ -2,7 +2,6 @@ package info.guardianproject.keanuapp.ui.camera;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Camera;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,20 +12,10 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.android.cameraview.CameraView;
 import com.google.android.cameraview.CameraViewImpl;
 
-import org.apache.commons.io.IOUtils;
-import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.Preferences;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.util.SecureMediaStore;
-import info.guardianproject.keanuapp.util.SystemServices;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,9 +26,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import info.guardianproject.keanuapp.R;
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileOutputStream;
+import info.guardianproject.keanu.core.Preferences;
+import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.util.SecureMediaStore;
+
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 
 public class CameraActivity extends AppCompatActivity {
@@ -278,7 +272,7 @@ public class CameraActivity extends AppCompatActivity {
                 try {
                     ProofMode.generateProof(CameraActivity.this, vfsUri);
                 } catch (FileNotFoundException e) {
-                    Log.e(ImApp.LOG_TAG,"error generating proof for photo",e);
+                    Log.e(LOG_TAG,"error generating proof for photo",e);
                 }
             }
 
@@ -286,7 +280,7 @@ public class CameraActivity extends AppCompatActivity {
         }
         catch (IOException ioe)
         {
-            Log.e(ImApp.LOG_TAG,"error importing photo",ioe);
+            Log.e(LOG_TAG,"error importing photo",ioe);
         }
     }
 

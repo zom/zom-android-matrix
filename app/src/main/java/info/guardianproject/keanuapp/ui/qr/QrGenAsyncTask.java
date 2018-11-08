@@ -3,18 +3,15 @@ package info.guardianproject.keanuapp.ui.qr;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.Point;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.util.Log;
-import android.view.Display;
 import android.widget.ImageView;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 
-import info.guardianproject.keanuapp.zxing.encode.Contents;
-import info.guardianproject.keanuapp.zxing.encode.QRCodeEncoder;
+import info.guardianproject.keanuapp.ui.qr.zxing.encode.Contents;
+import info.guardianproject.keanuapp.ui.qr.zxing.encode.QRCodeEncoder;
 
 public class QrGenAsyncTask extends AsyncTask<String, Void, Void> {
     private static final String TAG = "QrGenAsyncTask";

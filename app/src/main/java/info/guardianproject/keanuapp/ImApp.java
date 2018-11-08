@@ -57,61 +57,41 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
 import info.guardianproject.iocipher.VirtualFileSystem;
-import info.guardianproject.keanuapp.cacheword.CacheWordHandler;
-import info.guardianproject.keanuapp.cacheword.ICacheWordSubscriber;
-import info.guardianproject.keanuapp.cacheword.PRNGFixes;
-import info.guardianproject.keanuapp.model.ImConnection;
-import info.guardianproject.keanuapp.model.ImErrorInfo;
-import info.guardianproject.keanuapp.model.Server;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.provider.ImpsProvider;
-import info.guardianproject.keanuapp.service.Broadcaster;
-import info.guardianproject.keanuapp.service.IChatSession;
-import info.guardianproject.keanuapp.service.IChatSessionManager;
-import info.guardianproject.keanuapp.service.IConnectionCreationListener;
-import info.guardianproject.keanuapp.service.IImConnection;
-import info.guardianproject.keanuapp.service.IRemoteImService;
-import info.guardianproject.keanuapp.service.ImServiceConstants;
-import info.guardianproject.keanuapp.service.NetworkConnectivityReceiver;
-import info.guardianproject.keanuapp.service.RemoteImService;
-import info.guardianproject.keanuapp.service.StatusBarNotifier;
+import info.guardianproject.keanu.core.Preferences;
+import info.guardianproject.keanu.core.cacheword.CacheWordHandler;
+import info.guardianproject.keanu.core.cacheword.ICacheWordSubscriber;
+import info.guardianproject.keanu.core.cacheword.PRNGFixes;
+import info.guardianproject.keanu.core.model.ImConnection;
+import info.guardianproject.keanu.core.model.ImErrorInfo;
+import info.guardianproject.keanu.core.model.Server;
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.provider.ImpsProvider;
+import info.guardianproject.keanu.core.service.Broadcaster;
+import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.service.IChatSessionManager;
+import info.guardianproject.keanu.core.service.IConnectionCreationListener;
+import info.guardianproject.keanu.core.service.IImConnection;
+import info.guardianproject.keanu.core.service.IRemoteImService;
+import info.guardianproject.keanu.core.service.ImServiceConstants;
+import info.guardianproject.keanu.core.service.NetworkConnectivityReceiver;
+import info.guardianproject.keanu.core.service.RemoteImService;
+import info.guardianproject.keanu.core.service.StatusBarNotifier;
+import info.guardianproject.keanu.core.service.adapters.ConnectionListenerAdapter;
+import info.guardianproject.keanu.core.util.Debug;
+import info.guardianproject.keanu.core.util.ImPluginHelper;
+import info.guardianproject.keanu.core.util.Languages;
 import info.guardianproject.keanuapp.tasks.MigrateAccountTask;
-import info.guardianproject.keanuapp.ui.legacy.ImPluginHelper;
-import info.guardianproject.keanuapp.ui.legacy.ProviderDef;
-import info.guardianproject.keanuapp.ui.legacy.adapter.ConnectionListenerAdapter;
-import info.guardianproject.keanuapp.util.Debug;
-import info.guardianproject.keanuapp.util.Languages;
+
+import static info.guardianproject.keanu.core.KeanuConstants.IMPS_CATEGORY;
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanu.core.KeanuConstants.NOTIFICATION_CHANNEL_ID_MESSAGE;
+import static info.guardianproject.keanu.core.KeanuConstants.NOTIFICATION_CHANNEL_ID_SERVICE;
+import static info.guardianproject.keanu.core.service.RemoteImService.getConnection;
 
 public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
-    public static final String LOG_TAG = "KeanuApp";
-
-    public static final String EXTRA_INTENT_SEND_TO_USER = "Send2_U";
-
-    public static final String IMPS_CATEGORY = "org.awesomeapp.info.guardianproject.keanuapp.service.IMPS_CATEGORY";
-    public static final String ACTION_QUIT = "org.awesomeapp.info.guardianproject.keanuapp.service.QUIT";
-
-    public static final int SMALL_AVATAR_WIDTH = 48;
-    public static final int SMALL_AVATAR_HEIGHT = 48;
-
-    public static final int DEFAULT_AVATAR_WIDTH = 196;
-    public static final int DEFAULT_AVATAR_HEIGHT = 196;
-
-    public static final String HOCKEY_APP_ID = "3cd4c5ff8b666e25466d3b8b66f31766";
-
-    public static final String DEFAULT_TIMEOUT_CACHEWORD = "-1"; //one day
-
-    public static final String CACHEWORD_PASSWORD_KEY = "pkey";
-    public static final String CLEAR_PASSWORD_KEY = "clear_key";
-
-    public static final String NO_CREATE_KEY = "nocreate";
-
-    public static final String PREFERENCE_KEY_TEMP_PASS = "temppass";
-    
-    //ACCOUNT SETTINGS Imps defaults
-    public static final String DEFAULT_XMPP_RESOURCE = "keanu";
-    public static final int DEFAULT_XMPP_PRIORITY = 20;
 
     public final static String URL_UPDATER = "";
 
@@ -123,7 +103,6 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
    // HashMap<Long, IImConnection> mConnections;
     MyConnListener mConnectionListener;
-    HashMap<Long, ProviderDef> mProviders;
 
     Broadcaster mBroadcaster;
 
@@ -157,9 +136,6 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
     public static final int EVENT_USER_PRESENCE_UPDATED = 300;
     public static final int EVENT_UPDATE_USER_PRESENCE_ERROR = 301;
 
-    private static final String[] PROVIDER_PROJECTION = { Imps.Provider._ID, Imps.Provider.NAME,
-                                                         Imps.Provider.FULLNAME,
-                                                         Imps.Provider.SIGNUP_URL, };
 
     private static final String[] ACCOUNT_PROJECTION = { Imps.Account._ID, Imps.Account.PROVIDER,
                                                         Imps.Account.NAME, Imps.Account.USERNAME,
@@ -169,8 +145,6 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         Log.d(LOG_TAG, log);
     }
 
-    public static final String NOTIFICATION_CHANNEL_ID_SERVICE = "info.guardianproject.keanu.service";
-    public static final String NOTIFICATION_CHANNEL_ID_MESSAGE = "info.guardianproject.keanu.message.2";
 
     public void initChannel(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -494,93 +468,6 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         }
     }
 
-    private void loadImProviderSettings() {
-
-        mProviders = new HashMap<Long, ProviderDef>();
-        ContentResolver cr = getContentResolver();
-
-        String selectionArgs[] = new String[1];
-        selectionArgs[0] = ImApp.IMPS_CATEGORY;
-
-        Cursor c = cr.query(Imps.Provider.CONTENT_URI, PROVIDER_PROJECTION, Imps.Provider.CATEGORY
-                                                                            + "=?", selectionArgs,
-                null);
-        if (c == null) {
-            return;
-        }
-
-        try {
-            while (c.moveToNext()) {
-                long id = c.getLong(0);
-                String providerName = c.getString(1);
-                String fullName = c.getString(2);
-                String signUpUrl = c.getString(3);
-
-                if (mProviders == null) // mProviders has been reset
-                    break;
-                mProviders.put(id, new ProviderDef(id, providerName, fullName, signUpUrl));
-            }
-        } finally {
-            c.close();
-        }
-    }
-
-    public long getProviderId(String name) {
-        loadImProviderSettings();
-        for (ProviderDef provider : mProviders.values()) {
-            if (provider.mName.equals(name)) {
-                return provider.mId;
-            }
-        }
-        return -1;
-    }
-
-    public ProviderDef getProvider(long id) {
-        loadImProviderSettings();
-        return mProviders.get(id);
-    }
-
-    public static IImConnection createConnection(long providerId, long accountId) throws RemoteException {
-
-        if (mImService == null) {
-            // Service hasn't been connected or has died.
-            return null;
-        }
-
-        IImConnection conn = mImService.createConnection(providerId, accountId);
-
-        return conn;
-    }
-
-    public static IImConnection getConnection(long providerId,long accountId) {
-
-        try {
-
-            if (providerId == -1 || accountId == -1)
-                throw new RuntimeException("getConnection() needs valid values: " + providerId + "," + accountId);
-
-            if (mImService != null) {
-                IImConnection im = mImService.getConnection(providerId, accountId);
-
-                if (im != null) {
-
-                    im.getState();
-
-                } else {
-                    im = createConnection(providerId, accountId);
-
-                }
-
-                return im;
-            }
-            else
-                return null;
-        }
-        catch (RemoteException re)
-        {
-            return null;
-        }
-    }
 
 
     public Collection<IImConnection> getActiveConnections() {
@@ -855,7 +742,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
                 Imps.Provider.ACTIVE_ACCOUNT_ID + "=" + accountId
                         + " AND " + Imps.Provider.CATEGORY + "=?"
                         + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" /* selection */,
-                new String[]{ImApp.IMPS_CATEGORY} /* selection args */,
+                new String[]{IMPS_CATEGORY} /* selection args */,
                 Imps.Provider.DEFAULT_SORT_ORDER);
 
         if (cursorProviders != null && cursorProviders.getCount() > 0) {
@@ -905,7 +792,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
             final Cursor cursorProviders = getContentResolver().query(uri, PROVIDER_PROJECTION,
                     Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" /* selection */,
-                    new String[]{ImApp.IMPS_CATEGORY} /* selection args */,
+                    new String[]{IMPS_CATEGORY} /* selection args */,
                     Imps.Provider.DEFAULT_SORT_ORDER);
 
             if (cursorProviders != null && cursorProviders.getCount() > 0) {
@@ -973,7 +860,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
         final Cursor cursorProviders = getContentResolver().query(uri, PROVIDER_PROJECTION,
                 Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" /* selection */,
-                new String[]{ImApp.IMPS_CATEGORY} /* selection args */,
+                new String[]{IMPS_CATEGORY} /* selection args */,
                 Imps.Provider.DEFAULT_SORT_ORDER);
 
         if (cursorProviders != null && cursorProviders.getCount() > 0) {
@@ -1102,7 +989,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
         final Cursor cursorProviders = getContentResolver().query(uri, PROVIDER_PROJECTION,
                 Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" /* selection */,
-                new String[]{ImApp.IMPS_CATEGORY} /* selection args */,
+                new String[]{IMPS_CATEGORY} /* selection args */,
                 Imps.Provider.DEFAULT_SORT_ORDER);
 
         if (cursorProviders != null && cursorProviders.getCount() > 0) {

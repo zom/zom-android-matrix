@@ -29,17 +29,18 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
-import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.ImUrlActivity;
-import info.guardianproject.keanuapp.nearby.NearbyShareActivity;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.util.SecureMediaStore;
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.util.SecureMediaStore;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ImUrlActivity;
+import info.guardianproject.keanuapp.nearby.NearbyShareActivity;
+
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 public class ImageViewActivity extends AppCompatActivity implements PZSImageView.PSZImageViewImageMatrixListener {
 
@@ -326,7 +327,7 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
                 }
             }
             catch (Throwable t) { // may run Out Of Memory
-                Log.w(ImApp.LOG_TAG, "unable to load thumbnail: " + t);
+                Log.w(LOG_TAG, "unable to load thumbnail: " + t);
             }
             return imageView;
         }

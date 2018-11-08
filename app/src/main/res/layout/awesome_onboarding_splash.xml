@@ -35,7 +35,7 @@ android:orientation="vertical"
 
         />
 
-    <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+    <info.guardianproject.keanu.core.type.CustomTypefaceTextView
         android:id="@+id/languageButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,7 +51,7 @@ android:orientation="vertical"
 
 </LinearLayout>
 
-    <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+    <info.guardianproject.keanu.core.type.CustomTypefaceTextView
         android:id="@+id/nextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

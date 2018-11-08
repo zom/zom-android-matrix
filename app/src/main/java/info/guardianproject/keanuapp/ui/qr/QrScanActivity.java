@@ -12,6 +12,9 @@ import static android.widget.ImageView.ScaleType.FIT_CENTER;
 import static android.widget.LinearLayout.HORIZONTAL;
 import static android.widget.LinearLayout.VERTICAL;
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ImApp;
+import info.guardianproject.keanuapp.ui.BaseActivity;
+import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
 
 import android.Manifest;
 import android.app.Activity;
@@ -34,9 +37,6 @@ import android.widget.Toast;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 
-import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.ui.BaseActivity;
-import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
 
 import java.util.ArrayList;
 

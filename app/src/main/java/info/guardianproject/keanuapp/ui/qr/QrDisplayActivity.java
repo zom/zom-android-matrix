@@ -11,15 +11,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 
-import com.google.zxing.Result;
-
-import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.ui.BaseActivity;
-import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
-
 import java.util.ArrayList;
 
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ImApp;
+import info.guardianproject.keanuapp.ui.BaseActivity;
 
 import static android.content.pm.ActivityInfo.SCREEN_ORIENTATION_NOSENSOR;
 import static android.graphics.Color.BLACK;

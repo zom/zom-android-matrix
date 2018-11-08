@@ -69,7 +69,7 @@
         android:dividerHeight="6dp"
         android:transcriptMode="normal"
         android:scrollbars="vertical"
-        app:layout_behavior="info.guardianproject.keanuapp.ui.widgets.PatchedScrollingViewBehavior"
+        app:layout_behavior="info.guardianproject.keanu.core.ui.widgets.PatchedScrollingViewBehavior"
         android:paddingBottom="48dp"
         android:layout_marginTop="0dp"
         android:paddingTop="0dp"
@@ -100,7 +100,7 @@
                 android:id="@+id/upgrade_view_image"
                 />
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:id="@+id/upgrade_view_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -110,7 +110,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:gravity="center"
                 />
-            <info.guardianproject.keanuapp.type.CustomTypefaceButton
+            <info.guardianproject.keanu.core.type.CustomTypefaceButton
                 android:layout_width="200dp"
                 android:layout_height="40dp"
                 android:gravity="center"
@@ -138,7 +138,7 @@
             android:id="@+id/btnDeleteVoice"
             />
 
-        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/swipe_up_delete"
@@ -177,7 +177,7 @@
                 >
 
 
-                <info.guardianproject.keanuapp.ui.CircleColorImageView
+                <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
                     android:id="@+id/btnAttachPicture"
                     android:src="@drawable/ic_insert_photo_white_36dp"
                     android:layout_margin="3dp"
@@ -187,7 +187,7 @@
                     android:layout_height="64dp"
                     />
 
-                <info.guardianproject.keanuapp.ui.CircleColorImageView
+                <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
                     android:id="@+id/btnTakePicture"
                     android:src="@drawable/ic_photo_camera_white_36dp"
                     android:layout_margin="3dp"
@@ -198,7 +198,7 @@
 
                     />
 
-                <info.guardianproject.keanuapp.ui.CircleColorImageView
+                <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
                     android:id="@+id/btnAttachSticker"
                     android:src="@drawable/ic_insert_emoticon_white_36dp"
                     android:layout_margin="3dp"
@@ -207,7 +207,7 @@
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     />
-                <info.guardianproject.keanuapp.ui.CircleColorImageView
+                <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
                     android:id="@+id/btnAttachAudio"
                     android:src="@drawable/ic_audiotrack_white_24dp"
                     android:layout_margin="3dp"
@@ -217,7 +217,7 @@
                     android:layout_height="64dp"
                     />
 <!--
-                <info.guardianproject.keanuapp.ui.CircleColorImageView
+                <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
                     android:id="@+id/btnAttachFile"
                     android:src="@drawable/ic_insert_drive_file_white_36dp"
                     android:layout_margin="3dp"
@@ -255,7 +255,7 @@
 
         </RelativeLayout>
 
-        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="..."
@@ -318,7 +318,7 @@
                 android:layout_margin="6dp"
                 />
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceEditText
+            <info.guardianproject.keanu.core.type.CustomTypefaceEditText
                 android:id="@+id/composeMessage"
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
@@ -333,7 +333,7 @@
 
                 />
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:layout_width="0dip"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -391,7 +391,7 @@
                 android:layout_height="120dp"
                 android:src="@drawable/waiting_for_friend" />
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:id="@+id/waiting_view_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

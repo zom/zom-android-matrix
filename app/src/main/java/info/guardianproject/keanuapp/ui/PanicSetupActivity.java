@@ -3,7 +3,6 @@ package info.guardianproject.keanuapp.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,11 +12,12 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
-import info.guardianproject.keanuapp.Preferences;
+import info.guardianproject.keanu.core.Preferences;
 
 import java.util.ArrayList;
 
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ui.contacts.ContactsPickerActivity;
 import info.guardianproject.panic.PanicResponder;
 
 public class PanicSetupActivity extends BaseActivity {

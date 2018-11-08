@@ -46,7 +46,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import info.guardianproject.keanuapp.util.HttpMediaStreamer;
+import info.guardianproject.keanu.core.util.HttpMediaStreamer;
 
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.iocipher.File;

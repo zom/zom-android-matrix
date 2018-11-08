@@ -40,27 +40,32 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
-import info.guardianproject.keanuapp.model.Contact;
-import info.guardianproject.keanuapp.model.ImConnection;
-import info.guardianproject.keanuapp.plugin.xmpp.XmppAddress;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.service.IChatSession;
-import info.guardianproject.keanuapp.service.IChatSessionManager;
-import info.guardianproject.keanuapp.service.IImConnection;
-import info.guardianproject.keanuapp.service.ImServiceConstants;
+import info.guardianproject.keanu.core.model.Contact;
+import info.guardianproject.keanu.core.model.ImConnection;
+import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.service.IChatSessionManager;
+import info.guardianproject.keanu.core.service.IImConnection;
+import info.guardianproject.keanu.core.service.ImServiceConstants;
+import info.guardianproject.keanu.core.service.RemoteImService;
+import info.guardianproject.keanu.core.tasks.ChatSessionInitTask;
+import info.guardianproject.keanu.core.util.LogCleaner;
+import info.guardianproject.keanu.core.util.SecureMediaStore;
+import info.guardianproject.keanu.core.util.SystemServices;
+import info.guardianproject.keanu.core.util.SystemServices.FileInfo;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
-import info.guardianproject.keanuapp.tasks.ChatSessionInitTask;
-import info.guardianproject.keanuapp.ui.AccountViewFragment;
-import info.guardianproject.keanuapp.ui.ContactsPickerActivity;
-import info.guardianproject.keanuapp.ui.ConversationDetailActivity;
+import info.guardianproject.keanuapp.tasks.SignInHelper;
 import info.guardianproject.keanuapp.ui.LockScreenActivity;
-import info.guardianproject.keanuapp.ui.legacy.SignInHelper;
+import info.guardianproject.keanuapp.ui.accounts.AccountViewFragment;
+import info.guardianproject.keanuapp.ui.contacts.ContactsPickerActivity;
+import info.guardianproject.keanuapp.ui.conversation.ConversationDetailActivity;
 import info.guardianproject.keanuapp.ui.legacy.SimpleAlertHandler;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
-import info.guardianproject.keanuapp.util.LogCleaner;
-import info.guardianproject.keanuapp.util.SecureMediaStore;
-import info.guardianproject.keanuapp.util.SystemServices;
-import info.guardianproject.keanuapp.util.SystemServices.FileInfo;
+
+import static info.guardianproject.keanu.core.KeanuConstants.EXTRA_INTENT_SEND_TO_USER;
+import static info.guardianproject.keanu.core.KeanuConstants.IMPS_CATEGORY;
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 public class ImUrlActivity extends Activity {
     private static final String TAG = "ImUrlActivity";
@@ -191,7 +196,7 @@ public class ImUrlActivity extends Activity {
                         {
                             providerId = cProviderId;
                             accountId = cursorProvider.getLong(ACTIVE_ACCOUNT_ID_COLUMN);
-                            mConn = ((ImApp)getApplication()).getConnection(providerId,accountId);
+                            mConn = RemoteImService.getConnection(providerId,accountId);
 
 
                             //now sign in
@@ -243,7 +248,7 @@ public class ImUrlActivity extends Activity {
                             } catch (InterruptedException e1) {
                                 e1.printStackTrace();
                             }//wait here for three seconds
-                            mConn = ((ImApp)getApplication()).getConnection(providerId,accountId);
+                            mConn = RemoteImService.getConnection(providerId,accountId);
 
                             break;
                         }
@@ -298,7 +303,7 @@ public class ImUrlActivity extends Activity {
         Intent intent = new Intent(this, AccountViewFragment.class);
         intent.setAction(Intent.ACTION_EDIT);
         intent.setData(accountUri);
-        intent.putExtra(ImApp.EXTRA_INTENT_SEND_TO_USER, mToAddress);
+        intent.putExtra(EXTRA_INTENT_SEND_TO_USER, mToAddress);
         startActivityForResult(intent,REQUEST_SIGNIN_ACCOUNT);
     }
 
@@ -331,7 +336,7 @@ public class ImUrlActivity extends Activity {
     private void showContactList(long accountId) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Imps.Contacts.CONTENT_URI);
-        intent.addCategory(ImApp.IMPS_CATEGORY);
+        intent.addCategory(IMPS_CATEGORY);
         intent.putExtra("accountId", accountId);
 
         startActivity(intent);
@@ -350,7 +355,7 @@ public class ImUrlActivity extends Activity {
             intent.putExtra(ImServiceConstants.EXTRA_INTENT_FROM_ADDRESS, mToAddress);
             intent.putExtra(ImServiceConstants.EXTRA_INTENT_PROVIDER_ID, provider);
             intent.putExtra(ImServiceConstants.EXTRA_INTENT_ACCOUNT_ID, account);
-            intent.addCategory(ImApp.IMPS_CATEGORY);
+            intent.addCategory(IMPS_CATEGORY);
             startActivity(intent);
         } catch (RemoteException e) {
             // Ouch!  Service died!  We'll just disappear.
@@ -390,7 +395,7 @@ public class ImUrlActivity extends Activity {
                 ImApp app = (ImApp)getApplication();
                 app.initAccountInfo();
 
-                new AddContactAsyncTask(app.getDefaultProviderId(), app.getDefaultAccountId(), (ImApp)getApplication()).executeOnExecutor(ImApp.sThreadPoolExecutor,diLink.username,diLink.fingerprint,diLink.nickname);
+                new AddContactAsyncTask(app.getDefaultProviderId(), app.getDefaultAccountId()).executeOnExecutor(ImApp.sThreadPoolExecutor,diLink.username,diLink.fingerprint,diLink.nickname);
 
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("newcontact",diLink.username);
@@ -401,7 +406,7 @@ public class ImUrlActivity extends Activity {
             }
             catch (Exception e)
             {
-                Log.w(ImApp.LOG_TAG, "error parsing QR invite link", e);
+                Log.w(LOG_TAG, "error parsing QR invite link", e);
             }
 
         }
@@ -454,7 +459,7 @@ public class ImUrlActivity extends Activity {
                 if (parts.length > 2)
                     nickname = parts[2];
 
-                new AddContactAsyncTask(app.getDefaultProviderId(), app.getDefaultAccountId(), (ImApp)getApplication()).executeOnExecutor(ImApp.sThreadPoolExecutor,username, fingerprint);
+                new AddContactAsyncTask(app.getDefaultProviderId(), app.getDefaultAccountId()).executeOnExecutor(ImApp.sThreadPoolExecutor,username, fingerprint);
 
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("newcontact",username);
@@ -465,13 +470,13 @@ public class ImUrlActivity extends Activity {
             }
             catch (Exception e)
             {
-                Log.w(ImApp.LOG_TAG, "error parsing QR invite link", e);
+                Log.w(LOG_TAG, "error parsing QR invite link", e);
             }
 
 
         }
 
-        if (Log.isLoggable(ImApp.LOG_TAG, Log.DEBUG)) {
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
             log("resolveIntent: host=" + mHost);
         }
 
@@ -484,7 +489,7 @@ public class ImUrlActivity extends Activity {
                     String providerName = getProviderNameForCategory(category);
                     mProviderName = findMatchingProvider(providerName);
                     if (mProviderName == null) {
-                        Log.w(ImApp.LOG_TAG, "resolveIntent: IM provider " + category
+                        Log.w(LOG_TAG, "resolveIntent: IM provider " + category
                                              + " not supported");
                         return false;
                     }
@@ -496,13 +501,13 @@ public class ImUrlActivity extends Activity {
             mProviderName = findMatchingProvider(mHost);
 
             if (mProviderName == null) {
-                Log.w(ImApp.LOG_TAG, "resolveIntent: IM provider " + mHost + " not supported");
+                Log.w(LOG_TAG, "resolveIntent: IM provider " + mHost + " not supported");
                 return false;
             }
 
             String path = data.getPath();
 
-            if (Log.isLoggable(ImApp.LOG_TAG, Log.DEBUG))
+            if (Log.isLoggable(LOG_TAG, Log.DEBUG))
                 log("resolveIntent: path=" + path);
 
             if (!TextUtils.isEmpty(path)) {
@@ -513,7 +518,7 @@ public class ImUrlActivity extends Activity {
             }
         }
 
-        if (Log.isLoggable(ImApp.LOG_TAG, Log.DEBUG)) {
+        if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
             log("resolveIntent: provider=" + mProviderName + ", to=" + mToAddress);
         }
 
@@ -550,7 +555,7 @@ public class ImUrlActivity extends Activity {
     }
 
     private static void log(String msg) {
-        Log.d(ImApp.LOG_TAG, "<ImUrlActivity> " + msg);
+        Log.d(LOG_TAG, "<ImUrlActivity> " + msg);
     }
 
     void createNewAccount() {
@@ -717,7 +722,7 @@ public class ImUrlActivity extends Activity {
         //startCrypto is not actually used anymore, as we move to OMEMO
 
         if (username != null)
-            new ChatSessionInitTask(((ImApp)getApplication()),providerId, accountId, Imps.Contacts.TYPE_NORMAL, true)
+            new ChatSessionInitTask(providerId, accountId, Imps.Contacts.TYPE_NORMAL, true)
             {
                 @Override
                 protected void onPostExecute(Long chatId) {
@@ -740,7 +745,7 @@ public class ImUrlActivity extends Activity {
 
         try
         {
-            IImConnection conn = ((ImApp)getApplication()).getConnection(providerId,accountId);
+            IImConnection conn = RemoteImService.getConnection(providerId,accountId);
 
             if (conn == null)
                 return; //can't send without a connection
@@ -813,7 +818,7 @@ public class ImUrlActivity extends Activity {
 
                 return session;
             } catch (RemoteException e) {
-                LogCleaner.error(ImApp.LOG_TAG, "send message error",e);
+                LogCleaner.error(LOG_TAG, "send message error",e);
             }
         }
         return null;
@@ -900,7 +905,7 @@ public class ImUrlActivity extends Activity {
             }
 
             if (TextUtils.isEmpty(mToAddress)) {
-                LogCleaner.warn(ImApp.LOG_TAG, "<ImUrlActivity>Invalid to address");
+                LogCleaner.warn(LOG_TAG, "<ImUrlActivity>Invalid to address");
               //  finish();
                 return;
             }
@@ -933,7 +938,7 @@ public class ImUrlActivity extends Activity {
         //just init the contentprovider db
         return getContentResolver().query(uri, PROVIDER_PROJECTION,
                 Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" /* selection */,
-                new String[] { ImApp.IMPS_CATEGORY } /* selection args */,
+                new String[] { IMPS_CATEGORY } /* selection args */,
                 Imps.Provider.DEFAULT_SORT_ORDER);
 
     }

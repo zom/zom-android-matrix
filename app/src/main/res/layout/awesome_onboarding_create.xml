@@ -18,7 +18,7 @@ android:orientation="vertical"
     android:id="@+id/viewCreate"
     >
 
-    <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+    <info.guardianproject.keanu.core.type.CustomTypefaceTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
@@ -27,7 +27,7 @@ android:orientation="vertical"
         android:textColor="?colorPrimary"
 
         />
-    <info.guardianproject.keanuapp.type.CustomTypefaceEditText android:id="@+id/edtNewName"
+    <info.guardianproject.keanu.core.type.CustomTypefaceEditText android:id="@+id/edtNewName"
         android:selectAllOnFocus="true"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
@@ -45,7 +45,7 @@ android:orientation="vertical"
         android:textColor="?messageTextPrimary"
 
         />
-    <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+    <info.guardianproject.keanu.core.type.CustomTypefaceTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
@@ -54,7 +54,7 @@ android:orientation="vertical"
         android:gravity="center"
         />
 
-    <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+    <info.guardianproject.keanu.core.type.CustomTypefaceTextView
         android:id="@+id/statusError"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -70,7 +70,7 @@ android:orientation="vertical"
     <include layout="@layout/awesome_onboarding_success"/>
 
 
-    <info.guardianproject.keanuapp.type.CustomTypefaceButton android:id="@+id/btnAdvanced"
+    <info.guardianproject.keanu.core.type.CustomTypefaceButton android:id="@+id/btnAdvanced"
         android:text="@string/advanced"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dip"

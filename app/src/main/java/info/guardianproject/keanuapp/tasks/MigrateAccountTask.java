@@ -11,31 +11,31 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONException;
 
 import java.io.ByteArrayOutputStream;
-import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
 
+import info.guardianproject.keanu.core.model.ImConnection;
+import info.guardianproject.keanu.core.model.ImErrorInfo;
+import info.guardianproject.keanu.core.model.Server;
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.service.IChatSessionManager;
+import info.guardianproject.keanu.core.service.IContactList;
+import info.guardianproject.keanu.core.service.IContactListManager;
+import info.guardianproject.keanu.core.service.IImConnection;
+import info.guardianproject.keanu.core.service.RemoteImService;
+import info.guardianproject.keanu.core.util.DatabaseUtils;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.R;
-import info.guardianproject.keanuapp.model.ImConnection;
-import info.guardianproject.keanuapp.model.ImErrorInfo;
-import info.guardianproject.keanuapp.model.Server;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.service.IChatSession;
-import info.guardianproject.keanuapp.service.IChatSessionManager;
-import info.guardianproject.keanuapp.service.IContactList;
-import info.guardianproject.keanuapp.service.IContactListManager;
-import info.guardianproject.keanuapp.service.IImConnection;
-import info.guardianproject.keanuapp.ui.legacy.DatabaseUtils;
-import info.guardianproject.keanuapp.ui.legacy.SignInHelper;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingAccount;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
+
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 /**
  * Created by n8fr8 on 5/1/17.
@@ -67,7 +67,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
 
         mListener = listener;
 
-        mConn = app.getConnection(providerId, accountId);
+        mConn = RemoteImService.getConnection(providerId, accountId);
 
         Cursor cursor = context.getContentResolver().query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(mProviderId)}, null);
 
@@ -116,7 +116,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
                 signInHelper.activateAccount(mNewAccount.providerId, mNewAccount.accountId);
                 signInHelper.signIn(mNewAccount.password, mNewAccount.providerId, mNewAccount.accountId, true);
 
-                mNewConn = mApp.getConnection(mNewAccount.providerId, mNewAccount.accountId);
+                mNewConn = RemoteImService.getConnection(mNewAccount.providerId, mNewAccount.accountId);
 
                 while (mNewConn.getState() != ImConnection.LOGGED_IN) {
                     try {
@@ -169,7 +169,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
                 }
 
                 if (loggedInToOldAccount) {
-                    //archive existing info.guardianproject.keanuapp.conversations and contacts
+                    //archive existing info.guardianproject.keanu.core.conversations and contacts
                     List<IChatSession> listSession = mConn.getChatSessionManager().getActiveChatSessions();
                     for (IChatSession session : listSession) {
                         session.leave();
@@ -189,7 +189,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
                 return mNewAccount;
 
             } catch (Exception e) {
-                Log.e(ImApp.LOG_TAG, "error with migration", e);
+                Log.e(LOG_TAG, "error with migration", e);
             }
         }
 
@@ -252,7 +252,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
             }
 
         } catch (RemoteException re) {
-            Log.e(ImApp.LOG_TAG, "error adding contact", re);
+            Log.e(LOG_TAG, "error adding contact", re);
         }
 
         return res;
@@ -335,7 +335,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
             String avatarHash = "nohash";
             DatabaseUtils.insertAvatarBlob(mContext.getContentResolver(), Imps.Avatars.CONTENT_URI, mProviderId, mAccountId, avatarBytesCompressed, avatarHash, address);
         } catch (Exception e) {
-            Log.w(ImApp.LOG_TAG, "error loading image bytes", e);
+            Log.w(LOG_TAG, "error loading image bytes", e);
         }
     }
 
@@ -345,7 +345,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
             String avatarHash = "nohash";
             DatabaseUtils.insertAvatarBlob(mContext.getContentResolver(), Imps.Avatars.CONTENT_URI, mProviderId, mAccountId, avatarBytesCompressed, avatarHash, address);
         } catch (Exception e) {
-            Log.w(ImApp.LOG_TAG, "error loading image bytes", e);
+            Log.w(LOG_TAG, "error loading image bytes", e);
         }
     }
 }

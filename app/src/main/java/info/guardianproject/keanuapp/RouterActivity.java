@@ -29,33 +29,34 @@ import android.net.Uri.Builder;
 import android.os.Bundle;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.inputmethod.InputMethodInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
-import info.guardianproject.keanuapp.cacheword.CacheWordHandler;
-import info.guardianproject.keanuapp.cacheword.ICacheWordSubscriber;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.ui.AddContactActivity;
-import info.guardianproject.keanuapp.ui.legacy.ImPluginHelper;
+import info.guardianproject.keanu.core.Preferences;
+import info.guardianproject.keanu.core.cacheword.CacheWordHandler;
+import info.guardianproject.keanu.core.cacheword.ICacheWordSubscriber;
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.util.ImPluginHelper;
+import info.guardianproject.keanu.core.util.SecureMediaStore;
+import info.guardianproject.keanuapp.tasks.SignInHelper;
 import info.guardianproject.keanuapp.ui.LockScreenActivity;
-import info.guardianproject.keanuapp.ui.legacy.SignInHelper;
+import info.guardianproject.keanuapp.ui.contacts.AddContactActivity;
 import info.guardianproject.keanuapp.ui.legacy.SimpleAlertHandler;
-import info.guardianproject.keanuapp.ui.legacy.ThemeableActivity;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingActivity;
-import info.guardianproject.keanuapp.util.SecureMediaStore;
-
-import java.security.GeneralSecurityException;
-import java.util.List;
-import java.util.UUID;
-
-
 import info.guardianproject.panic.Panic;
 import info.guardianproject.panic.PanicResponder;
 
-public class RouterActivity extends ThemeableActivity implements ICacheWordSubscriber {
+import java.security.GeneralSecurityException;
+import java.util.UUID;
+
+import static info.guardianproject.keanu.core.KeanuConstants.IMPS_CATEGORY;
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanu.core.KeanuConstants.PREFERENCE_KEY_TEMP_PASS;
+
+
+public class RouterActivity extends AppCompatActivity implements ICacheWordSubscriber {
 
     private static final String TAG = "RouterActivity";
     private Cursor mProviderCursor;
@@ -147,7 +148,7 @@ public class RouterActivity extends ThemeableActivity implements ICacheWordSubsc
         mSignInHelper = new SignInHelper(this, mHandler);
         mDoSignIn = intent.getBooleanExtra(EXTRA_DO_SIGNIN, true);
 
-        AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 
         mCacheWord = new CacheWordHandler(this, (ICacheWordSubscriber)this);
         mCacheWord.connectToService();
@@ -179,7 +180,7 @@ public class RouterActivity extends ThemeableActivity implements ICacheWordSubsc
 
             mProviderCursor = managedQuery(uri,
                     PROVIDER_PROJECTION, Imps.Provider.CATEGORY + "=?" /* selection */,
-                    new String[] { ImApp.IMPS_CATEGORY } /* selection args */,
+                    new String[] { IMPS_CATEGORY } /* selection args */,
                     Imps.Provider.DEFAULT_SORT_ORDER);
 
             if (mProviderCursor != null)
@@ -198,9 +199,9 @@ public class RouterActivity extends ThemeableActivity implements ICacheWordSubsc
         } catch (Exception e) {
             // Only complain if we thought this password should succeed
 
-                Log.e(ImApp.LOG_TAG, e.getMessage(), e);
+                Log.e(LOG_TAG, e.getMessage(), e);
 
-                Toast.makeText(this, getString(R.string.error_welcome_database), Toast.LENGTH_LONG).show();
+                Toast.makeText(this, getString(info.guardianproject.keanu.core.R.string.error_welcome_database), Toast.LENGTH_LONG).show();
                 finish();
 
 
@@ -356,7 +357,7 @@ public class RouterActivity extends ThemeableActivity implements ICacheWordSubsc
 
     @Override
     public void onCacheWordUninitialized() {
-        Log.d(ImApp.LOG_TAG,"cache word uninit");
+        Log.d(LOG_TAG,"cache word uninit");
 
         initTempPassphrase();
         showOnboarding();
@@ -369,7 +370,7 @@ public class RouterActivity extends ThemeableActivity implements ICacheWordSubsc
         try {
             String tempPassphrase = UUID.randomUUID().toString();
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-            settings.edit().putString(ImApp.PREFERENCE_KEY_TEMP_PASS, tempPassphrase).apply();
+            settings.edit().putString(PREFERENCE_KEY_TEMP_PASS, tempPassphrase).apply();
             mCacheWord.setPassphrase(tempPassphrase.toCharArray());
                 
            
@@ -418,7 +419,7 @@ public class RouterActivity extends ThemeableActivity implements ICacheWordSubsc
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        if (resultCode == RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_LOCK_SCREEN) {
                 showMain();
                 return;
@@ -437,20 +438,20 @@ public class RouterActivity extends ThemeableActivity implements ICacheWordSubsc
     @Override
     public void onCacheWordLocked() {
         if (mDoLock) {
-            Log.d(ImApp.LOG_TAG, "info.guardianproject.keanuapp.cacheword lock requested but already locked");
+            Log.d(LOG_TAG, "info.guardianproject.keanu.core.cacheword lock requested but already locked");
 
         } else {
             SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
 
-            if (settings.contains(ImApp.PREFERENCE_KEY_TEMP_PASS))
+            if (settings.contains(PREFERENCE_KEY_TEMP_PASS))
             {
                 try {
-                    mCacheWord.setPassphrase(settings.getString(ImApp.PREFERENCE_KEY_TEMP_PASS, null).toCharArray());
+                    mCacheWord.setPassphrase(settings.getString(PREFERENCE_KEY_TEMP_PASS, null).toCharArray());
 
 
                 } catch (GeneralSecurityException e) {
                     
-                    Log.d(ImApp.LOG_TAG, "couldn't open info.guardianproject.keanuapp.cacheword with temp password",e);
+                    Log.d(LOG_TAG, "couldn't open info.guardianproject.keanu.core.cacheword with temp password",e);
                     showLockScreen();
                 }
             }

@@ -7,11 +7,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import info.guardianproject.keanuapp.ui.GalleryMediaViewHolder;
-import info.guardianproject.keanuapp.ui.MediaViewHolder;
-import info.guardianproject.keanuapp.ui.MessageListItem;
 
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ui.conversation.MessageListItem;
 
 /**
  * Created by n8fr8 on 12/11/15.

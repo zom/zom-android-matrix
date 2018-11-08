@@ -39,7 +39,7 @@
             android:paddingBottom="0dp"
             android:paddingTop="12dp">
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:id="@+id/title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -56,7 +56,7 @@
                 android:textSize="17sp"
                 android:textStyle="bold" />
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceEditText
+            <info.guardianproject.keanu.core.type.CustomTypefaceEditText
                 android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
                 android:layout_gravity="center_horizontal"
                 />
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:id="@+id/input_contact_label"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -136,7 +136,7 @@
         </RelativeLayout>
 
 
-        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="4dp"
@@ -209,7 +209,7 @@
         </LinearLayout>
 
 
-        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"

@@ -12,9 +12,9 @@
         android:normalScreens="true"
         android:smallScreens="true" />
 
-    <uses-permission android:name="info.guardianproject.keanuapp.permission.READ_ONLY" />
-    <uses-permission android:name="info.guardianproject.keanuapp.permission.WRITE_ONLY" />
-    <uses-permission android:name="info.guardianproject.keanuapp.permission.IM_SERVICE" />
+    <uses-permission android:name="info.guardianproject.keanu.core.permission.READ_ONLY" />
+    <uses-permission android:name="info.guardianproject.keanu.core.permission.WRITE_ONLY" />
+    <uses-permission android:name="info.guardianproject.keanu.core.permission.IM_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -68,19 +68,19 @@
         android:required="false" />
 
     <permission
-        android:name="info.guardianproject.keanuapp.permission.IM_SERVICE"
+        android:name="info.guardianproject.keanu.core.permission.IM_SERVICE"
         android:description="@string/perm_desc"
         android:label="@string/perm_label"
         android:permissionGroup="android.permission-group.MESSAGES"
         android:protectionLevel="dangerous" />
     <permission
-        android:name="info.guardianproject.keanuapp.permission.READ_ONLY"
+        android:name="info.guardianproject.keanu.core.permission.READ_ONLY"
         android:description="@string/ro_perm_desc"
         android:label="@string/ro_perm_label"
         android:permissionGroup="android.permission-group.MESSAGES"
         android:protectionLevel="dangerous" />
     <permission
-        android:name="info.guardianproject.keanuapp.permission.WRITE_ONLY"
+        android:name="info.guardianproject.keanu.core.permission.WRITE_ONLY"
         android:description="@string/wo_perm_desc"
         android:label="@string/wo_perm_label"
         android:permissionGroup="android.permission-group.MESSAGES"
@@ -188,33 +188,6 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".util.SoundService"
-            android:exported="false" />
-
-        <!-- android:process="info.guardianproject.otr.app.process.im" -->
-        <service
-            android:name=".service.RemoteImService"
-            android:exported="false"
-            android:permission="info.guardianproject.keanuapp.permission.IM_SERVICE"
-            >
-            <intent-filter>
-                <action android:name="info.guardianproject.otr.app.im.IRemoteImService" />
-                <action android:name="info.guardianproject.otr.app.im.SERVICE" />
-            </intent-filter>
-        </service>
-        <service
-            android:name=".service.HeartbeatService"
-            android:exported="false" />
-
-        <provider
-            android:name="info.guardianproject.keanuapp.provider.ImpsProvider"
-            android:authorities="info.guardianproject.keanuapp.provider.Imps"
-            android:directBootAware="true"
-            android:exported="false"
-            android:grantUriPermissions="true"
-            android:readPermission="info.guardianproject.keanuapp.permission.READ_ONLY"
-            android:writePermission="info.guardianproject.keanuapp.permission.WRITE_ONLY" />
 
         <activity
             android:name=".ImUrlActivity"
@@ -229,11 +202,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.AddContactActivity"
+            android:name=".ui.contacts.AddContactActivity"
             android:exported="false"
             android:label="@string/add_friends" />
         <activity
-            android:name=".ui.ContactsPickerActivity"
+            android:name=".ui.contacts.ContactsPickerActivity"
             android:exported="false"
             android:label="@string/choose_friend">
             <intent-filter>
@@ -252,14 +225,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.AccountActivity"
+            android:name=".ui.accounts.AccountActivity"
             android:exported="false"
             android:windowSoftInputMode="stateUnchanged">
             <intent-filter>
                 <action android:name="android.intent.action.EDIT" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="info.guardianproject.keanuapp.service.IMPS_CATEGORY" />
+                <category android:name="info.guardianproject.keanu.core.service.IMPS_CATEGORY" />
 
                 <data android:mimeType="vnd.android.cursor.item/imps-accounts" />
             </intent-filter>
@@ -267,13 +240,13 @@
                 <action android:name="android.intent.action.INSERT" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="info.guardianproject.keanuapp.service.IMPS_CATEGORY" />
+                <category android:name="info.guardianproject.keanu.core.service.IMPS_CATEGORY" />
 
                 <data android:mimeType="vnd.android.cursor.item/imps-providers" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.AccountSettingsActivity"
+            android:name=".ui.accounts.AccountSettingsActivity"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.PICK" />
@@ -296,28 +269,8 @@
                 <data android:mimeType="vnd.android-dir/imps-providerSettings" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ssl.MemorizingActivity"
-            android:configChanges="orientation|locale"
-            android:exported="false"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
-        <receiver
-            android:name="info.guardianproject.keanuapp.service.NetworkConnectivityReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".service.BootCompletedReceiver"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
+
 
         <activity
             android:name=".ui.LockScreenActivity"
@@ -333,22 +286,11 @@
             android:name=".ui.qr.QrDisplayActivity"
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
-            android:name=".ui.legacy.DummyActivity"
-            android:allowTaskReparenting="true"
-            android:alwaysRetainTaskState="false"
-            android:clearTaskOnLaunch="true"
-            android:enabled="true"
-            android:excludeFromRecents="true"
-            android:finishOnTaskLaunch="true"
-            android:noHistory="true"
-            android:stateNotNeeded="true"
-            android:theme="@android:style/Theme.NoDisplay" />
-        <activity
             android:name=".ui.widgets.ImageViewActivity"
             android:theme="@style/AppTheme.Transparent" />
         <activity android:name=".ui.widgets.SecureCameraActivity" />
         <activity
-            android:name="info.guardianproject.keanuapp.MainActivity"
+            android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/AppThemeNoAction">
             <intent-filter>
@@ -374,16 +316,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.ConversationDetailActivity"
+            android:name=".ui.conversation.ConversationDetailActivity"
             android:exported="false"
             android:launchMode="standard"
             android:theme="@style/AppThemeNoAction"
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
-            android:name=".ui.ContactListActivity"
+            android:name=".ui.contacts.ContactListActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.GalleryActivity"
+            android:name=".ui.gallery.GalleryActivity"
             android:exported="false"
             android:title="@string/photo_gallery" />
         <activity
@@ -406,12 +348,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.ContactDisplayActivity"
+            android:name=".ui.contacts.ContactDisplayActivity"
             android:exported="false"
             android:theme="@style/AppThemeNoAction" />
-        <activity android:name=".ui.GroupDisplayActivity" />
+        <activity android:name=".ui.contacts.GroupDisplayActivity" />
         <activity
-            android:name=".ui.AccountsActivity"
+            android:name=".ui.accounts.AccountsActivity"
             android:label="@string/accounts"
             android:exported="false"
             />
@@ -426,14 +368,6 @@
                 android:resource="@xml/provider_paths" />
         </provider>
 
-        <service
-            android:name=".service.NetworkSchedulerService"
-            android:exported="true"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
-
-        <service
-            android:name=".service.GeneralJobIntentService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <activity
             android:name=".nearby.NearbyAddContactActivity"
@@ -453,23 +387,6 @@
             android:exported="false"
             />
 
-        <service
-            android:name="info.guardianproject.keanuapp.plugin.matrix.MatrixImPlugin"
-            android:exported="false" >
-            <intent-filter>
-                <action android:name="info.guardianproject.keanuapp.plugin" />
-            </intent-filter>
-
-            <meta-data
-                android:name="info.guardianproject.keanuapp.plugin.provider_name"
-                android:value="MATRIX" />
-            <meta-data
-                android:name="info.guardianproject.keanuapp.plugin.provider_full_name"
-                android:value="Matrix" />
-            <meta-data
-                android:name="info.guardianproject.keanuapp.plugin.signup_url"
-                android:value="https://matrix.org" />
-        </service>
 
     </application>
 

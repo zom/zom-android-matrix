@@ -8,7 +8,7 @@ android:padding="10dp"
 android:paddingTop="40dp"
     >
 
-<info.guardianproject.keanuapp.type.CustomTypefaceTextView
+<info.guardianproject.keanu.core.type.CustomTypefaceTextView
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="20dp"
@@ -17,7 +17,7 @@ android:paddingTop="40dp"
     android:textColor="@android:color/black"
     />
 
-<info.guardianproject.keanuapp.type.CustomTypefaceEditText android:id="@+id/edtName"
+<info.guardianproject.keanu.core.type.CustomTypefaceEditText android:id="@+id/edtName"
     android:selectAllOnFocus="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -32,7 +32,7 @@ android:paddingTop="40dp"
     android:layout_margin="3dp"
     />
 
-<info.guardianproject.keanuapp.type.CustomTypefaceEditText android:id="@+id/edtPass"
+<info.guardianproject.keanu.core.type.CustomTypefaceEditText android:id="@+id/edtPass"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:hint="@string/account_setup_password"
@@ -44,7 +44,7 @@ android:paddingTop="40dp"
     android:layout_margin="3dp"
     />
 
-<info.guardianproject.keanuapp.type.CustomTypefaceButton android:id="@+id/btnSignIn"
+<info.guardianproject.keanu.core.type.CustomTypefaceButton android:id="@+id/btnSignIn"
     android:text="@string/sign_in"
     android:layout_height="wrap_content"
     android:layout_marginTop="3dip"

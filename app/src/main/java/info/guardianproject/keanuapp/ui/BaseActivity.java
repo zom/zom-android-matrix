@@ -1,20 +1,17 @@
 package info.guardianproject.keanuapp.ui;
 
 import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.TextView;
 
-import info.guardianproject.keanuapp.Preferences;
-
+import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanuapp.R;
+
 
 /**
  * Created by n8fr8 on 5/7/16.

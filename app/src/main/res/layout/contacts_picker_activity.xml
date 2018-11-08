@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <info.guardianproject.keanuapp.ui.widgets.FlowLayout
+        <info.guardianproject.keanu.core.ui.widgets.FlowLayout
             android:id="@+id/flSelectedContacts"
             android:layout_width="match_parent"
             android:layout_height="200dp"
@@ -58,7 +58,7 @@
             android:orientation="horizontal"
             android:padding="3dp">
 
-            <info.guardianproject.keanuapp.ui.CircleColorImageView
+            <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
@@ -67,7 +67,7 @@
                 android:src="@drawable/ic_group_add_white_36dp"
                 app:circleColor="@android:color/holo_green_light" />
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
@@ -87,7 +87,7 @@
             android:orientation="horizontal"
             android:padding="3dp">
 
-            <info.guardianproject.keanuapp.ui.CircleColorImageView
+            <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
@@ -96,7 +96,7 @@
                 android:src="@drawable/ic_person_add_white_36dp"
                 app:circleColor="@color/app_primary" />
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
@@ -119,7 +119,7 @@
         android:divider="@null"
         android:padding="0dp" />
 
-    <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+    <info.guardianproject.keanu.core.type.CustomTypefaceTextView
         android:id="@android:id/empty"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"

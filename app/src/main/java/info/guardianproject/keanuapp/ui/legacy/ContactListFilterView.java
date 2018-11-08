@@ -17,18 +17,20 @@
 
 package info.guardianproject.keanuapp.ui.legacy;
 
-import info.guardianproject.keanuapp.service.IContactListManager;
-import info.guardianproject.keanuapp.service.IImConnection;
+import info.guardianproject.keanu.core.service.IContactListManager;
+import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanuapp.R;
-import info.guardianproject.keanuapp.model.ImErrorInfo;
+import info.guardianproject.keanu.core.model.ImErrorInfo;
 
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.service.RemoteImService;
+import info.guardianproject.keanu.core.util.ErrorResUtils;
+import info.guardianproject.keanu.core.util.LogCleaner;
 import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.ui.ContactListItem;
+import info.guardianproject.keanuapp.ui.contacts.ContactListItem;
+import info.guardianproject.keanuapp.ui.contacts.ContactViewHolder;
+import info.guardianproject.keanuapp.ui.contacts.ContactsPickerActivity;
 
-import info.guardianproject.keanuapp.ui.ContactViewHolder;
-import info.guardianproject.keanuapp.ui.ContactsPickerActivity;
-import info.guardianproject.keanuapp.util.LogCleaner;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -44,7 +46,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.ResourceCursorAdapter;
-import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -55,11 +56,12 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 public class ContactListFilterView extends LinearLayout {
     private AbsListView mFilterList;
@@ -360,7 +362,7 @@ public class ContactListFilterView extends LinearLayout {
                 } catch (RemoteException e) {
 
         mHandler.showServiceErrorAlert(e.getLocalizedMessage());
-        LogCleaner.error(ImApp.LOG_TAG, "remote error",e);
+        LogCleaner.error(LOG_TAG, "remote error",e);
                 }
             }
         };
@@ -378,7 +380,7 @@ public class ContactListFilterView extends LinearLayout {
 
     private IImConnection getConnection (Cursor c)
     {
-        return ImApp.sImApp.getConnection(c.getLong(ContactListItem.COLUMN_CONTACT_PROVIDER),c.getLong(ContactListItem.COLUMN_CONTACT_ACCOUNT));
+        return RemoteImService.getConnection(c.getLong(ContactListItem.COLUMN_CONTACT_PROVIDER),c.getLong(ContactListItem.COLUMN_CONTACT_ACCOUNT));
 
     }
 
@@ -413,7 +415,7 @@ public class ContactListFilterView extends LinearLayout {
                 } catch (RemoteException e) {
 
         mHandler.showServiceErrorAlert(e.getLocalizedMessage());
-        LogCleaner.error(ImApp.LOG_TAG, "remote error",e);
+        LogCleaner.error(LOG_TAG, "remote error",e);
                 }
             }
         };

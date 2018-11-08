@@ -14,12 +14,6 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-
-import info.guardianproject.keanuapp.ImApp;
-
-import info.guardianproject.keanuapp.R;
 
 
 public class StickerGridAdapter extends BaseAdapter

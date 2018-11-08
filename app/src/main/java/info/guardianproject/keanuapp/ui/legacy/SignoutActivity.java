@@ -16,11 +16,12 @@
  */
 package info.guardianproject.keanuapp.ui.legacy;
 
-import info.guardianproject.keanuapp.service.IImConnection;
+import info.guardianproject.keanu.core.service.IImConnection;
 
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.service.RemoteImService;
+import info.guardianproject.keanu.core.util.LogCleaner;
 import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.util.LogCleaner;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -31,6 +32,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.util.Log;
+
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 public class SignoutActivity extends ThemeableActivity {
 
@@ -45,7 +48,7 @@ public class SignoutActivity extends ThemeableActivity {
         Intent intent = getIntent();
         Uri data = intent.getData();
         if (data == null) {
-            Log.e(ImApp.LOG_TAG, "Need account data to sign in");
+            Log.e(LOG_TAG, "Need account data to sign in");
             //finish();
             return;
         }
@@ -59,7 +62,7 @@ public class SignoutActivity extends ThemeableActivity {
 
         try {
             if (!c.moveToFirst()) {
-                LogCleaner.warn(ImApp.LOG_TAG, "[SignoutActivity] No data for " + data);
+                LogCleaner.warn(LOG_TAG, "[SignoutActivity] No data for " + data);
              //   finish();
                 return;
             }
@@ -82,7 +85,7 @@ public class SignoutActivity extends ThemeableActivity {
     private void signOut(long providerId, long accountId) {
         try {
 
-            IImConnection conn = mApp.getConnection(providerId,accountId);
+            IImConnection conn = RemoteImService.getConnection(providerId,accountId);
             if (conn != null) {
                 conn.logout();
             } else {
@@ -98,7 +101,7 @@ public class SignoutActivity extends ThemeableActivity {
                         new String[] { Long.toString(accountId) });
             }
         } catch (RemoteException ex) {
-            Log.e(ImApp.LOG_TAG, "signout: caught ", ex);
+            Log.e(LOG_TAG, "signout: caught ", ex);
         } finally {
             //finish();
 
@@ -116,6 +119,6 @@ public class SignoutActivity extends ThemeableActivity {
     }
 
     static void log(String msg) {
-        Log.d(ImApp.LOG_TAG, "[Signout] " + msg);
+        Log.d(LOG_TAG, "[Signout] " + msg);
     }
 }

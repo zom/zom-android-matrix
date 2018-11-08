@@ -27,7 +27,6 @@ import android.support.v4.content.FileProvider;
 import android.support.v7.widget.ListPopupWindow;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -48,33 +47,33 @@ import android.widget.ViewFlipper;
 
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import info.guardianproject.keanuapp.BuildConfig;
-import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.MainActivity;
-import info.guardianproject.keanuapp.model.Server;
-import info.guardianproject.keanuapp.plugin.xmpp.XmppAddress;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
-import info.guardianproject.keanuapp.ui.BaseActivity;
-import info.guardianproject.keanuapp.ui.legacy.DatabaseUtils;
-import info.guardianproject.keanuapp.ui.legacy.SignInHelper;
-import info.guardianproject.keanuapp.ui.legacy.SimpleAlertHandler;
-import info.guardianproject.keanuapp.ui.widgets.RoundedAvatarDrawable;
-import info.guardianproject.keanuapp.util.SecureMediaStore;
+import info.guardianproject.keanu.core.BuildConfig;
+import info.guardianproject.keanu.core.model.Server;
+import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.ui.RoundedAvatarDrawable;
+import info.guardianproject.keanu.core.util.DatabaseUtils;
+import info.guardianproject.keanu.core.util.SecureMediaStore;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.KeyPair;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import info.guardianproject.keanuapp.R;
-import info.guardianproject.keanuapp.util.Languages;
+import info.guardianproject.keanu.core.util.Languages;
+import info.guardianproject.keanuapp.ImApp;
+import info.guardianproject.keanuapp.MainActivity;
+import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
+import info.guardianproject.keanuapp.tasks.SignInHelper;
+import info.guardianproject.keanuapp.ui.BaseActivity;
+import info.guardianproject.keanuapp.ui.legacy.SimpleAlertHandler;
+
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 public class OnboardingActivity extends BaseActivity {
 
@@ -615,7 +614,7 @@ public class OnboardingActivity extends BaseActivity {
             }
             catch (Exception e)
             {
-                Log.e(ImApp.LOG_TAG, "auto onboarding fail", e);
+                Log.e(LOG_TAG, "auto onboarding fail", e);
                 return null;
             }
         }
@@ -808,7 +807,7 @@ public class OnboardingActivity extends BaseActivity {
             }
             catch (Exception e)
             {
-                Log.e(ImApp.LOG_TAG, "auto onboarding fail", e);
+                Log.e(LOG_TAG, "auto onboarding fail", e);
                 return null;
             }
         }
@@ -852,13 +851,13 @@ public class OnboardingActivity extends BaseActivity {
                         //parse each string and if they are for a new user then add the user
                         OnboardingManager.DecodedInviteLink diLink = OnboardingManager.decodeInviteLink(resultScan);
 
-                        new AddContactAsyncTask(mNewAccount.providerId, mNewAccount.accountId, mApp).execute(diLink.username, diLink.fingerprint, diLink.nickname);
+                        new AddContactAsyncTask(mNewAccount.providerId, mNewAccount.accountId).execute(diLink.username, diLink.fingerprint, diLink.nickname);
 
                         //if they are for a group chat, then add the group
                     }
                     catch (Exception e)
                     {
-                        Log.w(ImApp.LOG_TAG, "error parsing QR invite link", e);
+                        Log.w(LOG_TAG, "error parsing QR invite link", e);
                     }
                 }
 
@@ -910,7 +909,7 @@ public class OnboardingActivity extends BaseActivity {
 
                     ;
                 } catch (IOException ioe) {
-                    Log.e(ImApp.LOG_TAG, "couldn't load avatar", ioe);
+                    Log.e(LOG_TAG, "couldn't load avatar", ioe);
                 }
             }
 
@@ -935,7 +934,7 @@ public class OnboardingActivity extends BaseActivity {
 
             DatabaseUtils.insertAvatarBlob(getContentResolver(), Imps.Avatars.CONTENT_URI, account.providerId, account.accountId, avatarBytesCompressed, avatarHash, account.username + '@' + account.domain);
         } catch (Exception e) {
-            Log.w(ImApp.LOG_TAG, "error loading image bytes", e);
+            Log.w(LOG_TAG, "error loading image bytes", e);
         }
     }
 

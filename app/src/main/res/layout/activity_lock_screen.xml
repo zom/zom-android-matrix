@@ -40,7 +40,7 @@
                     android:gravity="center"
                     android:orientation="vertical" >
 
-                        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+                        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_toLeftOf="@+id/languageButton"
@@ -49,7 +49,7 @@
                             android:text="@string/lock_screen_passphrase_not_set_enter" />
 
 
-                    <info.guardianproject.keanuapp.type.CustomTypefaceEditText
+                    <info.guardianproject.keanu.core.type.CustomTypefaceEditText
                         android:id="@+id/editNewPassphrase"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
@@ -72,7 +72,7 @@
                     android:gravity="center"
                     android:orientation="vertical" >
 
-                    <info.guardianproject.keanuapp.type.CustomTypefaceEditText
+                    <info.guardianproject.keanu.core.type.CustomTypefaceEditText
                         android:id="@+id/editConfirmNewPassphrase"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
@@ -88,7 +88,7 @@
                 </LinearLayout>
             </ViewFlipper>
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:id="@+id/btnCreate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -97,7 +97,7 @@
                 android:layout_marginTop="0dp"
                 android:text="@string/lock_screen_create_passphrase" />
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:id="@+id/btnSkip"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -122,7 +122,7 @@
                 android:layout_margin="5dp"
                 android:gravity="center" >
 
-                <info.guardianproject.keanuapp.type.CustomTypefaceEditText
+                <info.guardianproject.keanu.core.type.CustomTypefaceEditText
                     android:id="@+id/editEnterPassphrase"
                     android:layout_width="300dip"
                     android:layout_height="wrap_content"
@@ -136,7 +136,7 @@
                     >
 
                     <requestFocus />
-                </info.guardianproject.keanuapp.type.CustomTypefaceEditText>
+                </info.guardianproject.keanu.core.type.CustomTypefaceEditText>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

@@ -1,14 +1,14 @@
 package info.guardianproject.keanuapp.ui.onboarding;
 
 import info.guardianproject.keanuapp.R;
-import info.guardianproject.keanuapp.nearby.NearbyAddContactActivity;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.ui.qr.QrScanActivity;
+import info.guardianproject.keanu.core.provider.Imps;
 import org.json.JSONException;
 
+import info.guardianproject.keanu.core.util.ImPluginHelper;
+import info.guardianproject.keanu.core.util.LogCleaner;
 import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.ui.legacy.ImPluginHelper;
-import info.guardianproject.keanuapp.util.LogCleaner;
+import info.guardianproject.keanuapp.nearby.NearbyAddContactActivity;
+import info.guardianproject.keanuapp.ui.qr.QrScanActivity;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -27,6 +27,8 @@ import android.os.Handler;
 import android.provider.Telephony;
 import android.util.Base64;
 import android.util.Log;
+
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 public class OnboardingManager {
 
@@ -114,7 +116,7 @@ public class OnboardingManager {
             return resp.toString();
         } catch (Exception e)
         { 
-            Log.d(ImApp.LOG_TAG,"error with link",e);
+            Log.d(LOG_TAG,"error with link",e);
             return null;
         }
     }
@@ -197,7 +199,7 @@ public class OnboardingManager {
             }
             catch (IllegalArgumentException iae)
             {
-             Log.e(ImApp.LOG_TAG,"bad link decode",iae);
+             Log.e(LOG_TAG,"bad link decode",iae);
             }
         }
 
@@ -349,7 +351,7 @@ public class OnboardingManager {
                 return result;
             }
         } catch (Exception e) {
-            LogCleaner.error(ImApp.LOG_TAG, "error registering new account", e);
+            LogCleaner.error(LOG_TAG, "error registering new account", e);
 
 
         }
@@ -417,7 +419,7 @@ public class OnboardingManager {
 
             // settings closed in registerAccount
         } catch (Exception e) {
-            LogCleaner.error(ImApp.LOG_TAG, "error registering new account", e);
+            LogCleaner.error(LOG_TAG, "error registering new account", e);
 
 
         }

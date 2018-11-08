@@ -1,7 +1,6 @@
 package info.guardianproject.keanuapp.ui;
 
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,9 +13,7 @@ import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -26,14 +23,14 @@ import android.widget.ViewFlipper;
 
 import info.guardianproject.keanuapp.R;
 
+import info.guardianproject.keanu.core.cacheword.CacheWordHandler;
+import info.guardianproject.keanu.core.cacheword.ICacheWordSubscriber;
+import info.guardianproject.keanu.core.cacheword.PassphraseSecrets;
 import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.Preferences;
-import info.guardianproject.keanuapp.cacheword.CacheWordHandler;
-import info.guardianproject.keanuapp.cacheword.ICacheWordSubscriber;
-import info.guardianproject.keanuapp.cacheword.PassphraseSecrets;
 
-import java.util.List;
 import java.util.UUID;
+
+import static info.guardianproject.keanu.core.KeanuConstants.PREFERENCE_KEY_TEMP_PASS;
 
 public class LockScreenActivity extends BaseActivity implements ICacheWordSubscriber {
     private static final String TAG = "LockScreenActivity";
@@ -200,8 +197,8 @@ public class LockScreenActivity extends BaseActivity implements ICacheWordSubscr
 
                 //now remove the temp passphrase if it exists
                 SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-                if (settings.contains(ImApp.PREFERENCE_KEY_TEMP_PASS))
-                    settings.edit().remove(ImApp.PREFERENCE_KEY_TEMP_PASS).commit();
+                if (settings.contains(PREFERENCE_KEY_TEMP_PASS))
+                    settings.edit().remove(PREFERENCE_KEY_TEMP_PASS).commit();
 
                 finish();
 
@@ -472,7 +469,7 @@ public class LockScreenActivity extends BaseActivity implements ICacheWordSubscr
             if (p != null) {
                 String tempPassphrase = UUID.randomUUID().toString();
                 SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-                settings.edit().putString(ImApp.PREFERENCE_KEY_TEMP_PASS, tempPassphrase).apply();
+                settings.edit().putString(PREFERENCE_KEY_TEMP_PASS, tempPassphrase).apply();
                 mCacheWord.changePassphrase(p, tempPassphrase.toCharArray());
             }
 

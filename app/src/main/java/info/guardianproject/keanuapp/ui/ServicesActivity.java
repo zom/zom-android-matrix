@@ -28,12 +28,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 
+
+import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
 import info.guardianproject.keanuapp.ui.bots.ZomServicesRecyclerViewAdapter;
-
-import info.guardianproject.keanuapp.R;
 
 public class ServicesActivity extends BaseActivity implements ZomServicesRecyclerViewAdapter.ServiceItemCallback {
 
@@ -92,7 +92,7 @@ public class ServicesActivity extends BaseActivity implements ZomServicesRecycle
         dialog.setCancelable(true);
         dialog.show();
 
-        new AddContactAsyncTask(app.getDefaultProviderId(), app.getDefaultAccountId(), app){
+        new AddContactAsyncTask(app.getDefaultProviderId(), app.getDefaultAccountId()){
             @Override
             protected void onPostExecute(Integer response) {
                 super.onPostExecute(response);

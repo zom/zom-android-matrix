@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    tools:context="info.guardianproject.keanuapp.nearby.NearbyAddContactActivity">
+    tools:context="info.guardianproject.keanu.core.nearby.NearbyAddContactActivity">
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"

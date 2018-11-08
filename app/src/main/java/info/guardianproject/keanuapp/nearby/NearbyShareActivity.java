@@ -21,18 +21,16 @@ import com.google.android.gms.nearby.connection.Payload;
 import com.google.android.gms.nearby.connection.Strategy;
 
 import org.apache.commons.io.IOUtils;
-import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.conversations.Downloader;
-import info.guardianproject.keanuapp.model.Contact;
-import info.guardianproject.keanuapp.model.Presence;
-import info.guardianproject.keanuapp.plugin.xmpp.XmppAddress;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.service.IChatSession;
-import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
-import info.guardianproject.keanuapp.ui.ContactListItem;
-import info.guardianproject.keanuapp.ui.ContactViewHolder;
-import info.guardianproject.keanuapp.util.GlideUtils;
-import info.guardianproject.keanuapp.util.SecureMediaStore;
+
+import info.guardianproject.iocipher.File;
+import info.guardianproject.iocipher.FileInputStream;
+import info.guardianproject.keanu.core.conversations.Downloader;
+import info.guardianproject.keanu.core.model.Contact;
+import info.guardianproject.keanu.core.model.Presence;
+import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.util.SecureMediaStore;
 
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
@@ -41,8 +39,10 @@ import java.util.Date;
 import java.util.HashMap;
 
 import info.guardianproject.keanuapp.R;
-import info.guardianproject.iocipher.File;
-import info.guardianproject.iocipher.FileInputStream;
+import info.guardianproject.keanuapp.ImApp;
+import info.guardianproject.keanuapp.ui.contacts.ContactListItem;
+import info.guardianproject.keanuapp.ui.contacts.ContactViewHolder;
+import info.guardianproject.keanuapp.ui.widgets.GlideUtils;
 
 public class NearbyShareActivity extends ConnectionsActivity {
 
@@ -51,7 +51,7 @@ public class NearbyShareActivity extends ConnectionsActivity {
      * sample does exactly one thing, so we hardcode the ID.
      */
     private static final String SERVICE_ID =
-            "org.awesomeapp.info.guardianproject.keanuapp.nearby.share.SERVICE_ID";
+            "org.awesomeapp.info.guardianproject.keanu.core.nearby.share.SERVICE_ID";
 
     /**
      * The connection strategy we'll use for Nearby Connections. In this case, we've decided on

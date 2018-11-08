@@ -22,7 +22,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <fragment android:name="info.guardianproject.keanuapp.ui.ContactsListFragment"
+    <fragment android:name="info.guardianproject.keanu.core.ui.contacts.ContactsListFragment"
         android:id="@+id/contacts_fragment"
         android:layout_weight="1"
         android:layout_width="match_parent"

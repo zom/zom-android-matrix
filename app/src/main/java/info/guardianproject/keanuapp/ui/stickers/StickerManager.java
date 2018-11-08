@@ -26,9 +26,8 @@ import android.text.Spannable;
 import android.text.style.ImageSpan;
 import android.util.Log;
 
-import info.guardianproject.keanuapp.ImApp;
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
-import info.guardianproject.keanuapp.R;
 
 public class StickerManager {
 	
@@ -215,7 +214,7 @@ public class StickerManager {
 
 
 		} catch (Exception fe) {
-			Log.e(ImApp.LOG_TAG, "could not load emoji definition", fe);
+			Log.e(LOG_TAG, "could not load emoji definition", fe);
 		}
 
 	}

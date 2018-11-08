@@ -59,7 +59,7 @@
             android:padding="10dp"
             >
 
-                <info.guardianproject.keanuapp.type.CustomTypefaceTextView android:id="@+id/tvNickname"
+                <info.guardianproject.keanu.core.type.CustomTypefaceTextView android:id="@+id/tvNickname"
                     android:selectAllOnFocus="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
                 android:gravity="right"
                 />
 
-                <info.guardianproject.keanuapp.type.CustomTypefaceTextView android:id="@+id/tvUsername"
+                <info.guardianproject.keanu.core.type.CustomTypefaceTextView android:id="@+id/tvUsername"
                     android:selectAllOnFocus="true"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">
-        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:autoLink="none"
@@ -137,7 +137,7 @@
                 android:layout_alignParentLeft="true"
                 />
 
-            <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:id="@+id/tvFingerprint"
                 android:selectAllOnFocus="true"
                 android:layout_width="250dp"
@@ -166,7 +166,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">
-            <info.guardianproject.keanuapp.type.CustomTypefaceButton android:id="@+id/btnVerify"
+            <info.guardianproject.keanu.core.type.CustomTypefaceButton android:id="@+id/btnVerify"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/menu_verify"
@@ -176,11 +176,11 @@
                 android:visibility="gone"
                 >
 
-            </info.guardianproject.keanuapp.type.CustomTypefaceButton>
+            </info.guardianproject.keanu.core.type.CustomTypefaceButton>
 
         </RelativeLayout>
 
-        <info.guardianproject.keanuapp.type.CustomTypefaceButton android:id="@+id/btnAddAsFriend"
+        <info.guardianproject.keanu.core.type.CustomTypefaceButton android:id="@+id/btnAddAsFriend"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@null"

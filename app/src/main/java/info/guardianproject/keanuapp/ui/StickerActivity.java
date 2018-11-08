@@ -42,8 +42,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.ui.stickers.Sticker;
 import info.guardianproject.keanuapp.ui.stickers.StickerGroup;
 import info.guardianproject.keanuapp.ui.stickers.StickerManager;

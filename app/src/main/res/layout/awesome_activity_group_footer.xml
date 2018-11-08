@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<info.guardianproject.keanuapp.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
+<info.guardianproject.keanu.core.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/tvActionLeave"
     style="@style/GroupInfoAction"
     android:layout_width="match_parent"

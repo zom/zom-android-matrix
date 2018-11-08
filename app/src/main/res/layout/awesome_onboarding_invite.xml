@@ -15,7 +15,7 @@ android:orientation="vertical"
     android:layout_margin="0dp"
     />
 
-<info.guardianproject.keanuapp.type.CustomTypefaceTextView
+<info.guardianproject.keanu.core.type.CustomTypefaceTextView
     android:id="@+id/statusInviteFriends"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -34,7 +34,7 @@ android:orientation="vertical"
     android:gravity="center_horizontal|top"
     android:orientation="horizontal" >
 
-    <info.guardianproject.keanuapp.type.CustomTypefaceButton
+    <info.guardianproject.keanu.core.type.CustomTypefaceButton
         android:id="@+id/btnInviteSMS"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -48,7 +48,7 @@ android:orientation="vertical"
         style="@android:style/Widget.Button"
 
 
-        />   <info.guardianproject.keanuapp.type.CustomTypefaceButton
+        />   <info.guardianproject.keanu.core.type.CustomTypefaceButton
     android:id="@+id/btnInviteShare"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -63,7 +63,7 @@ android:orientation="vertical"
 
 
     />
-    <info.guardianproject.keanuapp.type.CustomTypefaceButton
+    <info.guardianproject.keanu.core.type.CustomTypefaceButton
         android:id="@+id/btnInviteScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -81,7 +81,7 @@ android:orientation="vertical"
 
 </LinearLayout>
     <!--
-<info.guardianproject.keanuapp.type.CustomTypefaceButton
+<info.guardianproject.keanu.core.type.CustomTypefaceButton
     android:id="@+id/btnInviteSkip"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"

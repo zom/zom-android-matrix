@@ -26,7 +26,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -57,42 +56,43 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
 
-import info.guardianproject.keanuapp.model.Contact;
-import info.guardianproject.keanuapp.model.ImConnection;
-import info.guardianproject.keanuapp.model.ImErrorInfo;
-import info.guardianproject.keanuapp.plugin.xmpp.XmppAddress;
-import info.guardianproject.keanuapp.provider.Imps;
-import info.guardianproject.keanuapp.service.IChatSession;
-import info.guardianproject.keanuapp.service.IChatSessionManager;
-import info.guardianproject.keanuapp.service.IConnectionListener;
-import info.guardianproject.keanuapp.service.IImConnection;
-import info.guardianproject.keanuapp.service.ImServiceConstants;
+import info.guardianproject.iocipher.VirtualFileSystem;
+import info.guardianproject.keanu.core.Preferences;
+import info.guardianproject.keanu.core.model.Contact;
+import info.guardianproject.keanu.core.model.ImConnection;
+import info.guardianproject.keanu.core.model.ImErrorInfo;
+import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.service.IChatSessionManager;
+import info.guardianproject.keanu.core.service.IConnectionListener;
+import info.guardianproject.keanu.core.service.IImConnection;
+import info.guardianproject.keanu.core.service.ImServiceConstants;
+import info.guardianproject.keanu.core.service.RemoteImService;
+import info.guardianproject.keanu.core.util.SecureMediaStore;
+import info.guardianproject.keanu.core.util.SystemServices;
+import info.guardianproject.keanu.core.util.XmppUriHelper;
+import info.guardianproject.keanu.core.tasks.ChatSessionInitTask;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
-import info.guardianproject.keanuapp.tasks.ChatSessionInitTask;
-import info.guardianproject.keanuapp.ui.AccountFragment;
-import info.guardianproject.keanuapp.ui.AccountsActivity;
-import info.guardianproject.keanuapp.ui.AddContactActivity;
 import info.guardianproject.keanuapp.ui.BaseActivity;
-import info.guardianproject.keanuapp.ui.ContactsListFragment;
-import info.guardianproject.keanuapp.ui.ContactsPickerActivity;
-import info.guardianproject.keanuapp.ui.ConversationDetailActivity;
-import info.guardianproject.keanuapp.ui.ConversationListFragment;
 import info.guardianproject.keanuapp.ui.LockScreenActivity;
 import info.guardianproject.keanuapp.ui.MoreFragment;
+import info.guardianproject.keanuapp.ui.accounts.AccountFragment;
+import info.guardianproject.keanuapp.ui.accounts.AccountsActivity;
 import info.guardianproject.keanuapp.ui.camera.CameraActivity;
+import info.guardianproject.keanuapp.ui.contacts.AddContactActivity;
+import info.guardianproject.keanuapp.ui.contacts.ContactsListFragment;
+import info.guardianproject.keanuapp.ui.contacts.ContactsPickerActivity;
+import info.guardianproject.keanuapp.ui.conversation.ConversationDetailActivity;
+import info.guardianproject.keanuapp.ui.conversation.ConversationListFragment;
 import info.guardianproject.keanuapp.ui.legacy.SettingActivity;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
-import info.guardianproject.keanuapp.util.AssetUtil;
-import info.guardianproject.keanuapp.util.SecureMediaStore;
-import info.guardianproject.keanuapp.util.SystemServices;
-import info.guardianproject.keanuapp.util.XmppUriHelper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -104,7 +104,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
-import info.guardianproject.iocipher.VirtualFileSystem;
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanu.core.KeanuConstants.PREFERENCE_KEY_TEMP_PASS;
 
 /**
  * TODO
@@ -344,12 +345,12 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
         }
         else {
             if (mConn == null) {
-                mConn = mApp.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
+                mConn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
                 if (mConn != null) {
                     try {
                         mConn.registerConnectionListener(this);
                     } catch (Exception e) {
-                        Log.e(ImApp.LOG_TAG, "unable to register connection listener", e);
+                        Log.e(LOG_TAG, "unable to register connection listener", e);
                     }
 
                 }
@@ -377,7 +378,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
             }
 
             if (mApp.getDefaultProviderId() != -1) {
-                final IImConnection conn = mApp.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
+                final IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
                 final int connState = conn.getState();
 
                 if (connState == ImConnection.DISCONNECTED
@@ -527,7 +528,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                 }
                 catch (Exception e)
                 {
-                    Log.w(ImApp.LOG_TAG, "error importing photo",e);
+                    Log.w(LOG_TAG, "error importing photo",e);
 
                 }
             }
@@ -545,14 +546,14 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                         {
                             address = XmppUriHelper.parse(Uri.parse(resultScan)).get(XmppUriHelper.KEY_ADDRESS);
                             String fingerprint =  XmppUriHelper.getOtrFingerprint(resultScan);
-                            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId(), mApp).execute(address, fingerprint);
+                            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(address, fingerprint);
 
                         }
                         else {
                             //parse each string and if they are for a new user then add the user
                             OnboardingManager.DecodedInviteLink diLink = OnboardingManager.decodeInviteLink(resultScan);
 
-                            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId(), mApp).execute(diLink.username,diLink.fingerprint,diLink.nickname);
+                            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(diLink.username,diLink.fingerprint,diLink.nickname);
                         }
 
                         if (address != null)
@@ -562,7 +563,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                     }
                     catch (Exception e)
                     {
-                        Log.w(ImApp.LOG_TAG, "error parsing QR invite link", e);
+                        Log.w(LOG_TAG, "error parsing QR invite link", e);
                     }
                 }
             }
@@ -578,7 +579,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
         String nickname = mApp.getDefaultUsername().split("@")[0];
         try
         {
-            IImConnection conn = mApp.getConnection(mApp.getDefaultProviderId(),mApp.getDefaultAccountId());
+            IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(),mApp.getDefaultAccountId());
             if (conn.getState() == ImConnection.LOGGED_IN)
             {
                 this.startGroupChat(chatRoom, chatServer, nickname, invitees, conn);
@@ -631,7 +632,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
         }
         catch (IOException ioe)
         {
-            Log.e(ImApp.LOG_TAG,"error importing photo",ioe);
+            Log.e(LOG_TAG,"error importing photo",ioe);
         }
 
     }
@@ -700,7 +701,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
         MenuItem mItem = menu.findItem(R.id.menu_lock_reset);
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        if (!settings.contains(ImApp.PREFERENCE_KEY_TEMP_PASS))
+        if (!settings.contains(PREFERENCE_KEY_TEMP_PASS))
             mItem.setVisible(true);
 
         return true;
@@ -784,7 +785,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
     public void handleLock ()
     {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
-        if (settings.contains(ImApp.PREFERENCE_KEY_TEMP_PASS))
+        if (settings.contains(PREFERENCE_KEY_TEMP_PASS))
         {
             //need to setup new user passphrase
             Intent intent = new Intent(this, LockScreenActivity.class);
@@ -863,7 +864,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
         //startCrypto is not actually used anymore, as we move to OMEMO
 
         if (username != null)
-            new ChatSessionInitTask(((ImApp)getApplication()),providerId, accountId, Imps.Contacts.TYPE_NORMAL, true)
+            new ChatSessionInitTask(providerId, accountId, Imps.Contacts.TYPE_NORMAL, true)
             {
                 @Override
                 protected void onPostExecute(Long chatId) {
@@ -918,7 +919,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                          **/
 
                         try {
-                            IImConnection conn = mApp.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
+                            IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
                             if (conn.getState() == ImConnection.LOGGED_IN)
                                 startGroupChat(chatRoom, chatServer, nickname, null, conn);
 
@@ -1260,6 +1261,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
     private void checkCustomFont ()
     {
 
+        /**
         if (Preferences.isLanguageTibetan())
         {
         //    CustomTypefaceManager.loadFromAssets(this,true);
@@ -1288,6 +1290,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
 
 //            CustomTypefaceManager.loadFromAssets(this, loadTibetan);
         }
+         **/
 
     }
 

@@ -18,16 +18,17 @@
 package info.guardianproject.keanuapp.ui.legacy;
 
 import info.guardianproject.keanuapp.R;
-import info.guardianproject.keanuapp.model.Contact;
-import info.guardianproject.keanuapp.model.ContactListListener;
-import info.guardianproject.keanuapp.model.ImErrorInfo;
+import info.guardianproject.keanu.core.model.Contact;
+import info.guardianproject.keanu.core.model.ContactListListener;
+import info.guardianproject.keanu.core.model.ImErrorInfo;
+import info.guardianproject.keanu.core.util.ErrorResUtils;
+import info.guardianproject.keanuapp.ImApp;
+
 import android.app.Activity;
 import android.content.res.Resources;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.Toast;
-
-import info.guardianproject.keanuapp.ImApp;
 
 public class SimpleAlertHandler extends Handler {
 

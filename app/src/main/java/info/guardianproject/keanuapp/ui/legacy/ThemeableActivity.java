@@ -1,6 +1,7 @@
 package info.guardianproject.keanuapp.ui.legacy;
 
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ImApp;
 
 import java.io.File;
 
@@ -16,7 +17,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Display;
 import android.view.View;
 
-import info.guardianproject.keanuapp.ImApp;
 
 public class ThemeableActivity extends AppCompatActivity {
 

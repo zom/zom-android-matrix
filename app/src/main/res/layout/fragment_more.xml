@@ -20,7 +20,7 @@
         android:id="@+id/btnOpenServices"
         >
 
-        <info.guardianproject.keanuapp.ui.CircleColorImageView
+        <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/notify_app"
@@ -29,7 +29,7 @@
             android:layout_gravity="center"
             app:circleColor="@color/app_primary"
             />
-        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
 
             android:layout_width="match_parent"
             android:layout_height="64dp"
@@ -51,7 +51,7 @@
         android:id="@+id/btnOpenGalllery"
         >
 
-        <info.guardianproject.keanuapp.ui.CircleColorImageView
+        <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_photo_library_white_36dp"
@@ -60,7 +60,7 @@
             android:layout_gravity="center"
             app:circleColor="@color/honeycombish_blue"
             />
-        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
 
             android:layout_width="match_parent"
             android:layout_height="64dp"
@@ -82,7 +82,7 @@
         android:id="@+id/btnOpenGroups"
         >
 
-        <info.guardianproject.keanuapp.ui.CircleColorImageView
+        <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_group_add_white_36dp"
@@ -91,7 +91,7 @@
             android:layout_gravity="center"
             app:circleColor="@android:color/holo_green_light"
             />
-    <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+    <info.guardianproject.keanu.core.type.CustomTypefaceTextView
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:text="@string/create_group"
@@ -112,7 +112,7 @@
         android:id="@+id/btnOpenStickers"
         >
 
-        <info.guardianproject.keanuapp.ui.CircleColorImageView
+        <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_insert_emoticon_white_36dp"
@@ -121,7 +121,7 @@
             android:layout_gravity="center"
             app:circleColor="@android:color/holo_orange_light"
             />
-        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:text="@string/action_stickers"
@@ -141,7 +141,7 @@
         android:id="@+id/btnOpenThemes"
         >
 
-        <info.guardianproject.keanuapp.ui.CircleColorImageView
+        <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/tshirt128px"
@@ -150,7 +150,7 @@
             android:layout_gravity="center"
             app:circleColor="@android:color/holo_purple"
             />
-        <info.guardianproject.keanuapp.type.CustomTypefaceTextView
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
             android:layout_width="match_parent"
             android:layout_height="64dp"
             android:text="@string/action_theme"
