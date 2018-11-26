@@ -182,8 +182,6 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         // Have the heartbeat start autoLogin, unless onStart turns this off
         mNeedCheckAutoLogin = true;
 
-        HeartbeatService.startBeating(getApplicationContext());
-
         installTransports(this);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -364,6 +362,13 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             mNeedCheckAutoLogin = !autoLogin();
         }
 
+
+        try { HeartbeatService.startBeating(getApplicationContext()); }
+        catch (IllegalStateException ise){
+            debug("couldn't start Heartbeat service",ise);
+        }
+
+
         return START_STICKY;
     }
 
@@ -371,7 +376,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
     @Override
     public void onLowMemory() {
-        
+
+        debug ("onLowMemory()!");
     }
 
 
@@ -380,6 +386,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
      * @param level the memory-related event that was raised.
      */
     public void onTrimMemory(int level) {
+
+        debug ("OnTrimMemory: " + level);
 
         // Determine which lifecycle or system event was raised.
         switch (level) {
