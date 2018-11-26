@@ -678,5 +678,12 @@ public class MatrixConnection extends ImConnection {
         public void onGroupInvitedUsersListUpdate(String s) {
 
         }
+
+
+        @Override
+        public void onAccountDataUpdated() {
+        }
+
+
     };
 }
