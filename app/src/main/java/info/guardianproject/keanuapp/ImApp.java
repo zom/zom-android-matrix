@@ -227,17 +227,12 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         intentFilter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         registerReceiver(new NetworkConnectivityReceiver(), intentFilter);
 
-        if(Build.VERSION.SDK_INT>=24){
-            try{
-                Method m = StrictMode.class.getMethod("disableDeathOnFileUriExposure");
-                m.invoke(null);
-
-                StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.LAX);
-            }catch(Exception e){
-                e.printStackTrace();
-            }
+        if (BuildConfig.DEBUG) {
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build());
         }
-
     }
 
     public boolean isThemeDark ()
