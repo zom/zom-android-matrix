@@ -87,11 +87,6 @@ public class ContactDisplayActivity extends BaseActivity {
 
         mConn = RemoteImService.getConnection(mProviderId, mAccountId);
 
-        if (TextUtils.isEmpty(mNickname)) {
-            mNickname = mUsername;
-            mNickname = mNickname.split("@")[0].split("\\.")[0];
-        }
-
         setTitle("");
 
         TextView tv = (TextView) findViewById(R.id.tvNickname);
@@ -100,19 +95,6 @@ public class ContactDisplayActivity extends BaseActivity {
 
         tv = (TextView) findViewById(R.id.tvUsername);
         tv.setText(mUsername);
-
-        if (!TextUtils.isEmpty(mUsername)) {
-            try {
-                Drawable avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mUsername, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, false);
-                if (avatar != null) {
-                    ImageView iv = (ImageView) findViewById(R.id.imageAvatar);
-                    iv.setImageDrawable(avatar);
-                    iv.setVisibility(View.VISIBLE);
-                    findViewById(R.id.imageSpacer).setVisibility(View.GONE);
-                }
-            } catch (Exception e) {
-            }
-        }
 
         View btn = findViewById(R.id.btnStartChat);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -125,17 +107,32 @@ public class ContactDisplayActivity extends BaseActivity {
         });
 
         boolean showAddFriends = true;
-        Cursor c = getContentResolver().query(Imps.Contacts.CONTENT_URI, new String[]{Imps.Contacts.SUBSCRIPTION_TYPE}, Imps.Contacts.USERNAME + "=?", new String[]{mUsername}, null);
-        if (c != null) {
-            if (c.moveToFirst()) {
-                int subscriptionType = c.getInt(c.getColumnIndex(Imps.Contacts.SUBSCRIPTION_TYPE));
-                if (subscriptionType != Imps.Contacts.SUBSCRIPTION_TYPE_NONE && subscriptionType != Imps.Contacts.SUBSCRIPTION_TYPE_FROM) {
-                    // It is "to", or "both" or some other value with special meaning.
-                    showAddFriends = false;
+
+        if (!TextUtils.isEmpty(mUsername)) {
+            try {
+                Drawable avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mUsername, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, false);
+                if (avatar != null) {
+                    ImageView iv = (ImageView) findViewById(R.id.imageAvatar);
+                    iv.setImageDrawable(avatar);
+                    iv.setVisibility(View.VISIBLE);
+                    findViewById(R.id.imageSpacer).setVisibility(View.GONE);
                 }
+            } catch (Exception e) {
             }
-            c.close();
+
+            Cursor c = getContentResolver().query(Imps.Contacts.CONTENT_URI, new String[]{Imps.Contacts.SUBSCRIPTION_TYPE}, Imps.Contacts.USERNAME + "=?", new String[]{mUsername}, null);
+            if (c != null) {
+                if (c.moveToFirst()) {
+                    int subscriptionType = c.getInt(c.getColumnIndex(Imps.Contacts.SUBSCRIPTION_TYPE));
+                    if (subscriptionType != Imps.Contacts.SUBSCRIPTION_TYPE_NONE && subscriptionType != Imps.Contacts.SUBSCRIPTION_TYPE_FROM) {
+                        // It is "to", or "both" or some other value with special meaning.
+                        showAddFriends = false;
+                    }
+                }
+                c.close();
+            }
         }
+
         if (showAddFriends) {
             Button btnAddAsFriend = findViewById(R.id.btnAddAsFriend);
             btnAddAsFriend.setText(getString(R.string.add_x_as_friend, mNickname));
