@@ -341,15 +341,14 @@ public class ContactListItem extends FrameLayout {
 
                 Drawable avatar = null;
 
-                try
-                {
-                    avatar = DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
+                if (!TextUtils.isEmpty(address)) {
+                    try {
+                        avatar = DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
 
-                }
-                catch (Exception e)
-                {
-                    //problem decoding avatar
-                    Log.e(LOG_TAG,"error decoding avatar",e);
+                    } catch (Exception e) {
+                        //problem decoding avatar
+                        Log.e(LOG_TAG, "error decoding avatar", e);
+                    }
                 }
 
                 try
