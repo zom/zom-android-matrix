@@ -7,6 +7,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.JobIntentService;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import info.guardianproject.keanu.core.provider.Imps;
@@ -51,11 +52,7 @@ public class GeneralJobIntentService extends JobIntentService {
                     Intent serviceIntent = new Intent(context, RemoteImService.class);
                     //   serviceIntent.setComponent(ImServiceConstants.IM_SERVICE_COMPONENT);
                     serviceIntent.putExtra(ImServiceConstants.EXTRA_CHECK_AUTO_LOGIN, true);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        context.startForegroundService(serviceIntent);
-                    } else {
-                        context.startService(serviceIntent);
-                    }
+                    ContextCompat.startForegroundService(context,serviceIntent);
 
                     Log.d(LOG_TAG, "autostart done");
                 } else {
