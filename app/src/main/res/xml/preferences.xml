@@ -154,7 +154,7 @@
          
          
 <!-- 
-        <info.guardianproject.keanu.core.ui.legacy.ImRingtonePreference
+        <info.guardianproject.keanuapp.ui.legacy.ImRingtonePreference
                 android:layout="?android:attr/preferenceLayoutChild"
                 android:dependency="pref_notification_sound"
                 android:key="pref_notification_ringtone"
