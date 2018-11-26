@@ -44,12 +44,7 @@ dependencies {
     implementation 'cz.msebera.android:httpclient:4.4.1.2'
 
     //   implementation 'de.measite.minidns:minidns-hla:0.2.4'
-    implementation 'org.minidns:minidns-hla:0.3.0'
-
-    // https://mvnrepository.com/artifact/org.jxmpp/jxmpp-core
-    implementation 'org.jxmpp:jxmpp-core:0.6.2'
-    implementation 'org.jxmpp:jxmpp-jid:0.6.2'
-    implementation 'org.jxmpp:jxmpp-util-cache:0.6.2'
+    implementation 'org.minidns:minidns-hla:0.3.3'
 
     // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
     implementation 'com.google.protobuf:protobuf-java:3.4.0'
@@ -61,21 +56,21 @@ dependencies {
 
 
     // https://mvnrepository.com/artifact/org.jxmpp/jxmpp-core
-    implementation 'org.jxmpp:jxmpp-core:0.6.2'
-    implementation 'org.jxmpp:jxmpp-jid:0.6.2'
-    implementation 'org.jxmpp:jxmpp-util-cache:0.6.2'
+    implementation 'org.jxmpp:jxmpp-core:0.6.3'
+    implementation 'org.jxmpp:jxmpp-jid:0.6.3'
+    implementation 'org.jxmpp:jxmpp-util-cache:0.6.3'
 
 
     // Network
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
     implementation 'com.google.code.gson:gson:2.8.2'
-    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
     implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.10.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
     implementation 'com.facebook.stetho:stetho:1.5.0'
     implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
-    implementation 'com.squareup.okio:okio:1.14.0'
+    implementation 'com.squareup.okio:okio:1.15.0'
 
     //media
     implementation 'com.android.support:exifinterface:28.0.0'
