@@ -13,8 +13,23 @@ public class MatrixAddress extends Address {
 
     public MatrixAddress (String address)
     {
-        mAddress = address;
-        mUser = address.substring(1).split(":")[0];
+
+        if (address.startsWith("@")) {
+            mUser = address.substring(1).split(":")[0];
+            mAddress = address;
+        }
+        else if (address.startsWith("!")) {
+            mUser = address.split(":")[0];
+            mAddress = address;
+        }
+        else
+        {
+            //parts from XMPP style address
+            String[] parts = address.split("@");
+            mUser = parts[0];
+            mAddress = '@' + mUser + ':' + parts[1];
+        }
+
         mResource = "matrix";
     }
 
