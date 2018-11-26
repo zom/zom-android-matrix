@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <info.guardianproject.keanu.core.ui.widgets.FlowLayout
+        <info.guardianproject.keanuapp.ui.widgets.FlowLayout
             android:id="@+id/flSelectedContacts"
             android:layout_width="match_parent"
             android:layout_height="200dp"
@@ -58,7 +58,7 @@
             android:orientation="horizontal"
             android:padding="3dp">
 
-            <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
+            <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"
@@ -87,7 +87,7 @@
             android:orientation="horizontal"
             android:padding="3dp">
 
-            <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
+            <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center"

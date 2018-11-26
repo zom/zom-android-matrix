@@ -20,7 +20,7 @@
         android:id="@+id/btnOpenServices"
         >
 
-        <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
+        <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/notify_app"
@@ -51,7 +51,7 @@
         android:id="@+id/btnOpenGalllery"
         >
 
-        <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
+        <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_photo_library_white_36dp"
@@ -82,7 +82,7 @@
         android:id="@+id/btnOpenGroups"
         >
 
-        <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
+        <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_group_add_white_36dp"
@@ -112,7 +112,7 @@
         android:id="@+id/btnOpenStickers"
         >
 
-        <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
+        <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_insert_emoticon_white_36dp"
@@ -141,7 +141,7 @@
         android:id="@+id/btnOpenThemes"
         >
 
-        <info.guardianproject.keanu.core.ui.widgets.CircleColorImageView
+        <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/tshirt128px"

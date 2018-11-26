@@ -56,7 +56,7 @@ android:paddingTop="40dp"
 
 
     <!--
-<info.guardianproject.keanu.core.ui.widgets.InstantAutoCompleteTextView
+<info.guardianproject.keanuapp.ui.widgets.InstantAutoCompleteTextView
     android:id="@+id/spinnerDomains"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

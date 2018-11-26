@@ -23,7 +23,7 @@
 
     >
 
-    <fragment android:name="info.guardianproject.keanu.core.ui.accounts.AccountsFragment"
+    <fragment android:name="info.guardianproject.keanuapp.ui.accounts.AccountsFragment"
         android:id="@+id/accounts_fragment"
         android:layout_weight="1"
         android:layout_width="match_parent"

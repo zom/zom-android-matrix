@@ -22,7 +22,7 @@
     android:layout_height="match_parent">
 
 
-    <fragment android:name="info.guardianproject.keanu.core.ui.gallery.GalleryListFragment"
+    <fragment android:name="info.guardianproject.keanuapp.ui.gallery.GalleryListFragment"
         android:id="@+id/gallery_fragment"
         android:layout_weight="1"
         android:layout_width="match_parent"
