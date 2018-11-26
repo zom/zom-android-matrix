@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;
@@ -62,12 +63,7 @@ public class NetworkSchedulerService extends JobService implements
 
         NetworkConnectivityReceiver.State stateExtra = isConnected ? NetworkConnectivityReceiver.State.CONNECTED : NetworkConnectivityReceiver.State.NOT_CONNECTED;
         intent.putExtra(NETWORK_STATE_EXTRA,stateExtra.ordinal());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent);
-        }
-        else
-        {
-            startService(intent);
-        }
+        ContextCompat.startForegroundService(this,intent);
+
     }
 }
