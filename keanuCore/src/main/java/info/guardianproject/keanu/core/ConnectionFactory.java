@@ -27,6 +27,7 @@ import java.util.Map;
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.model.ImException;
 import info.guardianproject.keanu.core.plugin.ImConfigNames;
+import info.guardianproject.keanu.core.plugin.ImPlugin;
 import info.guardianproject.keanu.core.plugin.ProviderManager;
 import info.guardianproject.keanu.core.util.ImPluginHelper;
 
@@ -78,8 +79,8 @@ public class ConnectionFactory {
         **/
 
         try {
-            String className = ImPluginHelper.getInstance(context).getPluginInfo(protocolName).mClassName;
-            Class cls = Class.forName(className);
+            ImPlugin plugin = ImPluginHelper.getInstance(context).getPlugin(protocolName);
+            Class cls = Class.forName(plugin.getProviderConfig().get("connclass"));
             Constructor constructor = cls.getConstructor(new Class[] { Context.class });
             ImConnection conn = (ImConnection) constructor.newInstance(new Object[] { context});
             return conn;
