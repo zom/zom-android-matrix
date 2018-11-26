@@ -1,6 +1,8 @@
 
 package info.guardianproject.keanu.core.cacheword;
 
+import android.util.Log;
+
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -15,6 +17,8 @@ import javax.crypto.spec.SecretKeySpec;
  * strings as character arrays.
  */
 public class Wiper {
+
+    private final static String TAG = "CacheWordWiper";
 
     // On android the default is UTF-8
     public final static Charset Utf8CharSet = Charset.forName("UTF-8");
@@ -69,17 +73,15 @@ public class Wiper {
             byte[] bytes = (byte[]) key_field.get(key);
             wipe(bytes);
         } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+           Log.e(TAG,"wipe() Security Exception",e);
         } catch (NoSuchFieldException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.w(TAG,"wipe() Key field not supported on this OS");
         } catch (IllegalArgumentException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG,"wipe() Illegal Arg Exception",e);
+
         } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Log.e(TAG,"wipe() Illegal Access Exception",e);
+
         }
     }
 
