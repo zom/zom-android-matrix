@@ -815,18 +815,24 @@ public class OnboardingActivity extends BaseActivity {
         @Override
         protected void onPostExecute(OnboardingAccount account) {
 
-            mUsername = account.username + '@' + account.domain;
+            if (account != null) {
+                mUsername = account.username + '@' + account.domain;
 
-            ImApp mApp = (ImApp)getApplication();
-            mApp.setDefaultAccount(account.providerId,account.accountId);
+                ImApp mApp = (ImApp) getApplication();
+                mApp.setDefaultAccount(account.providerId, account.accountId);
 
-            SignInHelper signInHelper = new SignInHelper(OnboardingActivity.this, mHandler);
-            signInHelper.activateAccount(account.providerId,account.accountId);
-            signInHelper.signIn(account.password, account.providerId, account.accountId, true);
+                SignInHelper signInHelper = new SignInHelper(OnboardingActivity.this, mHandler);
+                signInHelper.activateAccount(account.providerId, account.accountId);
+                signInHelper.signIn(account.password, account.providerId, account.accountId, true);
 
-            showInviteScreen();
+                showInviteScreen();
 
-            mExistingAccountTask = null;
+                mExistingAccountTask = null;
+            }
+            else
+            {
+                Toast.makeText(OnboardingActivity.this,R.string.error,Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
