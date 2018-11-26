@@ -376,6 +376,7 @@ public class OnboardingManager {
 
         ContentResolver cr = context.getContentResolver();
         ImPluginHelper helper = ImPluginHelper.getInstance(context);
+
         long providerId = helper.createAdditionalProvider(helper.getProviderNames().get(0)); //xmpp FIXME
 
         long accountId = ImApp.insertOrUpdateAccount(cr, providerId, -1, nickname, username, password);
