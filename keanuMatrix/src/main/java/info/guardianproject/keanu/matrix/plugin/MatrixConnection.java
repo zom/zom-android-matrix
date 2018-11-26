@@ -3,6 +3,7 @@ package info.guardianproject.keanu.matrix.plugin;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.text.TextUtils;
@@ -26,6 +27,7 @@ import org.matrix.androidsdk.rest.model.RoomMember;
 import org.matrix.androidsdk.rest.model.User;
 import org.matrix.androidsdk.rest.model.bingrules.BingRule;
 import org.matrix.androidsdk.rest.model.login.Credentials;
+import org.w3c.dom.Text;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -65,7 +67,10 @@ public class MatrixConnection extends ImConnection {
     private MatrixChatGroupManager mChatGroupManager;
 
     private final static String TAG = "MATRIX";
+    private static final int THREAD_ID = 10001;
 
+    private final static String HTTPS_PREPEND = "https://";
+    
     public MatrixConnection (Context context)
     {
         super (context);
@@ -144,16 +149,33 @@ public class MatrixConnection extends ImConnection {
     private void loginAsync (String password)
     {
 
+        TrafficStats.setThreadStatsTag(THREAD_ID);
+
         String username = mUser.getAddress().getUser();
-        String server = "https://matrix.org";
 
         ContentResolver contentResolver = mContext.getContentResolver();
 
         if (password == null)
             password = Imps.Account.getPassword(contentResolver, mAccountId);
 
+        Cursor cursor = contentResolver.query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(mProviderId)}, null);
+
+        if (cursor == null)
+            return; //not going to work
+
+        Imps.ProviderSettings.QueryMap providerSettings = new Imps.ProviderSettings.QueryMap(
+                cursor, contentResolver, mProviderId, false, null);
+
+        String server = providerSettings.getServer();
+        if (TextUtils.isEmpty(server))
+            server = providerSettings.getDomain();
+
+        providerSettings.close();
+        if (!cursor.isClosed())
+            cursor.close();
+
         mConfig = new HomeServerConnectionConfig.Builder()
-                .withHomeServerUri(Uri.parse(server))
+                .withHomeServerUri(Uri.parse(HTTPS_PREPEND + server))
                 .build();
 
         new LoginRestClient(mConfig).loginWithUser(username, password, new SimpleApiCallback<Credentials>()
