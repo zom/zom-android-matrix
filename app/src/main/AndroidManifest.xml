@@ -38,6 +38,7 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <!--
      Some Chromebooks don't support touch. Although not essential,
@@ -386,6 +387,24 @@
             android:screenOrientation="portrait"
             android:exported="false"
             />
+
+        <service
+            android:name="info.guardianproject.keanu.matrix.plugin.MatrixImPlugin"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="info.guardianproject.keanu.core.plugin" />
+            </intent-filter>
+
+            <meta-data
+                android:name="info.guardianproject.keanu.core.plugin.provider_name"
+                android:value="MATRIX" />
+            <meta-data
+                android:name="info.guardianproject.keanu.core.plugin.provider_full_name"
+                android:value="Matrix" />
+            <meta-data
+                android:name="info.guardianproject.keanu.core.plugin.signup_url"
+                android:value="https://matrix.org" />
+        </service>
 
 
     </application>
