@@ -125,10 +125,24 @@ public class MatrixConnection extends ImConnection {
     }
 
     @Override
-    public void loginAsync(long accountId, String password, long providerId, boolean retry) {
-
+    public void loginAsync(long accountId, final String password, long providerId, boolean retry) {
 
         setState(LOGGING_IN, null);
+
+        mProviderId = providerId;
+        mAccountId = accountId;
+
+        new Thread ()
+        {
+            public void run ()
+            {
+                loginAsync (password);
+            }
+        }.start();
+    }
+
+    private void loginAsync (String password)
+    {
 
         String username = mUser.getAddress().getUser();
         String server = "https://matrix.org";
@@ -220,12 +234,13 @@ public class MatrixConnection extends ImConnection {
                     public void onSuccess(Void aVoid) {
                         debug ("enableCrypto: onSuccess");
                         mSession.startEventStream(initialToken);
+                        setState(LOGGED_IN, null);
+
 
                     }
                 });
 
 
-                setState(LOGGED_IN, null);
 
 
             }

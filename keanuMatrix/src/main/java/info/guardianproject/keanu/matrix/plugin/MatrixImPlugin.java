@@ -29,6 +29,7 @@ public class MatrixImPlugin extends Service implements ImPlugin {
         config.put(ImConfigNames.PLUGIN_VERSION, "0.1");
         config.put(ImpsConfigNames.HOST, "http://matrix.org");
         config.put(ImpsConfigNames.SUPPORT_USER_DEFINED_PRESENCE, "false");
+        config.put("connclass","info.guardianproject.keanu.matrix.plugin.MatrixConnection");
      //   config.put(ImpsConfigNames.CUSTOM_PRESENCE_MAPPING,
        //         "org.awesomeapp.messenger.plugin.xmpp.XmppPresenceMapping");
         return config;
