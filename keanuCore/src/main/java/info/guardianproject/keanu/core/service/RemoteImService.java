@@ -125,7 +125,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     private NotificationManager mNotifyManager;
     NotificationCompat.Builder mNotifyBuilder;
     private int mNumNotify = 0;
-    private final static int notifyId = 7777;
+    private final static int notifyId = 7;
     
     private static final String TAG = "ZomService";
 
@@ -288,6 +288,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+
+        startForeground(notifyId, getForegroundNotification());
 
         //if the service restarted, then we need to reconnect/reinit to info.guardianproject.keanu.core.cacheword
 //        if ((flags & START_FLAG_REDELIVERY)!=0)  // if crash restart..
@@ -1080,7 +1082,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                 throw new RuntimeException("getConnection() needs valid values: " + providerId + "," + accountId);
 
             if (mImService != null) {
-                IImConnection im = mImService.getConnection(providerId, accountId);
+                IImConnection im = mImService.mBinder.getConnection(providerId, accountId);
 
                 if (im != null) {
 
