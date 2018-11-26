@@ -44,7 +44,7 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     // https://mvnrepository.com/artifact/org.jxmpp/jxmpp-core
-    implementation 'org.jxmpp:jxmpp-core:0.6.2'
-    implementation 'org.jxmpp:jxmpp-jid:0.6.2'
-    implementation 'org.jxmpp:jxmpp-util-cache:0.6.2'
+    implementation 'org.jxmpp:jxmpp-core:0.6.3'
+    implementation 'org.jxmpp:jxmpp-jid:0.6.3'
+    implementation 'org.jxmpp:jxmpp-util-cache:0.6.3'
 }
