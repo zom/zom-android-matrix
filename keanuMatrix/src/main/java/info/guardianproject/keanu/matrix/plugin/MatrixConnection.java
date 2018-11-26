@@ -70,7 +70,7 @@ public class MatrixConnection extends ImConnection {
     private static final int THREAD_ID = 10001;
 
     private final static String HTTPS_PREPEND = "https://";
-    
+
     public MatrixConnection (Context context)
     {
         super (context);
@@ -316,13 +316,19 @@ public class MatrixConnection extends ImConnection {
 
         setState(ImConnection.LOGGING_OUT, null);
 
-        mSession.logout(mContext, new SimpleApiCallback<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
+        if (mSession.isAlive()) {
+            mSession.logout(mContext, new SimpleApiCallback<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
 
-                setState(ImConnection.DISCONNECTED, null);
-            }
-        });
+                    setState(ImConnection.DISCONNECTED, null);
+                }
+            });
+        }
+        else
+        {
+            setState(ImConnection.DISCONNECTED, null);
+        }
     }
 
     @Override
@@ -416,7 +422,7 @@ public class MatrixConnection extends ImConnection {
 
     private void addRoomContact (final Room room)
     {
-        debug ("Room: " + room.getRoomId() + " - " + room.getTopic() + " - " + room.getNumberOfMembers());
+        debug ("addRoomContact: " + room.getRoomId() + " - " + room.getTopic() + " - " + room.getNumberOfMembers());
 
         String subject = room.getTopic();
         if (TextUtils.isEmpty(subject))
@@ -515,7 +521,7 @@ public class MatrixConnection extends ImConnection {
 
         @Override
         public void onLiveEvent(Event event, RoomState roomState) {
-            debug ("live: " + event);
+            debug ("onLiveEvent: " + event);
 
         }
 
