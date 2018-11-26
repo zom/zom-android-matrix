@@ -1069,7 +1069,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             return null;
         }
 
-        IImConnection conn = mImService.createConnection(providerId, accountId);
+        IImConnection conn = mImService.mBinder.createConnection(providerId, accountId);
 
         return conn;
     }
