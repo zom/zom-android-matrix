@@ -20,7 +20,6 @@ package info.guardianproject.keanu.core.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 
 public class Contact extends ImEntity implements Parcelable {
@@ -125,8 +124,6 @@ public class Contact extends ImEntity implements Parcelable {
      */
     public void setPresence(Presence presence) {
         mPresence = presence;
-        if (mPresence != null && mPresence.getResource() != null)
-            mAddress = new XmppAddress(mAddress.getBareAddress() + '/' + mPresence.getResource());
     }
 
     public void writeToParcel(Parcel dest, int flags) {

@@ -422,9 +422,9 @@ public class MatrixConnection extends ImConnection {
 
     private void addRoomContact (final Room room)
     {
-        debug ("addRoomContact: " + room.getRoomId() + " - " + room.getTopic() + " - " + room.getNumberOfMembers());
+        debug ("addRoomContact: " + room.getRoomId() + " - " + room.getRoomDisplayName(mContext) + " - " + room.getNumberOfMembers());
 
-        String subject = room.getTopic();
+        String subject = room.getRoomDisplayName(mContext);
         if (TextUtils.isEmpty(subject))
             subject = room.getRoomId();// room.getRoomDisplayName(mContext);
 
@@ -453,7 +453,7 @@ public class MatrixConnection extends ImConnection {
 
                 for (RoomMember member : roomMembers)
                 {
-                    debug ( room.getRoomId() + ": " + member.getName() + " (" + member.getUserId() + ")");
+                    debug ( "RoomMember: " + room.getRoomId() + ": " + member.getName() + " (" + member.getUserId() + ")");
                     Contact contact = new Contact (new MatrixAddress(member.getUserId()),member.getName(), Imps.Contacts.TYPE_NORMAL);
                     try {
                         mContactListManager.doAddContactToListAsync (contact, null, true);
@@ -521,7 +521,34 @@ public class MatrixConnection extends ImConnection {
 
         @Override
         public void onLiveEvent(Event event, RoomState roomState) {
-            debug ("onLiveEvent: " + event);
+            debug ("onLiveEvent: " + event + "; roomState=" + roomState);
+
+            if (event.getType().equals(Event.EVENT_TYPE_MESSAGE))
+            {
+                String sender = event.getSender();
+                String roomId = event.roomId;
+                String message = event.getContent().getAsJsonObject().get("body").toString();
+                String messageType = event.getContent().getAsJsonObject().get("msgtype").toString();
+                String messageEventId = event.eventId;
+
+
+                User user = mStore.getUser(sender);
+                Room room = mStore.getRoom(roomId);
+                addRoomContact(room);
+
+                if (mContactListManager.getContact(sender)==null) {
+                    Contact contact = new Contact(new MatrixAddress(sender), user.displayname, Imps.Contacts.TYPE_NORMAL);
+                    try {
+                        mContactListManager.doAddContactToListAsync(contact, null, true);
+                    } catch (ImException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+
+            }
+
 
         }
 

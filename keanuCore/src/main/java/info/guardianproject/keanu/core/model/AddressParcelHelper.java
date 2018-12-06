@@ -20,9 +20,6 @@ package info.guardianproject.keanu.core.model;
 import android.os.Parcel;
 import android.util.Log;
 
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
-
-
 /**
  * A helper for marshalling and unmarshaling an Address Object to a Parcel. The
  * Address is only an abstract representation, the underlying protocol
@@ -32,7 +29,7 @@ import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 public class AddressParcelHelper {
     @SuppressWarnings("rawtypes")
     private static Class[] sAddressClasses =
-            new Class[] { XmppAddress.class };
+            new Class[] { Address.class };
 
     private AddressParcelHelper() {
     }

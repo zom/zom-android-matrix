@@ -42,7 +42,6 @@ import info.guardianproject.keanu.core.KeanuConstants;
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.R;
 import info.guardianproject.keanu.core.model.Contact;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.ui.DummyActivity;
 import info.guardianproject.keanu.core.util.DatabaseUtils;
@@ -90,7 +89,7 @@ public class StatusBarNotifier {
         Bitmap avatar = null;
 
 
-        try { byte[] bdata = DatabaseUtils.getAvatarBytesFromAddress(mContext.getContentResolver(), XmppAddress.stripResource(username));
+        try { byte[] bdata = DatabaseUtils.getAvatarBytesFromAddress(mContext.getContentResolver(), username);
             avatar = BitmapFactory.decodeByteArray(bdata, 0, bdata.length);
         }
         catch (Exception e){}

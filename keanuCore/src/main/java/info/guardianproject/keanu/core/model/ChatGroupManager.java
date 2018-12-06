@@ -80,7 +80,7 @@ public abstract class ChatGroupManager {
      * @param address the name of the ChatGroup to be created.
      * @throws Exception
      */
-    public abstract boolean createChatGroupAsync(String address, String subject, String nickname) throws Exception;
+    public abstract boolean createChatGroupAsync(Address address, String subject, String nickname) throws Exception;
 
     /**
      * Deletes a certain {@link ChatGroup}. This method returns immediately and the

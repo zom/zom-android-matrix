@@ -35,7 +35,7 @@ import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.GroupListener;
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
+import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IChatSessionListener;
@@ -87,24 +87,6 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
         Contact contact = listManager.getContactByAddress(Address.stripResource(contactAddress));
 
-        if (contact == null) {
-            try {
-
-               contact = new Contact (new XmppAddress(contactAddress),contactAddress, Imps.Contacts.TYPE_NORMAL);
-
-               // long contactId = listManager.queryOrInsertContact(contact);
-                
-               // String[] address = {Address.stripResource(contactAddress)};
-                //contact = listManager.createTemporaryContacts(address)[0];
-               
-            } catch (IllegalArgumentException e) {
-                mSessionListenerAdapter.notifyChatSessionCreateFailed(contactAddress,
-                        new ImErrorInfo(ImErrorInfo.ILLEGAL_CONTACT_ADDRESS,
-                                "Invalid contact address:" + contactAddress));
-                return null;
-            }
-        }
-
         if (contact != null) {
             ChatSession session = getChatSessionManager().createChatSession(contact, isNewSession);
 
@@ -121,20 +103,14 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
         try
         {
-            if (roomAddress.endsWith("@"))
-            {
-                String confServer = groupMan.getDefaultGroupChatService();
-                if (confServer != null)
-                    roomAddress += confServer;
-            }
 
-            Address address = new XmppAddress(roomAddress); //TODO hard coding XMPP for now
+            BaseAddress bAddr = new BaseAddress(roomAddress);
 
-            ChatGroup chatGroup = groupMan.getChatGroup(address);
+            ChatGroup chatGroup = groupMan.getChatGroup(bAddr);
             if (chatGroup == null)
-                groupMan.createChatGroupAsync(roomAddress, subject, nickname);
+                groupMan.createChatGroupAsync(bAddr, subject, nickname);
 
-            chatGroup = groupMan.getChatGroup(address);
+            chatGroup = groupMan.getChatGroup(bAddr);
 
             if (chatGroup != null)
                 chatGroup.setName(subject);

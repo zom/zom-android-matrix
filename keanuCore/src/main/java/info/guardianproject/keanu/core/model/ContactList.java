@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
+import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 
 public class ContactList extends ImEntity {
@@ -102,7 +102,7 @@ public class ContactList extends ImEntity {
 
         if (contact == null)
         {
-            contact = new Contact (new XmppAddress(address),nickname, Imps.Contacts.TYPE_NORMAL);
+            contact = new Contact (new BaseAddress(address),nickname, Imps.Contacts.TYPE_NORMAL);
         }
         else if (nickname != null)
             contact.setName(nickname);

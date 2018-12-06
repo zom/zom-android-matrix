@@ -23,7 +23,6 @@ import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.stringprep.XmppStringprepException;
 
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 
 /**
@@ -39,12 +38,6 @@ public class ChatSession {
 
     private boolean mIsSubscribed = true;
 
-    private boolean mPushSent = false;
-
-    private boolean mCanOmemo = true;
-
-    private Jid mJid = null;
-    private XmppAddress mXa = null; //our temporary internal representation
 
     /**
      * Creates a new ChatSession with a particular participant.
@@ -60,53 +53,8 @@ public class ChatSession {
         mParticipant = participant;
         mManager = manager;
 
-        initJid ();
-
-        //     mHistoryMessages = new Vector<Message>();
     }
 
-    private void initJid ()
-    {
-        try {
-            mJid = JidCreate.from(mParticipant.getAddress().getAddress());
-
-            if (mJid.hasNoResource() && mParticipant instanceof Contact)
-            {
-                Contact contact = (Contact)mParticipant;
-                if (contact.getPresence() != null && contact.getPresence().getResource() != null)
-                    mJid = JidCreate.from(mParticipant.getAddress().getBareAddress() + '/' + contact.getPresence().getResource());
-            }
-
-            mXa = new XmppAddress(mJid.toString());
-
-            if (mJid.hasNoResource()) {
-
-                if (!TextUtils.isEmpty(mParticipant.getAddress().getResource()))
-                {
-                    mJid = JidCreate.from(mParticipant.getAddress().getAddress());
-                }
-                else if (mParticipant instanceof Contact) {
-                    String resource = ((Contact) mParticipant).getPresence().getResource();
-                    if (!TextUtils.isEmpty(resource)) {
-                        mJid = JidCreate.from(mParticipant.getAddress().getBareAddress() + '/' + resource);
-                    }
-                }
-
-                mXa = new XmppAddress(mJid.toString());
-            }
-
-            //not for groups yet
-            if (mParticipant instanceof Contact) {
-                //if we can't omemo, check it again to be sure
-                if (!mCanOmemo) {
-                    mCanOmemo = mManager.resourceSupportsOmemo(mJid);
-                }
-            }
-
-        } catch (XmppStringprepException xe) {
-            throw new RuntimeException("Error with address that shouldn't happen: " + xe);
-        }
-    }
 
     public ImEntity getParticipant() {
         return mParticipant;
@@ -132,14 +80,9 @@ public class ChatSession {
         return mListener;
     }
 
-    public boolean canOmemo ()
+    public boolean canEncrypt ()
     {
-        if (mParticipant instanceof Contact)
-            return mCanOmemo;
-        else if (mParticipant instanceof ChatGroup)
-            return mCanOmemo;
-        else
-            return false;
+        return true;
     }
 
 
@@ -164,26 +107,18 @@ public class ChatSession {
      */
     public int sendMessageAsync(Message message, boolean sendOmemo) {
 
+
+        message.setTo(mParticipant.getAddress());
+
         if (mParticipant instanceof Contact) {
 
-            if (mJid.hasNoResource())
-                initJid();
-
-            message.setTo(mXa);
             message.setType(Imps.MessageType.QUEUED);
-
-            //if we can't omemo, check it again to be sure
-            if (!mCanOmemo) {
-                mCanOmemo = mManager.resourceSupportsOmemo(mJid);
-            }
-
             mManager.sendMessageAsync(this, message);
 
         }
         else if (mParticipant instanceof ChatGroup)
         {
 
-            message.setTo(mParticipant.getAddress());
             message.setType(Imps.MessageType.OUTGOING);
             mManager.sendMessageAsync(this, message);
 

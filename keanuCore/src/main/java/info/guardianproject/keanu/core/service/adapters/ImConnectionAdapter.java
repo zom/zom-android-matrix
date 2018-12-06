@@ -43,7 +43,6 @@ import info.guardianproject.keanu.core.model.ImException;
 import info.guardianproject.keanu.core.model.Invitation;
 import info.guardianproject.keanu.core.model.InvitationListener;
 import info.guardianproject.keanu.core.model.Presence;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IConnectionListener;
@@ -494,6 +493,7 @@ public class ImConnectionAdapter extends IImConnection.Stub {
                         Uri uriChats = builder.build();
                         c = getContext().getContentResolver().query(uriChats, CHAT_PROJECTION, buf.toString(), null, Imps.Contacts.TIME_ORDER);
 
+                        /**
                         if (c != null) {
                             if (c.getCount() > 0) {
                                 while (c.moveToNext()) {
@@ -506,7 +506,7 @@ public class ImConnectionAdapter extends IImConnection.Stub {
                                 }
                             }
                             c.close();
-                        }
+                        }**/
 
                     }
                     catch (Exception e)

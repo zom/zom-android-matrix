@@ -3,24 +3,25 @@ package info.guardianproject.keanu.matrix.plugin;
 import android.os.Parcel;
 
 import info.guardianproject.keanu.core.model.Address;
+import info.guardianproject.keanu.core.model.impl.BaseAddress;
 
 
-public class MatrixAddress extends Address {
+public class MatrixAddress extends BaseAddress {
 
-    private String mAddress;
     private String mUser;
     private String mResource;
 
     public MatrixAddress (String address)
     {
 
+        super (address);
+
         if (address.startsWith("@")) {
             mUser = address.substring(1).split(":")[0];
-            mAddress = address;
+
         }
         else if (address.startsWith("!")) {
             mUser = address.split(":")[0];
-            mAddress = address;
         }
         else
         {
@@ -31,11 +32,6 @@ public class MatrixAddress extends Address {
         }
 
         mResource = "matrix";
-    }
-
-    @Override
-    public String getAddress() {
-        return mAddress;
     }
 
     @Override

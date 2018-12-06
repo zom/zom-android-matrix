@@ -60,7 +60,7 @@ import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.model.MessageListener;
 import info.guardianproject.keanu.core.model.Presence;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
+import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatListener;
 import info.guardianproject.keanu.core.service.IChatSession;
@@ -290,7 +290,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         }
         ContactListManagerAdapter listManager = (ContactListManagerAdapter) mConnection
                 .getContactListManager();
-        Contact invitee = new Contact(new XmppAddress(contact),contact,Imps.Contacts.TYPE_NORMAL);
+        Contact invitee = new Contact(new BaseAddress(contact),contact,Imps.Contacts.TYPE_NORMAL);
         getGroupManager().inviteUserAsync((ChatGroup) mChatSession.getParticipant(), invitee);
 
     }
@@ -500,7 +500,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
                 }
 
-                boolean doEncryption = mChatSession.canOmemo();
+                boolean doEncryption = mChatSession.canEncrypt();
 
                 if (mIsGroupChat)
                     doEncryption = mEnableOmemoGroups;
@@ -1441,7 +1441,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             mGroupName = "G" + System.currentTimeMillis();
             try
             {
-                mGroupMgr.createChatGroupAsync(mGroupName, nickname, nickname);
+                mGroupMgr.createChatGroupAsync(new BaseAddress(mGroupName), nickname, nickname);
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -1765,7 +1765,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     public boolean isEncrypted ()
     {
-        return mChatSession.canOmemo();
+        return mChatSession.canEncrypt();
 
     }
 
@@ -1957,7 +1957,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         if (!mIsGroupChat) {
             return;
         }
-        Contact contact = new Contact(new XmppAddress(contactString), contactString, Imps.Contacts.TYPE_NORMAL);
+        Contact contact = new Contact(new BaseAddress(contactString), contactString, Imps.Contacts.TYPE_NORMAL);
         getGroupManager().removeGroupMemberAsync((ChatGroup) mChatSession.getParticipant(), contact);
     }
 
@@ -1966,7 +1966,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         if (!mIsGroupChat) {
             return;
         }
-        Contact contact = new Contact(new XmppAddress(contactString), contactString, Imps.Contacts.TYPE_NORMAL);
+        Contact contact = new Contact(new BaseAddress(contactString), contactString, Imps.Contacts.TYPE_NORMAL);
         getGroupManager().grantAdminAsync((ChatGroup) mChatSession.getParticipant(), contact);
     }
 }
