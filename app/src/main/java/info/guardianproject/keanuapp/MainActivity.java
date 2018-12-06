@@ -67,7 +67,6 @@ import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
@@ -79,6 +78,7 @@ import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.core.util.SystemServices;
 import info.guardianproject.keanu.core.util.XmppUriHelper;
 import info.guardianproject.keanu.core.tasks.ChatSessionInitTask;
+import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
 import info.guardianproject.keanuapp.ui.BaseActivity;
 import info.guardianproject.keanuapp.ui.LockScreenActivity;
@@ -878,7 +878,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                     super.onPostExecute(chatId);
                 }
 
-            }.executeOnExecutor(ImApp.sThreadPoolExecutor,new Contact(new XmppAddress(username)));
+            }.executeOnExecutor(ImApp.sThreadPoolExecutor,new Contact(new MatrixAddress(username)));
     }
 
     public void showGroupChatDialog ()

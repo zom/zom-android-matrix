@@ -53,7 +53,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import info.guardianproject.keanu.core.model.ImConnection;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IContactList;
 import info.guardianproject.keanu.core.service.IContactListManager;
@@ -67,6 +66,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
@@ -178,7 +178,7 @@ public class AddContactActivity extends BaseActivity {
 
         String nickname = app.getDefaultNickname();
         if (nickname == null)
-            nickname = new XmppAddress(app.getDefaultUsername()).getUser();
+            nickname = new MatrixAddress(app.getDefaultUsername()).getUser();
 
         String fingerprint = "";
         return OnboardingManager.generateInviteMessage(AddContactActivity.this, nickname, app.getDefaultUsername(), fingerprint);

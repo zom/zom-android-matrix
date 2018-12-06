@@ -27,7 +27,7 @@ import com.google.android.gms.nearby.messages.MessageListener;
 
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.Presence;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
+import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 
 import java.util.ArrayList;
@@ -139,7 +139,7 @@ public class NearbyAddContactActivity extends AppCompatActivity {
 
     private void addContact (OnboardingManager.DecodedInviteLink diLink)
     {
-        Contact contact = new Contact(new XmppAddress(diLink.username));
+        Contact contact = new Contact(new BaseAddress(diLink.username));
         contact.setName(diLink.nickname);
         contact.setPresence(new Presence());
         contact.setSubscriptionType(Imps.ContactsColumns.SUBSCRIPTION_TYPE_FROM);

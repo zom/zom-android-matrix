@@ -89,13 +89,13 @@ import java.util.Collection;
 import java.util.Date;
 
 import info.guardianproject.keanu.core.Preferences;
+import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.model.Address;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.model.Presence;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatListener;
 import info.guardianproject.keanu.core.service.IChatSession;
@@ -271,7 +271,7 @@ public class ConversationView {
             updateGroupTitle();
 
             try {
-                mApp.dismissChatNotification(mProviderId,XmppAddress.stripResource(mRemoteAddress));
+                mApp.dismissChatNotification(mProviderId,mRemoteAddress);
                 mCurrentChatSession.markAsRead();
             }
             catch (Exception e){}
@@ -2779,7 +2779,7 @@ public class ConversationView {
             int messageType = cursor.getInt(mTypeColumn);
 
             String address = isGroupChat() ? cursor.getString(mNicknameColumn)  : mRemoteAddress;
-            String nickname = isGroupChat() ? new XmppAddress(cursor.getString(mNicknameColumn)).getUser() : mRemoteNickname;
+            String nickname = isGroupChat() ? new BaseAddress(cursor.getString(mNicknameColumn)).getUser() : mRemoteNickname;
 
             String mimeType = cursor.getString(mMimeTypeColumn);
             int id = cursor.getInt(mIdColumn);
@@ -3184,7 +3184,7 @@ public class ConversationView {
         {
             try {
                 IContactListManager manager = mConn.getContactListManager();
-                manager.approveSubscription(new Contact(new XmppAddress(mRemoteAddress),mRemoteNickname, Imps.Contacts.TYPE_NORMAL));
+                manager.approveSubscription(new Contact(new BaseAddress(mRemoteAddress),mRemoteNickname, Imps.Contacts.TYPE_NORMAL));
             } catch (RemoteException e) {
 
                 // mHandler.showServiceErrorAlert(e.getLocalizedMessage());
@@ -3199,7 +3199,7 @@ public class ConversationView {
         {
             try {
                 IContactListManager manager = mConn.getContactListManager();
-                manager.declineSubscription(new Contact(new XmppAddress(mRemoteAddress),mRemoteNickname, Imps.Contacts.TYPE_NORMAL));
+                manager.declineSubscription(new Contact(new BaseAddress(mRemoteAddress),mRemoteNickname, Imps.Contacts.TYPE_NORMAL));
             } catch (RemoteException e) {
                 // mHandler.showServiceErrorAlert(e.getLocalizedMessage());
                 LogCleaner.error(LOG_TAG, "decline sub error",e);
@@ -3255,7 +3255,7 @@ public class ConversationView {
                     super.onPostExecute(chatId);
                 }
 
-            }.execute(new Contact(new XmppAddress(username)));
+            }.execute(new Contact(new BaseAddress(username)));
 
             mActivity.finish();
         }

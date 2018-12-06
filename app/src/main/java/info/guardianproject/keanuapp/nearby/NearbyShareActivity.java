@@ -27,7 +27,7 @@ import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.keanu.core.conversations.Downloader;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.Presence;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
+import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
@@ -132,7 +132,7 @@ public class NearbyShareActivity extends ConnectionsActivity {
     private void addContact (String username)
     {
         if (!contactList.containsKey(username)) {
-            Contact contact = new Contact(new XmppAddress(username));
+            Contact contact = new Contact(new BaseAddress(username));
             contact.setName(username);
             contact.setPresence(new Presence());
             contact.setSubscriptionType(Imps.ContactsColumns.SUBSCRIPTION_TYPE_FROM);

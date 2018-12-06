@@ -42,7 +42,7 @@ import java.util.UUID;
 
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImConnection;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
+import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
@@ -738,7 +738,7 @@ public class ImUrlActivity extends Activity {
                     super.onPostExecute(chatId);
                 }
 
-            }.executeOnExecutor(ImApp.sThreadPoolExecutor,new Contact(new XmppAddress(username)));
+            }.executeOnExecutor(ImApp.sThreadPoolExecutor,new Contact(new BaseAddress(username)));
     }
 
     private void sendOtrInBand(String username, long providerId, long accountId) {

@@ -13,8 +13,4 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
     }
 
-    @Override
-    public boolean resourceSupportsOmemo(Jid jid) {
-        return false;
-    }
 }

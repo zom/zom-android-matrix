@@ -18,12 +18,12 @@
 package info.guardianproject.keanuapp.ui.contacts;
 
 
+import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanuapp.R;
 
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.model.Presence;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 import info.guardianproject.keanu.core.service.IContactListManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.provider.Imps;
@@ -299,7 +299,7 @@ public class ContactListItem extends FrameLayout {
             nickname = nickname.split("@")[0].split("\\.")[0];
         }
 
-        final Contact contact = new Contact(new XmppAddress(address), nickname, Imps.Contacts.TYPE_NORMAL);
+        final Contact contact = new Contact(new BaseAddress(address), nickname, Imps.Contacts.TYPE_NORMAL);
 
         if (!TextUtils.isEmpty(underLineText)) {
             // highlight/underline the word being searched 

@@ -44,7 +44,6 @@ import info.guardianproject.keanu.core.model.ContactListManager;
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.model.ImException;
 import info.guardianproject.keanu.core.model.Presence;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 
 public class MatrixConnection extends ImConnection {

@@ -9,7 +9,7 @@ import info.guardianproject.keanu.core.model.Invitation;
 public class MatrixChatGroupManager extends ChatGroupManager {
 
     @Override
-    public boolean createChatGroupAsync(String address, String subject, String nickname) throws Exception {
+    public boolean createChatGroupAsync(Address address, String subject, String nickname) throws Exception {
         return false;
     }
 

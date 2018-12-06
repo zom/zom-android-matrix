@@ -55,12 +55,6 @@ dependencies {
     implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
 
 
-    // https://mvnrepository.com/artifact/org.jxmpp/jxmpp-core
-    implementation 'org.jxmpp:jxmpp-core:0.6.3'
-    implementation 'org.jxmpp:jxmpp-jid:0.6.3'
-    implementation 'org.jxmpp:jxmpp-util-cache:0.6.3'
-
-
     // Network
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'

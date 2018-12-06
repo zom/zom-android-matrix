@@ -49,7 +49,6 @@ import com.theartofdev.edmodo.cropper.CropImageView;
 
 import info.guardianproject.keanu.core.BuildConfig;
 import info.guardianproject.keanu.core.model.Server;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.ui.RoundedAvatarDrawable;
 import info.guardianproject.keanu.core.util.DatabaseUtils;
@@ -64,6 +63,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.util.Languages;
 import info.guardianproject.keanuapp.ImApp;
@@ -796,7 +796,7 @@ public class OnboardingActivity extends BaseActivity {
 
                 mFingerprint = "";
 
-                String nickname = new XmppAddress(account[0]).getUser();
+                String nickname = new MatrixAddress(account[0]).getUser();
                 OnboardingAccount result = OnboardingManager.addExistingAccount(OnboardingActivity.this, mHandler, nickname, account[0], account[1]);
 
                 if (result != null && result.accountId != -1 && (!TextUtils.isEmpty(result.username))) {

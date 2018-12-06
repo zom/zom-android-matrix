@@ -35,7 +35,6 @@ import org.apache.commons.codec.DecoderException;
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatListener;
 import info.guardianproject.keanu.core.service.IChatSession;
@@ -51,6 +50,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.service.adapters.ChatListenerAdapter;
@@ -468,7 +468,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
                     while (c.moveToNext()) {
                         GroupMemberDisplay member = new GroupMemberDisplay();
-                        member.username = new XmppAddress(c.getString(colUsername)).getBareAddress();
+                        member.username = c.getString(colUsername);
                         member.nickname = c.getString(colNickname);
                         member.role = c.getString(colRole);
                         member.affiliation = c.getString(colAffiliation);
@@ -534,7 +534,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             for (String invitee : invitees) {
                 session.inviteContact(invitee);
                 GroupMemberDisplay member = new GroupMemberDisplay();
-                XmppAddress address = new XmppAddress(invitee);
+                MatrixAddress address = new MatrixAddress(invitee);
                 member.username = address.getBareAddress();
                 member.nickname = address.getUser();
                 try {

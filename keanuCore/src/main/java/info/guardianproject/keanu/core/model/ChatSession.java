@@ -17,12 +17,6 @@
 
 package info.guardianproject.keanu.core.model;
 
-import android.text.TextUtils;
-
-import org.jxmpp.jid.Jid;
-import org.jxmpp.jid.impl.JidCreate;
-import org.jxmpp.stringprep.XmppStringprepException;
-
 import info.guardianproject.keanu.core.provider.Imps;
 
 /**

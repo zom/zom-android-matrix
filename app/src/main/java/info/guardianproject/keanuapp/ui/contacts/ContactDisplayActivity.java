@@ -27,10 +27,10 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.util.List;
 
+import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
-import info.guardianproject.keanu.core.plugin.xmpp.XmppAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
@@ -417,8 +417,7 @@ public class ContactDisplayActivity extends BaseActivity {
                                 finish();
                             }
                         }
-                    }.executeOnExecutor(ImApp.sThreadPoolExecutor,new Contact(new XmppAddress(mUsername)));
-                 //   Toast.makeText(this, getString(R.string.message_waiting_for_friend), Toast.LENGTH_LONG).show();
+                    }.executeOnExecutor(ImApp.sThreadPoolExecutor,new Contact(new MatrixAddress(mUsername)));
                 }
                 else
                 {
@@ -457,7 +456,7 @@ public class ContactDisplayActivity extends BaseActivity {
                         IContactListManager listManager = mConn.getContactListManager();
 
                         if (listManager != null)
-                            listManager.approveSubscription(new Contact(new XmppAddress(mUsername), mNickname, Imps.Contacts.TYPE_NORMAL));
+                            listManager.approveSubscription(new Contact(new MatrixAddress(mUsername), mNickname, Imps.Contacts.TYPE_NORMAL));
 
                         IChatSessionManager manager = mConn.getChatSessionManager();
 

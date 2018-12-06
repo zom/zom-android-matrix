@@ -17,8 +17,6 @@
 
 package info.guardianproject.keanu.core.model;
 
-import org.jxmpp.jid.Jid;
-
 import java.util.Hashtable;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -130,9 +128,4 @@ public abstract class ChatSessionManager {
      */
     public abstract void sendMessageAsync(ChatSession session, Message message);
 
-    /**
-     * The resource of this JID s
-     * @param jid
-     */
-    public abstract boolean resourceSupportsOmemo (Jid jid);
 }

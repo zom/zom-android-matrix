@@ -30,9 +30,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
-import org.jxmpp.jid.impl.JidCreate;
-import org.jxmpp.stringprep.XmppStringprepException;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -794,6 +791,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             results.add(matcher.group());
         }
 
+        /**
         if (allowWebDownloads)
         {
             //if someone sends us a random URL, only get it if it is from the same host as the jabberid
@@ -819,7 +817,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     //This shouldn't happeN!
                 }
             }
-        }
+        }**/
 
         return results;
 
