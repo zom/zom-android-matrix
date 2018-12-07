@@ -585,14 +585,12 @@ public abstract class ContactListManager {
      * @param type the type of the update
      * @param contact the involved contact, null if no contact involved.
      */
-    protected void notifyContactListUpdated(ContactList list, int type, Contact contact) {
-        synchronized (this) {
-            if (type == ContactListListener.LIST_CONTACT_ADDED) {
-                list.insertToCache(contact);
-            } else if (type == ContactListListener.LIST_CONTACT_REMOVED) {
-                list.removeFromCache(contact);
-                mDeletePending.remove(contact);
-            }
+    protected synchronized void notifyContactListUpdated(ContactList list, int type, Contact contact) {
+        if (type == ContactListListener.LIST_CONTACT_ADDED) {
+            list.insertToCache(contact);
+        } else if (type == ContactListListener.LIST_CONTACT_REMOVED) {
+            list.removeFromCache(contact);
+            mDeletePending.remove(contact);
         }
 
         for (ContactListListener listener : mContactListListeners) {

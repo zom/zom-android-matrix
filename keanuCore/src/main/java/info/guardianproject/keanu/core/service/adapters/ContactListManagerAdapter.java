@@ -132,6 +132,7 @@ public class ContactListManagerAdapter extends IContactListManager.Stub {
         if (mConn.getAccountId() != -1)
             seedInitialPresences();
 
+        loadContactLists();
     }
 
     public String[] getOfflineAddresses ()
@@ -319,12 +320,7 @@ public class ContactListManagerAdapter extends IContactListManager.Stub {
     }
 
     public Contact getContactByAddress(String address) {
-        if (mAdaptee.getState() == ContactListManager.LISTS_NOT_LOADED) {
-            //if (mOfflineContacts != null)
-             //   return mOfflineContacts.get(address);
-            //else
-                return null;
-        }
+
 
         Contact c = mAdaptee.getContact(address);
         if (c == null) {

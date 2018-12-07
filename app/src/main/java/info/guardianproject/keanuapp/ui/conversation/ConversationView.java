@@ -90,6 +90,7 @@ import java.util.Date;
 
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.impl.BaseAddress;
+import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.model.Address;
 import info.guardianproject.keanu.core.model.Contact;
@@ -710,7 +711,7 @@ public class ConversationView {
             }
 
             for (Contact c : contacts) {
-                if (c.getAddress().getBareAddress().equals(Address.stripResource(mRemoteAddress))) {
+                if (c.getAddress().getBareAddress().equals(mRemoteAddress)) {
 
                     if (c != null && c.getPresence() != null)
                     {
@@ -1841,7 +1842,7 @@ public class ConversationView {
                     checkConnection();
                     mConn = RemoteImService.getConnection(mProviderId,mAccountId);
                     IContactListManager manager = mConn.getContactListManager();
-                    manager.blockContact(Address.stripResource(mRemoteAddress));
+                    manager.blockContact(mRemoteAddress);
                   //  mNewChatActivity.finish();
                 } catch (Exception e) {
 
@@ -2779,7 +2780,7 @@ public class ConversationView {
             int messageType = cursor.getInt(mTypeColumn);
 
             String address = isGroupChat() ? cursor.getString(mNicknameColumn)  : mRemoteAddress;
-            String nickname = isGroupChat() ? new BaseAddress(cursor.getString(mNicknameColumn)).getUser() : mRemoteNickname;
+            String nickname = isGroupChat() ? cursor.getString(mNicknameColumn) : mRemoteNickname;
 
             String mimeType = cursor.getString(mMimeTypeColumn);
             int id = cursor.getInt(mIdColumn);
@@ -3184,7 +3185,7 @@ public class ConversationView {
         {
             try {
                 IContactListManager manager = mConn.getContactListManager();
-                manager.approveSubscription(new Contact(new BaseAddress(mRemoteAddress),mRemoteNickname, Imps.Contacts.TYPE_NORMAL));
+                manager.approveSubscription(new Contact(new MatrixAddress(mRemoteAddress),mRemoteNickname, Imps.Contacts.TYPE_NORMAL));
             } catch (RemoteException e) {
 
                 // mHandler.showServiceErrorAlert(e.getLocalizedMessage());
@@ -3199,7 +3200,7 @@ public class ConversationView {
         {
             try {
                 IContactListManager manager = mConn.getContactListManager();
-                manager.declineSubscription(new Contact(new BaseAddress(mRemoteAddress),mRemoteNickname, Imps.Contacts.TYPE_NORMAL));
+                manager.declineSubscription(new Contact(new MatrixAddress(mRemoteAddress),mRemoteNickname, Imps.Contacts.TYPE_NORMAL));
             } catch (RemoteException e) {
                 // mHandler.showServiceErrorAlert(e.getLocalizedMessage());
                 LogCleaner.error(LOG_TAG, "decline sub error",e);
@@ -3255,7 +3256,7 @@ public class ConversationView {
                     super.onPostExecute(chatId);
                 }
 
-            }.execute(new Contact(new BaseAddress(username)));
+            }.execute(new Contact(new MatrixAddress(username)));
 
             mActivity.finish();
         }

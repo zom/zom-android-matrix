@@ -391,7 +391,7 @@ public class ContactsListFragment extends Fragment {
             //first leave, delete an existing chat session
             IChatSessionManager sessionMgr = mConn.getChatSessionManager();
             if (sessionMgr != null) {
-                IChatSession session = sessionMgr.getChatSession(Address.stripResource(address));
+                IChatSession session = sessionMgr.getChatSession(address);
 
             }
 

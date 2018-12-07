@@ -25,6 +25,7 @@ public class MatrixContactListManager extends ContactListManager {
         super ();
 
         mContext = context;
+        init();
     }
 
     private void init ()
@@ -54,7 +55,7 @@ public class MatrixContactListManager extends ContactListManager {
 
     @Override
     public String normalizeAddress(String address) {
-        return null;
+        return address;
     }
 
     @Override
@@ -69,8 +70,6 @@ public class MatrixContactListManager extends ContactListManager {
 
     @Override
     public void loadContactListsAsync() {
-
-        init();
 
     }
 
@@ -106,9 +105,6 @@ public class MatrixContactListManager extends ContactListManager {
 
     @Override
     protected void doAddContactToListAsync(Contact contact, ContactList list, boolean autoPresenceSubscribe) throws ImException {
-
-        if (mDefaultContactList == null)
-            init();
 
         if (!mDefaultContactList.containsContact(contact)) {
             try {

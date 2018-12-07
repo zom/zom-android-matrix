@@ -85,7 +85,7 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
         ContactListManagerAdapter listManager = (ContactListManagerAdapter) mConnection
                 .getContactListManager();
 
-        Contact contact = listManager.getContactByAddress(Address.stripResource(contactAddress));
+        Contact contact = listManager.getContactByAddress(contactAddress);
 
         if (contact != null) {
             ChatSession session = getChatSessionManager().createChatSession(contact, isNewSession);
@@ -138,8 +138,7 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
             ChatSession session = adapter.getAdaptee();
             getChatSessionManager().closeChatSession(session);
 
-            String key = Address.stripResource(adapter.getAddress());
-            mActiveChatSessionAdapters.remove(key);
+            mActiveChatSessionAdapters.remove(adapter.getAddress());
         }
     }
 
@@ -151,8 +150,7 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
                 ChatSession session = adapter.getAdaptee();
                 getChatSessionManager().closeChatSession(session);
 
-                String key = Address.stripResource(adapter.getAddress());
-                mActiveChatSessionAdapters.remove(key);
+                mActiveChatSessionAdapters.remove(adapter.getAddress());
             }
         }
     }
@@ -160,13 +158,13 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
     public void updateChatSession(String oldAddress, ChatSessionAdapter adapter) {
         synchronized (mActiveChatSessionAdapters) {
             mActiveChatSessionAdapters.remove(oldAddress);
-            mActiveChatSessionAdapters.put(Address.stripResource(adapter.getAddress()), adapter);
+            mActiveChatSessionAdapters.put(adapter.getAddress(), adapter);
         }
     }
 
     public IChatSession getChatSession(String address) {
         synchronized (mActiveChatSessionAdapters) {
-            return mActiveChatSessionAdapters.get(Address.stripResource(address));
+            return mActiveChatSessionAdapters.get(address);
         }
     }
 
@@ -197,12 +195,11 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
     public synchronized ChatSessionAdapter getChatSessionAdapter(ChatSession session, boolean isNewSession) {
 
         Address participantAddress = session.getParticipant().getAddress();
-        String key = Address.stripResource(participantAddress.getAddress());
-        ChatSessionAdapter adapter = mActiveChatSessionAdapters.get(key);
+        ChatSessionAdapter adapter = mActiveChatSessionAdapters.get(participantAddress.getAddress());
 
         if (adapter == null) {
             adapter = new ChatSessionAdapter(session, session.getParticipant(), mConnection, isNewSession);
-            mActiveChatSessionAdapters.put(key, adapter);
+            mActiveChatSessionAdapters.put(participantAddress.getAddress(), adapter);
         }
 
         return adapter;

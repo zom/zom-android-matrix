@@ -58,16 +58,4 @@ public abstract class Address {
 
     public abstract void readFromParcel(Parcel source);
 
-    static public boolean hasResource(String address) {
-        return address.contains("/");
-    }
-
-    static public String stripResource(String address) {
-        if (TextUtils.isEmpty(address))
-            return "null";
-        else if (address.contains("/"))
-            return address.split("/")[0];
-        else
-            return address;
-    }
 }

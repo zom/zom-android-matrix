@@ -78,7 +78,7 @@ public abstract class ChatSessionManager {
      * @param participant the participant.
      * @return the created ChatSession.
      */
-    public ChatSession createChatSession(ImEntity participant, boolean isNewSession) {
+    public synchronized ChatSession createChatSession(ImEntity participant, boolean isNewSession) {
 
         ChatSession session = mSessions.get(participant.getAddress().getBareAddress());
 

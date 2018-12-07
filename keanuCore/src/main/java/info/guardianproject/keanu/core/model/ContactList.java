@@ -43,9 +43,8 @@ public class ContactList extends ImEntity {
         mContactsCache = new HashMap<String, Contact>();
         if (contacts != null) {
             for (Contact c : contacts) {
-                String aKey = mManager.normalizeAddress(address.getAddress());
-                if (!mContactsCache.containsKey(aKey))
-                    mContactsCache.put(aKey, c);
+                if (!mContactsCache.containsKey(address.getAddress()))
+                    mContactsCache.put(address.getAddress(), c);
             }
         }
     }
@@ -178,12 +177,12 @@ public class ContactList extends ImEntity {
 
         if (containsContact(contact)) {
             mManager.removeContactFromListAsync(contact, this);
-            mContactsCache.remove(mManager.normalizeAddress(contact.getAddress().getAddress()));
+            mContactsCache.remove((contact.getAddress().getAddress()));
         }
     }
 
     public Contact getContact(Address address) {
-        return getContact(mManager.normalizeAddress(address.getAddress()));
+        return getContact((address.getAddress()));
     }
 
     public Contact getContact(String address) {
@@ -199,26 +198,25 @@ public class ContactList extends ImEntity {
     }
 
     public boolean containsContact(String address) {
-        return mContactsCache.containsKey(mManager.normalizeAddress(address));
+        return mContactsCache.containsKey((address));
     }
 
     public boolean containsContact(Address address) {
-        return address == null ? false : mContactsCache.containsKey(mManager
-                .normalizeAddress(address.getAddress()));
+        return address == null ? false : mContactsCache.containsKey((address.getAddress()));
     }
 
     public synchronized boolean containsContact(Contact c) {
-        return c == null ? false : mContactsCache.containsKey(mManager.normalizeAddress(c
+        return c == null ? false : mContactsCache.containsKey((c
                 .getAddress().getAddress()));
     }
 
     protected void insertToCache(Contact contact) {
 
-        mContactsCache.put(mManager.normalizeAddress(contact.getAddress().getAddress()), contact);
+        mContactsCache.put((contact.getAddress().getAddress()), contact);
     }
 
     protected void removeFromCache(Contact contact) {
-        mContactsCache.remove(mManager.normalizeAddress(contact.getAddress().getAddress()));
+        mContactsCache.remove((contact.getAddress().getAddress()));
     }
 
 }

@@ -32,6 +32,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.text.TextUtils;
 import android.util.Log;
 
 import info.guardianproject.keanu.core.plugin.ImConfigNames;
@@ -99,19 +100,22 @@ public class DatabaseUtils {
 
     public static byte[] getAvatarBytesFromAddress(ContentResolver cr, String address) throws DecoderException {
 
-        String[] projection =  {Imps.Avatars.DATA};
-        String[] args = {address};
-        String query = Imps.Avatars.CONTACT + " LIKE ?";
-        Cursor cursor = cr.query(Imps.Avatars.CONTENT_URI, projection,
-                query, args, Imps.Avatars.DEFAULT_SORT_ORDER);
-
         byte[] data = null;
 
-        if (cursor != null) {
-            if (cursor.moveToFirst())
-                data = cursor.getBlob(0);
+        if (!TextUtils.isEmpty(address)) {
+            String[] projection = {Imps.Avatars.DATA};
+            String[] args = {address};
+            String query = Imps.Avatars.CONTACT + " LIKE ?";
+            Cursor cursor = cr.query(Imps.Avatars.CONTENT_URI, projection,
+                    query, args, Imps.Avatars.DEFAULT_SORT_ORDER);
 
-            cursor.close();
+
+            if (cursor != null) {
+                if (cursor.moveToFirst())
+                    data = cursor.getBlob(0);
+
+                cursor.close();
+            }
         }
 
         return data;
