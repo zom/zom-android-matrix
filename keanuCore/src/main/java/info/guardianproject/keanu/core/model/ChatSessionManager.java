@@ -80,7 +80,7 @@ public abstract class ChatSessionManager {
      */
     public synchronized ChatSession createChatSession(ImEntity participant, boolean isNewSession) {
 
-        ChatSession session = mSessions.get(participant.getAddress().getBareAddress());
+        ChatSession session = mSessions.get(participant.getAddress().getAddress());
 
         if (session == null)
         {
@@ -88,23 +88,17 @@ public abstract class ChatSessionManager {
             ChatSessionAdapter csa = mAdapter.getChatSessionAdapter(session, isNewSession);
 
             //this is redundant, as the getAdapter() returns the session instance itself
-            session.setMessageListener(csa.getAdaptee().getMessageListener());
+         //   session.setMessageListener(csa.getAdaptee().getMessageListener());
 
-            mSessions.put(participant.getAddress().getBareAddress(),session);
+            mSessions.put(participant.getAddress().getAddress(),session);
 
             for (ChatSessionListener listener : mListeners) {
                 listener.onChatSessionCreated(session);
             }
 
         }
-        else
-        {
-            ChatSessionAdapter csa = mAdapter.getChatSessionAdapter(session, isNewSession);
 
-            //this is redundant, as the getAdapter() returns the session instance itself
-            session.setMessageListener(csa.getAdaptee().getMessageListener());
-            
-        }
+        ChatSessionAdapter csa = mAdapter.getChatSessionAdapter(session, isNewSession);
 
         return session;
     }

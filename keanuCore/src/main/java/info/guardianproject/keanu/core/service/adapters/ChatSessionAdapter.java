@@ -191,7 +191,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         mNickname = contact.getName();
 
         ContactListManagerAdapter listManager = (ContactListManagerAdapter) mConnection.getContactListManager();
-        
+        mChatSession.setMessageListener(mListenerAdapter);
+
         mContactId = listManager.queryOrInsertContact(contact);
 
         mChatURI = ContentUris.withAppendedId(Imps.Chats.CONTENT_URI, mContactId);
@@ -1080,12 +1081,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     class ListenerAdapter implements MessageListener, GroupMemberListener {
 
         public boolean onIncomingMessage(ChatSession ses, final Message msg, boolean notifyUser) {
-
-            //if the session is encrypted, and this is a plain text message, then ignore
-            if (ses.getParticipant() instanceof ChatGroup &&
-                    mEnableOmemoGroups
-                    && msg.getType() == Imps.MessageType.INCOMING)
-                return false;
 
             //we already have an encrypted message with this idea, so don't override that
             if (Imps.messageExists(mContentResolver,msg.getID(),-1))

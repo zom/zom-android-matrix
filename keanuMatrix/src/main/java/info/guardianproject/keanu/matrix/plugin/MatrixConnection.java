@@ -460,6 +460,10 @@ public class MatrixConnection extends ImConnection {
             subject = room.getRoomId();// room.getRoomDisplayName(mContext);
 
         final ChatGroup group = new ChatGroup(new MatrixAddress(room.getRoomId()),subject,mChatGroupManager);
+        ChatSession session = mChatSessionManager.getSession(room.getRoomId());
+
+        if (session == null)
+            session = mChatSessionManager.createChatSession(group,false);
 
         room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
             @Override
