@@ -1088,7 +1088,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
             String body = msg.getBody();
             String username = msg.getFrom().getAddress();
-            String bareUsername = msg.getFrom().getBareAddress();
+            String bareUsername = msg.getFrom().getAddress();
             String nickname = getNickName(username);
 
             try {

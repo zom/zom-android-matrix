@@ -9,6 +9,20 @@ import info.guardianproject.keanu.core.model.Invitation;
 public class MatrixChatGroupManager extends ChatGroupManager {
 
 
+    public ChatGroup getChatGroup (MatrixAddress addr, String subject)
+    {
+        ChatGroup result = super.getChatGroup(addr);
+
+        if (result == null)
+        {
+            result = new ChatGroup(addr,subject,this);
+            notifyJoinedGroup(result);
+        }
+
+
+        return result;
+    }
+
     @Override
     public boolean createChatGroupAsync(Address address, String subject, String nickname) throws Exception {
         return false;

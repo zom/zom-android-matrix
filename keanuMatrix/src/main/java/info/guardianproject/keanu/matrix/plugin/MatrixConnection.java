@@ -119,15 +119,12 @@ public class MatrixConnection extends ImConnection {
 
     }
 
-    private synchronized Contact makeUser(Imps.ProviderSettings.QueryMap providerSettings, ContentResolver contentResolver) {
-
-        Contact contactUser = null;
+    private Contact makeUser(Imps.ProviderSettings.QueryMap providerSettings, ContentResolver contentResolver) {
 
         String nickname = Imps.Account.getNickname(contentResolver, mAccountId);
         String userName = Imps.Account.getUserName(contentResolver, mAccountId);
         String domain = providerSettings.getDomain();
-        String xmppName = userName + '@' + domain + '/' + providerSettings.getXmppResource();
-        contactUser = new Contact(new MatrixAddress(xmppName), nickname, Imps.Contacts.TYPE_NORMAL);
+        Contact contactUser = new Contact(new MatrixAddress('@' + userName + ':' + domain), nickname, Imps.Contacts.TYPE_NORMAL);
         return contactUser;
     }
 
@@ -459,7 +456,10 @@ public class MatrixConnection extends ImConnection {
         if (TextUtils.isEmpty(subject))
             subject = room.getRoomId();// room.getRoomDisplayName(mContext);
 
-        final ChatGroup group = new ChatGroup(new MatrixAddress(room.getRoomId()),subject,mChatGroupManager);
+        MatrixAddress mAddr = new MatrixAddress(room.getRoomId());
+
+        final ChatGroup group = mChatGroupManager.getChatGroup(mAddr, subject);
+
         ChatSession session = mChatSessionManager.getSession(room.getRoomId());
 
         if (session == null)
@@ -577,9 +577,9 @@ public class MatrixConnection extends ImConnection {
             if (event.getType().equals(Event.EVENT_TYPE_MESSAGE))
             {
                 if (!TextUtils.isEmpty(event.getSender())) {
-                    String messageBody = event.getContent().getAsJsonObject().get("body").toString();
-                    String messageType = event.getContent().getAsJsonObject().get("msgtype").toString();
-                    String messageEventId = event.eventId;
+
+                    String messageBody = event.getContent().getAsJsonObject().get("body").getAsString();
+                    String messageType = event.getContent().getAsJsonObject().get("msgtype").getAsString();
 
                     debug("MESSAGE: from=" + event.getSender() + " message=" + messageBody);
 
@@ -600,10 +600,10 @@ public class MatrixConnection extends ImConnection {
 
                     }
 
-                    if (contact != null) {
+                    if (contact != null && (!event.sender.equals(mUser.getAddress().getAddress()))){
                         //now pass the incoming message somewhere!
 
-                        ChatSession session = mChatSessionManager.getSession(event.getSender());
+                        ChatSession session = mChatSessionManager.getSession(room.getRoomId());
 
                         if (session == null)
                         {
@@ -615,7 +615,8 @@ public class MatrixConnection extends ImConnection {
                         message.setFrom(contact.getAddress());
                         message.setDateTime(new Date());//use "age"?
                         message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
-                        session.getMessageListener().onIncomingMessage(session, message, true);
+
+                        session.onReceiveMessage(message, true);
                     }
                 }
 
