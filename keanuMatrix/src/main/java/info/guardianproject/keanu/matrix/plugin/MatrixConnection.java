@@ -404,6 +404,7 @@ public class MatrixConnection extends ImConnection {
 
             @Override
             public void onSuccess(Void aVoid) {
+
                 debug ("sendTypingStatus:onSuccess!");
             }
         });
@@ -463,7 +464,7 @@ public class MatrixConnection extends ImConnection {
         ChatSession session = mChatSessionManager.getSession(room.getRoomId());
 
         if (session == null)
-            session = mChatSessionManager.createChatSession(group,false);
+            session = mChatSessionManager.createChatSession(group,true);
 
         room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
             @Override
