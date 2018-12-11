@@ -133,6 +133,7 @@ public class MatrixConnection extends ImConnection {
         String nickname = Imps.Account.getNickname(contentResolver, mAccountId);
         String userName = Imps.Account.getUserName(contentResolver, mAccountId);
         String domain = providerSettings.getDomain();
+
         Contact contactUser = new Contact(new MatrixAddress('@' + userName + ':' + domain), nickname, Imps.Contacts.TYPE_NORMAL);
         return contactUser;
     }

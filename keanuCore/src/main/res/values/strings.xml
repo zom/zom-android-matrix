@@ -85,10 +85,13 @@
     <string name="connect_server">Connect Server</string>
     <string name="tcp_port_for_xmpp_server">TCP Port for XMPP Server</string>
     <string name="server_port">Server Port</string>
-    <string name="xmpp_resource">XMPP Resource</string>
+    <string name="xmpp_resource">Device Name</string>
     <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">to distinguish this connection from other clients that are also logged in</string>
+
+    <!--
     <string name="xmpp_resource_prio_title">XMPP Resource Priority</string>
     <string name="xmpp_resource_prio_summary">Messages to clients with multiple active resources will be sent to the resource with the highest priority</string>
+    -->
 
     <!-- Views: Contact list -->
     <string name="title_chats">Conversations</string>
@@ -300,7 +303,7 @@
     <string name="menu_settings">Settings</string>
     <string name="menu_sign_out">Sign out</string>
     <!-- Other: Provider -->
-    <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+    <string name="provider_full_name_xmpp">Matrix</string>
     <!-- Other: Development Strings [Do not localize!] -->
     <!-- Other: Presence States -->
     <string name="presence_available">Online</string>

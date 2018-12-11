@@ -23,23 +23,14 @@
 
 	<EditTextPreference android:key="pref_account_xmpp_resource"
 		android:summary="@string/to_distinguish_this_connection_from_other_clients_that_are_also_logged_in"
-		android:defaultValue="Zom"
+		android:defaultValue="KeanuDevice"
 		android:title="@string/xmpp_resource" />
-	<EditTextPreference android:key="pref_account_xmpp_resource_prio"
-		android:summary="@string/xmpp_resource_prio_summary"
-		android:defaultValue="20"
-		android:numeric="integer"
-		android:title="@string/xmpp_resource_prio_title" />
-	<EditTextPreference android:key="pref_account_port"
-		android:title="@string/server_port"
-		android:defaultValue="5222"
-		android:numeric="integer"
-		android:maxLength="5"
-		android:summary="@string/tcp_port_for_xmpp_server" />
+
 	<EditTextPreference android:key="pref_account_server"
 		android:title="@string/connect_server"
 		android:summary="@string/the_server_to_connect_to_if_needed" />
 
+	<!--
 	<PreferenceCategory android:title="@string/encryption_and_anonymity_title">
 
 		<CheckBoxPreference android:key="pref_security_require_tls"
@@ -59,7 +50,8 @@
 			android:enabled="true"
 			android:summary="@string/use_dns_srv_to_find_actual_xmpp_server_from_domain_name"
 			android:defaultValue="true" />
-		</PreferenceCategory>
+		</PreferenceCategory>-->
+
 	<PreferenceCategory android:title="Proxy Settings">
 
 	<CheckBoxPreference android:key="pref_security_use_proxy"
