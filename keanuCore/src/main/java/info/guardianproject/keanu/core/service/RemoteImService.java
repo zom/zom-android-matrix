@@ -117,7 +117,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
     final RemoteCallbackList<IConnectionCreationListener> mRemoteListeners = new RemoteCallbackList<IConnectionCreationListener>();
     public long mHeartbeatInterval;
-    private WakeLock mWakeLock;
+//    private WakeLock mWakeLock;
     private  NetworkConnectivityReceiver.State mNetworkState;
 
     private CacheWordHandler mCacheWord = null;
@@ -127,7 +127,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     private int mNumNotify = 0;
     private final static int notifyId = 7;
     
-    private static final String TAG = "ZomService";
+    private static final String TAG = "RemoteImService";
 
     public long getHeartbeatInterval() {
         return mHeartbeatInterval;
@@ -166,8 +166,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
         Debug.onServiceStart();
 
-        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, LOG_TAG + ":IM_WAKELOCK");
+   //     PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+    //    mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, LOG_TAG + ":IM_WAKELOCK");
 
         // Clear all account statii to logged-out, since we just got started and we don't want
         // leftovers from any previous crash.
@@ -300,6 +300,9 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                         true);
 
             if (HeartbeatService.HEARTBEAT_ACTION.equals(intent.getAction())) {
+
+                //sendHeartbeat();
+                /**
               //  Log.d(TAG, "HEARTBEAT");
                 if (!mWakeLock.isHeld())
                 {
@@ -309,7 +312,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                     } finally {
                         mWakeLock.release();
                     }
-                }
+                }**/
+
                 return START_REDELIVER_INTENT;
             }
 
@@ -328,7 +332,9 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                     NetworkInfo networkInfo = (NetworkInfo) intent
                             .getParcelableExtra(HeartbeatService.NETWORK_INFO_EXTRA);
                     NetworkConnectivityReceiver.State networkState = NetworkConnectivityReceiver.State.values()[intent.getIntExtra(HeartbeatService.NETWORK_STATE_EXTRA, 0)];
+                    networkStateChanged(networkInfo, networkState);
 
+                    /**
                     if (!mWakeLock.isHeld()) {
                         try {
                             mWakeLock.acquire();
@@ -340,7 +346,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                     } else {
                         networkStateChanged(networkInfo, networkState);
 
-                    }
+                    }**/
                 }
 
             }
@@ -628,6 +634,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
     public static void installTransports (Context context)
     {
+        /**
         //restart transports if needed
         if (Preferences.useAdvancedNetworking())
         {
@@ -647,7 +654,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                 aNetworking.stopTransport();
 
             aNetworking = null;
-        }
+        }**/
     }
 
     private IImConnection do_createConnection(long providerId, long accountId) {
@@ -828,8 +835,9 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     boolean reestablishConnections() {
 
         //restart transports if needed
-        if (Preferences.useAdvancedNetworking())
-            activateAdvancedNetworking(this);
+
+        //if (Preferences.useAdvancedNetworking())
+          //  activateAdvancedNetworking(this);
 
         for (ImConnectionAdapter conn : mConnections.values()) {
             int connState = conn.getState();

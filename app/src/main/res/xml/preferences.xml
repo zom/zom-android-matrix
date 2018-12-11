@@ -37,7 +37,7 @@
            android:key="prefGroupEncryption"
            android:title="@string/group_encryption_title"
            android:summary="@string/group_encryption_summary"
-           android:defaultValue="false"
+           android:defaultValue="true"
            />
 
 

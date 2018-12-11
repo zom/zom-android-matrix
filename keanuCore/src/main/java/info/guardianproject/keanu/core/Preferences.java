@@ -249,33 +249,9 @@ public class Preferences {
         return OTR_MODE_VALUES;
     }
 
-    public static boolean getUseTibetanDictionary() {
-        return preferences.getBoolean(USE_TIBETAN_DICTIONARY, true);
-    }
-
-    public static boolean useAdvancedNetworking ()
-    {
-        return preferences.getBoolean(ADVANCED_NETWORKING,false);
-    }
-
-    public static void enableAdvancedNetworking (boolean enable)
-    {
-        preferences.edit().putBoolean(ADVANCED_NETWORKING,enable).apply();
-    }
-
-    public static String getProxyServerHost ()
-    {
-        return preferences.getString(PROXY_SERVER_HOST,null);
-    }
-
-    public static int getProxyServerPort ()
-    {
-        return preferences.getInt(PROXY_SERVER_PORT,-1);
-    }
-
     public static boolean doBlockScreenshots () { return preferences.getBoolean(BLOCK_SCREENSHOTS,true);}
 
-    public static boolean doGroupEncryption () { return preferences.getBoolean("prefGroupEncryption", false);}
+    public static boolean doGroupEncryption () { return preferences.getBoolean("prefGroupEncryption", true);}
 
     public static boolean doCheckBatteryOptimizations () { return preferences.getBoolean("prefCheckBattery",true); };
 

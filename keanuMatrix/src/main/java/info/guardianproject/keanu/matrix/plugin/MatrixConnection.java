@@ -128,7 +128,7 @@ public class MatrixConnection extends ImConnection {
         mUserPresence = new Presence(Presence.AVAILABLE, null, Presence.CLIENT_TYPE_MOBILE);
 
         mDeviceName = providerSettings.getDeviceName();
-        mDeviceId = providerSettings.getDeviceName(); //make them the say for now
+        mDeviceId = providerSettings.getDeviceName(); //make them the same for now
 
         providerSettings.close();
 
@@ -526,11 +526,6 @@ public class MatrixConnection extends ImConnection {
 
         final ChatGroup group = mChatGroupManager.getChatGroup(mAddr, subject);
 
-        ChatSession session = mChatSessionManager.getSession(room.getRoomId());
-
-        if (session == null)
-            session = mChatSessionManager.createChatSession(group,true);
-
         room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
             @Override
             public void onNetworkError(Exception e) {
@@ -575,14 +570,13 @@ public class MatrixConnection extends ImConnection {
 
 
                     if (group.getMember(member.getUserId())==null) {
-                        group.notifyMemberJoined(room.getRoomId(), contact);
+                        group.notifyMemberJoined(member.getUserId(), contact);
                         group.notifyMemberRoleUpdate(contact, null, "member");
                     }
 
                 }
 
                 group.endMemberUpdates();
-                mContactListManager.updateContactList();
 
             }
         });
@@ -747,7 +741,7 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onInitialSyncComplete(String s) {
             debug ("onInitialSyncComplete: " + s);
-      //      loadStateAsync();
+            loadStateAsync();
         }
 
         @Override
@@ -860,7 +854,7 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onGroupUsersListUpdate(String s) {
             debug ("onGroupUsersListUpdate: " + s);
-
+            loadStateAsync();
         }
 
         @Override
