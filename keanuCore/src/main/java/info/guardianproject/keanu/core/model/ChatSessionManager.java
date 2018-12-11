@@ -87,9 +87,6 @@ public abstract class ChatSessionManager {
             session = new ChatSession(participant, this);
             ChatSessionAdapter csa = mAdapter.getChatSessionAdapter(session, isNewSession);
 
-            //this is redundant, as the getAdapter() returns the session instance itself
-         //   session.setMessageListener(csa.getAdaptee().getMessageListener());
-
             mSessions.put(participant.getAddress().getAddress(),session);
 
             for (ChatSessionListener listener : mListeners) {

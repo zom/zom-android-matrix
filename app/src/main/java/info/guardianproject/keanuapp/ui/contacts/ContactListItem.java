@@ -418,6 +418,7 @@ public class ContactListItem extends FrameLayout {
                     }
 
                 }
+                /**
                 else
                 {
                     if (holder.mSubBox != null)
@@ -425,7 +426,7 @@ public class ContactListItem extends FrameLayout {
 
                     if (holder.mLine2 != null)
                             holder.mLine2.setText(getContext().getString(R.string.title_pending));
-                }
+                }**/
 
             }
             else

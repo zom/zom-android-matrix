@@ -70,7 +70,7 @@ public class MoreFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                openZomServices ();
+                openServices ();
 
             }
         });
@@ -168,7 +168,7 @@ public class MoreFragment extends Fragment {
         super.onDetach();
     }
 
-    private void openZomServices ()
+    private void openServices ()
     {
         Intent intent = new Intent(getActivity(),ServicesActivity.class);
         getActivity().startActivity(intent);

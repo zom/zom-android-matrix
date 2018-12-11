@@ -1445,7 +1445,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             mGroupName = "G" + System.currentTimeMillis();
             try
             {
-                mGroupMgr.createChatGroupAsync(new BaseAddress(mGroupName), nickname, nickname);
+                mGroupMgr.createChatGroupAsync(null, mGroupName, nickname);
             }
             catch (Exception e){
                 e.printStackTrace();

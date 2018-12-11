@@ -64,7 +64,7 @@ public class MatrixConnection extends ImConnection {
     private MXSession mSession;
     private MXDataHandler mDataHandler;
 
-    private KeanuMXFileStore mStore = null;
+    protected KeanuMXFileStore mStore = null;
     private Credentials mCredentials = null;
 
     private HomeServerConnectionConfig mConfig;
@@ -93,7 +93,7 @@ public class MatrixConnection extends ImConnection {
         super (context);
 
         mContactListManager = new MatrixContactListManager(context, this);
-        mChatGroupManager = new MatrixChatGroupManager();
+        mChatGroupManager = new MatrixChatGroupManager(this);
         mChatSessionManager = new MatrixChatSessionManager();
 
         mResponseHandler = new Handler();
@@ -250,6 +250,7 @@ public class MatrixConnection extends ImConnection {
         mStore.setDataHandler(mDataHandler);
 
         mChatSessionManager.setDataHandler(mDataHandler);
+        mChatGroupManager.setDataHandler(mDataHandler);
 
         new LoginRestClient(mConfig).loginWithUser(username, password, mDeviceName, mDeviceId, new SimpleApiCallback<Credentials>()
         {
@@ -297,7 +298,7 @@ public class MatrixConnection extends ImConnection {
                             }
                         });
 
-
+                        mChatGroupManager.setSession(mSession);
 
 
                     }
@@ -514,7 +515,7 @@ public class MatrixConnection extends ImConnection {
         }.execute();
     }
 
-    private void addRoomContact (final Room room)
+    protected ChatGroup addRoomContact (final Room room)
     {
         debug ("addRoomContact: " + room.getRoomId() + " - " + room.getRoomDisplayName(mContext) + " - " + room.getNumberOfMembers());
 
@@ -582,20 +583,21 @@ public class MatrixConnection extends ImConnection {
         });
 
 
+        return group;
     }
 
-    private void debug (String msg, MatrixError error)
+    protected void debug (String msg, MatrixError error)
     {
         Log.w(TAG, msg + ": " + error.errcode +  "=" + error.getMessage());
 
     }
 
-    private void debug (String msg)
+    protected void debug (String msg)
     {
         Log.d(TAG, msg);
     }
 
-    private void debug (String msg, Exception e)
+    protected void debug (String msg, Exception e)
     {
         Log.e(TAG, msg, e);
     }
@@ -685,7 +687,11 @@ public class MatrixConnection extends ImConnection {
                         message.setID(event.eventId);
                         message.setFrom(contact.getAddress());
                         message.setDateTime(new Date());//use "age"?
-                        message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
+
+                        if (mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId()))
+                            message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
+                        else
+                            message.setType(Imps.MessageType.INCOMING);
 
                         session.onReceiveMessage(message, true);
                     }

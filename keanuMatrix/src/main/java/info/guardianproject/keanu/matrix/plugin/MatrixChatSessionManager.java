@@ -4,6 +4,7 @@ import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.crypto.MXCryptoError;
 import org.matrix.androidsdk.crypto.data.MXDeviceInfo;
 import org.matrix.androidsdk.crypto.data.MXUsersDevicesMap;
+import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.data.RoomMediaMessage;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.model.MatrixError;
@@ -16,6 +17,7 @@ import java.util.Map;
 import info.guardianproject.keanu.core.model.ChatSession;
 import info.guardianproject.keanu.core.model.ChatSessionManager;
 import info.guardianproject.keanu.core.model.Message;
+import info.guardianproject.keanu.core.provider.Imps;
 
 import static info.guardianproject.keanu.core.service.RemoteImService.debug;
 
@@ -39,8 +41,9 @@ public class MatrixChatSessionManager extends ChatSessionManager {
     @Override
     public void sendMessageAsync(final ChatSession session, final Message message) {
 
-        mDataHandler.getRoom(session.getParticipant().getAddress().getAddress())
-                .sendTextMessage(message.getBody(),message.getBody(),"text/plain",new RoomMediaMessage.EventCreationListener()
+        final Room room = mDataHandler.getRoom(session.getParticipant().getAddress().getAddress());
+
+                room.sendTextMessage(message.getBody(),message.getBody(),"text/plain",new RoomMediaMessage.EventCreationListener()
                 {
 
                     @Override
@@ -120,6 +123,9 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 debug ("onSuccess: message sent: " + roomMediaMessage.getEvent().getMatrixId());
+
+                                if (mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId()))
+                                    message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
 
                             }
                         });

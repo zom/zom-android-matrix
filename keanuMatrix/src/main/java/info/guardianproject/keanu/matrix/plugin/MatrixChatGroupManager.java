@@ -1,14 +1,46 @@
 package info.guardianproject.keanu.matrix.plugin;
 
+import android.opengl.Matrix;
+import android.text.TextUtils;
+
+import org.matrix.androidsdk.MXDataHandler;
+import org.matrix.androidsdk.MXSession;
+import org.matrix.androidsdk.data.Room;
+import org.matrix.androidsdk.rest.callback.ApiCallback;
+import org.matrix.androidsdk.rest.model.MatrixError;
+import org.w3c.dom.Text;
+
 import info.guardianproject.keanu.core.model.Address;
 import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
+import info.guardianproject.keanu.core.model.ChatSession;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.Invitation;
 import info.guardianproject.keanu.core.model.impl.BaseAddress;
+import info.guardianproject.keanu.core.provider.Imps;
+
+import static org.matrix.androidsdk.crypto.MXCryptoAlgorithms.MXCRYPTO_ALGORITHM_MEGOLM;
 
 public class MatrixChatGroupManager extends ChatGroupManager {
 
+    private MXDataHandler mDataHandler;
+
+    private MXSession mSession;
+    private MatrixConnection mConn;
+
+    public MatrixChatGroupManager (MatrixConnection conn) {
+        mConn = conn;
+    }
+
+    public void setDataHandler (MXDataHandler dataHandler)
+    {
+        mDataHandler = dataHandler;
+    }
+
+    public void setSession (MXSession session)
+    {
+        mSession = session;
+    }
 
     @Override
     public ChatGroup getChatGroup (Address addr)
@@ -23,16 +55,61 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         if (result == null)
         {
             result = new ChatGroup(addr,subject,this);
-            notifyJoinedGroup(result);
         }
+        else
+            result.setName(subject);
 
+        notifyJoinedGroup(result);
 
         return result;
     }
 
     @Override
-    public boolean createChatGroupAsync(Address address, String subject, String nickname) throws Exception {
-        return false;
+    public ChatGroup createChatGroupAsync(final String address, final String subject, String nickname) throws Exception {
+
+        ChatGroup group = null;
+
+        if (!TextUtils.isEmpty(address))
+        {
+            Room room = mDataHandler.getRoom(address);
+            ChatGroup chatGroup = mConn.addRoomContact(room);
+            mConn.getChatSessionManager().createChatSession(chatGroup, false);
+        }
+        else {
+            mSession.createRoom(subject, subject, null, new ApiCallback<String>() {
+                @Override
+                public void onNetworkError(Exception e) {
+                    mConn.debug("createChatGroupAsync:onNetworkError: " + e);
+
+                }
+
+                @Override
+                public void onMatrixError(MatrixError e) {
+                    mConn.debug("createChatGroupAsync:onMatrixError: " + e);
+
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+                    mConn.debug("createChatGroupAsync:onUnexpectedError: " + e);
+
+                }
+
+                @Override
+                public void onSuccess(String roomId) {
+                    Room room = mDataHandler.getRoom(roomId);
+                    room.updateName(subject,new BasicApiCallback("RoomUpdate"));
+                    mConn.addRoomContact(room);
+                    room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("CreateRoomEncryption"));
+                    ChatGroup chatGroup = new ChatGroup(new MatrixAddress(roomId), subject, MatrixChatGroupManager.this);
+                    ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
+                    session.setUseEncryption(true);
+                }
+            });
+        }
+
+
+        return null;
     }
 
     @Override
@@ -58,6 +135,18 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     @Override
     public void leaveChatGroupAsync(ChatGroup group) {
 
+        Room room = mDataHandler.getRoom(group.getAddress().getAddress());
+
+        if (room != null ) {
+            mDataHandler.getRoom(group.getAddress().getAddress()).leave(new BasicApiCallback("Leave Room")
+            {
+                @Override
+                public void onSuccess(Object o) {
+                    debug ("Left Room: onSuccess: " + o);
+                }
+
+            });
+        }
     }
 
     @Override

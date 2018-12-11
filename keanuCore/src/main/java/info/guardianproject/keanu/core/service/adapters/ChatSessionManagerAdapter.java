@@ -96,38 +96,19 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
     public IChatSession createMultiUserChatSession(String roomAddress, String subject, String nickname, boolean isNewChat)
     {
 
-        ChatGroupManager groupMan = mConnection.getAdaptee().getChatGroupManager();
-
         try
         {
+            ChatGroupManager groupMan = mConnection.getAdaptee().getChatGroupManager();
+            groupMan.createChatGroupAsync(roomAddress, subject, nickname);
 
-            BaseAddress bAddr = new BaseAddress(roomAddress);
-
-            ChatGroup chatGroup = groupMan.getChatGroup(bAddr);
-            if (chatGroup == null)
-                groupMan.createChatGroupAsync(bAddr, subject, nickname);
-
-            chatGroup = groupMan.getChatGroup(bAddr);
-
-            if (chatGroup != null)
-                chatGroup.setName(subject);
-
-            if (chatGroup != null && mConnection.getState() == ImConnection.LOGGED_IN)
-            {
-                ChatSession session = getChatSessionManager().createChatSession(chatGroup,isNewChat);
-                ChatSessionAdapter adapter = getChatSessionAdapter(session, isNewChat);
-                return adapter;
-            }
-            else
-            {
-                return null;
-            }
         }
         catch (Exception e)
         {
             Log.e("Keanu","unable to join group chat" + e.getMessage());
-            return null;
+
         }
+
+        return null;
     }
 
     public void closeChatSession(ChatSessionAdapter adapter) {

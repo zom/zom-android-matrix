@@ -998,41 +998,34 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
             protected String doInBackground(String... params) {
 
                 String subject = params[0];
-                String chatRoom = "group" + UUID.randomUUID().toString().substring(0,8);
                 String server = params[1];
 
 
                 try {
 
+                    IChatSession session = null;
                     IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
 
-                    String roomAddress = (chatRoom + '@' + server).toLowerCase(Locale.US);
+                    String roomAddress = null;
                     String nickname = params[2];
 
-                    IChatSession session = manager.getChatSession(roomAddress);
+                    manager.createMultiUserChatSession(roomAddress, subject, nickname, true);
 
-                    if (session == null) {
-                        session = manager.createMultiUserChatSession(roomAddress, subject, nickname, true);
-
-                        if (session != null)
-                        {
-                            mRequestedChatId = session.getId();
-                            session.markAsSeen(); // We created this, so mark as seen
-                            session.sendTypingStatus(true);
-                            session.setMuted(false);
-                            session.setGroupChatSubject(subject);
-                            publishProgress(mRequestedChatId);
-
-                        } else {
-                            return getString(R.string.unable_to_create_or_join_group_chat);
-
-                        }
-                    } else {
+                    /**
+                    if (session != null)
+                    {
                         mRequestedChatId = session.getId();
+                        session.markAsSeen(); // We created this, so mark as seen
+                        session.sendTypingStatus(true);
+                        session.setMuted(false);
+                        session.setGroupChatSubject(subject);
                         publishProgress(mRequestedChatId);
-                    }
 
-                    if (invitees != null && invitees.size() > 0) {
+                    } else {
+                        return getString(R.string.unable_to_create_or_join_group_chat);
+                    }**/
+
+                    if (session != null && invitees != null && invitees.size() > 0) {
 
                         //wait a second for the server to sort itself out
                         try {
