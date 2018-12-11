@@ -11,6 +11,11 @@ public class MatrixAddress extends BaseAddress {
     private String mUser;
     private String mResource;
 
+    public MatrixAddress (String username, String domain)
+    {
+        this ('@' + username + ':' + domain);
+    }
+
     public MatrixAddress (String address)
     {
 

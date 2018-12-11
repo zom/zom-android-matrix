@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -19,8 +20,12 @@ import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.data.RoomMediaMessage;
 import org.matrix.androidsdk.data.RoomState;
 import org.matrix.androidsdk.data.store.IMXStoreListener;
+import org.matrix.androidsdk.data.store.MXFileStore;
 import org.matrix.androidsdk.data.store.MXMemoryStore;
+import org.matrix.androidsdk.db.MXMediasCache;
+import org.matrix.androidsdk.fragments.MatrixMessageListFragment;
 import org.matrix.androidsdk.listeners.IMXEventListener;
+import org.matrix.androidsdk.listeners.IMXMediaUploadListener;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.callback.SimpleApiCallback;
 import org.matrix.androidsdk.rest.client.LoginRestClient;
@@ -30,6 +35,8 @@ import org.matrix.androidsdk.rest.model.RoomMember;
 import org.matrix.androidsdk.rest.model.User;
 import org.matrix.androidsdk.rest.model.bingrules.BingRule;
 import org.matrix.androidsdk.rest.model.login.Credentials;
+import org.matrix.androidsdk.rest.model.sync.DeviceInfo;
+import org.matrix.androidsdk.util.ContentManager;
 import org.w3c.dom.Text;
 
 import java.io.InputStream;
@@ -52,14 +59,12 @@ import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.model.Presence;
 import info.guardianproject.keanu.core.provider.Imps;
 
-import static info.guardianproject.keanu.core.service.RemoteImService.debug;
-
 public class MatrixConnection extends ImConnection {
 
     private MXSession mSession;
     private MXDataHandler mDataHandler;
 
-    private MXMemoryStore mStore = null;
+    private KeanuMXFileStore mStore = null;
     private Credentials mCredentials = null;
 
     private HomeServerConnectionConfig mConfig;
@@ -78,6 +83,8 @@ public class MatrixConnection extends ImConnection {
 
     private final static String HTTPS_PREPEND = "https://";
 
+    private Handler mResponseHandler;
+
     public MatrixConnection (Context context)
     {
         super (context);
@@ -85,6 +92,8 @@ public class MatrixConnection extends ImConnection {
         mContactListManager = new MatrixContactListManager(context, this);
         mChatGroupManager = new MatrixChatGroupManager();
         mChatSessionManager = new MatrixChatSessionManager();
+
+        mResponseHandler = new Handler();
     }
 
     @Override
@@ -182,95 +191,112 @@ public class MatrixConnection extends ImConnection {
                 .withHomeServerUri(Uri.parse(HTTPS_PREPEND + server))
                 .build();
 
-        new LoginRestClient(mConfig).loginWithUser(username, password, new SimpleApiCallback<Credentials>()
+
+        final String initialToken = "";
+        final boolean enableEncryption = true;
+
+        final String deviceName = "KeanuDevice";
+        final String deviceId = "AABBCCDDEE";
+
+        mCredentials = new Credentials();
+        mCredentials.userId = mUser.getAddress().getAddress();
+        mCredentials.homeServer = HTTPS_PREPEND + server;
+        mCredentials.deviceId = deviceId;
+
+        mConfig.setCredentials(mCredentials);
+
+        mStore = new KeanuMXFileStore(mConfig,enableEncryption, mContext);
+
+        mStore.addMXStoreListener(new IMXStoreListener() {
+            @Override
+            public void postProcess(String s) {
+                debug ("MXSTORE: postProcess: " + s);
+
+
+            }
+
+            @Override
+            public void onStoreReady(String s) {
+                debug ("MXSTORE: onStoreReady: " + s);
+
+            }
+
+            @Override
+            public void onStoreCorrupted(String s, String s1) {
+                debug ("MXSTORE: onStoreCorrupted: " + s + " " + s1);
+            }
+
+            @Override
+            public void onStoreOOM(String s, String s1) {
+                debug ("MXSTORE: onStoreOOM: " + s + " " + s1);
+
+            }
+
+            @Override
+            public void onReadReceiptsLoaded(String s) {
+                debug ("MXSTORE: onReadReceiptsLoaded: " + s);
+
+            }
+        });
+        mStore.open();
+
+        mDataHandler = new MXDataHandler(mStore, mCredentials);
+        mDataHandler.addListener(mEventListener);
+        mStore.setDataHandler(mDataHandler);
+
+        mChatSessionManager.setDataHandler(mDataHandler);
+
+        new LoginRestClient(mConfig).loginWithUser(username, password, deviceName, deviceId, new SimpleApiCallback<Credentials>()
         {
 
             @Override
             public void onSuccess(Credentials credentials) {
 
-                final String initialToken = "";
-                boolean enableEncryption = true;
-
                 mCredentials = credentials;
                 mConfig.setCredentials(mCredentials);
 
-//                mStore = new MXFileStore(mConfig,enableEncryption, mContext);
-                mStore = new MXMemoryStore(mCredentials, mContext);
-
-                mStore.addMXStoreListener(new IMXStoreListener() {
-                    @Override
-                    public void postProcess(String s) {
-                        debug ("STORE: postProcess: " + s);
-
-                    }
-
-                    @Override
-                    public void onStoreReady(String s) {
-                        debug ("onStoreReady: " + s);
-
-                    }
-
-                    @Override
-                    public void onStoreCorrupted(String s, String s1) {
-                        debug ("onStoreCorrupted: " + s + " " + s1);
-                    }
-
-                    @Override
-                    public void onStoreOOM(String s, String s1) {
-                        debug ("onStoreOOM: " + s + " " + s1);
-
-                    }
-
-                    @Override
-                    public void onReadReceiptsLoaded(String s) {
-                        debug ("onReadReceiptsLoaded: " + s);
-
-                    }
-                });
-
-                mDataHandler = new MXDataHandler(mStore, mCredentials);
-                //mStore.setDataHandler(mDataHandler);
-                mDataHandler.addListener(mEventListener);
-
-                mChatSessionManager.setDataHandler(mDataHandler);
-
-                mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
-                        .withFileEncryption(enableEncryption)
-                        .build();
+                mResponseHandler.post(new Runnable ()
+                {
+                    public void run ()
+                    {
 
 
-                mSession.enableCrypto(true, new ApiCallback<Void>() {
-                    @Override
-                    public void onNetworkError(Exception e) {
-                        debug ("enableCrypto: onNetworkError",e);
+                        mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
+                                .withFileEncryption(enableEncryption)
+                                .build();
 
-                    }
+                        mSession.enableCrypto(true, new ApiCallback<Void>() {
+                            @Override
+                            public void onNetworkError(Exception e) {
+                                debug ("enableCrypto: onNetworkError",e);
 
-                    @Override
-                    public void onMatrixError(MatrixError matrixError) {
-                        debug ("enableCrypto: onMatrixError", matrixError);
+                            }
 
-                    }
+                            @Override
+                            public void onMatrixError(MatrixError matrixError) {
+                                debug ("enableCrypto: onMatrixError", matrixError);
 
-                    @Override
-                    public void onUnexpectedError(Exception e) {
-                        debug ("enableCrypto: onUnexpectedError",e);
+                            }
 
-                    }
+                            @Override
+                            public void onUnexpectedError(Exception e) {
+                                debug ("enableCrypto: onUnexpectedError",e);
 
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        debug ("enableCrypto: onSuccess");
-                        mSession.startEventStream(initialToken);
-                        setState(LOGGED_IN, null);
+                            }
+
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                debug ("enableCrypto: onSuccess");
+                                mSession.startEventStream(initialToken);
+                                setState(LOGGED_IN, null);
+                            }
+                        });
+
+
 
 
                     }
                 });
-
-
-
-
             }
 
             @Override
@@ -384,6 +410,7 @@ public class MatrixConnection extends ImConnection {
 
     @Override
     public void sendTypingStatus(String to, boolean isTyping) {
+        /**
         mDataHandler.getRoom(to).sendTypingNotification(isTyping, 3000, new ApiCallback<Void>() {
             @Override
             public void onNetworkError(Exception e) {
@@ -407,7 +434,7 @@ public class MatrixConnection extends ImConnection {
 
                 debug ("sendTypingStatus:onSuccess!");
             }
-        });
+        });**/
     }
 
     @Override
@@ -421,7 +448,40 @@ public class MatrixConnection extends ImConnection {
     }
 
     @Override
-    public String publishFile(String fileName, String mimeType, long fileSize, InputStream is, boolean doEncryption, UploadProgressListener listener) {
+    public String sendMediaMessage(String roomId, String fileName, String mimeType, long fileSize, InputStream is, boolean doEncryption, UploadProgressListener listener) {
+
+
+        final MXMediasCache mediasCache = mDataHandler.getMediasCache();
+
+        String uploadId = roomId + ':' + fileName;
+
+        mediasCache.uploadContent(is, fileName, mimeType, uploadId, new IMXMediaUploadListener() {
+            @Override
+            public void onUploadStart(String s) {
+
+            }
+
+            @Override
+            public void onUploadProgress(String s, UploadStats uploadStats) {
+
+            }
+
+            @Override
+            public void onUploadCancel(String s) {
+
+            }
+
+            @Override
+            public void onUploadError(String s, int i, String s1) {
+
+            }
+
+            @Override
+            public void onUploadComplete(final String uploadId, final String contentUri) {
+
+            }
+        });
+
         return null;
     }
 
@@ -552,6 +612,16 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onPresenceUpdate(Event event, User user) {
             debug ("onPresenceUpdate : " + user.user_id + ": event=" + event.toString());
+
+            boolean currentlyActive = false;
+            int lastActiveAgo = -1;
+
+            if (event.getContentAsJsonObject().has("currently_active"))
+                currentlyActive = event.getContentAsJsonObject().get("currently_active").getAsBoolean();
+
+            if (event.getContentAsJsonObject().has("last_active_ago"))
+                lastActiveAgo = event.getContentAsJsonObject().get("last_active_ago").getAsInt();
+
         }
 
         @Override
@@ -585,6 +655,7 @@ public class MatrixConnection extends ImConnection {
                     debug("MESSAGE: from=" + event.getSender() + " message=" + messageBody);
 
                     User user = mStore.getUser(event.getSender());
+//                    String deviceId = event.getContent().getAsJsonObject().get("deviceId").getAsString();
                     Room room = mStore.getRoom(event.roomId);
                     addRoomContact(room);
 
@@ -601,7 +672,7 @@ public class MatrixConnection extends ImConnection {
 
                     }
 
-                    if (contact != null && (!event.sender.equals(mUser.getAddress().getAddress()))){
+                    if (contact != null){
                         //now pass the incoming message somewhere!
 
                         ChatSession session = mChatSessionManager.getSession(room.getRoomId());

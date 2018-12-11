@@ -471,6 +471,7 @@ public class ImConnectionAdapter extends IImConnection.Stub {
 
                 if (state == ImConnection.LOGGED_IN)
                 {
+                    /**
                     //we need to reinit all group chat sessions here
                     Cursor c = null;
 
@@ -493,20 +494,6 @@ public class ImConnectionAdapter extends IImConnection.Stub {
                         Uri uriChats = builder.build();
                         c = getContext().getContentResolver().query(uriChats, CHAT_PROJECTION, buf.toString(), null, Imps.Contacts.TIME_ORDER);
 
-                        /**
-                        if (c != null) {
-                            if (c.getCount() > 0) {
-                                while (c.moveToNext()) {
-                                    int chatType = c.getInt(5);
-                                    String remoteAddress = c.getString(3);
-                                    String nickname = c.getString(4);
-                                    if (remoteAddress != null)
-                                       new ChatSessionInitTask(mProviderId, mAccountId, chatType, false)
-                                               .execute(new Contact(new XmppAddress(remoteAddress),nickname,chatType));
-                                }
-                            }
-                            c.close();
-                        }**/
 
                     }
                     catch (Exception e)
@@ -514,7 +501,7 @@ public class ImConnectionAdapter extends IImConnection.Stub {
                         Log.e(LOG_TAG,"exception init chatsession",e);
                         if (c != null && (!c.isClosed()))
                             c.close();
-                    }
+                    }**/
                 }
 
             }
@@ -667,9 +654,9 @@ public class ImConnectionAdapter extends IImConnection.Stub {
             return null;
     }
 
-    public String publishFile (String fileName, String mimeType, long fileSize, InputStream is, boolean doEncryption, UploadProgressListener listener)
+    public String sendMediaMessage (String recipient, String fileName, String mimeType, long fileSize, InputStream is, boolean doEncryption, UploadProgressListener listener)
     {
-        return mConnection.publishFile(fileName, mimeType, fileSize, is, doEncryption, listener);
+        return mConnection.sendMediaMessage(recipient, fileName, mimeType, fileSize, is, doEncryption, listener);
     }
 
 }

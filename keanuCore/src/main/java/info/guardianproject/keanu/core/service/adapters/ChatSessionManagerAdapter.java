@@ -51,6 +51,8 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
     HashMap<String, ChatSessionAdapter> mActiveChatSessionAdapters;
 
+    ChatGroupManager groupManager;
+
     public ChatSessionManagerAdapter(ImConnectionAdapter connection) {
 
         mConnection = connection;
@@ -62,18 +64,13 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
         mSessionListenerAdapter = new ChatSessionListenerAdapter();
         getChatSessionManager().addChatSessionListener(mSessionListenerAdapter);
 
-       
+        groupManager = mConnection.getAdaptee().getChatGroupManager();
+        groupManager.addGroupListener(new ChatGroupListenerAdapter());
     }
 
     public ChatGroupManager getChatGroupManager ()
     {
-        if ((mConnection.getAdaptee().getCapability() & ImConnection.CAPABILITY_GROUP_CHAT) != 0) {
-            ChatGroupManager groupManager = mConnection.getAdaptee().getChatGroupManager();
-            groupManager.addGroupListener(new ChatGroupListenerAdapter());
-            return groupManager;
-        }
-        else
-            return null;
+        return groupManager;
     }
     
     public ChatSessionManager getChatSessionManager() {

@@ -1928,6 +1928,9 @@ public class ConversationView {
 
                         IChatSession session = sessionMgr.getChatSession(mRemoteAddress);
 
+                        if (session == null)
+                            sessionMgr.createChatSession(mRemoteAddress,false);
+                        
                         return session;
 
                 }

@@ -359,24 +359,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         return msg;
     }
 
-    private void sendMediaMessage(String localUrl, String publishUrl, Message msg) {
 
-        String mediaPath = localUrl + ' ' + publishUrl;
-
-        long sendTime = System.currentTimeMillis();
-
-        msg.setBody(publishUrl);
-       // insertOrUpdateChat(mediaPath);
-
-        int newType = mChatSession.sendMessageAsync(msg, mEnableOmemoGroups);
-
-        if (msg.getDateTime() != null)
-            sendTime = msg.getDateTime().getTime();
-
-        updateMessageInDb(msg.getID(),newType,sendTime,mediaPath);
-
-
-    }
 
 
     @Override
@@ -517,7 +500,35 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     }
                 };**/
 
-                String resultUrl = mConnection.publishFile(sendFileName, mimeType, fileLength, fis, doEncryption, listener);
+                String resultUrl = mConnection.sendMediaMessage(mChatSession.getParticipant().getAddress().getAddress(), sendFileName, mimeType, fileLength, fis, doEncryption, listener);
+
+                int newType = Imps.MessageType.OUTGOING_ENCRYPTED;
+
+                if (TextUtils.isEmpty(resultUrl))
+                    newType = Imps.MessageType.QUEUED;
+
+                long sendTime = System.currentTimeMillis();
+                msgMedia.setBody(resultUrl);
+                if (msgMedia.getDateTime() != null)
+                    sendTime = msgMedia.getDateTime().getTime();
+
+                updateMessageInDb(msgMedia.getID(),newType,sendTime,mediaPath + ' ' + resultUrl);
+
+                /**
+                String mediaPath = localUrl + ' ' + publishUrl;
+
+                long sendTime = System.currentTimeMillis();
+
+                msg.setBody(publishUrl);
+                // insertOrUpdateChat(mediaPath);
+
+                int newType = mChatSession.sendMessageAsync(msg, mEnableOmemoGroups);
+
+                if (msg.getDateTime() != null)
+                    sendTime = msg.getDateTime().getTime();
+
+                updateMessageInDb(msg.getID(),newType,sendTime,mediaPath);
+                */
 
                 //make sure result is valid and starts with https, if so, send it!
                 /**

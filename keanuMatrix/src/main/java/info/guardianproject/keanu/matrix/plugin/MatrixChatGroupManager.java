@@ -5,9 +5,16 @@ import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.Invitation;
+import info.guardianproject.keanu.core.model.impl.BaseAddress;
 
 public class MatrixChatGroupManager extends ChatGroupManager {
 
+
+    @Override
+    public ChatGroup getChatGroup (Address addr)
+    {
+        return getChatGroup(new MatrixAddress(addr.getAddress()),addr.getAddress());
+    }
 
     public ChatGroup getChatGroup (MatrixAddress addr, String subject)
     {

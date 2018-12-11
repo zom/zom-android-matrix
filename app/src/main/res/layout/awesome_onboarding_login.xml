@@ -44,6 +44,21 @@ android:paddingTop="40dp"
     android:layout_margin="3dp"
     />
 
+    <info.guardianproject.keanu.core.type.CustomTypefaceEditText android:id="@+id/edtServer"
+        android:selectAllOnFocus="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:autoLink="none"
+        android:cursorVisible="true"
+        android:inputType="textUri|textNoSuggestions"
+        android:gravity="center"
+        android:padding="6dp"
+        android:textColor="?messageTextPrimary"
+        android:background="@drawable/rounded_rect"
+        android:layout_margin="3dp"
+        android:text="@string/default_server"
+        />
+
 <info.guardianproject.keanu.core.type.CustomTypefaceButton android:id="@+id/btnSignIn"
     android:text="@string/sign_in"
     android:layout_height="wrap_content"

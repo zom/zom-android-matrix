@@ -742,22 +742,16 @@ public class OnboardingActivity extends BaseActivity {
     {
         String username = ((TextView)findViewById(R.id.edtName)).getText().toString();
         String password = ((TextView)findViewById(R.id.edtPass)).getText().toString();
+        String server = ((TextView)findViewById(R.id.edtServer)).getText().toString();
 
-        if (verifyJabberID(username)) {
+        if (mExistingAccountTask == null) {
+            findViewById(R.id.progressExistingUser).setVisibility(View.VISIBLE);
+            findViewById(R.id.progressExistingImage).setVisibility(View.VISIBLE);
 
-            if (mExistingAccountTask == null) {
-                findViewById(R.id.progressExistingUser).setVisibility(View.VISIBLE);
-                findViewById(R.id.progressExistingImage).setVisibility(View.VISIBLE);
+            mExistingAccountTask = new ExistingAccountTask();
+            mExistingAccountTask.execute(username, server, password);
 
-                mExistingAccountTask = new ExistingAccountTask();
-                mExistingAccountTask.execute(username, password);
-
-                return true;
-            }
-        }
-        else
-        {
-            Toast.makeText(this,getString(R.string.account_setup_example_email_address),Toast.LENGTH_SHORT).show();
+            return true;
         }
 
         return false;
@@ -794,14 +788,7 @@ public class OnboardingActivity extends BaseActivity {
         protected OnboardingAccount doInBackground(String... account) {
             try {
 
-                mFingerprint = "";
-
-                String nickname = new MatrixAddress(account[0]).getUser();
-                OnboardingAccount result = OnboardingManager.addExistingAccount(OnboardingActivity.this, mHandler, nickname, account[0], account[1]);
-
-                if (result != null && result.accountId != -1 && (!TextUtils.isEmpty(result.username))) {
-                    String jabberId = result.username + '@' + result.domain;
-                }
+                OnboardingAccount result = OnboardingManager.addExistingAccount(OnboardingActivity.this, mHandler, account[0], account[1], account[2]);
 
                 return result;
             }

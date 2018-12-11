@@ -60,7 +60,7 @@
     <!-- Views: Account list -->
     <!-- Views: Setup: Account -->
     <string name="sign_in">Sign in</string>
-    <string name="account_setup_example_email_address">user@domain</string>
+    <string name="account_setup_example_email_address">username</string>
     <string name="account_setup_new_username">new username</string>
     <string name="account_setup_password">password</string>
     <string name="account_setup_password_confirm">confirm password</string>

@@ -365,13 +365,10 @@ public class OnboardingManager {
 
 
 
-    public static OnboardingAccount addExistingAccount (Activity context, Handler handler, String nickname, String jabberId, String password) {
+    public static OnboardingAccount addExistingAccount (Activity context, Handler handler, String username, String domain, String password) {
 
         OnboardingAccount result = null;
 
-        String[] jabberParts = jabberId.split("@");
-        String username = jabberParts[0];
-        String domain = jabberParts[1];
         int port = 5222;
 
         ContentResolver cr = context.getContentResolver();
@@ -379,7 +376,7 @@ public class OnboardingManager {
 
         long providerId = helper.createAdditionalProvider(helper.getProviderNames().get(0)); //xmpp FIXME
 
-        long accountId = ImApp.insertOrUpdateAccount(cr, providerId, -1, nickname, username, password);
+        long accountId = ImApp.insertOrUpdateAccount(cr, providerId, -1, username, username, password);
 
         if (accountId == -1)
             return null;
