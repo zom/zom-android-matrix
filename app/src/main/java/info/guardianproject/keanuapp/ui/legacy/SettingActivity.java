@@ -56,13 +56,11 @@ public class SettingActivity extends PreferenceActivity {
     ListPreference mPanicTriggerApp;
     Preference mPanicConfig;
     ListPreference mLanguage;
-  //  CheckBoxPreference mLinkifyOnTor;
-    CheckBoxPreference mHideOfflineContacts;
+
     CheckBoxPreference mDeleteUnsecuredMedia;
     CheckBoxPreference mEnableNotification;
     CheckBoxPreference mNotificationVibrate;
     CheckBoxPreference mNotificationSound;
-    CheckBoxPreference mForegroundService;
     CheckBoxPreference mAllowScreenshot;
     EditTextPreference mHeartbeatInterval;
 
@@ -71,13 +69,10 @@ public class SettingActivity extends PreferenceActivity {
     private void setInitialValues() {
         mOtrMode.setValue(Preferences.getOtrMode());
 
-//        mLinkifyOnTor.setChecked(Preferences.getDoLinkify());
-        mHideOfflineContacts.setChecked(Preferences.getHideOfflineContacts());
         mDeleteUnsecuredMedia.setChecked(Preferences.getDeleteInsecureMedia());
         mEnableNotification.setChecked(Preferences.isNotificationEnabled());
         mNotificationVibrate.setChecked(Preferences.getNotificationVibrate());
         mNotificationSound.setChecked(Preferences.getNotificationSound());
-        mForegroundService.setChecked(Preferences.getUseForegroundPriority());
 
         mHeartbeatInterval.setText(String.valueOf(Preferences.getHeartbeatInterval()));
 
@@ -116,8 +111,7 @@ public class SettingActivity extends PreferenceActivity {
         mPanicTriggerApp = (ListPreference) findPreference("pref_panic_trigger_app");
         mPanicConfig = (Preference) findPreference("pref_panic_config");
         mLanguage = (ListPreference) findPreference("pref_language");
-   //     mLinkifyOnTor = (CheckBoxPreference) findPreference("pref_linkify_on_tor");
-        mHideOfflineContacts = (CheckBoxPreference) findPreference("pref_hide_offline_contacts");
+
         mDeleteUnsecuredMedia = (CheckBoxPreference) findPreference("pref_delete_unsecured_media");
         mEnableNotification = (CheckBoxPreference) findPreference("pref_enable_notification");
         mNotificationVibrate = (CheckBoxPreference) findPreference("pref_notification_vibrate");
@@ -200,27 +194,11 @@ public class SettingActivity extends PreferenceActivity {
 
         });
 
-        mForegroundService = (CheckBoxPreference) findPreference("pref_foreground_enable");
-        mForegroundService.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object o) {
-
-                ((ImApp)getApplication()).forceStopImService();
-
-                return true;
-            }
-        });
 
 
         mHeartbeatInterval = (EditTextPreference) findPreference("pref_heartbeat_interval");
 
-        findPreference("prefAdvancedNetworking").setOnPreferenceClickListener(new OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                RemoteImService.installTransports(getApplicationContext());
-                return true;
-            }
-        });
+
     }
 
     @Override

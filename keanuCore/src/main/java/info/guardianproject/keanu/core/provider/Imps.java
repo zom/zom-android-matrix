@@ -32,8 +32,7 @@ import java.util.HashMap;
 import java.util.UUID;
 
 import static info.guardianproject.keanu.core.KeanuConstants.CACHEWORD_PASSWORD_KEY;
-import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_XMPP_PRIORITY;
-import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_XMPP_RESOURCE;
+import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_DEVICE_NAME;
 import static info.guardianproject.keanu.core.KeanuConstants.IMPS_CATEGORY;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.NO_CREATE_KEY;
@@ -1935,28 +1934,20 @@ public class Imps {
                 return getString(DOMAIN, "");
             }
 
-            public void setXmppResource(String resource) {
+            public void setDeviceName(String resource) {
                 ProviderSettings.setXmppResource(mContentResolver, mProviderId, resource);
             }
 
-            public String getXmppResource() {
-                String currentResource = getString(XMPP_RESOURCE, DEFAULT_XMPP_RESOURCE);
+            public String getDeviceName() {
+                String currentResource = getString(XMPP_RESOURCE, DEFAULT_DEVICE_NAME);
                 String defaultResource;
-                if (currentResource.equals(DEFAULT_XMPP_RESOURCE)) {
-                    defaultResource = DEFAULT_XMPP_RESOURCE + "-"
+                if (currentResource.equals(DEFAULT_DEVICE_NAME)) {
+                    defaultResource = DEFAULT_DEVICE_NAME + "-"
                                       + UUID.randomUUID().toString().substring(0, 8);
-                    setXmppResource(defaultResource);
+                    setDeviceName(defaultResource);
                     return defaultResource;
                 }
                 return currentResource;
-            }
-
-            public void setXmppResourcePrio(int prio) {
-                ProviderSettings.setXmppResourcePrio(mContentResolver, mProviderId, prio);
-            }
-
-            public int getXmppResourcePrio() {
-                return (int) getLong(XMPP_RESOURCE_PRIO, DEFAULT_XMPP_PRIORITY);
             }
 
             public void setPort(int port) {

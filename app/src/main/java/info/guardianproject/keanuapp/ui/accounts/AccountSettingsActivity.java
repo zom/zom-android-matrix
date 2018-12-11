@@ -56,15 +56,10 @@ public class AccountSettingsActivity extends PreferenceActivity implements
     private long mProviderId;
     private long mAccountId;
 
-    private EditTextPreference mXmppResource;
-    private EditTextPreference mXmppResourcePrio;
-    private EditTextPreference mPort;
+    private EditTextPreference mDeviceName;
     private EditTextPreference mServer;
     private EditTextPreference mProxyPort;
     private EditTextPreference mProxyServer;
-    private CheckBoxPreference mAllowPlainAuth;
-    private CheckBoxPreference mRequireTls;
-    private CheckBoxPreference mDoDnsSrv;
     private CheckBoxPreference mUseProxy;
 
 
@@ -75,21 +70,12 @@ public class AccountSettingsActivity extends PreferenceActivity implements
                 mProviderId, false /* keep updated */, null /* no handler */);
         String text;
 
-        text = settings.getXmppResource();
-        mXmppResource.setText(text);
+        text = settings.getDeviceName();
+        mDeviceName.setText(text);
         if (text != null) {
-            mXmppResource.setSummary(text);
+            mDeviceName.setSummary(text);
         }
-        text = Integer.toString(settings.getXmppResourcePrio());
-        mXmppResourcePrio.setText(text);
-        if (text != null) {
-            mXmppResourcePrio.setSummary(text);
-        }
-        text = Integer.toString(settings.getPort());
-        mPort.setText(text);
-        if (text != null && settings.getPort() != 0) {
-            mPort.setSummary(text);
-        }
+
         text = settings.getServer();
         mServer.setText(text);
         if (!TextUtils.isEmpty(text)) {
@@ -106,9 +92,6 @@ public class AccountSettingsActivity extends PreferenceActivity implements
             mProxyPort.setSummary(port+"");
         }
 
-        mAllowPlainAuth.setChecked(settings.getAllowPlainAuth());
-        mRequireTls.setChecked(settings.getRequireTls());
-        mDoDnsSrv.setChecked(settings.getDoDnsSrv());
         mUseProxy.setChecked(settings.getUseProxy());
 
 
@@ -215,34 +198,13 @@ public class AccountSettingsActivity extends PreferenceActivity implements
 
         if (key.equals("pref_account_xmpp_resource")) {
             value = prefs.getString(key, null);
-            settings.setXmppResource(value);
+            settings.setDeviceName(value);
             if (value != null) {
                 value = value.trim();
-                mXmppResource.setSummary(value);
-                mXmppResource.setText(value); // In case it was trimmed
+                mDeviceName.setSummary(value);
+                mDeviceName.setText(value); // In case it was trimmed
             }
-        } else if (key.equals("pref_account_xmpp_resource_prio")) {
-
-            value = prefs.getString(key, "20");
-            try {
-                settings.setXmppResourcePrio(Integer.parseInt(value));
-            } catch (NumberFormatException nfe) {
-                Toast.makeText(getBaseContext(),
-                        getString(R.string.error_account_settings_priority), Toast.LENGTH_SHORT)
-                        .show();
-            }
-            mXmppResourcePrio.setSummary(value);
-        } else if (key.equals("pref_account_port")) {
-            value = prefs.getString(key, "0");
-            try {
-                settings.setPort(Integer.parseInt(value));
-            } catch (NumberFormatException nfe) {
-                Toast.makeText(getBaseContext(), getString(R.string.error_account_settings_port), Toast.LENGTH_SHORT)
-                        .show();
-            }
-            if (settings.getPort() != 0)
-                mPort.setSummary(value);
-        } else if (key.equals("pref_account_server")) {
+        }  else if (key.equals("pref_account_server")) {
             value = prefs.getString(key, null);
             settings.setServer(value);
             if (value != null) {
@@ -300,13 +262,8 @@ public class AccountSettingsActivity extends PreferenceActivity implements
             throw new RuntimeException(
                     "AccountSettingsActivity must be created with an provider id");
         }
-        mXmppResource = (EditTextPreference) findPreference(("pref_account_xmpp_resource"));
-        mXmppResourcePrio = (EditTextPreference) findPreference(("pref_account_xmpp_resource_prio"));
-        mPort = (EditTextPreference) findPreference(("pref_account_port"));
+        mDeviceName = (EditTextPreference) findPreference(("pref_account_xmpp_resource"));
         mServer = (EditTextPreference) findPreference(("pref_account_server"));
-        mAllowPlainAuth = (CheckBoxPreference) findPreference(("pref_security_allow_plain_auth"));
-        mRequireTls = (CheckBoxPreference) findPreference(("pref_security_require_tls"));
-        mDoDnsSrv = (CheckBoxPreference) findPreference(("pref_security_do_dns_srv"));
         mUseProxy = (CheckBoxPreference) findPreference(("pref_security_use_proxy"));
         mProxyServer = (EditTextPreference) findPreference(("pref_security_proxy_host"));
         mProxyPort = (EditTextPreference) findPreference(("pref_security_proxy_port"));

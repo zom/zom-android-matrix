@@ -73,6 +73,9 @@ public class MatrixConnection extends ImConnection {
     private long mAccountId = -1;
     private Contact mUser = null;
 
+    private String mDeviceName = null;
+    private String mDeviceId = null;
+
     private HashMap<String,String> mSessionContext = new HashMap<>();
     private MatrixChatSessionManager mChatSessionManager;
     private MatrixContactListManager mContactListManager;
@@ -123,6 +126,9 @@ public class MatrixConnection extends ImConnection {
         mAccountId = accountId;
         mUser = makeUser(providerSettings, contentResolver);
         mUserPresence = new Presence(Presence.AVAILABLE, null, Presence.CLIENT_TYPE_MOBILE);
+
+        mDeviceName = providerSettings.getDeviceName();
+        mDeviceId = providerSettings.getDeviceName(); //make them the say for now
 
         providerSettings.close();
 
@@ -196,13 +202,11 @@ public class MatrixConnection extends ImConnection {
         final String initialToken = "";
         final boolean enableEncryption = true;
 
-        final String deviceName = "KeanuDevice";
-        final String deviceId = "AABBCCDDEE";
 
         mCredentials = new Credentials();
         mCredentials.userId = mUser.getAddress().getAddress();
         mCredentials.homeServer = HTTPS_PREPEND + server;
-        mCredentials.deviceId = deviceId;
+        mCredentials.deviceId = mDeviceId;
 
         mConfig.setCredentials(mCredentials);
 
@@ -247,7 +251,7 @@ public class MatrixConnection extends ImConnection {
 
         mChatSessionManager.setDataHandler(mDataHandler);
 
-        new LoginRestClient(mConfig).loginWithUser(username, password, deviceName, deviceId, new SimpleApiCallback<Credentials>()
+        new LoginRestClient(mConfig).loginWithUser(username, password, mDeviceName, mDeviceId, new SimpleApiCallback<Credentials>()
         {
 
             @Override
