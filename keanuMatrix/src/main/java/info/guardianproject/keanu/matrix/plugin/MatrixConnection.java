@@ -10,22 +10,14 @@ import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
-import org.jxmpp.jid.BareJid;
-import org.jxmpp.jid.impl.JidCreate;
 import org.matrix.androidsdk.HomeServerConnectionConfig;
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
 import org.matrix.androidsdk.data.MyUser;
 import org.matrix.androidsdk.data.Room;
-import org.matrix.androidsdk.data.RoomMediaMessage;
 import org.matrix.androidsdk.data.RoomState;
 import org.matrix.androidsdk.data.store.IMXStoreListener;
-import org.matrix.androidsdk.data.store.MXFileStore;
-import org.matrix.androidsdk.data.store.MXMemoryStore;
-import org.matrix.androidsdk.db.MXMediasCache;
-import org.matrix.androidsdk.fragments.MatrixMessageListFragment;
 import org.matrix.androidsdk.listeners.IMXEventListener;
-import org.matrix.androidsdk.listeners.IMXMediaUploadListener;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.callback.SimpleApiCallback;
 import org.matrix.androidsdk.rest.client.LoginRestClient;
@@ -34,17 +26,23 @@ import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.rest.model.RoomMember;
 import org.matrix.androidsdk.rest.model.User;
 import org.matrix.androidsdk.rest.model.bingrules.BingRule;
+import org.matrix.androidsdk.rest.model.login.AuthParams;
+import org.matrix.androidsdk.rest.model.login.AuthParamsLoginPassword;
 import org.matrix.androidsdk.rest.model.login.Credentials;
-import org.matrix.androidsdk.rest.model.sync.DeviceInfo;
-import org.matrix.androidsdk.util.ContentManager;
-import org.w3c.dom.Text;
+import org.matrix.androidsdk.rest.model.login.LoginFlow;
+import org.matrix.androidsdk.rest.model.login.RegistrationFlowResponse;
+import org.matrix.androidsdk.rest.model.login.RegistrationParams;
+import org.matrix.androidsdk.util.JsonUtils;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import info.guardianproject.keanu.core.conversations.UploadProgressListener;
 import info.guardianproject.keanu.core.model.ChatGroup;
@@ -59,15 +57,24 @@ import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.model.Presence;
 import info.guardianproject.keanu.core.provider.Imps;
 
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+
 public class MatrixConnection extends ImConnection {
 
     private MXSession mSession;
     private MXDataHandler mDataHandler;
+    private LoginRestClient mLoginRestClient;
 
     protected KeanuMXFileStore mStore = null;
     private Credentials mCredentials = null;
 
     private HomeServerConnectionConfig mConfig;
+
+    //Registration flows
+    private RegistrationFlowResponse mRegistrationFlowResponse;
+    private final Set<String> mSupportedStages = new HashSet<>();
+    private final List<String> mRequiredStages = new ArrayList<>();
+    private final List<String> mOptionalStages = new ArrayList<>();
 
     private long mProviderId = -1;
     private long mAccountId = -1;
@@ -86,7 +93,7 @@ public class MatrixConnection extends ImConnection {
 
     private final static String HTTPS_PREPEND = "https://";
 
-    private Handler mResponseHandler;
+    private Handler mResponseHandler = new Handler();
 
     public MatrixConnection (Context context)
     {
@@ -96,7 +103,6 @@ public class MatrixConnection extends ImConnection {
         mChatGroupManager = new MatrixChatGroupManager(this);
         mChatSessionManager = new MatrixChatSessionManager();
 
-        mResponseHandler = new Handler();
     }
 
     @Override
@@ -132,6 +138,8 @@ public class MatrixConnection extends ImConnection {
 
         providerSettings.close();
 
+        initMatrix();
+
     }
 
     private Contact makeUser(Imps.ProviderSettings.QueryMap providerSettings, ContentResolver contentResolver) {
@@ -166,25 +174,17 @@ public class MatrixConnection extends ImConnection {
         }.start();
     }
 
-    private void loginAsync (String password)
+    private void initMatrix ()
     {
-
         TrafficStats.setThreadStatsTag(THREAD_ID);
 
-        String username = mUser.getAddress().getUser();
-
-        ContentResolver contentResolver = mContext.getContentResolver();
-
-        if (password == null)
-            password = Imps.Account.getPassword(contentResolver, mAccountId);
-
-        Cursor cursor = contentResolver.query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(mProviderId)}, null);
+        Cursor cursor = mContext.getContentResolver().query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(mProviderId)}, null);
 
         if (cursor == null)
             return; //not going to work
 
         Imps.ProviderSettings.QueryMap providerSettings = new Imps.ProviderSettings.QueryMap(
-                cursor, contentResolver, mProviderId, false, null);
+                cursor, mContext.getContentResolver(), mProviderId, false, null);
 
         String server = providerSettings.getServer();
         if (TextUtils.isEmpty(server))
@@ -199,7 +199,6 @@ public class MatrixConnection extends ImConnection {
                 .build();
 
 
-        final String initialToken = "";
         final boolean enableEncryption = true;
 
 
@@ -252,7 +251,24 @@ public class MatrixConnection extends ImConnection {
         mChatSessionManager.setDataHandler(mDataHandler);
         mChatGroupManager.setDataHandler(mDataHandler);
 
-        new LoginRestClient(mConfig).loginWithUser(username, password, mDeviceName, mDeviceId, new SimpleApiCallback<Credentials>()
+        mLoginRestClient = new LoginRestClient(mConfig);
+    }
+
+    private void loginAsync (String password)
+    {
+
+        initMatrix();
+
+        String username = mUser.getAddress().getUser();
+
+
+        if (password == null)
+            password = Imps.Account.getPassword(mContext.getContentResolver(), mAccountId);
+
+        final boolean enableEncryption = true;
+        final String initialToken = "";
+
+        mLoginRestClient.loginWithUser(username, password, mDeviceName, mDeviceId, new SimpleApiCallback<Credentials>()
         {
 
             @Override
@@ -260,16 +276,17 @@ public class MatrixConnection extends ImConnection {
 
                 mCredentials = credentials;
                 mConfig.setCredentials(mCredentials);
+                setState(LOGGED_IN, null);
 
                 mResponseHandler.post(new Runnable ()
                 {
                     public void run ()
                     {
 
-
                         mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
                                 .withFileEncryption(enableEncryption)
                                 .build();
+                        mChatGroupManager.setSession(mSession);
 
                         mSession.enableCrypto(true, new ApiCallback<Void>() {
                             @Override
@@ -294,16 +311,17 @@ public class MatrixConnection extends ImConnection {
                             public void onSuccess(Void aVoid) {
                                 debug ("enableCrypto: onSuccess");
                                 mSession.startEventStream(initialToken);
-                                setState(LOGGED_IN, null);
+
                             }
                         });
 
-                        mChatGroupManager.setSession(mSession);
 
 
                     }
                 });
             }
+
+
 
             @Override
             public void onNetworkError(Exception e) {
@@ -457,6 +475,7 @@ public class MatrixConnection extends ImConnection {
     public String sendMediaMessage(String roomId, String fileName, String mimeType, long fileSize, InputStream is, boolean doEncryption, UploadProgressListener listener) {
 
 
+        /**
         final MXMediasCache mediasCache = mDataHandler.getMediasCache();
 
         String uploadId = roomId + ':' + fileName;
@@ -487,6 +506,7 @@ public class MatrixConnection extends ImConnection {
 
             }
         });
+        **/
 
         return null;
     }
@@ -878,5 +898,179 @@ public class MatrixConnection extends ImConnection {
 
     };
 
+    /**
+     * Send a registration request with the given parameters
+     *
+     * @param context
+     * @param listener
+     */
+    public void register(final Context context, String username, String password, final RegistrationListener listener) {
 
+
+        if (mLoginRestClient != null) {
+            final RegistrationParams params = new RegistrationParams();
+            params.username = username;
+            params.password = password;
+            params.initial_device_display_name = mDeviceName;
+            params.x_show_msisdn = false;
+            params.bind_email = false;
+            params.bind_msisdn = false;
+
+            AuthParams authParams = new AuthParams(LoginRestClient.LOGIN_FLOW_TYPE_DUMMY);
+
+            params.auth = authParams;
+
+            mLoginRestClient.register(params, new ApiCallback<Credentials>() {
+                @Override
+                public void onSuccess(Credentials credentials) {
+
+                    mCredentials = credentials;
+                    mConfig.setCredentials(credentials);
+
+                    listener.onRegistrationSuccess();
+                }
+
+
+                @Override
+                public void onNetworkError(Exception e) {
+                    debug ("register:onNetworkError",e);
+
+                }
+
+                @Override
+                public void onMatrixError(MatrixError e) {
+                    if (TextUtils.equals(e.errcode, MatrixError.USER_IN_USE)) {
+                        // user name is already taken, the registration process stops here (new user name should be provided)
+                        // ex: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
+                        org.matrix.androidsdk.util.Log.d(LOG_TAG, "User name is used");
+                        listener.onRegistrationFailed(MatrixError.USER_IN_USE);
+                    } else if (TextUtils.equals(e.errcode, MatrixError.UNAUTHORIZED)) {
+                        // happens while polling email validation, do nothing
+                    } else if (null != e.mStatus && e.mStatus == 401) {
+
+                        try {
+                            RegistrationFlowResponse registrationFlowResponse = JsonUtils.toRegistrationFlowResponse(e.mErrorBodyAsString);
+                            setRegistrationFlowResponse(registrationFlowResponse);
+
+                        } catch (Exception castExcept) {
+                            org.matrix.androidsdk.util.Log.e(LOG_TAG, "JsonUtils.toRegistrationFlowResponse " + castExcept.getLocalizedMessage(), castExcept);
+                        }
+
+                        listener.onRegistrationFailed("ERROR_MISSING_STAGE");
+                    } else if (TextUtils.equals(e.errcode, MatrixError.RESOURCE_LIMIT_EXCEEDED)) {
+                        listener.onResourceLimitExceeded(e);
+                    } else {
+                       listener.onRegistrationFailed("");
+                    }
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+                    debug ("register:onUnexpectedError",e);
+
+                }
+            });
+        }
+    }
+
+    public interface RegistrationListener {
+        void onRegistrationSuccess();
+
+        void onRegistrationFailed(String message);
+
+        void onResourceLimitExceeded(MatrixError e);
+    }
+
+    /**
+     * Set the flow stages for the current home server
+     *
+     * @param registrationFlowResponse
+     */
+    private void setRegistrationFlowResponse(final RegistrationFlowResponse registrationFlowResponse) {
+        if (registrationFlowResponse != null) {
+            mRegistrationFlowResponse = registrationFlowResponse;
+            analyzeRegistrationStages(mRegistrationFlowResponse);
+        }
+    }
+
+    /**
+     * Check if the given stage is supported by the current home server
+     *
+     * @param stage
+     * @return true if supported
+     */
+    public boolean supportStage(final String stage) {
+        return mSupportedStages.contains(stage);
+    }
+
+    /**
+     * Analyze the flows stages
+     *
+     * @param newFlowResponse
+     */
+    private void analyzeRegistrationStages(final RegistrationFlowResponse newFlowResponse) {
+        mSupportedStages.clear();
+        mRequiredStages.clear();
+        mOptionalStages.clear();
+
+        boolean canCaptchaBeMissing = false;
+        boolean canTermsBeMissing = false;
+        boolean canPhoneBeMissing = false;
+        boolean canEmailBeMissing = false;
+
+        // Add all supported stage and check if some stage can be missing
+        for (LoginFlow loginFlow : newFlowResponse.flows) {
+            mSupportedStages.addAll(loginFlow.stages);
+
+            if (!loginFlow.stages.contains(LoginRestClient.LOGIN_FLOW_TYPE_RECAPTCHA)) {
+                canCaptchaBeMissing = true;
+            }
+
+            /**
+            if (!loginFlow.stages.contains(LoginRestClient.LOGIN_FLOW_TYPE_TERMS)) {
+                canTermsBeMissing = true;
+            }**/
+
+            if (!loginFlow.stages.contains(LoginRestClient.LOGIN_FLOW_TYPE_MSISDN)) {
+                canPhoneBeMissing = true;
+            }
+
+            if (!loginFlow.stages.contains(LoginRestClient.LOGIN_FLOW_TYPE_EMAIL_IDENTITY)) {
+                canEmailBeMissing = true;
+            }
+        }
+
+        if (supportStage(LoginRestClient.LOGIN_FLOW_TYPE_RECAPTCHA)) {
+            if (canCaptchaBeMissing) {
+                mOptionalStages.add(LoginRestClient.LOGIN_FLOW_TYPE_RECAPTCHA);
+            } else {
+                mRequiredStages.add(LoginRestClient.LOGIN_FLOW_TYPE_RECAPTCHA);
+            }
+        }
+
+        /**
+        if (supportStage(LoginRestClient.LOGIN_FLOW_TYPE_TERMS)) {
+            if (canTermsBeMissing) {
+                mOptionalStages.add(LoginRestClient.LOGIN_FLOW_TYPE_TERMS);
+            } else {
+                mRequiredStages.add(LoginRestClient.LOGIN_FLOW_TYPE_TERMS);
+            }
+        }**/
+
+        if (supportStage(LoginRestClient.LOGIN_FLOW_TYPE_EMAIL_IDENTITY)) {
+            if (canEmailBeMissing) {
+                mOptionalStages.add(LoginRestClient.LOGIN_FLOW_TYPE_EMAIL_IDENTITY);
+            } else {
+                mRequiredStages.add(LoginRestClient.LOGIN_FLOW_TYPE_EMAIL_IDENTITY);
+            }
+        }
+
+        if (supportStage(LoginRestClient.LOGIN_FLOW_TYPE_MSISDN)) {
+            if (canPhoneBeMissing) {
+                mOptionalStages.add(LoginRestClient.LOGIN_FLOW_TYPE_MSISDN);
+            } else {
+                mRequiredStages.add(LoginRestClient.LOGIN_FLOW_TYPE_MSISDN);
+            }
+        }
+    }
 }

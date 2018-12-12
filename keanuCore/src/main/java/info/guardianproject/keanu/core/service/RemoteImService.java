@@ -368,11 +368,11 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             mNeedCheckAutoLogin = !autoLogin();
         }
 
-
+        /**
         try { HeartbeatService.startBeating(getApplicationContext()); }
         catch (IllegalStateException ise){
             debug("couldn't start Heartbeat service",ise);
-        }
+        }**/
 
 
         return START_STICKY;

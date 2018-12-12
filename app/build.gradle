@@ -1,7 +1,16 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'realm-android'
 
 android {
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     compileSdkVersion 28
+
     defaultConfig {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 16
@@ -99,4 +108,7 @@ dependencies {
     implementation project(':keanuMatrix')
 
 
+}
+repositories {
+    mavenCentral()
 }

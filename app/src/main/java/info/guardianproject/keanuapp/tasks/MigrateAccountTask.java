@@ -33,6 +33,7 @@ import info.guardianproject.keanu.core.util.DatabaseUtils;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingAccount;
+import info.guardianproject.keanuapp.ui.onboarding.OnboardingListener;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
@@ -99,12 +100,26 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
                 continue; //don't migrate to the same server... to to =
 
             //register account on new domain with same password
-            mNewAccount = registerNewAccount(nickname, username, password, newServer.domain, newServer.server);
+            //mNewAccount = registerNewAccount(nickname, username, password, newServer.domain, newServer.server);
 
-            if (mNewAccount == null)
-                continue; //try the next server
+            try {
+                OnboardingManager.registerAccount(mContext, nickname, username, password, newServer.domain, newServer.server, newServer.port, new OnboardingListener() {
+                    @Override
+                    public void registrationSuccessful(OnboardingAccount account) {
 
-            String newJabberId = mNewAccount.username + '@' + mNewAccount.domain;
+                    }
+
+                    @Override
+                    public void registrationFailed(String err) {
+
+                    }
+                });
+            } catch (JSONException e) {
+                e.printStackTrace();
+                continue;
+            }
+
+            String newAccountId = '@' + username + ':' + mNewAccount.domain;
 
             //send migration message to existing contacts and/or sessions
             try {
@@ -126,7 +141,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
                 }
 
                 String fingerprint = "";
-                String inviteLink = OnboardingManager.generateInviteLink(mContext, newJabberId, fingerprint, nickname, true);
+                String inviteLink = OnboardingManager.generateInviteLink(mContext, newAccountId, fingerprint, nickname, true);
 
                 String migrateMessage = mContext.getString(R.string.migrate_message) + ' ' + inviteLink;
                 IChatSessionManager sessionMgr = mConn.getChatSessionManager();
@@ -174,10 +189,10 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
                     for (IChatSession session : listSession) {
                         session.leave();
                     }
-                    mConn.broadcastMigrationIdentity(newJabberId);
+                    mConn.broadcastMigrationIdentity(newAccountId);
                 }
 
-                migrateAvatars(username, newJabberId);
+                migrateAvatars(username, newAccountId);
                 mApp.setDefaultAccount(mNewAccount.providerId, mNewAccount.accountId);
 
                 //logout of existing account
@@ -215,19 +230,6 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
 
     }
 
-    private OnboardingAccount registerNewAccount (String nickname, String username, String password, String domain, String server)
-    {
-        try {
-            OnboardingAccount result = OnboardingManager.registerAccount(mContext, nickname, username, password, domain, server, 5222);
-            return result;
-        }
-        catch (JSONException jse)
-        {
-
-        }
-
-        return null;
-    }
 
     private int addToContactList (IImConnection conn, String address, String otrFingperint, String nickname)
     {

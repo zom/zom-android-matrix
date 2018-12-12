@@ -1,8 +1,10 @@
 package info.guardianproject.keanuapp.ui.onboarding;
 
+import info.guardianproject.keanu.matrix.plugin.MatrixConnection;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.provider.Imps;
 import org.json.JSONException;
+import org.matrix.androidsdk.rest.model.MatrixError;
 
 import info.guardianproject.keanu.core.util.ImPluginHelper;
 import info.guardianproject.keanu.core.util.LogCleaner;
@@ -24,6 +26,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.Telephony;
 import android.util.Base64;
 import android.util.Log;
@@ -280,18 +283,17 @@ public class OnboardingManager {
         }
     }
 
-    public static OnboardingAccount registerAccount (Context context, String nickname, String username, String password, String domain, String server, int port) throws JSONException {
+    public static void registerAccount (final Context context, final String nickname, final String username, final String password, final String domain, final String server, final int port, final OnboardingListener oListener) throws JSONException {
 
-        if (password == null)
-            password = generatePassword();
 
-        ContentResolver cr = context.getContentResolver();
+
+        final ContentResolver cr = context.getContentResolver();
         ImPluginHelper helper = ImPluginHelper.getInstance(context);
-        long providerId = helper.createAdditionalProvider(helper.getProviderNames().get(0)); //xmpp FIXME
 
-        long accountId = ImApp.insertOrUpdateAccount(cr, providerId, -1, nickname, username, password);
+        final long providerId = helper.createAdditionalProvider(helper.getProviderNames().get(0)); //xmpp FIXME
+        final long accountId = ImApp.insertOrUpdateAccount(cr, providerId, -1, nickname, username, password);
 
-        Uri accountUri = ContentUris.withAppendedId(Imps.Account.CONTENT_URI, accountId);
+        final Uri accountUri = ContentUris.withAppendedId(Imps.Account.CONTENT_URI, accountId);
 
         Cursor pCursor = cr.query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(providerId)}, null);
 
@@ -321,45 +323,55 @@ public class OnboardingManager {
 
             settings.requery();
 
-            HashMap<String, String> aParams = new HashMap<String, String>();
+            Looper.prepare();
+            MatrixConnection conn = new MatrixConnection(context);
+            conn.initUser(providerId, accountId);
 
-            /**
-            XmppConnection xmppConn = new XmppConnection(context);
-            xmppConn.initUser(providerId, accountId);
+            final OnboardingAccount result = new OnboardingAccount();
+            result.username = username;
+            result.domain = domain;
+            result.password = password;
+            result.providerId = providerId;
+            result.accountId = accountId;
+            result.nickname = nickname;
 
-            boolean success = xmppConn.registerAccount(settings, username, password, aParams);
-             **/
-            boolean success = true;
+            conn.register(context, username, password, new MatrixConnection.RegistrationListener() {
+                @Override
+                public void onRegistrationSuccess() {
 
-            if (success) {
+                    //now keep this account signed-in
+                    ContentValues values = new ContentValues();
+                    values.put(Imps.AccountColumns.KEEP_SIGNED_IN, 1);
+                    cr.update(accountUri, values, null, null);
 
-                OnboardingAccount result = new OnboardingAccount();
-                result.username = username;
-                result.domain = domain;
-                result.password = password;
-                result.providerId = providerId;
-                result.accountId = accountId;
-                result.nickname = nickname;
+                    if (oListener != null)
+                        oListener.registrationSuccessful(result);
+                }
 
-                //now keep this account signed-in
-                ContentValues values = new ContentValues();
-                values.put(Imps.AccountColumns.KEEP_SIGNED_IN, 1);
-                cr.update(accountUri, values, null, null);
+                @Override
+                public void onRegistrationFailed(String message) {
+                    ImApp.deleteAccount(context.getContentResolver(),accountId, providerId);
 
-                settings.close();
+                    if (oListener != null)
+                        oListener.registrationFailed(message);
+                }
 
-                return result;
-            }
+                @Override
+                public void onResourceLimitExceeded(MatrixError e) {
+                    ImApp.deleteAccount(context.getContentResolver(),accountId, providerId);
+
+                }
+            });
+
+
         } catch (Exception e) {
             LogCleaner.error(LOG_TAG, "error registering new account", e);
 
 
         }
 
-        ImApp.deleteAccount(context.getContentResolver(),accountId, providerId);
-
         settings.close();
-        return null;
+
 
     }
 

@@ -16,10 +16,7 @@ import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.ChatSession;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.Invitation;
-import info.guardianproject.keanu.core.model.impl.BaseAddress;
-import info.guardianproject.keanu.core.provider.Imps;
-
-import static org.matrix.androidsdk.crypto.MXCryptoAlgorithms.MXCRYPTO_ALGORITHM_MEGOLM;
+import static org.matrix.androidsdk.crypto.CryptoConstantsKt.MXCRYPTO_ALGORITHM_MEGOLM;
 
 public class MatrixChatGroupManager extends ChatGroupManager {
 

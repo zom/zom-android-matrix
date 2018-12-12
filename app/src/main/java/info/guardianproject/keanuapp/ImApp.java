@@ -316,7 +316,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
             Intent serviceIntent = new Intent(this, RemoteImService.class);
 //        serviceIntent.putExtra(ImServiceConstants.EXTRA_CHECK_AUTO_LOGIN, isBoot);
 
-            mApplicationContext.startService(serviceIntent);
+            mApplicationContext.startForegroundService(serviceIntent);
 
             mConnectionListener = new MyConnListener(new Handler());
 

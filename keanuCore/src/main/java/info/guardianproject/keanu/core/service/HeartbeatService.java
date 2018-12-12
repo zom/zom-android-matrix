@@ -50,7 +50,7 @@ public class HeartbeatService extends Service {
         this.mRelayIntent = new Intent(HEARTBEAT_ACTION, null, this, RemoteImService.class);
         mHeartbeatInterval = Preferences.getHeartbeatInterval() * HEARTBEAT_INTERVAL;
 
-        startHeartbeat(mHeartbeatInterval);
+        //startHeartbeat(mHeartbeatInterval);
 
         mServiceHandler = new ServiceHandler();
 
@@ -71,7 +71,7 @@ public class HeartbeatService extends Service {
 
     @Override
     public void onDestroy() {
-        startHeartbeat(0);
+        //startHeartbeat(0);
         NetworkConnectivityReceiver.unregisterHandler(mServiceHandler);
         mNetworkConnectivityListener.stopListening();
         mNetworkConnectivityListener = null;
@@ -81,7 +81,7 @@ public class HeartbeatService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent != null && HEARTBEAT_ACTION.equals(intent.getAction())) {
-            startHeartbeat(mHeartbeatInterval);
+            //startHeartbeat(mHeartbeatInterval);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 //do nothing
             }

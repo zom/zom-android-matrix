@@ -1,7 +1,24 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
+
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     compileSdkVersion 28
+
+    dexOptions {
+        preDexLibraries = true
+        jumboMode = true
+        javaMaxHeapSize "2g"
+        //doesn't seem to be supported with multi dex
+        //   incremental true
+    }
 
     defaultConfig {
         minSdkVersion 16
@@ -39,16 +56,28 @@ dependencies {
     implementation project(':keanuCore')
 
     implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support:support-compat:28.0.0'
+    implementation 'com.android.support:preference-v7:28.0.0'
+    
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    // https://mvnrepository.com/artifact/org.jxmpp/jxmpp-core
-    implementation 'org.jxmpp:jxmpp-core:0.6.3'
-    implementation 'org.jxmpp:jxmpp-jid:0.6.3'
-    implementation 'org.jxmpp:jxmpp-util-cache:0.6.3'
+    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
+    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.10.0'
+    implementation 'com.facebook.stetho:stetho:1.5.0'
+    implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
 
+    // Database
+    kapt 'dk.ilios:realmfieldnameshelper:1.1.1'
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.8.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }

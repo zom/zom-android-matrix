@@ -247,11 +247,12 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
 
         applyStyle();
 
+        /**
         if (Preferences.doCheckBatteryOptimizations())
         {
             requestChangeBatteryOptimizations();
             Preferences.checkedBatteryOptimizations();
-        }
+        }**/
     }
 
     private void installRingtones ()
@@ -1287,6 +1288,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
 
     }
 
+    /**
     private void requestChangeBatteryOptimizations ()
     {
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -1309,7 +1311,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                         @Override
                         public void onClick(DialogInterface dialog, int whichButton) {
 
-                            /* User clicked cancel so do some stuff */
+
                             dialog.dismiss();
                         }
                     })
@@ -1317,6 +1319,6 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
             dialog.show();
         }
 
-    }
+    }**/
 
 }

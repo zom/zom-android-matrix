@@ -102,6 +102,8 @@ public class OnboardingActivity extends BaseActivity {
     private FindServerTask mCurrentFindServerTask;
     private ExistingAccountTask mExistingAccountTask;
 
+    private Handler mOnboardingHandler = new Handler ();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -589,28 +591,79 @@ public class OnboardingActivity extends BaseActivity {
                 String nickname = setupValues[0];
                 String username = setupValues[1];
 
-                OnboardingAccount result = null;
+                if (TextUtils.isEmpty(password))
+                    password = OnboardingManager.generatePassword();
 
-                while (result == null) {
+                OnboardingManager.registerAccount(
+                        OnboardingActivity.this, nickname, username, password, myServer.domain, myServer.domain, myServer.port,
+                        new OnboardingListener() {
+                            @Override
+                            public void registrationSuccessful(final OnboardingAccount account) {
 
-                    result = OnboardingManager.registerAccount(OnboardingActivity.this, nickname, username, password, myServer.domain, myServer.domain, myServer.port);
+                                mOnboardingHandler.post(new Runnable ()
+                                {
 
-                    if (result == null)
-                    {
-                        //wait one second
-                        try
-                        {Thread.sleep(1000);}
-                        catch (Exception e){}
+                                    public void run ()
+                                    {
+                                        View viewCreate = findViewById(R.id.flipViewCreateNew);
+                                        viewCreate.findViewById(R.id.progressImage).setVisibility(View.GONE);
 
-                        //append key to username
-                        username = setupValues[1] + '.' + mFingerprint.substring(mFingerprint.length()-8,mFingerprint.length()).toLowerCase();
-                    }
-                }
+                                        mUsername = '@' + account.username + ':' + account.domain;
+                                        mNewAccount = account;
 
-                String jid = result.username + '@' + result.domain;
+                                        viewCreate.findViewById(R.id.viewProgress).setVisibility(View.GONE);
+                                        viewCreate.findViewById(R.id.viewSuccess).setVisibility(View.VISIBLE);
+
+                                        ImApp mApp = (ImApp)getApplication();
+                                        mApp.setDefaultAccount(account.providerId,account.accountId);
+
+                                        SignInHelper signInHelper = new SignInHelper(OnboardingActivity.this, mHandler);
+                                        signInHelper.activateAccount(account.providerId, account.accountId);
+                                        signInHelper.signIn(account.password, account.providerId, account.accountId, true);
+
+                                        mItemSkip.setVisible(true);
+                                        mItemSkip.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                                            @Override
+                                            public boolean onMenuItemClick(MenuItem item) {
+
+                                                showInviteScreen();
+                                                return false;
+                                            }
+                                        });
+
+                                    }
+                                });
+
+                            }
+
+                            @Override
+                            public void registrationFailed(final String err) {
+
+                                mOnboardingHandler.post (new Runnable ()
+                                {
+
+                                    public void run ()
+                                    {
+                                        View viewCreate = findViewById(R.id.flipViewCreateNew);
+                                        viewCreate.findViewById(R.id.progressImage).setVisibility(View.GONE);
+
+                                        viewCreate.findViewById(R.id.viewProgress).setVisibility(View.GONE);
+                                        viewCreate.findViewById(R.id.viewCreate).setVisibility(View.VISIBLE);
+                                        viewCreate.findViewById(R.id.btnAdvanced).setVisibility(View.VISIBLE);
+
+                                        StringBuffer sb = new StringBuffer();
+                                        sb.append(getString(R.string.account_setup_error_server));
+                                        sb.append(": ").append(err);
+                                        TextView status = (TextView)viewCreate.findViewById(R.id.statusError);
+                                        status.setText(sb.toString());
 
 
-                return result;
+                                    }
+                                });
+                            }
+                        });
+
+                return null;
             }
             catch (Exception e)
             {
@@ -636,48 +689,7 @@ public class OnboardingActivity extends BaseActivity {
         @Override
         protected void onPostExecute(OnboardingAccount account) {
 
-            View viewCreate = findViewById(R.id.flipViewCreateNew);
-            viewCreate.findViewById(R.id.progressImage).setVisibility(View.GONE);
 
-            if (account != null) {
-                mUsername = account.username + '@' + account.domain;
-                mNewAccount = account;
-
-
-                viewCreate.findViewById(R.id.viewProgress).setVisibility(View.GONE);
-                viewCreate.findViewById(R.id.viewSuccess).setVisibility(View.VISIBLE);
-
-                ImApp mApp = (ImApp)getApplication();
-                mApp.setDefaultAccount(account.providerId,account.accountId);
-
-                SignInHelper signInHelper = new SignInHelper(OnboardingActivity.this, mHandler);
-                signInHelper.activateAccount(account.providerId, account.accountId);
-                signInHelper.signIn(account.password, account.providerId, account.accountId, true);
-
-                mItemSkip.setVisible(true);
-                mItemSkip.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-
-                        showInviteScreen();
-                        return false;
-                    }
-                });
-            }
-            else
-            {
-                viewCreate.findViewById(R.id.viewProgress).setVisibility(View.GONE);
-                viewCreate.findViewById(R.id.viewCreate).setVisibility(View.VISIBLE);
-                viewCreate.findViewById(R.id.btnAdvanced).setVisibility(View.VISIBLE);
-
-                StringBuffer sb = new StringBuffer();
-                sb.append(getString(R.string.account_setup_error_server));
-                TextView status = (TextView)viewCreate.findViewById(R.id.statusError);
-                status.setText(sb.toString());
-
-
-                //need to try again somehow
-            }
         }
       }
 
