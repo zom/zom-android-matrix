@@ -1590,7 +1590,7 @@ public class ConversationView {
 
     }
 
-    private void initSession ()
+    private synchronized void initSession ()
     {
         mHandler.post(mUpdateChatCallback);
 

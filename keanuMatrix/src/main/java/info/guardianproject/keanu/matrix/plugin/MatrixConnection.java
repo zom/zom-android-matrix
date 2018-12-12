@@ -102,7 +102,7 @@ public class MatrixConnection extends ImConnection {
 
         mContactListManager = new MatrixContactListManager(context, this);
         mChatGroupManager = new MatrixChatGroupManager(this);
-        mChatSessionManager = new MatrixChatSessionManager();
+        mChatSessionManager = new MatrixChatSessionManager(this);
 
     }
 
@@ -252,6 +252,7 @@ public class MatrixConnection extends ImConnection {
         mChatSessionManager.setDataHandler(mDataHandler);
         mChatGroupManager.setDataHandler(mDataHandler);
 
+
         mLoginRestClient = new LoginRestClient(mConfig);
     }
 
@@ -288,6 +289,7 @@ public class MatrixConnection extends ImConnection {
                                 .withFileEncryption(enableEncryption)
                                 .build();
                         mChatGroupManager.setSession(mSession);
+                        mChatSessionManager.setSession(mSession);
 
                         mSession.enableCrypto(true, new ApiCallback<Void>() {
                             @Override

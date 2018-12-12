@@ -34,11 +34,11 @@ public abstract class ChatSessionManager {
     private ChatSessionManagerAdapter mAdapter;
 
     /** Map session to the participant communicate with. */
-    protected Hashtable<String,ChatSession> mSessions;
+    protected Hashtable<String,ChatSessionAdapter> mSessions;
 
     protected ChatSessionManager() {
         mListeners = new CopyOnWriteArrayList<ChatSessionListener>();
-        mSessions = new Hashtable<String,ChatSession>();
+        mSessions = new Hashtable<String,ChatSessionAdapter>();
     }
 
     public void setAdapter (ChatSessionManagerAdapter adapter)
@@ -80,24 +80,24 @@ public abstract class ChatSessionManager {
      */
     public synchronized ChatSession createChatSession(ImEntity participant, boolean isNewSession) {
 
-        ChatSession session = mSessions.get(participant.getAddress().getAddress());
+        ChatSessionAdapter sessionAdapter = mSessions.get(participant.getAddress().getAddress());
 
-        if (session == null)
+        if (sessionAdapter == null)
         {
-            session = new ChatSession(participant, this);
-            ChatSessionAdapter csa = mAdapter.getChatSessionAdapter(session, isNewSession);
 
-            mSessions.put(participant.getAddress().getAddress(),session);
+            ChatSession session = new ChatSession(participant, this);
+            ChatSessionAdapter csa = mAdapter.getChatSessionAdapter(session, isNewSession);
 
             for (ChatSessionListener listener : mListeners) {
                 listener.onChatSessionCreated(session);
             }
 
+            sessionAdapter = mAdapter.getChatSessionAdapter(session, isNewSession);
+            mSessions.put(participant.getAddress().getAddress(),sessionAdapter);
+
         }
 
-        ChatSessionAdapter csa = mAdapter.getChatSessionAdapter(session, isNewSession);
-
-        return session;
+        return sessionAdapter.getChatSession();
     }
 
     /**

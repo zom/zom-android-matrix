@@ -57,6 +57,7 @@ public class MatrixContactListManager extends ContactListManager {
             mDefaultContactList = new ContactList(groupAddress,generalGroupName, true, contacts, this);
             mDefaultContactList.setDefault(true);
 
+            notifyContactListCreated(mDefaultContactList);
             notifyContactListLoaded(mDefaultContactList);
 
         }

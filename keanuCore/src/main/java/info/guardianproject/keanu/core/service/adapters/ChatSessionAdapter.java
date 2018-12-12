@@ -140,6 +140,11 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     }
 
+    public ChatSession getChatSession ()
+    {
+        return mChatSession;
+    }
+
 
     private int lastPresence = -1;
 

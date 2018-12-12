@@ -407,6 +407,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                 }
                 else if (connState == ImConnection.LOGGING_IN)
                 {
+                    /**
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -419,13 +420,14 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                                 mSbStatus.dismiss();
                             }
                         }
-                    }, 5000); //Timer is in ms here.
+                    }, 10000); //Timer is in ms here.
+                    **/
 
                 }
                 else if (connState == ImConnection.LOGGING_OUT)
                 {
-                    mSbStatus = Snackbar.make(mViewPager, R.string.signing_out_wait, Snackbar.LENGTH_INDEFINITE);
-                    mSbStatus.show();
+                    //mSbStatus = Snackbar.make(mViewPager, R.string.signing_out_wait, Snackbar.LENGTH_INDEFINITE);
+                    //mSbStatus.show();
                 }
             }
 

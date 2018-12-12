@@ -84,13 +84,12 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
         Contact contact = listManager.getContactByAddress(contactAddress);
 
-        if (contact != null) {
-            ChatSession session = getChatSessionManager().createChatSession(contact, isNewSession);
+        if (contact == null)
+            contact = new Contact (new BaseAddress(contactAddress));
 
-            return getChatSessionAdapter(session, isNewSession);
-        }
-        else
-            return null;
+        ChatSession session = getChatSessionManager().createChatSession(contact, isNewSession);
+        return getChatSessionAdapter(session, isNewSession);
+
     }
 
     public IChatSession createMultiUserChatSession(String roomAddress, String subject, String nickname, boolean isNewChat)
