@@ -64,6 +64,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
@@ -96,10 +97,6 @@ public class AddContactActivity extends BaseActivity {
     private Cursor mCursorProviders;
     private long mProviderId, mAccountId;
 
-    private static final String EMAIL_PATTERN =
-            "^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-                    + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -126,7 +123,7 @@ public class AddContactActivity extends BaseActivity {
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 if (actionId == EditorInfo.IME_ACTION_SEND) {
 
-                    inviteBuddies();
+                    addContact();
                 }
                 return false;
             }
@@ -193,7 +190,7 @@ public class AddContactActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (mNewAddress.getText() != null && mNewAddress.getText().length() > 0) {
-                    inviteBuddies();
+                    addContact();
                 }
             }
         });
@@ -453,32 +450,41 @@ public class AddContactActivity extends BaseActivity {
         return domain;
     }
 
-    void inviteBuddies() {
+    void addContact() {
 
-        Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+     //   Pattern pattern = Pattern.compile(EMAIL_PATTERN);
 
-        Rfc822Token[] recipients = Rfc822Tokenizer.tokenize(mNewAddress.getText());
+        //Rfc822Token[] recipients = Rfc822Tokenizer.tokenize(mNewAddress.getText());
+        String[] recipients = mNewAddress.getText().toString().split(",");
 
         boolean foundOne = false;
+        String addAddress = null;
 
-        for (Rfc822Token recipient : recipients) {
+        for (String address : recipients) {
 
-            String address = recipient.getAddress();
-            if (pattern.matcher(address).matches()) {
-                new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(address, null, null);
-                foundOne = true;
-            }
+            addAddress = address;
+
+            if (!address.startsWith("@"))
+                addAddress = '@' + address + ':' + getString(R.string.default_server);
+
+            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(addAddress, null, null);
+            foundOne = true;
+
         }
 
         if (foundOne) {
             Intent intent = new Intent();
-            intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, recipients[0].getAddress());
+            intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, addAddress);
             intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER, mApp.getDefaultProviderId());
             intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT, mApp.getDefaultAccountId());
 
             setResult(RESULT_OK, intent);
-            finish();
+
         }
+
+        finish();
+
+        /*
         else
         {
 
@@ -500,7 +506,7 @@ public class AddContactActivity extends BaseActivity {
                 finish();
             }
 
-        }
+        }*/
 
 
     }
@@ -547,7 +553,7 @@ public class AddContactActivity extends BaseActivity {
         public void onClick(View v) {
             mApp.callWhenServiceConnected(mHandler, new Runnable() {
                 public void run() {
-                    inviteBuddies();
+                    addContact();
                 }
             });
         }

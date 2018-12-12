@@ -679,7 +679,7 @@ public class ConversationListFragment extends Fragment {
                 }
             });
 
-            mUpgradeImage.setImageResource(R.drawable.olo_thinking);
+            mUpgradeImage.setImageResource(R.drawable.image_waiting);
 
 
             ((ImApp) getActivity().getApplication()).doUpgrade(getActivity(), mMigrateTaskListener);

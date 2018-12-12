@@ -311,6 +311,7 @@ public class MatrixConnection extends ImConnection {
                             public void onSuccess(Void aVoid) {
                                 debug ("enableCrypto: onSuccess");
                                 mSession.startEventStream(initialToken);
+                                setState(LOGGED_IN, null);
 
                             }
                         });
