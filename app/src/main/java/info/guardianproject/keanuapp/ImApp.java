@@ -804,7 +804,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
                     Imps.ProviderSettings.QueryMap settings = new Imps.ProviderSettings.QueryMap(
                             pCursor, getContentResolver(), providerId, false /* don't keep updated */, null /* no handler */);
 
-                    username = username + '@' + settings.getDomain();
+                    username = '@' + username + ':' + settings.getDomain();
 
                     settings.close();
 

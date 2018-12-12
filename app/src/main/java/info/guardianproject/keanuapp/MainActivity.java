@@ -233,7 +233,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                     startPhotoTaker();
                 }
 
-
+                checkConnection();
 
             }
         });
@@ -345,17 +345,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
             startActivity(new Intent(this,RouterActivity.class));
         }
         else {
-            if (mConn == null) {
-                mConn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
-                if (mConn != null) {
-                    try {
-                        mConn.registerConnectionListener(this);
-                    } catch (Exception e) {
-                        Log.e(LOG_TAG, "unable to register connection listener", e);
-                    }
 
-                }
-            }
 
             checkConnection();
 
@@ -368,8 +358,17 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
     private boolean checkConnection() {
         try {
 
-            if (mSbStatus != null)
-                mSbStatus.dismiss();
+            if (mConn == null) {
+                mConn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
+                if (mConn != null) {
+                    try {
+                        mConn.registerConnectionListener(this);
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, "unable to register connection listener", e);
+                    }
+
+                }
+            }
 
             if (!isNetworkAvailable())
             {
@@ -402,6 +401,9 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                 else if (connState == ImConnection.LOGGED_IN)
                 {
                     //do nothing
+                    if (mSbStatus != null)
+                        mSbStatus.dismiss();
+
                 }
                 else if (connState == ImConnection.LOGGING_IN)
                 {
@@ -411,6 +413,10 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                             if (connState == ImConnection.LOGGING_IN) {
                                 mSbStatus = Snackbar.make(mViewPager, R.string.signing_in_wait, Snackbar.LENGTH_INDEFINITE);
                                 mSbStatus.show();
+                            }
+                            else
+                            {
+                                mSbStatus.dismiss();
                             }
                         }
                     }, 5000); //Timer is in ms here.

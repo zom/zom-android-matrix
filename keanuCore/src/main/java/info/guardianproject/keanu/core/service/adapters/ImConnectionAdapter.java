@@ -471,37 +471,7 @@ public class ImConnectionAdapter extends IImConnection.Stub {
 
                 if (state == ImConnection.LOGGED_IN)
                 {
-                    /**
-                    //we need to reinit all group chat sessions here
-                    Cursor c = null;
 
-                    try {
-                        Uri baseUri = Imps.Contacts.CONTENT_URI_CHAT_CONTACTS_BY;
-                        String[] CHAT_PROJECTION = { Imps.Contacts._ID, Imps.Contacts.PROVIDER,
-                                Imps.Contacts.ACCOUNT, Imps.Contacts.USERNAME,
-                                Imps.Contacts.NICKNAME, Imps.Contacts.TYPE,
-                        };
-
-                        Uri.Builder builder = baseUri.buildUpon();
-                        builder.appendQueryParameter(Imps.Contacts.PROVIDER,mProviderId+"");
-                        builder.appendQueryParameter(Imps.Contacts.ACCOUNT,mAccountId+"");
-
-                        StringBuffer buf = new StringBuffer();
-                        buf.append("(" + Imps.Chats.CHAT_TYPE + " IS NULL")
-                                .append(" OR " + Imps.Chats.CHAT_TYPE + '=' + Imps.Chats.CHAT_TYPE_MUTED)
-                                .append(" OR " + Imps.Chats.CHAT_TYPE + '=' + Imps.Chats.CHAT_TYPE_ACTIVE + ")");
-
-                        Uri uriChats = builder.build();
-                        c = getContext().getContentResolver().query(uriChats, CHAT_PROJECTION, buf.toString(), null, Imps.Contacts.TIME_ORDER);
-
-
-                    }
-                    catch (Exception e)
-                    {
-                        Log.e(LOG_TAG,"exception init chatsession",e);
-                        if (c != null && (!c.isClosed()))
-                            c.close();
-                    }**/
                 }
 
             }

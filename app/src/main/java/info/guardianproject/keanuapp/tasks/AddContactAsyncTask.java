@@ -13,6 +13,7 @@ import info.guardianproject.keanu.core.service.IContactList;
 import info.guardianproject.keanu.core.service.IContactListManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.RemoteImService;
+import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
@@ -35,13 +36,9 @@ public class AddContactAsyncTask extends AsyncTask<String, Void, Integer> {
     public Integer doInBackground(String... strings) {
 
         String address = strings[0];
-        String fingerprint = strings[1];
-        String nickname = null;
+        String nickname = new MatrixAddress(address).getUser();
 
-        if (strings.length > 2)
-            nickname = strings[2];
-
-        return addToContactList(address, fingerprint, nickname);
+        return addToContactList(address, nickname);
     }
 
     @Override
@@ -50,7 +47,7 @@ public class AddContactAsyncTask extends AsyncTask<String, Void, Integer> {
 
     }
 
-    private int addToContactList (String address, String otrFingperint, String nickname)
+    private int addToContactList (String address, String nickname)
     {
         int res = -1;
 

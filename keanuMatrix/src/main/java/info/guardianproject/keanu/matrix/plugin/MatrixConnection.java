@@ -50,6 +50,7 @@ import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.ChatSession;
 import info.guardianproject.keanu.core.model.ChatSessionManager;
 import info.guardianproject.keanu.core.model.Contact;
+import info.guardianproject.keanu.core.model.ContactList;
 import info.guardianproject.keanu.core.model.ContactListManager;
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.model.ImException;
@@ -523,6 +524,8 @@ public class MatrixConnection extends ImConnection {
         {
             @Override
             protected String doInBackground(Void... voids) {
+
+                mContactListManager.loadContactListsAsync();
 
                 Collection<Room> rooms = mStore.getRooms();
 

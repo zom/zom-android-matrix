@@ -598,10 +598,13 @@ public class AccountFragment extends Fragment {
             @Override
             public void connectedToService() {
 
+
             }
 
             @Override
             public void stateChanged(int state, long accountId) {
+
+
 
             }
         });

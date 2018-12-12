@@ -18,40 +18,17 @@ import static info.guardianproject.keanu.core.model.ContactListListener.LIST_CON
 public class MatrixContactListManager extends ContactListManager {
 
     Context mContext;
-    MatrixConnection conn;
+    MatrixConnection mConn;
 
     public MatrixContactListManager (Context context, MatrixConnection conn)
     {
         super ();
 
         mContext = context;
-        init();
-    }
-
-    private void init ()
-    {
-        ContactList cl;
-
-        try {
-            cl = getDefaultContactList();
-        } catch (ImException e1) {
-            cl = null;
-        }
-
-        if (cl == null)
-        {
-            String generalGroupName = "Buddies";
-
-            Collection<Contact> contacts = new ArrayList<Contact>();
-            MatrixAddress groupAddress = new MatrixAddress('@' + generalGroupName + ":matrix.org");
-
-            cl = new ContactList(groupAddress,generalGroupName, true, contacts, this);
-            cl.setDefault(true);
-            mDefaultContactList = cl;
-            notifyContactListCreated(cl);
-        }
+        mConn = conn;
 
     }
+
 
     @Override
     public String normalizeAddress(String address) {
@@ -71,6 +48,22 @@ public class MatrixContactListManager extends ContactListManager {
     @Override
     public void loadContactListsAsync() {
 
+        if (mDefaultContactList == null) {
+            String generalGroupName = "Buddies";
+
+            Collection<Contact> contacts = new ArrayList<Contact>();
+            MatrixAddress groupAddress = new MatrixAddress('@' + generalGroupName + ":matrix.org");
+
+            mDefaultContactList = new ContactList(groupAddress,generalGroupName, true, contacts, this);
+            mDefaultContactList.setDefault(true);
+
+            notifyContactListLoaded(mDefaultContactList);
+
+        }
+
+        notifyContactListsLoaded();
+
+
     }
 
     @Override
@@ -85,7 +78,7 @@ public class MatrixContactListManager extends ContactListManager {
 
     @Override
     protected ImConnection getConnection() {
-        return conn;
+        return mConn;
     }
 
     @Override

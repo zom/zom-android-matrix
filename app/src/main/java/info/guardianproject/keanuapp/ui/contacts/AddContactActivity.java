@@ -467,7 +467,7 @@ public class AddContactActivity extends BaseActivity {
             if (!address.startsWith("@"))
                 addAddress = '@' + address + ':' + getString(R.string.default_server);
 
-            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(addAddress, null, null);
+            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(addAddress);
             foundOne = true;
 
         }
