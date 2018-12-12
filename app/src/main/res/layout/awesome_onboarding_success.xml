@@ -25,7 +25,7 @@
     <ImageView
         android:layout_width="128dp"
         android:layout_height="128dp"
-        android:src="@drawable/onboarding_congrats"
+        android:src="@drawable/image_success"
         />
 
     <info.guardianproject.keanu.core.type.CustomTypefaceTextView

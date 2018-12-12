@@ -113,7 +113,7 @@
                 android:textSize="17sp" />
 
             <View
-                android:id="@id/spacer"
+                android:id="@+id/spacer"
                 android:layout_width="match_parent"
                 android:layout_height="26dp"
                 android:layout_alignBottom="@id/image"
@@ -132,7 +132,7 @@
                 android:paddingRight="12dp"
                 android:paddingStart="12dp"
                 android:scaleType="centerInside"
-                android:src="@mipmap/add_friends" />
+                android:src="@drawable/add_friends" />
         </RelativeLayout>
 
 

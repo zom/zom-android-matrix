@@ -38,7 +38,7 @@ android:text="@string/no_photos"
         android:id="@+id/empty_view_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/olo_gallery"
+        android:src="@drawable/image_waiting"
         android:visibility="gone"
         />
 </LinearLayout>

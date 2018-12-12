@@ -33,7 +33,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="120dp"
-            android:src="@drawable/olo_yay"
+            android:src="@drawable/image_success"
             android:id="@+id/upgrade_view_image"
 
             />

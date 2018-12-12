@@ -23,7 +23,7 @@
         android:id="@+id/progressImage"
         android:layout_width="196dp"
         android:layout_height="196dp"
-        android:src="@drawable/olo_welcome"
+        android:src="@drawable/image_friend"
 
         />
 

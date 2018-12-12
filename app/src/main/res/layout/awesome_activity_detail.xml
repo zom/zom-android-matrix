@@ -96,7 +96,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="120dp"
-                android:src="@drawable/olo_yay"
+                android:src="@drawable/image_success"
                 android:id="@+id/upgrade_view_image"
                 />
 
@@ -389,7 +389,7 @@
                 android:id="@+id/waiting_view_image"
                 android:layout_width="wrap_content"
                 android:layout_height="120dp"
-                android:src="@drawable/waiting_for_friend" />
+                android:src="@drawable/image_waiting" />
 
             <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:id="@+id/waiting_view_text"

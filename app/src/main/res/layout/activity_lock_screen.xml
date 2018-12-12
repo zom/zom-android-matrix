@@ -18,7 +18,7 @@
             android:id="@+id/imageLogo"
             android:layout_width="wrap_content"
             android:layout_height="128dp"
-            android:src="@drawable/olo_welcome"
+            android:src="@drawable/image_friend"
             />
         <LinearLayout
             android:id="@+id/llCreatePassphrase"
