@@ -39,6 +39,11 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         mSession = session;
     }
 
+    public boolean hasChatGroup (String roomId)
+    {
+        return mGroups.containsKey(roomId);
+    }
+
     @Override
     public ChatGroup getChatGroup (Address addr)
     {
@@ -64,7 +69,6 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     @Override
     public ChatGroup createChatGroupAsync(final String address, final String subject, String nickname) throws Exception {
 
-        ChatGroup group = null;
 
         if (!TextUtils.isEmpty(address))
         {
@@ -97,6 +101,28 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                     Room room = mDataHandler.getRoom(roomId);
                     room.updateName(subject,new BasicApiCallback("RoomUpdate"));
                     mConn.addRoomContact(room);
+                    room.join(new ApiCallback<Void>() {
+                        @Override
+                        public void onNetworkError(Exception e) {
+
+                        }
+
+                        @Override
+                        public void onMatrixError(MatrixError matrixError) {
+
+                        }
+
+                        @Override
+                        public void onUnexpectedError(Exception e) {
+
+                        }
+
+                        @Override
+                        public void onSuccess(Void aVoid) {
+
+                        }
+                    });
+
                     room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("CreateRoomEncryption"));
                     ChatGroup chatGroup = new ChatGroup(new MatrixAddress(roomId), subject, MatrixChatGroupManager.this);
                     ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);

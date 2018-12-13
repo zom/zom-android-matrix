@@ -1018,7 +1018,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                     String roomAddress = null;
                     String nickname = params[2];
 
-                    manager.createMultiUserChatSession(roomAddress, subject, nickname, true);
+                    session = manager.createMultiUserChatSession(roomAddress, subject, nickname, true);
 
                     /**
                     if (session != null)
@@ -1034,16 +1034,16 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                         return getString(R.string.unable_to_create_or_join_group_chat);
                     }**/
 
-                    if (session != null && invitees != null && invitees.size() > 0) {
+                    if (session != null) {
 
-                        //wait a second for the server to sort itself out
-                        try {
-                            Thread.sleep(100);
-                        } catch (Exception e) {
+                        if ( invitees != null && invitees.size() > 0) {
+
+                            for (String invitee : invitees)
+                                session.inviteContact(invitee);
+
                         }
 
-                        for (String invitee : invitees)
-                            session.inviteContact(invitee);
+                        session.sendMessage(":)",false);
                     }
 
                     return null;

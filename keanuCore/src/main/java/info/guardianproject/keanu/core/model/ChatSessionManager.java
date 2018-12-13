@@ -86,13 +86,12 @@ public abstract class ChatSessionManager {
         {
 
             ChatSession session = new ChatSession(participant, this);
-            ChatSessionAdapter csa = mAdapter.getChatSessionAdapter(session, isNewSession);
+            sessionAdapter = mAdapter.getChatSessionAdapter(session, isNewSession);
 
             for (ChatSessionListener listener : mListeners) {
                 listener.onChatSessionCreated(session);
             }
 
-            sessionAdapter = mAdapter.getChatSessionAdapter(session, isNewSession);
             mSessions.put(participant.getAddress().getAddress(),sessionAdapter);
 
         }

@@ -11,6 +11,7 @@ import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.data.RoomMediaMessage;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.model.MatrixError;
+import org.matrix.androidsdk.rest.model.RoomMember;
 import org.matrix.androidsdk.rest.model.User;
 
 import java.util.ArrayList;
@@ -69,26 +70,60 @@ public class MatrixChatSessionManager extends ChatSessionManager {
     }
 
     @Override
-    public synchronized ChatSession createChatSession(ImEntity participant, boolean isNewSession) {
+    public synchronized ChatSession createChatSession(final ImEntity participant, boolean isNewSession) {
         ChatSession session = super.createChatSession(participant, isNewSession);
 
         Room room =  mRoomMap.get(participant.getAddress().getAddress());
         if (room == null) {
 
-            room = findRoom(participant.getAddress().getAddress());
+            if (participant instanceof ChatGroup) {
+                room = mDataHandler.getRoom(session.getParticipant().getAddress().getAddress());
 
-            if (room == null) {
-                User user = mDataHandler.getUser(participant.getAddress().getAddress());
+                if (room.getNumberOfMembers() == 2)
+                {
+                    final Room thisRoom = room;
 
-                if (user == null || participant instanceof ChatGroup) {
-                    room = mDataHandler.getRoom(session.getParticipant().getAddress().getAddress());
+                    room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
+                        @Override
+                        public void onNetworkError(Exception e) {
 
-                } else if (participant instanceof Contact) {
-                    createOneToOneRoom(session.getParticipant().getAddress().getAddress());
+                        }
+
+                        @Override
+                        public void onMatrixError(MatrixError matrixError) {
+
+                        }
+
+                        @Override
+                        public void onUnexpectedError(Exception e) {
+
+                        }
+
+                        @Override
+                        public void onSuccess(List<RoomMember> roomMembers) {
+                            for (RoomMember member : roomMembers)
+                            {
+                                mRoomMap.put(member.getUserId(),thisRoom);
+                            }
+                        }
+                    });
                 }
+
+            } else if (participant instanceof Contact) {
+
+                User user = mDataHandler.getUser(participant.getAddress().getAddress());
+                if (user != null) {
+                    room = findRoom(participant.getAddress().getAddress());
+
+                    if (room == null)
+                        createOneToOneRoom(session.getParticipant().getAddress().getAddress());
+                }
+                else
+                    return null;
             }
 
-            mRoomMap.put(participant.getAddress().getAddress(), room);
+            if (room != null)
+                mRoomMap.put(participant.getAddress().getAddress(), room);
         }
 
         return session;

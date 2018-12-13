@@ -7,6 +7,7 @@ import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -57,6 +58,7 @@ import info.guardianproject.keanu.core.model.ImException;
 import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.model.Presence;
 import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.service.IChatSession;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
@@ -533,7 +535,10 @@ public class MatrixConnection extends ImConnection {
 
                 for (Room room : rooms)
                 {
-                    addRoomContact (room);
+                    ChatGroup group = addRoomContact (room);
+
+                    mChatSessionManager.createChatSession(group,false);
+
                 }
 
                 return null;
@@ -546,6 +551,7 @@ public class MatrixConnection extends ImConnection {
         debug ("addRoomContact: " + room.getRoomId() + " - " + room.getRoomDisplayName(mContext) + " - " + room.getNumberOfMembers());
 
         String subject = room.getRoomDisplayName(mContext);
+
         if (TextUtils.isEmpty(subject))
             subject = room.getRoomId();// room.getRoomDisplayName(mContext);
 
@@ -682,9 +688,7 @@ public class MatrixConnection extends ImConnection {
                     debug("MESSAGE: from=" + event.getSender() + " message=" + messageBody);
 
                     User user = mStore.getUser(event.getSender());
-//                    String deviceId = event.getContent().getAsJsonObject().get("deviceId").getAsString();
-       //             Room room = mStore.getRoom(event.roomId);
-//                    addRoomContact(room);
+                    Room room = mStore.getRoom(event.roomId);
 
                     Contact contact = mContactListManager.getContact(event.sender);
 
@@ -699,36 +703,41 @@ public class MatrixConnection extends ImConnection {
 
                     }
 
-                    if (contact != null){
-                        //now pass the incoming message somewhere!
+                    String subject = room.getRoomDisplayName(mContext);
 
-                        ChatSession session = mChatSessionManager.getSession(event.roomId);
+                    ChatGroup group = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId),subject);
+                    if (group == null)
+                        group = addRoomContact(mStore.getRoom(event.roomId));
 
-                        if (session == null)
-                        {
-                           session = mChatSessionManager.createChatSession(contact,false);
-                        }
+                    //now pass the incoming message somewhere!
 
-                        Message message = new Message(messageBody);
-                        message.setID(event.eventId);
-                        message.setFrom(contact.getAddress());
-                        message.setDateTime(new Date());//use "age"?
+                    ChatSession session = mChatSessionManager.getSession(event.roomId);
 
-                        if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId))
-                            message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
-                        else
-                            message.setType(Imps.MessageType.INCOMING);
-
-                        session.onReceiveMessage(message, true);
-
-                        if (user.isActive())
-                            contact.setPresence(new Presence(Presence.AVAILABLE));
-                        else
-                            contact.setPresence(new Presence(Presence.OFFLINE));
-                        Contact[] contacts = {contact};
-                        mContactListManager.notifyContactsPresenceUpdated(contacts);
-
+                    if (session == null)
+                    {
+                       session = mChatSessionManager.createChatSession(group,false);
                     }
+
+                    Message message = new Message(messageBody);
+                    message.setID(event.eventId);
+                    message.setFrom(contact.getAddress());
+                    message.setDateTime(new Date());//use "age"?
+
+                    if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId))
+                        message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
+                    else
+                        message.setType(Imps.MessageType.INCOMING);
+
+                    session.onReceiveMessage(message, true);
+
+                    if (user.isActive())
+                        contact.setPresence(new Presence(Presence.AVAILABLE));
+                    else
+                        contact.setPresence(new Presence(Presence.OFFLINE));
+                    Contact[] contacts = {contact};
+                    mContactListManager.notifyContactsPresenceUpdated(contacts);
+
+
                 }
 
 
@@ -756,6 +765,27 @@ public class MatrixConnection extends ImConnection {
                 debug ("RECEIPT: from=" + event.getSender() + ": " + event.getContent());
 
             }
+            else if (event.getType().equals(Event.EVENT_TYPE_TYPING))
+            {
+                debug ("TYPING: from=" + event.getSender() + ": " + event.getContent());
+                Contact contact = mContactListManager.getContact(event.getSender());
+
+                if (contact.getPresence() == null || (!contact.getPresence().isOnline())) {
+                    contact.setPresence(new Presence(Presence.AVAILABLE));
+                    Contact[] contacts = {contact};
+                    mContactListManager.notifyContactsPresenceUpdated(contacts);
+                }
+
+                IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
+                if (csa != null) {
+                    try {
+                        csa.setContactTyping(contact,true);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
 
 
         }
@@ -769,6 +799,13 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onBingEvent(Event event, RoomState roomState, BingRule bingRule) {
             debug ("bing: " + event.toString());
+
+            Room room = mStore.getRoom(roomState.roomId);
+            if (room.isInvited())
+            {
+                onNewRoom(roomState.roomId);
+            }
+
         }
 
         @Override
@@ -813,8 +850,32 @@ public class MatrixConnection extends ImConnection {
         public void onNewRoom(String s) {
             debug ("onNewRoom: " + s);
 
-       //     Room room = mStore.getRoom(s);
-        //    addRoomContact(room);
+            final Room room = mStore.getRoom(s);
+            if (room.isInvited())
+                room.join(new ApiCallback<Void>() {
+                    @Override
+                    public void onNetworkError(Exception e) {
+
+                    }
+
+                    @Override
+                    public void onMatrixError(MatrixError matrixError) {
+
+                    }
+
+                    @Override
+                    public void onUnexpectedError(Exception e) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        ChatGroup group = addRoomContact(room);
+
+                        mChatSessionManager.createChatSession(group,true);
+                    }
+                });
+
 
         }
 
