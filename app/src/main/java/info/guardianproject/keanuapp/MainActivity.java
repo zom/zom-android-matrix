@@ -1017,8 +1017,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
 
                     String roomAddress = null;
                     String nickname = params[2];
-
-                    session = manager.createMultiUserChatSession(roomAddress, subject, nickname, true);
+                    manager.createMultiUserChatSession(roomAddress, subject, nickname, true);
 
                     /**
                     if (session != null)

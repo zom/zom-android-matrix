@@ -2,6 +2,7 @@ package info.guardianproject.keanu.matrix.plugin;
 
 import android.opengl.Matrix;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
@@ -14,8 +15,11 @@ import info.guardianproject.keanu.core.model.Address;
 import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.ChatSession;
+import info.guardianproject.keanu.core.model.ChatSessionListener;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.Invitation;
+import info.guardianproject.keanu.core.model.Message;
+
 import static org.matrix.androidsdk.crypto.CryptoConstantsKt.MXCRYPTO_ALGORITHM_MEGOLM;
 
 public class MatrixChatGroupManager extends ChatGroupManager {
@@ -101,33 +105,16 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                     Room room = mDataHandler.getRoom(roomId);
                     room.updateName(subject,new BasicApiCallback("RoomUpdate"));
                     mConn.addRoomContact(room);
-                    room.join(new ApiCallback<Void>() {
-                        @Override
-                        public void onNetworkError(Exception e) {
-
-                        }
-
-                        @Override
-                        public void onMatrixError(MatrixError matrixError) {
-
-                        }
-
-                        @Override
-                        public void onUnexpectedError(Exception e) {
-
-                        }
-
-                        @Override
-                        public void onSuccess(Void aVoid) {
-
-                        }
-                    });
-
+                    room.join(new BasicApiCallback("join room"));
                     room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("CreateRoomEncryption"));
                     ChatGroup chatGroup = new ChatGroup(new MatrixAddress(roomId), subject, MatrixChatGroupManager.this);
+                    chatGroup.beginMemberUpdates();
+                    chatGroup.notifyMemberJoined(mConn.getLoginUser().getAddress().getAddress(),mConn.getLoginUser());
+                    chatGroup.notifyMemberRoleUpdate(mConn.getLoginUser(),null,"owner");
+                    chatGroup.endMemberUpdates();
                     ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
                     session.setUseEncryption(true);
-
+                    mConn.getChatSessionManager().getAdapter().getChatSessionAdapter(session,true).sendMessage("!",false);
 
                 }
             });
@@ -163,7 +150,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         Room room = mDataHandler.getRoom(group.getAddress().getAddress());
 
         if (room != null ) {
-            mDataHandler.getRoom(group.getAddress().getAddress()).leave(new BasicApiCallback("Leave Room")
+            room.leave(new BasicApiCallback("Leave Room")
             {
                 @Override
                 public void onSuccess(Object o) {
@@ -177,6 +164,12 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     @Override
     public void inviteUserAsync(ChatGroup group, Contact invitee) {
 
+        Room room = mDataHandler.getRoom(group.getAddress().getAddress());
+
+        if (room != null ) {
+
+            room.invite(invitee.getAddress().getAddress(),new BasicApiCallback("InviteRoom"));
+        }
     }
 
     @Override

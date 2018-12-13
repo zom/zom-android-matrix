@@ -604,7 +604,7 @@ public class MatrixConnection extends ImConnection {
 
                     if (group.getMember(member.getUserId())==null) {
                         group.notifyMemberJoined(member.getUserId(), contact);
-                        group.notifyMemberRoleUpdate(contact, null, "member");
+                        group.notifyMemberRoleUpdate(contact, null, "owner");
                     }
 
                 }

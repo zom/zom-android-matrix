@@ -99,8 +99,12 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
         try
         {
             ChatGroupManager groupMan = mConnection.getAdaptee().getChatGroupManager();
-            groupMan.createChatGroupAsync(roomAddress, subject, nickname);
+            ChatGroup group = groupMan.createChatGroupAsync(roomAddress, subject, nickname);
 
+            if (group != null) {
+                ChatSession session = getChatSessionManager().createChatSession(group, isNewChat);
+                return getChatSessionAdapter(session, isNewChat);
+            }
         }
         catch (Exception e)
         {
