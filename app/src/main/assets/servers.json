@@ -16,7 +16,25 @@
       "captcha": false,
       "extensions": [],
               "certificate": ""
+    },
+    {
+      "name": "Matrix.org Home",
+      "description": "The main matrix server",
+      "website": "https://matrix.org",
+      "twitter": "https://twitter.com/matrix",
+      "privacy_policy": "https://matrix.org/privacy",
+      "logo": "image/matrix.png",
+      "country_code": "FR",
+      "domain": "matrix.org",
+      "server": "matrix.org",
+      "ip": "104.24.206.27",
+      "port": 443,
+      "requires_otr": true,
+      "captcha": false,
+      "extensions": [],
+      "certificate": ""
     }
+
 
   ]
 }
