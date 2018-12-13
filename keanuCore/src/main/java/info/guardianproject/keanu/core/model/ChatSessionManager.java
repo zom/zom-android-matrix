@@ -117,6 +117,6 @@ public abstract class ChatSessionManager {
      *
      * @param message the message to send.
      */
-    public abstract void sendMessageAsync(ChatSession session, Message message);
+    public abstract void sendMessageAsync(ChatSession session, Message message, ChatSessionListener listener);
 
 }

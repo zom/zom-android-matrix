@@ -80,6 +80,10 @@ public final class Presence implements Parcelable {
         this(Presence.OFFLINE, null, null, null, CLIENT_TYPE_DEFAULT, null, null);
     }**/
 
+    public Presence(int status) {
+        this(status, null, null, null, CLIENT_TYPE_DEFAULT);
+    }
+
     public Presence(int status, String statusText, int clientType) {
         this(status, statusText, null, null, clientType);
     }

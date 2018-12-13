@@ -103,29 +103,13 @@ public class ChatSession {
      *
      * @param message the message to send.
      */
-    public int sendMessageAsync(Message message, boolean sendOmemo) {
+    public int sendMessageAsync(Message message, boolean sendOmemo, ChatSessionListener listener) {
 
 
         message.setTo(mParticipant.getAddress());
 
-        if (mParticipant instanceof Contact) {
-
-            message.setType(Imps.MessageType.QUEUED);
-            mManager.sendMessageAsync(this, message);
-
-        }
-        else if (mParticipant instanceof ChatGroup)
-        {
-
-            message.setType(Imps.MessageType.OUTGOING);
-            mManager.sendMessageAsync(this, message);
-
-        }
-        else
-        {
-            //what do we do ehre?
-            message.setType(Imps.MessageType.QUEUED);
-        }
+        message.setType(Imps.MessageType.QUEUED);
+        mManager.sendMessageAsync(this, message, listener);
 
         return message.getType();
     }

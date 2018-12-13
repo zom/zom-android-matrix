@@ -665,12 +665,12 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onDirectMessageChatRoomsListUpdate() {
             debug("onDirectMessageChatRoomsListUpdate");
+
         }
 
         @Override
         public void onLiveEvent(Event event, RoomState roomState) {
             debug ("onLiveEvent:type=" + event.getType());
-
 
             if (event.getType().equals(Event.EVENT_TYPE_MESSAGE))
             {
@@ -683,8 +683,8 @@ public class MatrixConnection extends ImConnection {
 
                     User user = mStore.getUser(event.getSender());
 //                    String deviceId = event.getContent().getAsJsonObject().get("deviceId").getAsString();
-                    Room room = mStore.getRoom(event.roomId);
-                    addRoomContact(room);
+       //             Room room = mStore.getRoom(event.roomId);
+//                    addRoomContact(room);
 
                     Contact contact = mContactListManager.getContact(event.sender);
 
@@ -702,7 +702,7 @@ public class MatrixConnection extends ImConnection {
                     if (contact != null){
                         //now pass the incoming message somewhere!
 
-                        ChatSession session = mChatSessionManager.getSession(room.getRoomId());
+                        ChatSession session = mChatSessionManager.getSession(event.roomId);
 
                         if (session == null)
                         {
@@ -714,12 +714,20 @@ public class MatrixConnection extends ImConnection {
                         message.setFrom(contact.getAddress());
                         message.setDateTime(new Date());//use "age"?
 
-                        if (mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId()))
+                        if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId))
                             message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
                         else
                             message.setType(Imps.MessageType.INCOMING);
 
                         session.onReceiveMessage(message, true);
+
+                        if (user.isActive())
+                            contact.setPresence(new Presence(Presence.AVAILABLE));
+                        else
+                            contact.setPresence(new Presence(Presence.OFFLINE));
+                        Contact[] contacts = {contact};
+                        mContactListManager.notifyContactsPresenceUpdated(contacts);
+
                     }
                 }
 
@@ -729,6 +737,18 @@ public class MatrixConnection extends ImConnection {
             {
 
                 debug ("PRESENCE: from=" + event.getSender() + ": " + event.getContent());
+                Contact contact = mContactListManager.getContact(event.getSender());
+
+                if (contact != null)
+                {
+                    User user = mStore.getUser(event.getSender());
+                    if (user.isActive())
+                        contact.setPresence(new Presence(Presence.AVAILABLE));
+                    else
+                        contact.setPresence(new Presence(Presence.OFFLINE));
+                    Contact[] contacts = {contact};
+                    mContactListManager.notifyContactsPresenceUpdated(contacts);
+                }
 
             }
             else if (event.getType().equals(Event.EVENT_TYPE_RECEIPT))
@@ -736,6 +756,7 @@ public class MatrixConnection extends ImConnection {
                 debug ("RECEIPT: from=" + event.getSender() + ": " + event.getContent());
 
             }
+
 
         }
 
@@ -792,8 +813,8 @@ public class MatrixConnection extends ImConnection {
         public void onNewRoom(String s) {
             debug ("onNewRoom: " + s);
 
-            Room room = mStore.getRoom(s);
-            addRoomContact(room);
+       //     Room room = mStore.getRoom(s);
+        //    addRoomContact(room);
 
         }
 
@@ -857,9 +878,19 @@ public class MatrixConnection extends ImConnection {
         }
 
         @Override
-        public void onNewGroupInvitation(String s) {
+        public void onNewGroupInvitation(final String s) {
 
-            debug ("onNewGroupInvitation: " + s);
+            mResponseHandler.post (new Runnable ()
+            {
+                public void run ()
+                {
+                    debug ("onNewGroupInvitation: " + s);
+                    mSession.joinRoom(s, new BasicApiCallback("onNewGroupInvitation"));
+                    Room room = mStore.getRoom(s);
+                    addRoomContact(room);
+                }
+            });
+
         }
 
         @Override

@@ -35,6 +35,7 @@ import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.GroupListener;
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
+import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
@@ -199,6 +200,16 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
                 }
                 mRemoteListeners.finishBroadcast();
             }
+        }
+
+        @Override
+        public void onMessageSendSuccess(Message msg, String newPacketId) {
+
+        }
+
+        @Override
+        public void onMessageSendFail(Message msg) {
+
         }
 
         public void notifyChatSessionCreateFailed(final String name, final ImErrorInfo error) {

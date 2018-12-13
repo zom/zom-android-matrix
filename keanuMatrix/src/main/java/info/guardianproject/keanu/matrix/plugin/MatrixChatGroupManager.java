@@ -101,6 +101,8 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                     ChatGroup chatGroup = new ChatGroup(new MatrixAddress(roomId), subject, MatrixChatGroupManager.this);
                     ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
                     session.setUseEncryption(true);
+
+
                 }
             });
         }

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatSession;
+import info.guardianproject.keanu.core.model.ChatSessionListener;
 import info.guardianproject.keanu.core.model.ChatSessionManager;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImEntity;
@@ -71,24 +72,30 @@ public class MatrixChatSessionManager extends ChatSessionManager {
     public synchronized ChatSession createChatSession(ImEntity participant, boolean isNewSession) {
         ChatSession session = super.createChatSession(participant, isNewSession);
 
-        Room room = null;
+        Room room =  mRoomMap.get(participant.getAddress().getAddress());
+        if (room == null) {
 
-        if (participant instanceof ChatGroup) {
-            room = mDataHandler.getRoom(session.getParticipant().getAddress().getAddress());
+            room = findRoom(participant.getAddress().getAddress());
 
+            if (room == null) {
+                User user = mDataHandler.getUser(participant.getAddress().getAddress());
+
+                if (user == null || participant instanceof ChatGroup) {
+                    room = mDataHandler.getRoom(session.getParticipant().getAddress().getAddress());
+
+                } else if (participant instanceof Contact) {
+                    createOneToOneRoom(session.getParticipant().getAddress().getAddress());
+                }
+            }
+
+            mRoomMap.put(participant.getAddress().getAddress(), room);
         }
-        else if (participant instanceof Contact)
-        {
-            createOneToOneRoom(session.getParticipant().getAddress().getAddress());
-        }
-
-        mRoomMap.put(participant.getAddress().getAddress(),room);
 
         return session;
     }
 
     @Override
-    public void sendMessageAsync(final ChatSession session, final Message message) {
+    public void sendMessageAsync(final ChatSession session, final Message message, final ChatSessionListener listener) {
 
         Room room = mRoomMap.get(session.getParticipant().getAddress().getAddress());
 
@@ -113,7 +120,6 @@ public class MatrixChatSessionManager extends ChatSessionManager {
             @Override
             public void onEventCreated(final RoomMediaMessage roomMediaMessage) {
                 debug("sendMessageAsync:onEventCreated: " + roomMediaMessage);
-                message.setID(roomMediaMessage.getEvent().eventId);
 
                 roomMediaMessage.setEventSendingCallback(new ApiCallback<Void>() {
                     @Override
@@ -121,6 +127,9 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                         debug ("onNetworkError: sending message",e);
                         message.setType(Imps.MessageType.QUEUED);
 
+
+                        if (listener != null)
+                            listener.onMessageSendFail(message);
                     }
 
                     @Override
@@ -155,7 +164,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                                 mDataHandler.getCrypto().setDevicesKnown(knownDevices, new BasicApiCallback("setDevicesKnown"));
 
                                 //now resend!
-                                sendMessageAsync(session, message);
+                                sendMessageAsync(session, message, listener);
                             }
                         }
 
@@ -165,6 +174,10 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                     public void onUnexpectedError(Exception e) {
                         debug ("onUnexpectedError: sending message",e);
                         message.setType(Imps.MessageType.QUEUED);
+
+
+                        if (listener != null)
+                            listener.onMessageSendFail(message);
                     }
 
                     @Override
@@ -174,7 +187,11 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
                         if (mDataHandler.getCrypto().isRoomEncrypted(roomId))
                             message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
+                        else
+                            message.setType(Imps.MessageType.OUTGOING);
 
+                        if (listener != null)
+                            listener.onMessageSendSuccess(message, roomMediaMessage.getEvent().eventId);
                     }
                 });
             }
@@ -183,20 +200,28 @@ public class MatrixChatSessionManager extends ChatSessionManager {
             public void onEventCreationFailed(RoomMediaMessage roomMediaMessage, String s) {
                 debug("sendMessageAsync:onEventCreationFailed: " + s + ";" + roomMediaMessage);
 
+
+
+                if (listener != null)
+                    listener.onMessageSendFail(message);
+
             }
 
             @Override
             public void onEncryptionFailed(RoomMediaMessage roomMediaMessage) {
                 debug("sendMessageAsync:onEncryptionFailed: " + roomMediaMessage);
 
+
+
+                if (listener != null)
+                    listener.onMessageSendFail(message);
+
             }
         });
     }
 
-    private void createOneToOneRoom (final String contactId)
+    private Room findRoom (String contactId)
     {
-
-        final MatrixAddress addr = new MatrixAddress(contactId);
 
         //first see if we have a room with them already
         Collection<Room> rooms = mDataHandler.getStore().getRooms();
@@ -207,14 +232,22 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                 if (room.getMember(contactId) != null)
                 {
                     mRoomMap.put(contactId, room);
-                    return;
+                    return room;
                 }
 
             }
         }
 
-        //otherwise create a room!
-        mSession.createRoom(addr.getUser(), null, null, new ApiCallback<String>() {
+        return null;
+    }
+
+    private void createOneToOneRoom (final String contactId)
+    {
+
+        final MatrixAddress addr = new MatrixAddress(contactId);
+
+
+        mSession.createDirectMessageRoom(addr.getUser(),new ApiCallback<String>() {
             @Override
             public void onNetworkError(Exception e) {
                 mConn.debug("createChatGroupAsync:onNetworkError: " + e);
@@ -237,8 +270,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
             public void onSuccess(String roomId) {
                 Room room = mDataHandler.getRoom(roomId);
                 mRoomMap.put(contactId, room);
-                room.updateName(addr.getUser(),new BasicApiCallback("RoomUpdate"));
-
+             //   room.updateName(addr.getUser(),new BasicApiCallback("RoomUpdate"));
                 room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("CreateRoomEncryption"));
                 ChatGroup chatGroup = new ChatGroup(new MatrixAddress(roomId), null, mConn.getChatGroupManager());
                 ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);

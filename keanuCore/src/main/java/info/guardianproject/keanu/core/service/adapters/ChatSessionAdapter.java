@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ import info.guardianproject.keanu.core.conversations.UploadProgressListener;
 import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.ChatSession;
+import info.guardianproject.keanu.core.model.ChatSessionListener;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.GroupListener;
 import info.guardianproject.keanu.core.model.GroupMemberListener;
@@ -338,12 +340,37 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             setLastMessage(text);
         }
 
-        int newType = mChatSession.sendMessageAsync(msg, mEnableOmemoGroups);
+        int newType = mChatSession.sendMessageAsync(msg, mEnableOmemoGroups, new ChatSessionListener() {
+            @Override
+            public void onChatSessionCreated(ChatSession session) {
 
-        if (msg.getDateTime() != null)
-            sendTime = msg.getDateTime().getTime();
+            }
 
-        updateMessageInDb(msg.getID(),newType,sendTime, null);
+            @Override
+            public void onMessageSendSuccess(Message msg, String newPacketId) {
+
+                long sendTime = new Date().getTime();
+
+                if (msg.getDateTime() != null)
+                    sendTime = msg.getDateTime().getTime();
+
+                updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, newPacketId);
+
+                msg.setID(newPacketId);
+            }
+
+            @Override
+            public void onMessageSendFail(Message msg) {
+                long sendTime = new Date().getTime();
+
+                if (msg.getDateTime() != null)
+                    sendTime = msg.getDateTime().getTime();
+
+                updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, null);
+            }
+        });
+
+
 
 
     }
@@ -517,7 +544,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 if (msgMedia.getDateTime() != null)
                     sendTime = msgMedia.getDateTime().getTime();
 
-                updateMessageInDb(msgMedia.getID(),newType,sendTime,mediaPath + ' ' + resultUrl);
+                updateMessageInDb(msgMedia.getID(),newType,sendTime,mediaPath + ' ' + resultUrl, null);
 
                 /**
                 String mediaPath = localUrl + ' ' + publishUrl;
@@ -1078,12 +1105,12 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         return Imps.insertMessageInDb(mContentResolver, mIsGroupChat, mContactId, false, contact, body, time, type, errCode, id, mimeType);
     }
 
-    int updateMessageInDb(String id, int type, long time, String body) {
+    int updateMessageInDb(String id, int type, long time, String body, String newPacketId) {
 
         if (body != null)
             Imps.updateMessageBody(mContentResolver, id, body, null);
 
-        return Imps.updateMessageInDb(mContentResolver, id, type, time, mContactId);
+        return Imps.updateMessageInDb(mContentResolver, id, type, time, mContactId, newPacketId);
     }
 
     int deleteMessageInDb (String id) {
@@ -1384,7 +1411,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
         @Override
         public void onMessagePostponed(ChatSession ses, String id) {
-            updateMessageInDb(id, Imps.MessageType.QUEUED, -1, null);
+            updateMessageInDb(id, Imps.MessageType.QUEUED, -1, null, null);
         }
 
         @Override

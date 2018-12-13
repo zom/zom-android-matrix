@@ -31,4 +31,9 @@ public interface ChatSessionListener {
      * @param session the created ChatSession.
      */
     public void onChatSessionCreated(ChatSession session);
+
+    public void onMessageSendSuccess (Message msg, String newMessageId);
+
+    public void onMessageSendFail (Message msg);
+
 }

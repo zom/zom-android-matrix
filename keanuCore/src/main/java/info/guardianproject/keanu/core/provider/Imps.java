@@ -2485,16 +2485,19 @@ public class Imps {
         return result;
     }
 
-    public static int updateMessageInDb(ContentResolver resolver, String id, int type, long time, long contactId) {
+    public static int updateMessageInDb(ContentResolver resolver, String id, int type, long time, long contactId, String newPacketId) {
 
         Builder builder = Messages.OTR_MESSAGES_CONTENT_URI_BY_PACKET_ID.buildUpon();
         builder.appendPath(id);
 
-        ContentValues values = new ContentValues(2);
+        ContentValues values = new ContentValues();
         values.put(Messages.TYPE, type);
         values.put(Messages.THREAD_ID, contactId);
         if (time != -1)
             values.put(Messages.DATE, time);
+
+        if (newPacketId != null)
+            values.put(Messages.PACKET_ID,newPacketId);
 
         int result = resolver.update(builder.build(), values, null, null);
 
