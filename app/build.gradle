@@ -15,8 +15,8 @@ android {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 101
-        versionName "0.0.1-alpha-1"
+        versionCode 102
+        versionName "0.0.1-alpha-2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -37,23 +37,22 @@ android {
     // list each dimension determines its priority, from highest to lowest,
     // when Gradle merges variant sources and configurations. You must assign
     // each product flavor you configure to one of the flavor dimensions.
-    flavorDimensions "free"
+    /**
+    flavorDimensions "release","free"
 
     productFlavors {
         primary {
             // Assigns this product flavor to the "mode" flavor dimension.
-            dimension "free"
-
+            dimension "release"
         }
 
         altbrand {
             dimension "free"
             applicationIdSuffix ".altbrand"
             versionNameSuffix "-altbrand"
-
         }
 
-    }
+    }**/
 
 
     repositories {
