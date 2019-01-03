@@ -748,16 +748,25 @@ public class MatrixConnection extends ImConnection {
                 debug ("PRESENCE: from=" + event.getSender() + ": " + event.getContent());
                 Contact contact = mContactListManager.getContact(event.getSender());
 
-                if (contact != null)
-                {
+                if (contact == null) {
+
                     User user = mStore.getUser(event.getSender());
-                    if (user.isActive())
-                        contact.setPresence(new Presence(Presence.AVAILABLE));
-                    else
-                        contact.setPresence(new Presence(Presence.OFFLINE));
-                    Contact[] contacts = {contact};
-                    mContactListManager.notifyContactsPresenceUpdated(contacts);
+                    contact = new Contact(new MatrixAddress(event.getSender()), user.displayname, Imps.Contacts.TYPE_NORMAL);
+                    try {
+                        mContactListManager.doAddContactToListAsync(contact, null, false);
+                    } catch (ImException e) {
+                        e.printStackTrace();
+                    }
+
                 }
+
+                User user = mStore.getUser(event.getSender());
+                if (user.isActive())
+                    contact.setPresence(new Presence(Presence.AVAILABLE));
+                else
+                    contact.setPresence(new Presence(Presence.OFFLINE));
+                Contact[] contacts = {contact};
+                mContactListManager.notifyContactsPresenceUpdated(contacts);
 
             }
             else if (event.getType().equals(Event.EVENT_TYPE_RECEIPT))
@@ -770,18 +779,20 @@ public class MatrixConnection extends ImConnection {
                 debug ("TYPING: from=" + event.getSender() + ": " + event.getContent());
                 Contact contact = mContactListManager.getContact(event.getSender());
 
-                if (contact.getPresence() == null || (!contact.getPresence().isOnline())) {
-                    contact.setPresence(new Presence(Presence.AVAILABLE));
-                    Contact[] contacts = {contact};
-                    mContactListManager.notifyContactsPresenceUpdated(contacts);
-                }
+                if (contact != null) {
+                    if (contact.getPresence() == null || (!contact.getPresence().isOnline())) {
+                        contact.setPresence(new Presence(Presence.AVAILABLE));
+                        Contact[] contacts = {contact};
+                        mContactListManager.notifyContactsPresenceUpdated(contacts);
+                    }
 
-                IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
-                if (csa != null) {
-                    try {
-                        csa.setContactTyping(contact,true);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
+                    IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
+                    if (csa != null) {
+                        try {
+                            csa.setContactTyping(contact, true);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
                     }
                 }
 
