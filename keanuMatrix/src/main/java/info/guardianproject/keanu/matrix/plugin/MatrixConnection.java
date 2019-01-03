@@ -591,6 +591,7 @@ public class MatrixConnection extends ImConnection {
             public void onSuccess(List<RoomMember> roomMembers) {
 
                 group.beginMemberUpdates();
+              //  group.clearMembers(true);
 
                 for (RoomMember member : roomMembers)
                 {
@@ -613,10 +614,8 @@ public class MatrixConnection extends ImConnection {
                     }
 
 
-                    if (group.getMember(member.getUserId())==null) {
-                        group.notifyMemberJoined(member.getUserId(), contact);
-                        group.notifyMemberRoleUpdate(contact, null, "owner");
-                    }
+                    group.notifyMemberJoined(member.getUserId(), contact);
+                    group.notifyMemberRoleUpdate(contact, "moderator", "owner");
 
                 }
 

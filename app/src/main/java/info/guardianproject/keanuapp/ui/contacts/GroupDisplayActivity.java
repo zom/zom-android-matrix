@@ -122,7 +122,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
         mMembers = new ArrayList<>();
         mConn = RemoteImService.getConnection(mProviderId, mAccountId);
-        mLocalAddress = Imps.Account.getUserName(getContentResolver(), mAccountId) + '@' + providerSettings.getDomain();
+        mLocalAddress = '@' + Imps.Account.getUserName(getContentResolver(), mAccountId) + ':' + providerSettings.getDomain();
 
         providerSettings.close();
 

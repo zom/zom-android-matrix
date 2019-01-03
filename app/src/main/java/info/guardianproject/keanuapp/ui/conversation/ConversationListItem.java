@@ -375,12 +375,13 @@ public class ConversationListItem extends FrameLayout {
 
         holder.mLine1.setVisibility(View.VISIBLE);
 
+        /**
         if (isEncrypted)
         {
             holder.mStatusIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_encrypted_grey));
             holder.mStatusIcon.setVisibility(View.VISIBLE);
         }
-
+        **/
 
     }
 

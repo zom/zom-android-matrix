@@ -107,14 +107,17 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                     mConn.addRoomContact(room);
                     room.join(new BasicApiCallback("join room"));
                     room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("CreateRoomEncryption"));
+
                     ChatGroup chatGroup = new ChatGroup(new MatrixAddress(roomId), subject, MatrixChatGroupManager.this);
                     chatGroup.beginMemberUpdates();
                     chatGroup.notifyMemberJoined(mConn.getLoginUser().getAddress().getAddress(),mConn.getLoginUser());
-                    chatGroup.notifyMemberRoleUpdate(mConn.getLoginUser(),null,"owner");
+                    chatGroup.notifyMemberRoleUpdate(mConn.getLoginUser(),"moderator","owner");
                     chatGroup.endMemberUpdates();
+
                     ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
                     session.setUseEncryption(true);
-                    mConn.getChatSessionManager().getAdapter().getChatSessionAdapter(session,true).sendMessage("!",false);
+
+                    mConn.getChatSessionManager().getAdapter().getChatSessionAdapter(session,true).sendMessage("",false);
 
                 }
             });
