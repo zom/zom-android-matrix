@@ -14,6 +14,9 @@ import android.util.Log;
 import org.matrix.androidsdk.HomeServerConnectionConfig;
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
+import org.matrix.androidsdk.crypto.IncomingRoomKeyRequest;
+import org.matrix.androidsdk.crypto.IncomingRoomKeyRequestCancellation;
+import org.matrix.androidsdk.crypto.MXCrypto;
 import org.matrix.androidsdk.data.MyUser;
 import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.data.RoomState;
@@ -54,6 +57,7 @@ import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ContactList;
 import info.guardianproject.keanu.core.model.ContactListManager;
 import info.guardianproject.keanu.core.model.ImConnection;
+import info.guardianproject.keanu.core.model.ImEntity;
 import info.guardianproject.keanu.core.model.ImException;
 import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.model.Presence;
@@ -290,8 +294,11 @@ public class MatrixConnection extends ImConnection {
                         mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
                                 .withFileEncryption(enableEncryption)
                                 .build();
+                        mSession.enableCryptoWhenStarting();
+
                         mChatGroupManager.setSession(mSession);
                         mChatSessionManager.setSession(mSession);
+
 
                         mSession.enableCrypto(true, new ApiCallback<Void>() {
                             @Override
@@ -317,6 +324,9 @@ public class MatrixConnection extends ImConnection {
                                 debug ("enableCrypto: onSuccess");
                                 mSession.startEventStream(initialToken);
                                 setState(LOGGED_IN, null);
+                                mSession.setIsOnline(true);
+                                mDataHandler.getCrypto().start(false, new BasicApiCallback("getCrypto().start"));
+                                mSession.setDeviceName(mDeviceId,mDeviceName,new BasicApiCallback("setDeviceName()"));
 
                             }
                         });
@@ -379,6 +389,7 @@ public class MatrixConnection extends ImConnection {
         setState(ImConnection.LOGGING_OUT, null);
 
         if (mSession.isAlive()) {
+            mSession.setIsOnline(false);
             mSession.logout(mContext, new SimpleApiCallback<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
@@ -614,8 +625,18 @@ public class MatrixConnection extends ImConnection {
             }
         });
 
+        checkRoomEncryption(room);
 
         return group;
+    }
+
+    protected void checkRoomEncryption (Room room)
+    {
+
+        boolean isEncrypted = mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId());
+        ChatSession session = mChatSessionManager.getSession(room.getRoomId());
+        session.setUseEncryption(isEncrypted);
+
     }
 
     protected void debug (String msg, MatrixError error)
@@ -644,7 +665,7 @@ public class MatrixConnection extends ImConnection {
 
         @Override
         public void onPresenceUpdate(Event event, User user) {
-            debug ("onPresenceUpdate : " + user.user_id + ": event=" + event.toString());
+             debug ("onPresenceUpdate : " + user.user_id + ": event=" + event.toString());
 
             boolean currentlyActive = false;
             int lastActiveAgo = -1;
@@ -705,17 +726,25 @@ public class MatrixConnection extends ImConnection {
 
                     String subject = room.getRoomDisplayName(mContext);
 
-                    ChatGroup group = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId),subject);
-                    if (group == null)
-                        group = addRoomContact(mStore.getRoom(event.roomId));
+                    ImEntity participant = null;
 
-                    //now pass the incoming message somewhere!
+                    String userId = event.roomId;
+                    if (room.getNumberOfMembers() == 2) {
+                        userId = event.getSender();
+                        participant = contact;
+                    }
+                    else {
+                        participant = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId), subject);
+                        if (participant == null)
+                            participant = addRoomContact(mStore.getRoom(event.roomId));
+                    }
 
-                    ChatSession session = mChatSessionManager.getSession(event.roomId);
+
+                    ChatSession session = mChatSessionManager.getSession(userId);
 
                     if (session == null)
                     {
-                       session = mChatSessionManager.createChatSession(group,false);
+                       session = mChatSessionManager.createChatSession(participant,false);
                     }
 
                     Message message = new Message(messageBody);
@@ -723,8 +752,9 @@ public class MatrixConnection extends ImConnection {
                     message.setFrom(contact.getAddress());
                     message.setDateTime(new Date());//use "age"?
 
-                    if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId))
+                    if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
                         message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
+                    }
                     else
                         message.setType(Imps.MessageType.INCOMING);
 
@@ -817,6 +847,12 @@ public class MatrixConnection extends ImConnection {
                 onNewRoom(roomState.roomId);
             }
 
+            if (!TextUtils.isEmpty(event.type)) {
+                if (event.type.equals("m.room.encrypted")) {
+                    mSession.getCrypto().reRequestRoomKeyForEvent(event);
+                }
+            }
+
         }
 
         @Override
@@ -842,6 +878,24 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onInitialSyncComplete(String s) {
             debug ("onInitialSyncComplete: " + s);
+            if (null != mSession.getCrypto()) {
+                mSession.getCrypto().addRoomKeysRequestListener(new MXCrypto.IRoomKeysRequestListener() {
+                    @Override
+                    public void onRoomKeyRequest(IncomingRoomKeyRequest request) {
+                    //    KeyRequestHandler.getSharedInstance().handleKeyRequest(request);
+                        debug ("onRoomKeyRequest: " + request);
+
+                    }
+
+                    @Override
+                    public void onRoomKeyRequestCancellation(IncomingRoomKeyRequestCancellation request) {
+                      //  KeyRequestHandler.getSharedInstance().handleKeyRequestCancellation(request);
+                        debug ("onRoomKeyRequestCancellation: " + request);
+
+                    }
+                });
+            }
+
             loadStateAsync();
         }
 

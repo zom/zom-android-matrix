@@ -101,9 +101,11 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
                         @Override
                         public void onSuccess(List<RoomMember> roomMembers) {
+                            ChatSessionAdapter adapter = mSessions.get(participant.getAddress().getAddress());
                             for (RoomMember member : roomMembers)
                             {
                                 mRoomMap.put(member.getUserId(),thisRoom);
+                                mSessions.put(member.getUserId(),adapter);
                             }
                         }
                     });
@@ -122,8 +124,12 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                     return null;
             }
 
-            if (room != null)
+            if (room != null) {
+
+                mConn.checkRoomEncryption(room);
+
                 mRoomMap.put(participant.getAddress().getAddress(), room);
+            }
         }
 
         return session;
@@ -132,18 +138,35 @@ public class MatrixChatSessionManager extends ChatSessionManager {
     @Override
     public void sendMessageAsync(final ChatSession session, final Message message, final ChatSessionListener listener) {
 
-        Room room = mRoomMap.get(session.getParticipant().getAddress().getAddress());
+        String userId = session.getParticipant().getAddress().getAddress();
+
+        Room room = mRoomMap.get(userId);
 
         if (room == null)
         {
-            room = mDataHandler.getRoom(session.getParticipant().getAddress().getAddress());
+            if (userId.startsWith("@"))
+            {
+                createOneToOneRoom(userId);
+            }
+            else {
+                room = mDataHandler.getRoom(userId);
+            }
 
             if (room != null)
-                mRoomMap.put(session.getParticipant().getAddress().getAddress(),room);
+                mRoomMap.put(userId,room);
             else
             {
                 //can't send, no room!
                 return;
+            }
+        }
+
+        if (session.useEncryption())
+        {
+            boolean isEncrypted = mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId());
+            if (!isEncrypted)
+            {
+                room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("enableEncryptionWithAlgorithm"));
             }
         }
 
@@ -176,27 +199,10 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                             MXCryptoError mxCryptoError = (MXCryptoError)matrixError;
 
                             if (matrixError.errcode.equals(mxCryptoError.UNKNOWN_DEVICES_CODE)) {
+
                                 //TODO this just auto "knowns" all, which isn't good. we need to warn the user
                                 MXUsersDevicesMap devices = (MXUsersDevicesMap) mxCryptoError.mExceptionData;
-
-                                ArrayList<MXDeviceInfo> knownDevices = new ArrayList<>();
-
-                                List<String> userIds = devices.getUserIds();
-
-                                Iterator itUserIds = userIds.iterator();
-                                while (itUserIds.hasNext()) {
-
-                                    String userId = (String)itUserIds.next();
-                                    List<String> deviceIds = devices.getUserDeviceIds(userId);
-                                    Iterator itDeviceIds = deviceIds.iterator();
-                                    while (itDeviceIds.hasNext())
-                                    {
-                                        String deviceId = (String)itDeviceIds.next();
-                                        knownDevices.add((MXDeviceInfo)devices.getObject(deviceId,userId));
-                                    }
-                                }
-
-                                mDataHandler.getCrypto().setDevicesKnown(knownDevices, new BasicApiCallback("setDevicesKnown"));
+                                acceptUnknownDevices (devices);
 
                                 //now resend!
                                 sendMessageAsync(session, message, listener);
@@ -235,8 +241,6 @@ public class MatrixChatSessionManager extends ChatSessionManager {
             public void onEventCreationFailed(RoomMediaMessage roomMediaMessage, String s) {
                 debug("sendMessageAsync:onEventCreationFailed: " + s + ";" + roomMediaMessage);
 
-
-
                 if (listener != null)
                     listener.onMessageSendFail(message);
 
@@ -255,7 +259,31 @@ public class MatrixChatSessionManager extends ChatSessionManager {
         });
     }
 
-    private Room findRoom (String contactId)
+    protected void acceptUnknownDevices (MXUsersDevicesMap devices)
+    {
+
+        ArrayList<MXDeviceInfo> knownDevices = new ArrayList<>();
+
+        List<String> userIds = devices.getUserIds();
+
+        Iterator itUserIds = userIds.iterator();
+        while (itUserIds.hasNext()) {
+
+            String userId = (String)itUserIds.next();
+            List<String> deviceIds = devices.getUserDeviceIds(userId);
+            Iterator itDeviceIds = deviceIds.iterator();
+            while (itDeviceIds.hasNext())
+            {
+                String deviceId = (String)itDeviceIds.next();
+                knownDevices.add((MXDeviceInfo)devices.getObject(deviceId,userId));
+            }
+        }
+
+        mDataHandler.getCrypto().setDevicesKnown(knownDevices, new BasicApiCallback("setDevicesKnown"));
+
+    }
+
+    protected Room findRoom (String contactId)
     {
 
         //first see if we have a room with them already
@@ -280,7 +308,6 @@ public class MatrixChatSessionManager extends ChatSessionManager {
     {
 
         final MatrixAddress addr = new MatrixAddress(contactId);
-
 
         mSession.createDirectMessageRoom(addr.getUser(),new ApiCallback<String>() {
             @Override

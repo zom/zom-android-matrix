@@ -54,6 +54,11 @@ public class ChatSession {
         mManager.getAdapter().getChatSessionAdapter(this,false).useEncryption(useEncryption);
     }
 
+    public boolean useEncryption ()
+    {
+        return mManager.getAdapter().getChatSessionAdapter(this,false).isEncrypted();
+    }
+
     public ImEntity getParticipant() {
         return mParticipant;
     }

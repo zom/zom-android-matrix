@@ -89,7 +89,10 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
             contact = new Contact (new BaseAddress(contactAddress));
 
         ChatSession session = getChatSessionManager().createChatSession(contact, isNewSession);
-        return getChatSessionAdapter(session, isNewSession);
+        if (session != null)
+            return getChatSessionAdapter(session, isNewSession);
+        else
+            return null;
 
     }
 
