@@ -1296,7 +1296,7 @@ public class Imps {
         /**
          * This is to store whether to allow encryption or not per chat
          */
-        String USE_ENCRYPTION = "use_encryption";
+        String USE_ENCRYPTION = "use_encryption"; //1 or 0
 
     }
 

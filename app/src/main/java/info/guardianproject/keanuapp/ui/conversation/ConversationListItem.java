@@ -64,6 +64,7 @@ import static info.guardianproject.keanu.core.KeanuConstants.SMALL_AVATAR_WIDTH;
 
 public class ConversationListItem extends FrameLayout {
 
+    /**
     public final String[] CHAT_PROJECTION = { Imps.Contacts._ID, Imps.Contacts.PROVIDER,
             Imps.Contacts.ACCOUNT, Imps.Contacts.USERNAME,
             Imps.Contacts.NICKNAME, Imps.Contacts.TYPE,
@@ -74,11 +75,12 @@ public class ConversationListItem extends FrameLayout {
             Imps.Chats.LAST_MESSAGE_DATE,
             Imps.Chats.LAST_UNREAD_MESSAGE,
             Imps.Chats.LAST_READ_DATE,
-            Imps.Chats.CHAT_TYPE
+            Imps.Chats.CHAT_TYPE,
+            Imps.Chats.USE_ENCRYPTION
             //          Imps.Contacts.AVATAR_HASH,
             //        Imps.Contacts.AVATAR_DATA
 
-    };
+    };              **/
 
     public static final int COLUMN_CONTACT_ID = 0;
     public static final int COLUMN_CONTACT_PROVIDER = 1;
@@ -94,6 +96,9 @@ public class ConversationListItem extends FrameLayout {
     public static final int COLUMN_LAST_MESSAGE = 11;
     public static final int COLUMN_LAST_READ_DATE = 12;
     public static final int COLUMN_CHAT_TYPE = 13;
+    public static final int COLUMN_USE_ENCRYPTION = 14;
+
+
 
 
     static Drawable AVATAR_DEFAULT_GROUP = null;
@@ -104,7 +109,7 @@ public class ConversationListItem extends FrameLayout {
         sPrettyTime = new PrettyTime(getCurrentLocale());
     }
 
-    public void bind(ConversationViewHolder holder, long contactId, long providerId, long accountId, String address, String nickname, int contactType, String message, long messageDate, String messageType, int presence, int subscription, String underLineText, boolean showChatMsg, boolean scrolling, boolean isMuted) {
+    public void bind(ConversationViewHolder holder, long contactId, long providerId, long accountId, String address, String nickname, int contactType, String message, long messageDate, String messageType, int presence, int subscription, String underLineText, boolean showChatMsg, boolean scrolling, boolean isMuted, boolean isEncrypted) {
 
         //applyStyleColors(holder);
 
@@ -370,42 +375,16 @@ public class ConversationListItem extends FrameLayout {
 
         holder.mLine1.setVisibility(View.VISIBLE);
 
-        if (providerId != -1)
-            getEncryptionState (providerId, accountId, address, holder);
-    }
-
-    private void getEncryptionState (long providerId, long accountId, String address, ConversationViewHolder holder)
-    {
-
-         try {
-
-
-             IImConnection conn = RemoteImService.getConnection(providerId,accountId);
-             if (conn == null || conn.getChatSessionManager() == null)
-                 return;
-
-            IChatSession chatSession = conn.getChatSessionManager().getChatSession(address);
-
-            if (chatSession != null)
-            {
-                if (chatSession.isEncrypted())
-                {
-                    holder.mStatusIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_encrypted_grey));
-                    holder.mStatusIcon.setVisibility(View.VISIBLE);
-                }
-            }
-
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        if (isEncrypted)
+        {
+            holder.mStatusIcon.setImageDrawable(getResources().getDrawable(R.drawable.ic_encrypted_grey));
+            holder.mStatusIcon.setVisibility(View.VISIBLE);
         }
 
 
-
-                //mCurrentChatSession.getOtrChatSession();
-
     }
 
+   
     private Uri mLastMediaUri = null;
 
     /**
