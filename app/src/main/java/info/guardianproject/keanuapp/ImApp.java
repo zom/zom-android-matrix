@@ -311,22 +311,17 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             log("start ImService");
 
-        if (mImService == null) {
+        Intent serviceIntent = new Intent(getApplicationContext(), RemoteImService.class);
 
-            Intent serviceIntent = new Intent(this, RemoteImService.class);
-//        serviceIntent.putExtra(ImServiceConstants.EXTRA_CHECK_AUTO_LOGIN, isBoot);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            mApplicationContext.startForegroundService(serviceIntent);
+        else
+            mApplicationContext.startService(serviceIntent);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                mApplicationContext.startForegroundService(serviceIntent);
-            else
-                mApplicationContext.startService(serviceIntent);
+        mConnectionListener = new MyConnListener(new Handler());
 
-            mConnectionListener = new MyConnListener(new Handler());
-
-            mApplicationContext
-                    .bindService(serviceIntent, mImServiceConn, Context.BIND_AUTO_CREATE);
-
-        }
+   //     mApplicationContext
+     //           .bindService(serviceIntent, mImServiceConn, Context.BIND_AUTO_CREATE|Context.BIND_IMPORTANT);
 
     }
 
@@ -370,7 +365,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
             {
 
             }
-            mApplicationContext.unbindService(mImServiceConn);
+          //  mApplicationContext.unbindService(mImServiceConn);
 
             mImService = null;
         }
@@ -389,7 +384,6 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
                 log("service connected");
 
             mImService = IRemoteImService.Stub.asInterface(service);
-         //   fetchActiveConnections();
 
             synchronized (mQueue) {
                 for (Message msg : mQueue) {
