@@ -1085,7 +1085,10 @@ public class MatrixConnection extends ImConnection {
 
             }
 
-            if (messageType.equals("m.image"))
+            if (messageType.equals("m.image")
+                    || messageType.equals("m.file")
+                    || messageType.equals("m.video")
+                    || messageType.equals("m.audio"))
             {
                 FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
 
