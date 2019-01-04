@@ -53,6 +53,7 @@ import java.util.Locale;
 
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ImApp;
+import info.guardianproject.keanuapp.ui.VectorUtils;
 import info.guardianproject.keanuapp.ui.widgets.ConversationViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.GlideUtils;
 import info.guardianproject.keanuapp.ui.widgets.GroupAvatar;

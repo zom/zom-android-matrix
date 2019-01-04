@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import info.guardianproject.keanu.core.conversations.UploadProgressListener;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.ConnectionListener;
 import info.guardianproject.keanu.core.model.Contact;
@@ -52,6 +51,7 @@ import info.guardianproject.keanu.core.service.IInvitationListener;
 import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.tasks.ChatSessionInitTask;
 import info.guardianproject.keanu.core.util.Debug;
+import info.guardianproject.keanu.core.util.UploadProgressListener;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 

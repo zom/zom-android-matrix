@@ -24,12 +24,12 @@ import org.apache.commons.io.IOUtils;
 
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileInputStream;
-import info.guardianproject.keanu.core.conversations.Downloader;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.Presence;
 import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.util.Downloader;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 
 import java.io.FileNotFoundException;

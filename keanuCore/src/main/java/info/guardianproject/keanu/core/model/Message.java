@@ -30,7 +30,8 @@ public class Message implements Parcelable {
     private Address mTo;
     private String mBody;
     private Date mDate;
-    private int mType;    
+    private int mMessageType;
+    private String mContentType;
 
     /**
      * @param msg
@@ -52,7 +53,8 @@ public class Message implements Parcelable {
         if (time != -1) {
             mDate = new Date(time);
         }
-        mType = source.readInt();
+        mMessageType = source.readInt();
+        mContentType = source.readString();
     }
 
     /**
@@ -138,7 +140,8 @@ public class Message implements Parcelable {
         AddressParcelHelper.writeToParcel(dest, mTo);
         dest.writeString(mBody);
         dest.writeLong(mDate == null ? -1 : mDate.getTime());
-        dest.writeInt(mType);
+        dest.writeInt(mMessageType);
+        dest.writeString(mContentType);
     }
 
     public int describeContents() {
@@ -158,11 +161,18 @@ public class Message implements Parcelable {
 
 
     public int getType() {
-        return mType;
+        return mMessageType;
     }
 
     public void setType(int mType) {
-        this.mType = mType;
+        this.mMessageType = mType;
+    }
+
+    public String getContentType () { return mContentType; }
+
+    public void setContentType (String contentType)
+    {
+        this.mContentType = contentType;
     }
 
 }

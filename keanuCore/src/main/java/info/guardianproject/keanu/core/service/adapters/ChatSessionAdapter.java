@@ -45,7 +45,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import info.guardianproject.keanu.core.R;
-import info.guardianproject.keanu.core.conversations.UploadProgressListener;
 import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.ChatSession;
@@ -518,7 +517,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 if (mIsGroupChat)
                     doEncryption = mEnableOmemoGroups;
 
-                UploadProgressListener listener = null;
+                Object listener = null;
                 /**
                 UploadProgressListener listener = new UploadProgressListener() {
                     @Override
@@ -532,7 +531,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     }
                 };**/
 
-                String resultUrl = mConnection.sendMediaMessage(mChatSession.getParticipant().getAddress().getAddress(), sendFileName, mimeType, fileLength, fis, doEncryption, listener);
+                String resultUrl = null;//mConnection.sendMediaMessage(mChatSession.getParticipant().getAddress().getAddress(), sendFileName, mimeType, fileLength, fis, doEncryption, listener);
 
                 int newType = Imps.MessageType.OUTGOING_ENCRYPTED;
 
@@ -1177,13 +1176,16 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
             }
             else {
+
+
+
                 //if it wasn't a media file or we had an issue downloading, then it is chat
                 Uri messageUri = null;
 
                 if (msg.getID() == null)
-                    messageUri = insertMessageInDb(nickname, body, time, msg.getType(), null);
+                    messageUri = insertMessageInDb(nickname, body, time, msg.getType(), msg.getContentType());
                 else
-                    messageUri = insertMessageInDb(nickname, body, time, msg.getType(), 0, msg.getID(), null);
+                    messageUri = insertMessageInDb(nickname, body, time, msg.getType(), 0, msg.getID(), msg.getContentType());
 
                 setLastMessage(body);
 

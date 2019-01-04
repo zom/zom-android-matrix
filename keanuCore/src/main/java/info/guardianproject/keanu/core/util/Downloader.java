@@ -1,4 +1,4 @@
-package info.guardianproject.keanu.core.conversations;
+package info.guardianproject.keanu.core.util;
 
 import android.util.Log;
 import android.webkit.URLUtil;
@@ -21,13 +21,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import info.guardianproject.iocipher.File;
-import info.guardianproject.keanu.core.util.SecureMediaStore;
 
 public class Downloader {
 
-    static {
-        URL.setURLStreamHandlerFactory(new AesGcmURLStreamHandlerFactory());
-    }
 
     private String mMimeType = null;
 

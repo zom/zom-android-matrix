@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import info.guardianproject.keanu.core.conversations.UploadProgressListener;
+import info.guardianproject.keanu.core.util.UploadProgressListener;
+
 
 /**
  * An <code>ImConnection</code> is an abstract representation of a connection to

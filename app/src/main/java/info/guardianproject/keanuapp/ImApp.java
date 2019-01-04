@@ -95,8 +95,6 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
     public final static String URL_UPDATER = "";
 
-    private Locale locale = null;
-
     public static ImApp sImApp;
 
     private static IRemoteImService mImService;
