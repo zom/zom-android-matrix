@@ -58,6 +58,7 @@ import info.guardianproject.keanu.core.model.ContactList;
 import info.guardianproject.keanu.core.model.ContactListManager;
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.model.ImEntity;
+import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.model.ImException;
 import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.model.Presence;
@@ -147,6 +148,14 @@ public class MatrixConnection extends ImConnection {
 
         initMatrix();
 
+    }
+
+    @Override
+    public void networkTypeChanged() {
+        super.networkTypeChanged();
+
+        if (mSession != null)
+            mSession.setIsOnline(true);
     }
 
     private Contact makeUser(Imps.ProviderSettings.QueryMap providerSettings, ContentResolver contentResolver) {
@@ -268,7 +277,7 @@ public class MatrixConnection extends ImConnection {
         initMatrix();
 
         String username = mUser.getAddress().getUser();
-
+        setState(ImConnection.LOGGING_IN, null);
 
         if (password == null)
             password = Imps.Account.getPassword(mContext.getContentResolver(), mAccountId);
@@ -284,7 +293,7 @@ public class MatrixConnection extends ImConnection {
 
                 mCredentials = credentials;
                 mConfig.setCredentials(mCredentials);
-                setState(LOGGED_IN, null);
+                setState(ImConnection.LOGGING_IN, null);
 
                 mResponseHandler.post(new Runnable ()
                 {
@@ -345,8 +354,6 @@ public class MatrixConnection extends ImConnection {
 
                 Log.w(TAG,"OnNetworkError",e);
 
-                setState(SUSPENDED, null);
-
             }
 
             @Override
@@ -354,8 +361,6 @@ public class MatrixConnection extends ImConnection {
                 super.onMatrixError(e);
 
                 Log.w(TAG,"onMatrixError: " + e.mErrorBodyAsString);
-
-                setState(SUSPENDED, null);
 
             }
 
@@ -366,8 +371,6 @@ public class MatrixConnection extends ImConnection {
                 Log.w(TAG,"onUnexpectedError",e);
 
 
-                setState(SUSPENDED, null);
-
             }
         });
     }
@@ -375,10 +378,15 @@ public class MatrixConnection extends ImConnection {
     @Override
     public void reestablishSessionAsync(Map<String, String> sessionContext) {
 
+        setState(ImConnection.LOGGED_IN, null);
+        if (mSession != null)
+            mSession.setIsOnline(true);
     }
 
     @Override
     public void logoutAsync() {
+
+
         logout();
     }
 
@@ -406,7 +414,16 @@ public class MatrixConnection extends ImConnection {
 
     @Override
     public void suspend() {
+      //  if (mSession != null)
+        //    mSession.setIsOnline(false);
+    }
 
+    @Override
+    protected void setState(int state, ImErrorInfo error) {
+        super.setState(state, error);
+
+        if (mSession != null)
+            mSession.setIsOnline(state != ImConnection.SUSPENDED);
     }
 
     @Override

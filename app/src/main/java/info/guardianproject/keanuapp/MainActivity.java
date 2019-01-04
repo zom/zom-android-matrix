@@ -110,7 +110,7 @@ import static info.guardianproject.keanu.core.KeanuConstants.PREFERENCE_KEY_TEMP
 /**
  * TODO
  */
-public class MainActivity extends BaseActivity implements IConnectionListener {
+public class MainActivity extends BaseActivity {
 
     private ViewPager mViewPager;
     private TabLayout mTabLayout;
@@ -127,9 +127,6 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
     private ContactsListFragment mContactList;
     private MoreFragment mMoreFragment;
     private AccountFragment mAccountFragment;
-
-    private IImConnection mConn;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -358,22 +355,21 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
     private boolean checkConnection() {
         try {
 
-            if (mConn == null) {
-                mConn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
-                if (mConn != null) {
-                    try {
-                        mConn.registerConnectionListener(this);
-                    } catch (Exception e) {
-                        Log.e(LOG_TAG, "unable to register connection listener", e);
-                    }
-
-                }
-            }
+            if (mSbStatus != null && mSbStatus.isShown())
+                mSbStatus.dismiss();
 
             if (!isNetworkAvailable())
             {
-                mSbStatus = Snackbar.make(mViewPager, "No Internet", Snackbar.LENGTH_INDEFINITE);
+                mSbStatus = Snackbar.make(mViewPager, R.string.status_no_internet, Snackbar.LENGTH_INDEFINITE);
                 mSbStatus.show();
+
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        checkConnection();
+                    }
+                }, 5000); //Timer is in ms here.
+
                 return false;
             }
 
@@ -381,9 +377,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                 final IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
                 final int connState = conn.getState();
 
-                if (connState == ImConnection.DISCONNECTED
-                        || connState == ImConnection.SUSPENDED
-                        || connState == ImConnection.SUSPENDING) {
+                if (connState == ImConnection.DISCONNECTED) {
 
                     mSbStatus = Snackbar.make(mViewPager, R.string.error_suspended_connection, Snackbar.LENGTH_INDEFINITE);
                     mSbStatus.setAction(getString(R.string.connect), new View.OnClickListener() {
@@ -400,34 +394,16 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
                 }
                 else if (connState == ImConnection.LOGGED_IN)
                 {
-                    //do nothing
-                    if (mSbStatus != null)
-                        mSbStatus.dismiss();
 
                 }
                 else if (connState == ImConnection.LOGGING_IN)
                 {
-                    /**
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (connState == ImConnection.LOGGING_IN) {
-                                mSbStatus = Snackbar.make(mViewPager, R.string.signing_in_wait, Snackbar.LENGTH_INDEFINITE);
-                                mSbStatus.show();
-                            }
-                            else
-                            {
-                                mSbStatus.dismiss();
-                            }
-                        }
-                    }, 10000); //Timer is in ms here.
-                    **/
+
 
                 }
                 else if (connState == ImConnection.LOGGING_OUT)
                 {
-                    //mSbStatus = Snackbar.make(mViewPager, R.string.signing_out_wait, Snackbar.LENGTH_INDEFINITE);
-                    //mSbStatus.show();
+
                 }
             }
 
@@ -811,26 +787,6 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
         }
     }
 
-    @Override
-    public void onStateChanged(IImConnection connection, int state, ImErrorInfo error) throws RemoteException {
-        checkConnection();
-    }
-
-    @Override
-    public void onUserPresenceUpdated(IImConnection connection) throws RemoteException {
-
-    }
-
-    @Override
-    public void onUpdatePresenceError(IImConnection connection, ImErrorInfo error) throws RemoteException {
-
-    }
-
-    @Override
-    public IBinder asBinder() {
-        return mConn.asBinder();
-    }
-
     static class Adapter extends FragmentPagerAdapter {
         private final List<Fragment> mFragments = new ArrayList<>();
         private final List<String> mFragmentTitles = new ArrayList<>();
@@ -1096,13 +1052,7 @@ public class MainActivity extends BaseActivity implements IConnectionListener {
     protected void onDestroy() {
         super.onDestroy();
 
-        if (mConn != null) {
-            try {
-                mConn.unregisterConnectionListener(this);
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
+
     }
 
     private void checkForUpdates() {

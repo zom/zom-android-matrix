@@ -320,13 +320,16 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
             if (HeartbeatService.NETWORK_STATE_ACTION.equals(intent.getAction())) {
 
+                ConnectivityManager connectivityManager
+                        = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+                NetworkConnectivityReceiver.State networkState = NetworkConnectivityReceiver.State.values()[intent.getIntExtra(HeartbeatService.NETWORK_STATE_EXTRA, 0)];
+                networkStateChanged(activeNetworkInfo,networkState);
+
+                /**
                 if (intent.hasExtra(HeartbeatService.NETWORK_INFO_CONNECTED))
                 {
-                    ConnectivityManager connectivityManager
-                            = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-                    NetworkConnectivityReceiver.State networkState = NetworkConnectivityReceiver.State.values()[intent.getIntExtra(HeartbeatService.NETWORK_STATE_EXTRA, 0)];
-                    networkStateChanged(activeNetworkInfo,networkState);
+
                 }
                 else {
                     NetworkInfo networkInfo = (NetworkInfo) intent
@@ -346,8 +349,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                     } else {
                         networkStateChanged(networkInfo, networkState);
 
-                    }**/
-                }
+                    }
+                }**/
 
             }
 
@@ -747,9 +750,11 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         }
     }
 
-    boolean isNetworkAvailable ()
-    {
-        return mNetworkState == NetworkConnectivityReceiver.State.CONNECTED;
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     void networkStateChanged(NetworkInfo networkInfo, NetworkConnectivityReceiver.State networkState) {
@@ -768,8 +773,6 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             mNetworkState = networkState;
             mNetworkType = networkType;
 
-            isNetworkAvailable = isNetworkAvailable();
-
             if (isNetworkAvailable) {
 
                 if (mNeedCheckAutoLogin) {
@@ -783,7 +786,6 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             } else {
                 suspendConnections();
             }
-
 
         }
 

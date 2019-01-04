@@ -440,6 +440,7 @@ public class ImConnectionAdapter extends IImConnection.Stub {
                 if (state != ImConnection.DISCONNECTED) {
                     mConnectionState = state;
                 }
+
                 if (state == ImConnection.LOGGED_IN && mConnectionState == ImConnection.LOGGING_OUT) {
 
                     // A bit tricky here. The engine did login successfully
@@ -482,10 +483,11 @@ public class ImConnectionAdapter extends IImConnection.Stub {
                     saveSessionCookie(cr);
                 }
 
+                /**
                 if (mAutoLoadContacts)
                 {
                     mContactListManager.loadContactLists();
-                }
+                }**/
 
                 try {
                     Collection<ChatSessionAdapter> adapters = mChatSessionManager.mActiveChatSessionAdapters.values();
