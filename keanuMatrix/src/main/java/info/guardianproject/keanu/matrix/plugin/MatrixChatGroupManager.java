@@ -1,5 +1,6 @@
 package info.guardianproject.keanu.matrix.plugin;
 
+import android.app.backup.BackupDataInputStream;
 import android.opengl.Matrix;
 import android.text.TextUtils;
 import android.util.Log;
@@ -193,6 +194,12 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     @Override
     public void setGroupSubject(ChatGroup group, String subject) {
 
+        Room room = mDataHandler.getRoom(group.getAddress().getAddress());
+
+        if (room != null)
+        {
+            room.updateName(subject,new BasicApiCallback("setGroupSubject"));
+        }
     }
 
     @Override
