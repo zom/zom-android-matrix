@@ -95,13 +95,12 @@
         android:label="@string/ic_launcher_name"
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:allowBackup,android:label">
-        <meta-data
-            android:name="com.google.android.nearby.messages.API_KEY"
-            android:value="AIzaSyAIyP2Qqn7NdWNk3oll8I3ThRKADfmQv8g" />
 
         <activity
             android:name=".RouterActivity"
-            android:theme="@style/InviteDialog">
+            android:theme="@style/InviteDialog"
+            android:launchMode="singleTop"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -189,7 +188,33 @@
                     android:scheme="https" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".MainActivity"
+            android:launchMode="singleTop"
+            android:exported="true"
+            android:theme="@style/AppThemeNoAction">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="info.guardianproject.otr.app.im.IMPS_CATEGORY" />
 
+                <data android:mimeType="vnd.android.cursor.item/imps-chats" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="vnd.android.cursor.item/imps-invitations" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.IM_MANAGE_SUBSCRIPTION" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="vnd.android.cursor.item/imps-contacts" />
+            </intent-filter>
+        </activity>
 
         <activity
             android:name=".ImUrlActivity"
@@ -291,32 +316,7 @@
             android:name=".ui.widgets.ImageViewActivity"
             android:theme="@style/AppTheme.Transparent" />
         <activity android:name=".ui.widgets.SecureCameraActivity" />
-        <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:theme="@style/AppThemeNoAction">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="info.guardianproject.otr.app.im.IMPS_CATEGORY" />
 
-                <data android:mimeType="vnd.android.cursor.item/imps-chats" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="vnd.android.cursor.item/imps-invitations" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.IM_MANAGE_SUBSCRIPTION" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="vnd.android.cursor.item/imps-contacts" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".ui.conversation.ConversationDetailActivity"
             android:exported="false"
