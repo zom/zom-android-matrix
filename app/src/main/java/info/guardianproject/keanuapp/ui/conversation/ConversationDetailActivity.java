@@ -476,11 +476,14 @@ public class ConversationDetailActivity extends BaseActivity {
         }
         else {
 
+            Intent intent = new Intent(this, CameraActivity.class);
+            intent.putExtra(CameraActivity.SETTING_ONE_AND_DONE,true);
+            startActivityForResult(intent, ConversationDetailActivity.REQUEST_TAKE_PICTURE);
+
+            /**
            if (Preferences.useProofMode())
            {
-               Intent intent = new Intent(this, CameraActivity.class);
-               intent.putExtra(CameraActivity.SETTING_ONE_AND_DONE,true);
-               startActivityForResult(intent, ConversationDetailActivity.REQUEST_TAKE_PICTURE);
+
            }
            else {
                // create Intent to take a picture and return control to the calling application
@@ -497,7 +500,7 @@ public class ConversationDetailActivity extends BaseActivity {
                // start the image capture Intent
                startActivityForResult(intent, ConversationDetailActivity.REQUEST_TAKE_PICTURE);
 
-           }
+           }**/
 
         }
     }
@@ -731,19 +734,20 @@ public class ConversationDetailActivity extends BaseActivity {
             {
                 ShareRequest request = new ShareRequest();
 
-                if (Preferences.useProofMode()) {
+                //if (Preferences.useProofMode()) {
                     request.deleteFile = false;
                     request.resizeImage = false;
                     request.importContent = false;
                     request.media = resultIntent.getData();
-                }
+               // }
+                /**
                 else
                 {
                     request.deleteFile = false;
                     request.resizeImage = true;
                     request.importContent = true;
                     request.media = mLastPhoto;
-                }
+                }**/
 
                 request.mimeType = "image/jpeg";
 
