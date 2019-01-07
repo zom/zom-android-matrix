@@ -99,7 +99,6 @@
         <activity
             android:name=".RouterActivity"
             android:theme="@style/InviteDialog"
-            android:launchMode="singleTop"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -190,7 +189,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleTop"
+            android:launchMode="singleInstance"
             android:exported="true"
             android:theme="@style/AppThemeNoAction">
             <intent-filter>
