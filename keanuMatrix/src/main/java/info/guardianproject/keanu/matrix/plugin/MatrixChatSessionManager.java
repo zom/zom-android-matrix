@@ -1,6 +1,10 @@
 package info.guardianproject.keanu.matrix.plugin;
 
+import android.content.ClipData;
+import android.content.Context;
+import android.net.Uri;
 import android.opengl.Matrix;
+import android.text.TextUtils;
 
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
@@ -30,6 +34,7 @@ import info.guardianproject.keanu.core.model.ImEntity;
 import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.adapters.ChatSessionAdapter;
+import info.guardianproject.keanu.core.util.UploadProgressListener;
 
 import static info.guardianproject.keanu.core.service.RemoteImService.debug;
 import static org.matrix.androidsdk.crypto.CryptoConstantsKt.MXCRYPTO_ALGORITHM_MEGOLM;
@@ -40,11 +45,13 @@ public class MatrixChatSessionManager extends ChatSessionManager {
     private MXSession mSession;
     private HashMap<String,Room> mRoomMap;
     private MatrixConnection mConn;
+    private Context mContext;
 
     private final static String MESSAGE_TEXT_PLAIN = "text/plain";
 
-    public MatrixChatSessionManager (MatrixConnection conn) {
+    public MatrixChatSessionManager (Context context, MatrixConnection conn) {
         super();
+        mContext = context;
         mConn = conn;
     }
 
@@ -135,11 +142,9 @@ public class MatrixChatSessionManager extends ChatSessionManager {
         return session;
     }
 
-    @Override
-    public void sendMessageAsync(final ChatSession session, final Message message, final ChatSessionListener listener) {
-
+    private Room getRoom (ChatSession session)
+    {
         String userId = session.getParticipant().getAddress().getAddress();
-
         Room room = mRoomMap.get(userId);
 
         if (room == null)
@@ -157,7 +162,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
             else
             {
                 //can't send, no room!
-                return;
+                return null;
             }
         }
 
@@ -170,10 +175,123 @@ public class MatrixChatSessionManager extends ChatSessionManager {
             }
         }
 
-        final String roomId = room.getRoomId();
+        return room;
+    }
 
-        room.sendTextMessage(message.getBody(),message.getBody(),MESSAGE_TEXT_PLAIN,new RoomMediaMessage.EventCreationListener()
+    @Override
+    public void sendMessageAsync(final ChatSession session, final Message message, final ChatSessionListener listener) {
+
+        Room room = getRoom(session);
+        if (room == null)
+            return;
+
+        if (TextUtils.isEmpty(message.getContentType())||message.getContentType().equals(MESSAGE_TEXT_PLAIN)) {
+            room.sendTextMessage(message.getBody(), message.getBody(), MESSAGE_TEXT_PLAIN, new RoomMediaMessage.EventCreationListener() {
+
+                @Override
+                public void onEventCreated(final RoomMediaMessage roomMediaMessage) {
+                    debug("sendMessageAsync:onEventCreated: " + roomMediaMessage);
+
+                    roomMediaMessage.setEventSendingCallback(new ApiCallback<Void>() {
+                        @Override
+                        public void onNetworkError(Exception e) {
+                            debug("onNetworkError: sending message", e);
+                            message.setType(Imps.MessageType.QUEUED);
+
+
+                            if (listener != null)
+                                listener.onMessageSendFail(message);
+                        }
+
+                        @Override
+                        public void onMatrixError(MatrixError matrixError) {
+                            debug("onMatrixError: sending message: " + matrixError);
+                            message.setType(Imps.MessageType.QUEUED);
+
+                            if (matrixError instanceof MXCryptoError) {
+                                MXCryptoError mxCryptoError = (MXCryptoError) matrixError;
+
+                                if (matrixError.errcode.equals(mxCryptoError.UNKNOWN_DEVICES_CODE)) {
+
+                                    //TODO this just auto "knowns" all, which isn't good. we need to warn the user
+                                    MXUsersDevicesMap devices = (MXUsersDevicesMap) mxCryptoError.mExceptionData;
+                                    acceptUnknownDevices(devices);
+
+                                    //now resend!
+                                    sendMessageAsync(session, message, listener);
+                                }
+                            }
+
+                        }
+
+                        @Override
+                        public void onUnexpectedError(Exception e) {
+                            debug("onUnexpectedError: sending message", e);
+                            message.setType(Imps.MessageType.QUEUED);
+
+
+                            if (listener != null)
+                                listener.onMessageSendFail(message);
+                        }
+
+                        @Override
+                        public void onSuccess(Void aVoid) {
+
+                            debug("onSuccess: message sent: " + roomMediaMessage.getEvent().getMatrixId());
+
+                            if (mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId()))
+                                message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
+                            else
+                                message.setType(Imps.MessageType.OUTGOING);
+
+                            if (listener != null)
+                                listener.onMessageSendSuccess(message, roomMediaMessage.getEvent().eventId);
+                        }
+                    });
+                }
+
+                @Override
+                public void onEventCreationFailed(RoomMediaMessage roomMediaMessage, String s) {
+                    debug("sendMessageAsync:onEventCreationFailed: " + s + ";" + roomMediaMessage);
+
+                    if (listener != null)
+                        listener.onMessageSendFail(message);
+
+                }
+
+                @Override
+                public void onEncryptionFailed(RoomMediaMessage roomMediaMessage) {
+                    debug("sendMessageAsync:onEncryptionFailed: " + roomMediaMessage);
+
+
+                    if (listener != null)
+                        listener.onMessageSendFail(message);
+
+                }
+            });
+        }
+        else
         {
+            sendMediaMessage(session, message, listener);
+        }
+    }
+
+    public void sendMediaMessage(final ChatSession session, final Message message, final ChatSessionListener listener) {
+
+        Room room = getRoom(session);
+        if (room == null)
+            return;
+
+        Uri uriMedia = Uri.parse(message.getBody());
+        String mimeType = message.getContentType();
+
+        ClipData.Item clipItemData = new ClipData.Item(uriMedia);
+
+        RoomMediaMessage msg = new RoomMediaMessage(clipItemData, mimeType);
+        msg.setMessageType("m.file");
+
+        KeanuRoomMediaMessagesSender sender = new KeanuRoomMediaMessagesSender(mContext,mDataHandler,room);
+        sender.send(msg, new RoomMediaMessage.EventCreationListener() {
 
             @Override
             public void onEventCreated(final RoomMediaMessage roomMediaMessage) {
@@ -182,7 +300,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                 roomMediaMessage.setEventSendingCallback(new ApiCallback<Void>() {
                     @Override
                     public void onNetworkError(Exception e) {
-                        debug ("onNetworkError: sending message",e);
+                        debug("onNetworkError: sending message", e);
                         message.setType(Imps.MessageType.QUEUED);
 
 
@@ -192,17 +310,17 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
                     @Override
                     public void onMatrixError(MatrixError matrixError) {
-                        debug ("onMatrixError: sending message: " + matrixError);
+                        debug("onMatrixError: sending message: " + matrixError);
                         message.setType(Imps.MessageType.QUEUED);
 
                         if (matrixError instanceof MXCryptoError) {
-                            MXCryptoError mxCryptoError = (MXCryptoError)matrixError;
+                            MXCryptoError mxCryptoError = (MXCryptoError) matrixError;
 
                             if (matrixError.errcode.equals(mxCryptoError.UNKNOWN_DEVICES_CODE)) {
 
                                 //TODO this just auto "knowns" all, which isn't good. we need to warn the user
                                 MXUsersDevicesMap devices = (MXUsersDevicesMap) mxCryptoError.mExceptionData;
-                                acceptUnknownDevices (devices);
+                                acceptUnknownDevices(devices);
 
                                 //now resend!
                                 sendMessageAsync(session, message, listener);
@@ -213,7 +331,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
                     @Override
                     public void onUnexpectedError(Exception e) {
-                        debug ("onUnexpectedError: sending message",e);
+                        debug("onUnexpectedError: sending message", e);
                         message.setType(Imps.MessageType.QUEUED);
 
 
@@ -224,9 +342,9 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                     @Override
                     public void onSuccess(Void aVoid) {
 
-                        debug ("onSuccess: message sent: " + roomMediaMessage.getEvent().getMatrixId());
+                        debug("onSuccess: message sent: " + roomMediaMessage.getEvent().getMatrixId());
 
-                        if (mDataHandler.getCrypto().isRoomEncrypted(roomId))
+                        if (mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId()))
                             message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
                         else
                             message.setType(Imps.MessageType.OUTGOING);
@@ -251,13 +369,14 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                 debug("sendMessageAsync:onEncryptionFailed: " + roomMediaMessage);
 
 
-
                 if (listener != null)
                     listener.onMessageSendFail(message);
 
             }
         });
+
     }
+
 
     protected void acceptUnknownDevices (MXUsersDevicesMap devices)
     {

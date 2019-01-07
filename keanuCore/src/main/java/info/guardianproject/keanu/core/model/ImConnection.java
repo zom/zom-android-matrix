@@ -18,6 +18,7 @@
 package info.guardianproject.keanu.core.model;
 
 import android.content.Context;
+import android.net.Uri;
 
 import java.io.InputStream;
 import java.util.List;
@@ -269,7 +270,7 @@ public abstract class ImConnection {
 
     public abstract void broadcastMigrationIdentity (String newIdentity);
 
-    public abstract String sendMediaMessage (String recipient, String fileName, String mimeType, long fileSize, InputStream is, boolean doEncryption, UploadProgressListener listener);
+   // public abstract String sendMediaMessage (String recipient, Uri uriMedia, String fileName, String mimeType, long fileSize, boolean doEncryption, UploadProgressListener listener);
 
     public abstract void changeNickname (String nickname);
 }

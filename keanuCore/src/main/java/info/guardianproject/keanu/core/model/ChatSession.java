@@ -108,7 +108,7 @@ public class ChatSession {
      *
      * @param message the message to send.
      */
-    public int sendMessageAsync(Message message, boolean sendOmemo, ChatSessionListener listener) {
+    public int sendMessageAsync(Message message, ChatSessionListener listener) {
 
 
         message.setTo(mParticipant.getAddress());
@@ -118,9 +118,6 @@ public class ChatSession {
 
         return message.getType();
     }
-
-
-
 
     /**
      * Called by ChatSessionManager when received a message of the ChatSession.

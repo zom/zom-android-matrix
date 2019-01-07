@@ -340,7 +340,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             setLastMessage(text);
         }
 
-        int newType = mChatSession.sendMessageAsync(msg, mEnableOmemoGroups, new ChatSessionListener() {
+        int newType = mChatSession.sendMessageAsync(msg, new ChatSessionListener() {
             @Override
             public void onChatSessionCreated(ChatSession session) {
 
@@ -371,8 +371,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         });
 
 
-
-
     }
 
     private Message storeMediaMessage(String mediaPath, String mimeType) {
@@ -382,6 +380,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
         msg.setFrom(mConnection.getLoginUser().getAddress());
         msg.setType(Imps.MessageType.QUEUED);
+
+        msg.setContentType(mimeType);
 
         long sendTime = System.currentTimeMillis();
 
@@ -409,11 +409,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         InputStream fis = null;
         long fileLength = -1;
 
-        boolean isVfs = false;
 
         if (mediaUri.getScheme() != null &&
                 mediaUri.getScheme().equals("vfs")) {
-            isVfs = true;
             info.guardianproject.iocipher.File fileLocal = new info.guardianproject.iocipher.File(mediaUri.getPath());
             if (fileLocal.exists()) {
                 try {
@@ -473,14 +471,14 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             }
         }
 
-        sendMediaMessageAsync(mediaPath, mimeType, fileName, fis, fileLength);
+        sendMediaMessageAsync(mediaPath, mimeType, fileName, fileLength);
 
 
         return true;
 
     }
 
-    private void sendMediaMessageAsync (final String mediaPath, final String mimeType, final String fileName, final InputStream fis, final long fileLength)
+    private void sendMediaMessageAsync (final String mediaPath, final String mimeType, final String fileName, final long fileLength)
     {
 
         //TODO do HTTP Upload XEP 363
@@ -513,10 +511,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
                 }
 
-                boolean doEncryption = mChatSession.canEncrypt();
-
-                if (mIsGroupChat)
-                    doEncryption = mEnableOmemoGroups;
 
                 UploadProgressListener listener = new UploadProgressListener() {
                     @Override
@@ -530,7 +524,39 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     }
                 };
 
-                String resultUrl = mConnection.sendMediaMessage(mChatSession.getParticipant().getAddress().getAddress(), sendFileName, mimeType, fileLength, fis, doEncryption, listener);
+                int newType = mChatSession.sendMessageAsync(msgMedia, new ChatSessionListener() {
+                    @Override
+                    public void onChatSessionCreated(ChatSession session) {
+
+                    }
+
+                    @Override
+                    public void onMessageSendSuccess(Message msg, String newPacketId) {
+
+                        long sendTime = new Date().getTime();
+
+                        if (msg.getDateTime() != null)
+                            sendTime = msg.getDateTime().getTime();
+
+                        updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, newPacketId);
+
+                        msg.setID(newPacketId);
+                    }
+
+                    @Override
+                    public void onMessageSendFail(Message msg) {
+                        long sendTime = new Date().getTime();
+
+                        if (msg.getDateTime() != null)
+                            sendTime = msg.getDateTime().getTime();
+
+                        updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, null);
+                    }
+                });
+
+
+                /**
+                String resultUrl = mConnection.sendMediaMessage(mChatSession.getParticipant().getAddress().getAddress(), Uri.parse(mediaPath), sendFileName, mimeType, fileLength, doEncryption, listener);
 
                 int newType = Imps.MessageType.OUTGOING_ENCRYPTED;
 
@@ -543,6 +569,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     sendTime = msgMedia.getDateTime().getTime();
 
                 updateMessageInDb(msgMedia.getID(),newType,sendTime,mediaPath + ' ' + resultUrl, null);
+                **/
+
 
                 /**
                 String mediaPath = localUrl + ' ' + publishUrl;
@@ -1170,7 +1198,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     displayType += "\uD83D\uDCF7";
                 }
 
-                body = service.getString(R.string.file_notify_text, displayType, nickname);
+                body = service.getString(R.string.file_notify_text, displayType);
 
 
             }
@@ -1612,7 +1640,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                             String nickname = getNickName(from);
                             if (!isMuted())
                                 mStatusBarNotifier.notifyChat(mConnection.getProviderId(), mConnection.getAccountId(),
-                                    getId(), from, nickname,service.getString(R.string.file_notify_text,mimeType,nickname) , false);
+                                    getId(), from, nickname,service.getString(R.string.file_notify_text,mimeType) , false);
                         }
                     }
                     catch (Exception e)

@@ -626,9 +626,10 @@ public class ImConnectionAdapter extends IImConnection.Stub {
             return null;
     }
 
-    public String sendMediaMessage (String recipient, String fileName, String mimeType, long fileSize, InputStream is, boolean doEncryption, UploadProgressListener listener)
+    /**
+    public String sendMediaMessage (String recipient, Uri uriMedia, String fileName, String mimeType, long fileSize, boolean doEncryption, UploadProgressListener listener)
     {
-        return mConnection.sendMediaMessage(recipient, fileName, mimeType, fileSize, is, doEncryption, listener);
-    }
+        return mConnection.sendMediaMessage(recipient, uriMedia, fileName, mimeType, fileSize, doEncryption, listener);
+    }**/
 
 }

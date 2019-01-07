@@ -1,5 +1,6 @@
 package info.guardianproject.keanu.matrix.plugin;
 
+import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -22,6 +23,7 @@ import org.matrix.androidsdk.MXSession;
 import org.matrix.androidsdk.crypto.IncomingRoomKeyRequest;
 import org.matrix.androidsdk.crypto.IncomingRoomKeyRequestCancellation;
 import org.matrix.androidsdk.crypto.MXCrypto;
+import org.matrix.androidsdk.crypto.MXCryptoError;
 import org.matrix.androidsdk.crypto.MXEncryptedAttachments;
 import org.matrix.androidsdk.crypto.data.MXDeviceInfo;
 import org.matrix.androidsdk.crypto.data.MXUsersDevicesMap;
@@ -70,6 +72,7 @@ import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.ChatSession;
+import info.guardianproject.keanu.core.model.ChatSessionListener;
 import info.guardianproject.keanu.core.model.ChatSessionManager;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ContactListManager;
@@ -86,6 +89,7 @@ import info.guardianproject.keanu.core.util.UploadProgressListener;
 
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanu.core.service.RemoteImService.debug;
 
 public class MatrixConnection extends ImConnection {
 
@@ -130,7 +134,7 @@ public class MatrixConnection extends ImConnection {
 
         mContactListManager = new MatrixContactListManager(context, this);
         mChatGroupManager = new MatrixChatGroupManager(this);
-        mChatSessionManager = new MatrixChatSessionManager(this);
+        mChatSessionManager = new MatrixChatSessionManager(context, this);
 
         mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>());
@@ -529,36 +533,6 @@ public class MatrixConnection extends ImConnection {
     public void broadcastMigrationIdentity(String newIdentity) {
 
     }
-
-    @Override
-    public String sendMediaMessage(String roomId, String fileName, String mimeType, long fileSize, InputStream is, boolean doEncryption, UploadProgressListener listener) {
-
-        /**
-        Room room = mDataHandler.getRoom(roomId);
-
-        RoomMediaMessage msg = new RoomMediaMessage();
-
-        room.sendMediaMessage(msg, 320, 320, new RoomMediaMessage.EventCreationListener() {
-            @Override
-            public void onEventCreated(RoomMediaMessage roomMediaMessage) {
-
-            }
-
-            @Override
-            public void onEventCreationFailed(RoomMediaMessage roomMediaMessage, String s) {
-
-            }
-
-            @Override
-            public void onEncryptionFailed(RoomMediaMessage roomMediaMessage) {
-
-            }
-        });**/
-
-        return null;
-    }
-
-
 
     @Override
     public void changeNickname(String nickname) {
@@ -1024,6 +998,8 @@ public class MatrixConnection extends ImConnection {
 
                 }
             }
+
+
         }
 
         @Override
