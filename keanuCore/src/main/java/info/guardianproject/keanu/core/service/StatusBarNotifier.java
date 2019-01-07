@@ -69,6 +69,9 @@ public class StatusBarNotifier {
     private Vibrator mVibrator;
     private VibrationEffect mVibeEffect;
     private final static long[] VIBRATION_TIMINGS = {0,500,100,100,1000};
+
+    public static String defaultMainClass = "info.guardianproject.keanu.core.ui.DummyActivity";
+
     public StatusBarNotifier(Context context) {
         mContext = context;
         mNotificationManager = (NotificationManager) context
@@ -299,11 +302,18 @@ public class StatusBarNotifier {
     }
 
     private Intent getDefaultIntent(long accountId, long providerId) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setType(Imps.Contacts.CONTENT_TYPE);
-        intent.setClass(mContext, DummyActivity.class);
-        intent.putExtra(ImServiceConstants.EXTRA_INTENT_ACCOUNT_ID, accountId);
-        intent.putExtra(ImServiceConstants.EXTRA_INTENT_PROVIDER_ID, providerId);
+
+        Intent intent = null;
+        try {
+            intent = new Intent(mContext,Class.forName(defaultMainClass));
+            intent.setAction(Intent.ACTION_VIEW);
+            intent.setType(Imps.Contacts.CONTENT_TYPE);
+            intent.putExtra(ImServiceConstants.EXTRA_INTENT_ACCOUNT_ID, accountId);
+            intent.putExtra(ImServiceConstants.EXTRA_INTENT_PROVIDER_ID, providerId);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
 
         return intent;
     }

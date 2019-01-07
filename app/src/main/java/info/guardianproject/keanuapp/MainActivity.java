@@ -74,6 +74,7 @@ import info.guardianproject.keanu.core.service.IConnectionListener;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.ImServiceConstants;
 import info.guardianproject.keanu.core.service.RemoteImService;
+import info.guardianproject.keanu.core.service.StatusBarNotifier;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.core.util.SystemServices;
 import info.guardianproject.keanu.core.util.XmppUriHelper;
@@ -132,6 +133,8 @@ public class MainActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
+        StatusBarNotifier.defaultMainClass = getClass().getCanonicalName();
 
         if (Preferences.doBlockScreenshots()) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
