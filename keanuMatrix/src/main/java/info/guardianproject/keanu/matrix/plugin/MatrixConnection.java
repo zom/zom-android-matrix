@@ -12,6 +12,10 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+
+import org.json.JSONArray;
 import org.matrix.androidsdk.HomeServerConnectionConfig;
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
@@ -19,16 +23,22 @@ import org.matrix.androidsdk.crypto.IncomingRoomKeyRequest;
 import org.matrix.androidsdk.crypto.IncomingRoomKeyRequestCancellation;
 import org.matrix.androidsdk.crypto.MXCrypto;
 import org.matrix.androidsdk.crypto.MXEncryptedAttachments;
+import org.matrix.androidsdk.crypto.data.MXDeviceInfo;
+import org.matrix.androidsdk.crypto.data.MXUsersDevicesMap;
 import org.matrix.androidsdk.data.MyUser;
 import org.matrix.androidsdk.data.Room;
+import org.matrix.androidsdk.data.RoomMediaMessage;
 import org.matrix.androidsdk.data.RoomState;
 import org.matrix.androidsdk.data.store.IMXStoreListener;
+import org.matrix.androidsdk.db.MXMediaCache;
 import org.matrix.androidsdk.listeners.IMXEventListener;
+import org.matrix.androidsdk.listeners.IMXMediaUploadListener;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.callback.SimpleApiCallback;
 import org.matrix.androidsdk.rest.client.LoginRestClient;
 import org.matrix.androidsdk.rest.model.Event;
 import org.matrix.androidsdk.rest.model.MatrixError;
+import org.matrix.androidsdk.rest.model.ReceiptData;
 import org.matrix.androidsdk.rest.model.RoomMember;
 import org.matrix.androidsdk.rest.model.User;
 import org.matrix.androidsdk.rest.model.bingrules.BingRule;
@@ -44,6 +54,7 @@ import org.matrix.androidsdk.util.JsonUtils;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -321,7 +332,6 @@ public class MatrixConnection extends ImConnection {
                         mChatGroupManager.setSession(mSession);
                         mChatSessionManager.setSession(mSession);
 
-
                         mSession.enableCrypto(true, new ApiCallback<Void>() {
                             @Override
                             public void onNetworkError(Exception e) {
@@ -349,6 +359,8 @@ public class MatrixConnection extends ImConnection {
                                 mSession.setIsOnline(true);
                                 mDataHandler.getCrypto().start(false, new BasicApiCallback("getCrypto().start"));
                                 mSession.setDeviceName(mDeviceId,mDeviceName,new BasicApiCallback("setDeviceName()"));
+
+                                mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
 
                             }
                         });
@@ -481,7 +493,7 @@ public class MatrixConnection extends ImConnection {
 
     @Override
     public void sendTypingStatus(String to, boolean isTyping) {
-        /**
+
         mDataHandler.getRoom(to).sendTypingNotification(isTyping, 3000, new ApiCallback<Void>() {
             @Override
             public void onNetworkError(Exception e) {
@@ -505,7 +517,7 @@ public class MatrixConnection extends ImConnection {
 
                 debug ("sendTypingStatus:onSuccess!");
             }
-        });**/
+        });
     }
 
     @Override
@@ -521,42 +533,32 @@ public class MatrixConnection extends ImConnection {
     @Override
     public String sendMediaMessage(String roomId, String fileName, String mimeType, long fileSize, InputStream is, boolean doEncryption, UploadProgressListener listener) {
 
-
         /**
-        final MXMediasCache mediasCache = mDataHandler.getMediasCache();
+        Room room = mDataHandler.getRoom(roomId);
 
-        String uploadId = roomId + ':' + fileName;
+        RoomMediaMessage msg = new RoomMediaMessage();
 
-        mediasCache.uploadContent(is, fileName, mimeType, uploadId, new IMXMediaUploadListener() {
+        room.sendMediaMessage(msg, 320, 320, new RoomMediaMessage.EventCreationListener() {
             @Override
-            public void onUploadStart(String s) {
+            public void onEventCreated(RoomMediaMessage roomMediaMessage) {
 
             }
 
             @Override
-            public void onUploadProgress(String s, UploadStats uploadStats) {
+            public void onEventCreationFailed(RoomMediaMessage roomMediaMessage, String s) {
 
             }
 
             @Override
-            public void onUploadCancel(String s) {
+            public void onEncryptionFailed(RoomMediaMessage roomMediaMessage) {
 
             }
-
-            @Override
-            public void onUploadError(String s, int i, String s1) {
-
-            }
-
-            @Override
-            public void onUploadComplete(final String uploadId, final String contentUri) {
-
-            }
-        });
-        **/
+        });**/
 
         return null;
     }
+
+
 
     @Override
     public void changeNickname(String nickname) {
@@ -597,6 +599,11 @@ public class MatrixConnection extends ImConnection {
             subject = room.getRoomId();// room.getRoomDisplayName(mContext);
 
         MatrixAddress mAddr = new MatrixAddress(room.getRoomId());
+
+        if (!mChatGroupManager.hasChatGroup(room.getRoomId()))
+        {
+
+        }
 
         final ChatGroup group = mChatGroupManager.getChatGroup(mAddr, subject);
 
@@ -707,12 +714,31 @@ public class MatrixConnection extends ImConnection {
             if (event.getContentAsJsonObject().has("last_active_ago"))
                 lastActiveAgo = event.getContentAsJsonObject().get("last_active_ago").getAsInt();
 
-            if (!mSession.getMediaCache().isAvatarThumbnailCached(user.getAvatarUrl(),DEFAULT_AVATAR_HEIGHT))
-            {
+            if (!mSession.getMediaCache().isAvatarThumbnailCached(user.getAvatarUrl(),DEFAULT_AVATAR_HEIGHT)) {
                 ImageView iv = new ImageView(mContext);
-                mSession.getMediaCache().loadAvatarThumbnail(mConfig,iv,user.getAvatarUrl(),DEFAULT_AVATAR_HEIGHT);
+                mSession.getMediaCache().loadAvatarThumbnail(mConfig, iv, user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT);
             }
 
+            Contact contact = mContactListManager.getContact(user.user_id);
+
+            if (contact == null) {
+
+                contact = new Contact(new MatrixAddress(event.getSender()), user.displayname, Imps.Contacts.TYPE_NORMAL);
+                try {
+                    mContactListManager.doAddContactToListAsync(contact, null, false);
+                } catch (ImException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            if (currentlyActive)
+                contact.setPresence(new Presence(Presence.AVAILABLE));
+            else
+                contact.setPresence(new Presence(Presence.OFFLINE));
+
+            Contact[] contacts = {contact};
+            mContactListManager.notifyContactsPresenceUpdated(contacts);
         }
 
         @Override
@@ -827,19 +853,21 @@ public class MatrixConnection extends ImConnection {
 
         @Override
         public void onInitialSyncComplete(String s) {
+
             debug ("onInitialSyncComplete: " + s);
             if (null != mSession.getCrypto()) {
                 mSession.getCrypto().addRoomKeysRequestListener(new MXCrypto.IRoomKeysRequestListener() {
                     @Override
                     public void onRoomKeyRequest(IncomingRoomKeyRequest request) {
-                    //    KeyRequestHandler.getSharedInstance().handleKeyRequest(request);
+
                         debug ("onRoomKeyRequest: " + request);
+                        downloadKeys(request.mUserId,request.mDeviceId);
 
                     }
 
                     @Override
                     public void onRoomKeyRequestCancellation(IncomingRoomKeyRequestCancellation request) {
-                      //  KeyRequestHandler.getSharedInstance().handleKeyRequestCancellation(request);
+                     //  KeyRequestHandler.getSharedInstance().handleKeyRequestCancellation(request);
                         debug ("onRoomKeyRequestCancellation: " + request);
 
                     }
@@ -847,6 +875,54 @@ public class MatrixConnection extends ImConnection {
             }
 
             loadStateAsync();
+        }
+
+        private void downloadKeys (String user, String device)
+        {
+            mSession.getCrypto().getDeviceList().downloadKeys(Arrays.asList(user), false, new ApiCallback<MXUsersDevicesMap<MXDeviceInfo>>() {
+                @Override
+                public void onSuccess(MXUsersDevicesMap<MXDeviceInfo> devicesMap) {
+                    final MXDeviceInfo deviceInfo = devicesMap.getObject(device, user);
+
+                    if (null == deviceInfo) {
+                        org.matrix.androidsdk.util.Log.e(LOG_TAG, "## displayKeyShareDialog() : No details found for device " + user + ":" + device);
+                      //  onDisplayKeyShareDialogClose(false, false);
+                        return;
+                    }
+
+                    if (deviceInfo.isUnknown()) {
+                        mSession.getCrypto()
+                                .setDeviceVerification(MXDeviceInfo.DEVICE_VERIFICATION_UNVERIFIED, device, user, new SimpleApiCallback<Void>() {
+                                    @Override
+                                    public void onSuccess(Void info) {
+                                      //  displayKeyShareDialog(session, deviceInfo, true);
+                                    }
+                                });
+                    } else {
+                     //   displayKeyShareDialog(session, deviceInfo, false);
+                    }
+                }
+
+                private void onError(String errorMessage) {
+                    org.matrix.androidsdk.util.Log.e(LOG_TAG, "## displayKeyShareDialog : downloadKeys failed " + errorMessage);
+                 //   onDisplayKeyShareDialogClose(false, false);
+                }
+
+                @Override
+                public void onNetworkError(Exception e) {
+                    onError(e.getMessage());
+                }
+
+                @Override
+                public void onMatrixError(MatrixError e) {
+                    onError(e.getMessage());
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+                    onError(e.getMessage());
+                }
+            });
         }
 
         @Override
@@ -933,23 +1009,38 @@ public class MatrixConnection extends ImConnection {
         }
 
         @Override
-        public void onReceiptEvent(String s, List<String> list) {
-            debug ("onReceiptEvent: " + s);
+        public void onReceiptEvent(String roomId, List<String> list) {
+            debug ("onReceiptEvent: " + roomId);
 
+            Room room = mStore.getRoom(roomId);
+            ChatSession session = mChatSessionManager.getSession(roomId);
+
+            if (session != null) {
+
+                for (String userId : list) {
+                    //userId who got the room receipt
+                    ReceiptData data = mStore.getReceipt(roomId, userId);
+                    session.onMessageReceipt(data.eventId);
+
+                }
+            }
         }
 
         @Override
         public void onRoomTagEvent(String s) {
+            debug ("onRoomTagEvent: " + s);
 
         }
 
         @Override
         public void onReadMarkerEvent(String s) {
+            debug ("onReadMarkerEvent: " + s);
 
         }
 
         @Override
         public void onToDeviceEvent(Event event) {
+            debug ("onToDeviceEvent: " + event);
 
         }
 
@@ -1038,21 +1129,33 @@ public class MatrixConnection extends ImConnection {
 
     private void handleTyping (Event event)
     {
-        Contact contact = mContactListManager.getContact(event.getSender());
+        Contact contact = null;
 
-        if (contact != null) {
-            if (contact.getPresence() == null || (!contact.getPresence().isOnline())) {
-                contact.setPresence(new Presence(Presence.AVAILABLE));
-                Contact[] contacts = {contact};
-                mContactListManager.notifyContactsPresenceUpdated(contacts);
-            }
+        if (event.getContentAsJsonObject().has("user_ids")) {
+            JsonArray userIds = event.getContentAsJsonObject().get("user_ids").getAsJsonArray();
 
-            IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
-            if (csa != null) {
-                try {
-                    csa.setContactTyping(contact, true);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
+            for (JsonElement element : userIds) {
+                String userId = element.getAsString();
+                if (!userId.equals(mSession.getMyUserId())) {
+                    contact = mContactListManager.getContact(userId);
+                    if (contact != null) {
+
+                        /**
+                        if (contact.getPresence() == null || (!contact.getPresence().isOnline())) {
+                            contact.setPresence(new Presence(Presence.AVAILABLE));
+                            Contact[] contacts = {contact};
+                            mContactListManager.notifyContactsPresenceUpdated(contacts);
+                        }**/
+
+                        IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
+                        if (csa != null) {
+                            try {
+                                csa.setContactTyping(contact, true);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1161,14 +1264,16 @@ public class MatrixConnection extends ImConnection {
 
             session.onReceiveMessage(message, true);
 
-            if (user.isActive())
-                contact.setPresence(new Presence(Presence.AVAILABLE));
-            else
-                contact.setPresence(new Presence(Presence.OFFLINE));
-            Contact[] contacts = {contact};
-            mContactListManager.notifyContactsPresenceUpdated(contacts);
+            IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
+            if (csa != null) {
+                try {
+                    csa.setContactTyping(contact, false);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
 
-
+            room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
         }
 
     }

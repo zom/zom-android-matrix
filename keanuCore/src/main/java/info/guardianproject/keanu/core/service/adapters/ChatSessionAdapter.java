@@ -66,6 +66,7 @@ import info.guardianproject.keanu.core.service.IDataListener;
 import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.service.StatusBarNotifier;
 import info.guardianproject.keanu.core.util.SystemServices;
+import info.guardianproject.keanu.core.util.UploadProgressListener;
 
 import static cz.msebera.android.httpclient.conn.ssl.SSLConnectionSocketFactory.TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
@@ -517,8 +518,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 if (mIsGroupChat)
                     doEncryption = mEnableOmemoGroups;
 
-                Object listener = null;
-                /**
                 UploadProgressListener listener = new UploadProgressListener() {
                     @Override
                     public void onUploadProgress(long sent, long total) {
@@ -529,9 +528,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         if (mDataHandlerListener != null)
                             mDataHandlerListener.onTransferProgress(true,"","",mediaPath,percentF);
                     }
-                };**/
+                };
 
-                String resultUrl = null;//mConnection.sendMediaMessage(mChatSession.getParticipant().getAddress().getAddress(), sendFileName, mimeType, fileLength, fis, doEncryption, listener);
+                String resultUrl = mConnection.sendMediaMessage(mChatSession.getParticipant().getAddress().getAddress(), sendFileName, mimeType, fileLength, fis, doEncryption, listener);
 
                 int newType = Imps.MessageType.OUTGOING_ENCRYPTED;
 
