@@ -245,7 +245,6 @@ public class MatrixConnection extends ImConnection {
 
         final boolean enableEncryption = true;
 
-
         mCredentials = new Credentials();
         mCredentials.userId = mUser.getAddress().getAddress();
         mCredentials.homeServer = HTTPS_PREPEND + server;
@@ -295,14 +294,15 @@ public class MatrixConnection extends ImConnection {
         mChatSessionManager.setDataHandler(mDataHandler);
         mChatGroupManager.setDataHandler(mDataHandler);
 
-
         mLoginRestClient = new LoginRestClient(mConfig);
+
+
+
+
     }
 
     private void loginAsync (String password)
     {
-
-        initMatrix();
 
         String username = mUser.getAddress().getUser();
         setState(ImConnection.LOGGING_IN, null);
@@ -320,59 +320,47 @@ public class MatrixConnection extends ImConnection {
             public void onSuccess(Credentials credentials) {
 
                 mCredentials = credentials;
+                mCredentials.deviceId = mDeviceId;
                 mConfig.setCredentials(mCredentials);
+                mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
+                        .withFileEncryption(enableEncryption)
+                        .build();
+
+                mChatGroupManager.setSession(mSession);
+                mChatSessionManager.setSession(mSession);
+
                 setState(ImConnection.LOGGING_IN, null);
+                mSession.startEventStream(initialToken);
+                setState(LOGGED_IN, null);
+                mSession.setIsOnline(true);
 
-                mResponseHandler.post(new Runnable ()
-                {
-                    public void run ()
-                    {
+                mSession.enableCrypto(true, new ApiCallback<Void>() {
+                    @Override
+                    public void onNetworkError(Exception e) {
+                            debug("getCrypto().start.onNetworkError",e);
+                    }
 
-                        mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
-                                .withFileEncryption(enableEncryption)
-                                .build();
-                        mSession.enableCryptoWhenStarting();
-
-                        mChatGroupManager.setSession(mSession);
-                        mChatSessionManager.setSession(mSession);
-
-                        mSession.enableCrypto(true, new ApiCallback<Void>() {
-                            @Override
-                            public void onNetworkError(Exception e) {
-                                debug ("enableCrypto: onNetworkError",e);
-
-                            }
-
-                            @Override
-                            public void onMatrixError(MatrixError matrixError) {
-                                debug ("enableCrypto: onMatrixError", matrixError);
-
-                            }
-
-                            @Override
-                            public void onUnexpectedError(Exception e) {
-                                debug ("enableCrypto: onUnexpectedError",e);
-
-                            }
-
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                debug ("enableCrypto: onSuccess");
-                                mSession.startEventStream(initialToken);
-                                setState(LOGGED_IN, null);
-                                mSession.setIsOnline(true);
-                                mDataHandler.getCrypto().start(false, new BasicApiCallback("getCrypto().start"));
-                                mSession.setDeviceName(mDeviceId,mDeviceName,new BasicApiCallback("setDeviceName()"));
-
-                                mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
-
-                            }
-                        });
-
-
+                    @Override
+                    public void onMatrixError(MatrixError matrixError) {
+                        debug("getCrypto().start.onMatrixError",matrixError);
 
                     }
+
+                    @Override
+                    public void onUnexpectedError(Exception e) {
+                        debug("getCrypto().start.onUnexpectedError",e);
+
+                    }
+
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                        debug("getCrypto().start.onSuccess");
+
+                        mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
+                    }
                 });
+
             }
 
 
@@ -381,7 +369,7 @@ public class MatrixConnection extends ImConnection {
             public void onNetworkError(Exception e) {
                 super.onNetworkError(e);
 
-                Log.w(TAG,"OnNetworkError",e);
+                debug("loginWithUser: OnNetworkError",e);
 
             }
 
@@ -389,7 +377,7 @@ public class MatrixConnection extends ImConnection {
             public void onMatrixError(MatrixError e) {
                 super.onMatrixError(e);
 
-                Log.w(TAG,"onMatrixError: " + e.mErrorBodyAsString);
+                debug("loginWithUser: onMatrixError: " + e.mErrorBodyAsString);
 
             }
 
@@ -397,7 +385,7 @@ public class MatrixConnection extends ImConnection {
             public void onUnexpectedError(Exception e) {
                 super.onUnexpectedError(e);
 
-                Log.w(TAG,"onUnexpectedError",e);
+                debug("loginWithUser: onUnexpectedError",e);
 
 
             }
@@ -908,6 +896,7 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onCryptoSyncComplete() {
             debug ("onCryptoSyncComplete");
+
 
         }
 

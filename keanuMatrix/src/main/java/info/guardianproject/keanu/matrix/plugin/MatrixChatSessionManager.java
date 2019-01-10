@@ -171,7 +171,8 @@ public class MatrixChatSessionManager extends ChatSessionManager {
             boolean isEncrypted = mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId());
             if (!isEncrypted)
             {
-                room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("enableEncryptionWithAlgorithm"));
+                if (!room.isEncrypted())
+                    room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("enableEncryptionWithAlgorithm"));
             }
         }
 
