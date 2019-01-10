@@ -233,8 +233,6 @@ public class MainActivity extends BaseActivity {
                     startPhotoTaker();
                 }
 
-                checkConnection();
-
             }
         });
 
@@ -346,8 +344,13 @@ public class MainActivity extends BaseActivity {
         }
         else {
 
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    checkConnection();
+                }
+            }, 5000); //Timer is in ms here.
 
-            checkConnection();
 
         }
 
@@ -392,6 +395,13 @@ public class MainActivity extends BaseActivity {
                         }
                     });
                     mSbStatus.show();
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            checkConnection();
+                        }
+                    }, 5000); //Timer is in ms here.
 
                     return false;
                 }

@@ -245,27 +245,9 @@ public class SignInHelper {
 
             conn.login(password, autoLoadContacts, autoRetryLogin);
 
-            /*
-            if (mApp.isNetworkAvailableAndConnected()) {
-
-            } else {
-             //   promptForBackgroundDataSetting(providerName);
-                return;
-            }*/
-
     }
 
-    /**
-     * Popup a dialog to ask the user whether he/she wants to enable background
-     * connection to continue. If yes, enable the setting and broadcast the
-     * change. Otherwise, quit the signing in window immediately.
-     */
-    private void promptForBackgroundDataSetting(String providerName) {
 
-        Toast.makeText(mContext, mContext.getString(R.string.bg_data_prompt_message, providerName), Toast.LENGTH_LONG).show();
-
-
-    }
 
     public void activateAccount(long providerId, long accountId) {
         // Update the active value. We restrict to only one active
