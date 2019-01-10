@@ -1,6 +1,6 @@
 *.iml
 .gradle
-/local.properties
+local.properties
 /.idea/caches/build_file_checksums.ser
 /.idea/libraries
 /.idea/modules.xml
@@ -10,4 +10,4 @@
 /captures
 .externalNativeBuild
 .idea/*
-/gradle.properties
+gradle.properties
