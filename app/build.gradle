@@ -3,14 +3,11 @@ apply plugin: 'kotlin-android'
 apply plugin: 'realm-android'
 
 android {
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-
     compileSdkVersion 28
-
     defaultConfig {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 16
@@ -21,6 +18,7 @@ android {
         multiDexEnabled true
 
     }
+
     dexOptions {
         javaMaxHeapSize "3g"
         preDexLibraries true
@@ -32,35 +30,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
     // Specifies the flavor dimensions you want to use. The order in which you
     // list each dimension determines its priority, from highest to lowest,
     // when Gradle merges variant sources and configurations. You must assign
     // each product flavor you configure to one of the flavor dimensions.
     /**
-    flavorDimensions "release","free"
+     flavorDimensions "release","free"
 
-    productFlavors {
-        primary {
-            // Assigns this product flavor to the "mode" flavor dimension.
-            dimension "release"
-        }
-
-        altbrand {
-            dimension "free"
-            applicationIdSuffix ".altbrand"
-            versionNameSuffix "-altbrand"
-        }
-
-    }**/
-
+     productFlavors {primary {// Assigns this product flavor to the "mode" flavor dimension.
+     dimension "release"}altbrand {dimension "free"
+     applicationIdSuffix ".altbrand"
+     versionNameSuffix "-altbrand"}}**/
 
     repositories {
         flatDir {
             dir 'libs'
         }
     }
-
     splits {
         abi {
             enable true
@@ -69,68 +55,49 @@ android {
             universalApk false
         }
     }
-
+    buildToolsVersion '28.0.3'
 }
 
 dependencies {
-
     implementation 'com.android.support:appcompat-v7:28.0.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.google.zxing:core:3.3.0'
-
-
     implementation 'info.guardianproject.panic:panic:0.5'
-
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.0.0'
     implementation 'de.hdodenhof:circleimageview:2.0.0'
-    implementation 'com.github.bumptech.glide:glide:4.6.1'
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.3.1'
     implementation 'com.github.javiersantos:AppUpdater:2.6.4'
     implementation 'com.github.QuadFlask:colorpicker:0.0.10'
-
-
     //adding this nearby library for now
     implementation 'com.google.android.gms:play-services-nearby:16.0.0'
-
     //built in camera now!
     //https://github.com/siralam/CameraViewPlus
     implementation 'com.asksira.android:cameraviewplus:0.9.5'
-
     //from here: https://github.com/guardianproject/proofmode
     implementation 'org.witness:android-libproofmode:0.0.3'
     implementation 'com.eternitywall:opentimestamps:0.1.14.1'
-
-
     implementation project(':keanuCore')
-
     implementation 'net.zetetic:android-database-sqlcipher:3.5.4@aar'
     implementation 'info.guardianproject.iocipher:IOCipher:0.4'
-
     implementation 'commons-codec:commons-codec:1.9'
     implementation 'commons-io:commons-io:2.4'
-
-
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.8.2'
-
     /************* Matrix SDK management **************/
     // use the matrix SDK as external lib
     implementation(name: 'matrix-sdk', ext: 'aar')
     implementation(name: 'olm-sdk', ext: 'aar')
-
     implementation project(':keanuMatrix')
-
-
 }
 repositories {
     mavenCentral()
