@@ -27,7 +27,6 @@ allprojects {
         }
         mavenCentral()
         maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
-
         google()
     }
 }
