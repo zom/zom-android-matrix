@@ -27,44 +27,11 @@ public class CustomTypefaceManager {
 		return mTypeface != null;
 	}
 
-	public static void loadFromKeyboard (Context context)
-	{
-		PackageManager packageManager = context.getPackageManager();
-		
-		String fontName = "DDC_Uchen.ttf";
-		
-		try {
-			Resources res = packageManager.getResourcesForApplication("org.ironrabbit.bhoboard");
-			InputStream reader = res.getAssets().open(fontName);
-			File fileFont = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),fontName);
-			OutputStream writer = new FileOutputStream(fileFont);
-			byte[] buffer = new byte[32000];
-			int l = 0;
-		    while((l = reader.read(buffer)) > 0)
-		    {
-		    	writer.write(buffer, 0, l);
-		    }
-		    writer.close();
-			
-			mTypeface = Typeface.createFromFile(fileFont);
-
-		} catch (Exception e) {
-			Log.e("CustomTypeface","can't find assets",e);
-		}
-	
-	}
-
-	public static void loadFromAssets (Context context, boolean loadTibetan)
+	public static void loadFromAssets (Context context)
 	{
 
         if (mTypeface == null) {
             String fontName = "Lato-Medium.ttf";
-
-            if (loadTibetan) {
-                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                    fontName = "NotoSansTibetan-Regular.ttf";
-                }
-            }
 
             try {
                 mTypeface = Typeface.createFromAsset(context.getAssets(), fontName);

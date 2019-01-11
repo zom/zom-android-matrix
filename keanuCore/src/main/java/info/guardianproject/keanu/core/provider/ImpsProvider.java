@@ -21,6 +21,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
+import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.CursorWindow;
@@ -59,7 +60,7 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
     private static final String DATABASE_OPEN_TRAIL_TAG = "database_open";
     private static final String LOG_TAG = "imProvider";
 
-    private static final String AUTHORITY = "info.guardianproject.keanuapp.provider.Imps";
+    private static String AUTHORITY = Imps.appId + ".provider.Imps";
 
     private static final String TABLE_ACCOUNTS = "accounts";
     private static final String TABLE_PROVIDERS = "providers";
@@ -1229,15 +1230,20 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
 
     public ImpsProvider() {
         this(DATABASE_VERSION);
+    }
 
+    protected ImpsProvider(int dbVersion) {
+
+        mDatabaseVersion = dbVersion;
+
+     // if (Imps.appId == null)
+        //    Imps.appId = getContext().getPackageName();
+
+        AUTHORITY = "*";//Imps.appId + ".provider.Imps";
 
         setupImUrlMatchers(AUTHORITY);
         setupMcsUrlMatchers(AUTHORITY);
         setupChatSecurePushMatchers(AUTHORITY);
-    }
-
-    protected ImpsProvider(int dbVersion) {
-        mDatabaseVersion = dbVersion;
     }
 
     private void setupImUrlMatchers(String authority) {

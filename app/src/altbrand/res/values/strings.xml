@@ -2,8 +2,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="default_server">dev.keanu.im</string>
     <!-- General: Names -->
-    <string name="ic_launcher_name">MyChatApp</string>
-    <string name="app_name">MyChatApp</string>
-    <string name="im_label">MyChatApp</string>
-
+    <string name="ic_launcher_name">MeChat</string>
+    <string name="app_name">MeChat</string>
+    <string name="im_label">MeChat</string>
 </resources>

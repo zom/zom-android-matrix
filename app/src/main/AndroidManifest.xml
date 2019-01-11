@@ -12,11 +12,6 @@
         android:normalScreens="true"
         android:smallScreens="true" />
 
-    <uses-permission android:name="info.guardianproject.keanu.core.permission.READ_ONLY" />
-    <uses-permission android:name="info.guardianproject.keanu.core.permission.WRITE_ONLY" />
-    <uses-permission android:name="info.guardianproject.keanu.core.permission.IM_SERVICE" />
-  <!--  <uses-permission android:name="android.permission.WAKE_LOCK" />-->
-
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -70,19 +65,19 @@
         android:required="false" />
 
     <permission
-        android:name="info.guardianproject.keanu.core.permission.IM_SERVICE"
+        android:name="${applicationId}.core.permission.IM_SERVICE"
         android:description="@string/perm_desc"
         android:label="@string/perm_label"
         android:permissionGroup="android.permission-group.MESSAGES"
         android:protectionLevel="dangerous" />
     <permission
-        android:name="info.guardianproject.keanu.core.permission.READ_ONLY"
+        android:name="${applicationId}.core.permission.READ_ONLY"
         android:description="@string/ro_perm_desc"
         android:label="@string/ro_perm_label"
         android:permissionGroup="android.permission-group.MESSAGES"
         android:protectionLevel="dangerous" />
     <permission
-        android:name="info.guardianproject.keanu.core.permission.WRITE_ONLY"
+        android:name="${applicationId}.core.permission.WRITE_ONLY"
         android:description="@string/wo_perm_desc"
         android:label="@string/wo_perm_label"
         android:permissionGroup="android.permission-group.MESSAGES"
@@ -192,14 +187,15 @@
             android:launchMode="singleInstance"
             android:exported="true"
             android:theme="@style/AppThemeNoAction">
-            <intent-filter>
+            <intent-filter
+                tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="info.guardianproject.otr.app.im.IMPS_CATEGORY" />
-
                 <data android:mimeType="vnd.android.cursor.item/imps-chats" />
             </intent-filter>
-            <intent-filter>
+            <intent-filter
+                tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -258,7 +254,7 @@
                 <action android:name="android.intent.action.EDIT" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="info.guardianproject.keanu.core.service.IMPS_CATEGORY" />
+                <category android:name="${applicationId}.core.service.IMPS_CATEGORY" />
 
                 <data android:mimeType="vnd.android.cursor.item/imps-accounts" />
             </intent-filter>
@@ -266,7 +262,7 @@
                 <action android:name="android.intent.action.INSERT" />
 
                 <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="info.guardianproject.keanu.core.service.IMPS_CATEGORY" />
+                <category android:name="${applicationId}.core.service.IMPS_CATEGORY" />
 
                 <data android:mimeType="vnd.android.cursor.item/imps-providers" />
             </intent-filter>
@@ -277,7 +273,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.PICK" />
 
-                <category android:name="info.guardianproject.otr.app.im.IMPS_CATEGORY" />
+                <category android:name="${applicationId}.core.service.IMPS_CATEGORY" />
                 <category android:name="android.intent.category.DEFAULT" />
 
                 <data android:mimeType="vnd.android-dir/imps-providersettings" />
@@ -289,10 +285,10 @@
             <intent-filter>
                 <action android:name="android.intent.action.PICK" />
 
-                <category android:name="info.guardianproject.otr.app.im.IMPS_CATEGORY" />
+                <category android:name="${applicationId}.core.service.IMPS_CATEGORY" />
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:mimeType="vnd.android-dir/imps-providerSettings" />
+                <data android:mimeType="vnd.android-dir/imps-providersettings" />
             </intent-filter>
         </activity>
 
@@ -387,25 +383,6 @@
             android:screenOrientation="portrait"
             android:exported="false"
             />
-
-        <service
-            android:name="info.guardianproject.keanu.matrix.plugin.MatrixImPlugin"
-            android:exported="false" >
-            <intent-filter>
-                <action android:name="info.guardianproject.keanu.core.plugin" />
-            </intent-filter>
-
-            <meta-data
-                android:name="info.guardianproject.keanu.core.plugin.provider_name"
-                android:value="MATRIX" />
-            <meta-data
-                android:name="info.guardianproject.keanu.core.plugin.provider_full_name"
-                android:value="Matrix" />
-            <meta-data
-                android:name="info.guardianproject.keanu.core.plugin.signup_url"
-                android:value="https://matrix.org" />
-        </service>
-
 
     </application>
 

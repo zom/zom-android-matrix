@@ -8,7 +8,7 @@
             android:name="info.guardianproject.keanu.matrix.plugin.MatrixImPlugin"
             android:exported="false" >
             <intent-filter>
-                <action android:name="info.guardianproject.keanuapp.plugin" />
+                <action android:name="info.guardianproject.keanu.plugin" />
             </intent-filter>
 
             <meta-data
@@ -16,7 +16,7 @@
                 android:value="MATRIX" />
             <meta-data
                 android:name="info.guardianproject.keanu.plugin.provider_full_name"
-                android:value="Matrix" />
+                android:value="Keanu Matrix Plugin" />
             <meta-data
                 android:name="info.guardianproject.keanu.plugin.signup_url"
                 android:value="https://matrix.org" />

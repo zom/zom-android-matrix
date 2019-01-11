@@ -19,19 +19,19 @@ package info.guardianproject.keanu.core.plugin;
 public class ImPluginConstants {
 
     /** The intent action name for the plugin service. */
-    public static final String PLUGIN_ACTION_NAME = "info.guardianproject.keanu.core.plugin";
+    public static final String PLUGIN_ACTION_NAME = "info.guardianproject.keanu.plugin";
 
     /**
      * The name of the provider. It should match the values defined in
      * {@link info.guardianproject.keanu.core.provider.Imps.ProviderNames}.
      */
-    public static final String METADATA_PROVIDER_NAME = "info.guardianproject.keanu.core.plugin.provider_name";
+    public static final String METADATA_PROVIDER_NAME = "info.guardianproject.keanu.plugin.provider_name";
 
     /** The full name of the provider. */
-    public static final String METADATA_PROVIDER_FULL_NAME = "info.guardianproject.keanu.core.plugin.provider_full_name";
+    public static final String METADATA_PROVIDER_FULL_NAME = "info.guardianproject.keanu.plugin.provider_full_name";
 
     /** The url where the user can register a new account for the provider. */
-    public static final String METADATA_SIGN_UP_URL = "info.guardianproject.keanu.core.plugin.signup_url";
+    public static final String METADATA_SIGN_UP_URL = "info.guardianproject.keanu.plugin.signup_url";
 
     /**
      * Presence status OFFLINE. Should match the value defined in the IM engine.

@@ -155,7 +155,7 @@ public class RouterActivity extends AppCompatActivity implements ICacheWordSubsc
 
         // if we have an incoming contact, send it to the right place
         String scheme = intent.getScheme();
-        if(TextUtils.equals(scheme, "xmpp"))
+        if(TextUtils.equals(scheme, "keanu"))
         {
             intent.setClass(this, AddContactActivity.class);
             startActivity(intent);

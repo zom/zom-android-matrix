@@ -198,21 +198,10 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         JobInfo myJob = new JobInfo.Builder(0, new ComponentName(this, NetworkSchedulerService.class))
                 .setMinimumLatency(1000)
                 .setOverrideDeadline(2000)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED)
+                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
                 .setPersisted(true)
                 .build();
 
-        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        jobScheduler.schedule(myJob);
-
-        myJob = new JobInfo.Builder(0, new ComponentName(this, NetworkSchedulerService.class))
-                .setMinimumLatency(1000)
-                .setOverrideDeadline(2000)
-                .setRequiredNetworkType(JobInfo.NETWORK_TYPE_METERED)
-                .setPersisted(true)
-                .build();
-
-        jobScheduler.schedule(myJob);
     }
 
     /**
@@ -524,7 +513,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         Cursor cursor = resolver.query(Imps.Account.CONTENT_URI, ACCOUNT_PROJECTION, where, null,
                 null);
         if (cursor == null) {
-            Log.w(TAG, "Can't query account!");
+            debug("Can't query account!");
             return false;
         }
 
@@ -671,6 +660,9 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         try {
 
             ImConnection conn = factory.createConnection(settings, this);
+            if (conn == null)
+                return null;
+
             conn.initUser(providerId, accountId);
             ImConnectionAdapter imConnectionAdapter =
                     new ImConnectionAdapter(providerId, accountId, conn, this);

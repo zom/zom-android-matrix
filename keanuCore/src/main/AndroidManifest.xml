@@ -1,10 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="info.guardianproject.keanu.core" >
 
-
-    <uses-permission android:name="info.guardianproject.keanuapp.permission.READ_ONLY" />
-    <uses-permission android:name="info.guardianproject.keanuapp.permission.WRITE_ONLY" />
-    <uses-permission android:name="info.guardianproject.keanuapp.permission.IM_SERVICE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -30,15 +26,13 @@
             android:name=".util.SoundService"
             android:exported="false" />
 
-        <!-- android:process="info.guardianproject.otr.app.process.im" -->
         <service
             android:name=".service.RemoteImService"
             android:exported="false"
-            android:permission="info.guardianproject.keanuapp.permission.IM_SERVICE"
             >
             <intent-filter>
-                <action android:name="info.guardianproject.otr.app.im.IRemoteImService" />
-                <action android:name="info.guardianproject.otr.app.im.SERVICE" />
+                <action android:name="info.guardianproject.keanu.core.server.IRemoteImService" />
+                <action android:name="info.guardianproject.keanu.core.server.SERVICE" />
             </intent-filter>
         </service>
         <service
@@ -47,13 +41,10 @@
 
         <provider
             android:name=".provider.ImpsProvider"
-            android:authorities="info.guardianproject.keanuapp.provider.Imps"
+            android:authorities="${applicationId}.provider.Imps"
             android:directBootAware="true"
             android:exported="false"
-            android:grantUriPermissions="true"
-            android:readPermission="info.guardianproject.keanuapp.permission.READ_ONLY"
-            android:writePermission="info.guardianproject.keanuapp.permission.WRITE_ONLY" />
-
+            android:grantUriPermissions="false" />
 
         <receiver
             android:name=".service.NetworkConnectivityReceiver"

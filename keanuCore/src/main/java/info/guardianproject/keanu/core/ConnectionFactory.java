@@ -61,22 +61,6 @@ public class ConnectionFactory {
 
         String protocolName = settings.get(ImConfigNames.PROTOCOL_NAME);
 
-        /**
-        if ("XMPP".equals(protocolName)) {
-
-            try
-            {
-                return new LoopbackConnection();//XmppConnection(context);
-            }
-            catch (Exception e)
-            {
-                throw new ImException(e.getMessage());
-            }
-        }
-        else {
-            throw new ImException("Unsupported protocol: " + protocolName);
-        }
-        **/
 
         try {
             ImPlugin plugin = ImPluginHelper.getInstance(context).getPlugin(protocolName);

@@ -553,36 +553,6 @@ public class AccountActivity extends BaseActivity {
         settingsForDomain(settings.getDomain(),settings.getPort(),settings);
         settings.close();
     }
-/*
-    private void getOTRKeyInfo() {
-
-        if (mApp != null && FFF != null) {
-            try {
-                otrKeyManager = mApp.getRemoteImService().getOtrKeyManager(mOriginalUserAccount);
-
-                if (otrKeyManager == null) {
-                    mTxtFingerprint = ((TextView) findViewById(R.id.txtFingerprint));
-
-                    String localFingerprint = otrKeyManager.getLocalFingerprint();
-                    if (localFingerprint != null) {
-                        ((TextView) findViewById(R.id.lblFingerprint)).setVisibility(View.VISIBLE);
-                        mTxtFingerprint.setText(processFingerprint(localFingerprint));
-                    } else {
-                        ((TextView) findViewById(R.id.lblFingerprint)).setVisibility(View.GONE);
-                        mTxtFingerprint.setText("");
-                    }
-                } else {
-                    //don't need to notify people if there is nothing to show here
-//                    Toast.makeText(this, "OTR is not initialized yet", Toast.LENGTH_SHORT).show();
-                }
-
-            } catch (Exception e) {
-                Log.e(ImApp.LOG_TAG, "error on create", e);
-
-            }
-        }
-
-    }*/
 
     private void checkUserChanged() {
         if (mEditUserAccount != null)

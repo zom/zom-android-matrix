@@ -99,7 +99,6 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
     private static IRemoteImService mImService;
 
-   // HashMap<Long, IImConnection> mConnections;
     MyConnListener mConnectionListener;
 
     Broadcaster mBroadcaster;
@@ -182,6 +181,9 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Imps.appId = BuildConfig.APPLICATION_ID;//"info.guardianproject.keanuapp";
+
         Preferences.setup(this);
         initChannel();
 
@@ -305,7 +307,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         startImServiceIfNeed(false);
     }
 
-    public synchronized void startImServiceIfNeed(boolean isBoot) {
+    public void startImServiceIfNeed(boolean isBoot) {
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             log("start ImService");
 
@@ -317,6 +319,15 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
             mApplicationContext.startService(serviceIntent);
 
         mConnectionListener = new MyConnListener(new Handler());
+
+        synchronized (mQueue) {
+            for (Message msg : mQueue) {
+                msg.sendToTarget();
+            }
+            mQueue.clear();
+        }
+        Message msg = Message.obtain(null, EVENT_SERVICE_CONNECTED);
+        mBroadcaster.broadcast(msg);
 
    //     mApplicationContext
      //           .bindService(serviceIntent, mImServiceConn, Context.BIND_AUTO_CREATE|Context.BIND_IMPORTANT);
@@ -353,20 +364,17 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         if (Log.isLoggable(LOG_TAG, Log.DEBUG))
             log("stop ImService");
 
-
-        if (mImServiceConn != null) {
-            try {
-                if (mImService != null)
-                 mImService.shutdownAndLock();
-            }
-            catch (RemoteException re)
-            {
-
-            }
-          //  mApplicationContext.unbindService(mImServiceConn);
-
-            mImService = null;
+        try {
+            if (mImService != null)
+                mImService.shutdownAndLock();
         }
+        catch (RemoteException re)
+        {
+
+        }
+
+        mImService = null;
+
 
 
         Intent serviceIntent = new Intent(this, RemoteImService.class);
@@ -376,6 +384,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
     }
 
+    /**
     private ServiceConnection mImServiceConn = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             if (Log.isLoggable(LOG_TAG, Log.DEBUG))
@@ -392,11 +401,11 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
             Message msg = Message.obtain(null, EVENT_SERVICE_CONNECTED);
             mBroadcaster.broadcast(msg);
 
-            /*
+
             if (mKillServerOnStart)
             {
                 forceStopImService();
-            }*/
+            }
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -406,7 +415,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
            // mConnections.clear();
             mImService = null;
         }
-    };
+    };**/
 
     public boolean serviceConnected() {
         return mImService != null;

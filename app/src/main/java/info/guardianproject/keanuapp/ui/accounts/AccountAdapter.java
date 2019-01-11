@@ -244,12 +244,9 @@ public class AccountAdapter extends CursorAdapter implements AccountListItem.Sig
         // Remember that the user signed in.
         setKeepSignedIn(accountId, true);
 
- //       long providerId = cursor.getLong(PROVIDER_ID_COLUMN);
         String password = cursor.getString(ACTIVE_ACCOUNT_PW_COLUMN);
 
-        boolean isActive = true; // TODO(miron)
-
-        new SignInHelper(mActivity, sHandler).signIn(password, providerId, accountId, isActive);
+        new SignInHelper(mActivity, sHandler).signIn(password, providerId, accountId, true);
 
         cursor.moveToPosition(-1);
     }

@@ -16,6 +16,7 @@
 
 package info.guardianproject.keanu.core.provider;
 
+import android.app.Application;
 import android.content.ContentQueryMap;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -30,6 +31,8 @@ import android.util.Log;
 
 import java.util.HashMap;
 import java.util.UUID;
+
+import info.guardianproject.keanu.core.BuildConfig;
 
 import static info.guardianproject.keanu.core.KeanuConstants.CACHEWORD_PASSWORD_KEY;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_DEVICE_NAME;
@@ -46,6 +49,8 @@ public class Imps {
     /** no public constructor since this is a utility class */
     private Imps() {
     }
+
+    public static String appId = null;
 
     /** The Columns for IM providers (i.e. AIM, Y!, GTalk) */
     public interface ProviderColumns {
@@ -133,10 +138,10 @@ public class Imps {
 
         /** The content:// style URL for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/providers");
+                .parse("content://" + appId + ".provider.Imps/providers");
 
         public static final Uri CONTENT_URI_WITH_ACCOUNT = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/providers/account");
+                .parse("content://" + appId + ".provider.Imps/providers/account");
 
         /**
          * The MIME type of {@link #CONTENT_URI} providing a directory of
@@ -267,11 +272,11 @@ public class Imps {
 
         /** The content:// style URL for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/accounts");
+                .parse("content://" + appId + ".provider.Imps/accounts");
 
         /** The content:// style URL for looking up by domain */
         public static final Uri BY_DOMAIN_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/domainAccounts");
+                .parse("content://" + appId + ".provider.Imps/domainAccounts");
 
 
         /**
@@ -326,7 +331,7 @@ public class Imps {
     public static final class AccountStatus implements BaseColumns, AccountStatusColumns {
         /** The content:// style URL for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/accountStatus");
+                .parse("content://" + appId + ".provider.Imps/accountStatus");
 
         /**
          * The MIME type of {@link #CONTENT_URI} providing a directory of
@@ -472,62 +477,62 @@ public class Imps {
 
         /** The content:// style URL for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/contacts");
+                .parse("content://" + appId + ".provider.Imps/contacts");
 
         /** The content:// style URL for contacts joined with presence */
         public static final Uri CONTENT_URI_WITH_PRESENCE = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/contactsWithPresence");
+                .parse("content://" + appId + ".provider.Imps/contactsWithPresence");
 
         /**
          * The content:// style URL for barebone contacts, not joined with any
          * other table
          */
         public static final Uri CONTENT_URI_CONTACTS_BAREBONE = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/contactsBarebone");
+                .parse("content://" + appId + ".provider.Imps/contactsBarebone");
 
         /** The content:// style URL for contacts who have an open chat session */
         public static final Uri CONTENT_URI_CHAT_CONTACTS = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/contacts/chatting");
+                .parse("content://" + appId + ".provider.Imps/contacts/chatting");
 
         /** The content:// style URL for contacts who have been blocked */
         public static final Uri CONTENT_URI_BLOCKED_CONTACTS = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/contacts/blocked");
+                .parse("content://" + appId + ".provider.Imps/contacts/blocked");
 
         /** The content:// style URL for contacts by provider and account */
         public static final Uri CONTENT_URI_CONTACTS_BY = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/contacts");
+                .parse("content://" + appId + ".provider.Imps/contacts");
 
         /**
          * The content:// style URL for contacts by provider and account, and
          * who have an open chat session
          */
         public static final Uri CONTENT_URI_CHAT_CONTACTS_BY = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/contacts/chatting");
+                .parse("content://" + appId + ".provider.Imps/contacts/chatting");
 
         /**
          * The content:// style URL for contacts by provider and account, and
          * who are online
          */
         public static final Uri CONTENT_URI_ONLINE_CONTACTS_BY = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/contacts/online");
+                .parse("content://" + appId + ".provider.Imps/contacts/online");
 
         /**
          * The content:// style URL for contacts by provider and account, and
          * who are offline
          */
         public static final Uri CONTENT_URI_OFFLINE_CONTACTS_BY = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/contacts/offline");
+                .parse("content://" + appId + ".provider.Imps/contacts/offline");
 
         /** The content:// style URL for operations on bulk contacts */
         public static final Uri BULK_CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/bulk_contacts");
+                .parse("content://" + appId + ".provider.Imps/bulk_contacts");
 
         /**
          * The content:// style URL for the count of online contacts in each
          * contact list by provider and account.
          */
         public static final Uri CONTENT_URI_ONLINE_COUNT = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/contacts/onlineCount");
+                .parse("content://" + appId + ".provider.Imps/contacts/onlineCount");
 
         /**
          * The MIME type of {@link #CONTENT_URI} providing a directory of
@@ -581,7 +586,7 @@ public class Imps {
 
         /** The content:// style URL for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/contactLists");
+                .parse("content://" + appId + ".provider.Imps/contactLists");
 
         /**
          * The MIME type of {@link #CONTENT_URI} providing a directory of
@@ -625,7 +630,7 @@ public class Imps {
 
         /** The content:// style URL for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/blockedList");
+                .parse("content://" + appId + ".provider.Imps/blockedList");
 
         /**
          * The MIME type of {@link #CONTENT_URI} providing a directory of
@@ -728,7 +733,7 @@ public class Imps {
 
         /** The content:// style URL for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/contactsEtag");
+                .parse("content://" + appId + ".provider.Imps/contactsEtag");
 
         /**
          * The MIME type of {@link #CONTENT_URI} providing a directory of
@@ -952,57 +957,57 @@ public class Imps {
 
         /** The content:// style URL for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/messages");
+                .parse("content://" + appId + ".provider.Imps/messages");
 
         /** The content:// style URL for messages by thread id */
         public static final Uri CONTENT_URI_MESSAGES_BY_THREAD_ID = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/messagesByThreadId");
+                .parse("content://" + appId + ".provider.Imps/messagesByThreadId");
 
         /** The content:// style URL for messages by thread id */
         public static final Uri CONTENT_URI_MESSAGES_BY_PACKET_ID = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/messagesByPacketId");
+                .parse("content://" + appId + ".provider.Imps/messagesByPacketId");
 
         /** The content:// style URL for messages by account and contact */
         public static final Uri CONTENT_URI_MESSAGES_BY_ACCOUNT_AND_CONTACT = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/messagesByAcctAndContact");
+                .parse("content://" + appId + ".provider.Imps/messagesByAcctAndContact");
 
         /** The content:// style URL for messages by account and contact */
         public static final Uri CONTENT_URI_MESSAGES_BY_SEARCH = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/messagesBySearch");
+                .parse("content://" + appId + ".provider.Imps/messagesBySearch");
 
         /** The content:// style URL for messages by provider */
         public static final Uri CONTENT_URI_MESSAGES_BY_PROVIDER = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/messagesByProvider");
+                .parse("content://" + appId + ".provider.Imps/messagesByProvider");
 
         /** The content:// style URL for messages by account */
         public static final Uri CONTENT_URI_BY_ACCOUNT = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/messagesByAccount");
+                .parse("content://" + appId + ".provider.Imps/messagesByAccount");
 
         /** The content:// style url for off the record messages */
         public static final Uri OTR_MESSAGES_CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/otrMessages");
+                .parse("content://" + appId + ".provider.Imps/otrMessages");
 
         /** The content:// style url for off the record messages by thread id */
         public static final Uri OTR_MESSAGES_CONTENT_URI_BY_THREAD_ID = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/otrMessagesByThreadId");
+                .parse("content://" + appId + ".provider.Imps/otrMessagesByThreadId");
 
         /**
          * The content:// style url for off the record messages by account and
          * contact
          */
         public static final Uri OTR_MESSAGES_CONTENT_URI_BY_ACCOUNT_AND_CONTACT = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/otrMessagesByAcctAndContact");
+                .parse("content://" + appId + ".provider.Imps/otrMessagesByAcctAndContact");
 
         /** The content:// style URL for off the record messages by provider */
         public static final Uri OTR_MESSAGES_CONTENT_URI_BY_PROVIDER = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/otrMessagesByProvider");
+                .parse("content://" + appId + ".provider.Imps/otrMessagesByProvider");
 
         /** The content:// style URL for off the record messages by account */
         public static final Uri OTR_MESSAGES_CONTENT_URI_BY_ACCOUNT = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/otrMessagesByAccount");
+                .parse("content://" + appId + ".provider.Imps/otrMessagesByAccount");
 
         public static final Uri OTR_MESSAGES_CONTENT_URI_BY_PACKET_ID = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/otrMessagesByPacketId");
+                .parse("content://" + appId + ".provider.Imps/otrMessagesByPacketId");
 
         /**
          * The MIME type of {@link #CONTENT_URI} providing a directory of
@@ -1052,7 +1057,7 @@ public class Imps {
         }
 
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/groupMembers");
+                .parse("content://" + appId + ".provider.Imps/groupMembers");
 
         /**
          * The MIME type of {@link #CONTENT_URI} providing a directory of group
@@ -1105,7 +1110,7 @@ public class Imps {
 
         /** The content:// style URL for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/invitations");
+                .parse("content://" + appId + ".provider.Imps/invitations");
 
         /**
          * The MIME type of {@link #CONTENT_URI} providing a directory of
@@ -1144,13 +1149,13 @@ public class Imps {
 
         /** The content:// style URL for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/avatars");
+                .parse("content://" + appId + ".provider.Imps/avatars");
 
         /**
          * The content:// style URL for avatars by provider, account and contact
          */
         public static final Uri CONTENT_URI_AVATARS_BY = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/avatarsBy");
+                .parse("content://" + appId + ".provider.Imps/avatarsBy");
 
         /** The MIME type of {@link #CONTENT_URI} providing the avatars */
         public static final String CONTENT_TYPE = "vnd.android.cursor.dir/imps-avatars";
@@ -1217,22 +1222,22 @@ public class Imps {
     public static final class Presence implements BaseColumns, PresenceColumns {
         /** The content:// style URL for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/presence");
+                .parse("content://" + appId + ".provider.Imps/presence");
 
         /** The content URL for IM presences for an account */
         public static final Uri CONTENT_URI_BY_ACCOUNT = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/presence/account");
+                .parse("content://" + appId + ".provider.Imps/presence/account");
 
         /** The content:// style URL for operations on bulk contacts */
         public static final Uri BULK_CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/bulk_presence");
+                .parse("content://" + appId + ".provider.Imps/bulk_presence");
 
         /**
          * The content:// style URL for seeding presences for a given account
          * id.
          */
         public static final Uri SEED_PRESENCE_BY_ACCOUNT_CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/seed_presence/account");
+                .parse("content://" + appId + ".provider.Imps/seed_presence/account");
 
         /**
          * The MIME type of a {@link #CONTENT_URI} providing a directory of
@@ -1308,11 +1313,11 @@ public class Imps {
 
         /** The content:// style URL for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/chats");
+                .parse("content://" + appId + ".provider.Imps/chats");
 
         /** The content URL for all chats that belong to the account */
         public static final Uri CONTENT_URI_BY_ACCOUNT = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/chats/account");
+                .parse("content://" + appId + ".provider.Imps/chats/account");
 
         /**
          * The MIME type of {@link #CONTENT_URI} providing a directory of chats.
@@ -1344,11 +1349,11 @@ public class Imps {
 
         /** The content:// style URI for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/sessionCookies");
+                .parse("content://" + appId + ".provider.Imps/sessionCookies");
 
         /** The content:// style URL for session cookies by provider and account */
         public static final Uri CONTENT_URI_SESSION_COOKIES_BY = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/sessionCookiesBy");
+                .parse("content://" + appId + ".provider.Imps/sessionCookiesBy");
 
         /**
          * The MIME type of {@link #CONTENT_URI} providing a directory of
@@ -1380,7 +1385,7 @@ public class Imps {
 
         /** The content:// style URI for this table */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/providerSettings");
+                .parse("content://" + appId + ".provider.Imps/providerSettings");
 
         /** The MIME type of {@link #CONTENT_URI} providing provider settings */
         public static final String CONTENT_TYPE = "vnd.android-dir/imps-providerSettings";
@@ -2185,7 +2190,7 @@ public class Imps {
             BrandingResourceMapCacheColumns {
         /** The content:// style URL for this table. */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/brandingResMapCache");
+                .parse("content://" + appId + ".provider.Imps/brandingResMapCache");
     }
 
     /**
@@ -2238,14 +2243,14 @@ public class Imps {
 
         /** The content:// style URL for this table. */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/outgoingRmqMessages");
+                .parse("content://" + appId + ".provider.Imps/outgoingRmqMessages");
 
         /**
          * The content:// style URL for the highest rmq id for the outgoing rmq
          * messages
          */
         public static final Uri CONTENT_URI_FOR_HIGHEST_RMQ_ID = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/outgoingHighestRmqId");
+                .parse("content://" + appId + ".provider.Imps/outgoingHighestRmqId");
 
         /** The default sort order for this table. */
         public static final String DEFAULT_SORT_ORDER = "rmq_id ASC";
@@ -2313,7 +2318,7 @@ public class Imps {
 
         /** The content:// style URL for this table. */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/lastRmqId");
+                .parse("content://" + appId + ".provider.Imps/lastRmqId");
     }
 
     /**
@@ -2330,7 +2335,7 @@ public class Imps {
 
         /** The content:// style URL for this table. */
         public static final Uri CONTENT_URI = Uri
-                .parse("content://info.guardianproject.keanuapp.provider.Imps/s2dids");
+                .parse("content://" + appId + ".provider.Imps/s2dids");
     }
 
     public static boolean isUnlocked(Context context)
