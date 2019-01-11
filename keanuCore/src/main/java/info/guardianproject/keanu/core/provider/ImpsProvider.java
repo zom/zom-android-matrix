@@ -1919,7 +1919,6 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
             qb.setTables(TABLE_S2D_RMQ_IDS);
             break;
 
-
         default:
             throw new IllegalArgumentException("Unknown URL " + url);
         }
