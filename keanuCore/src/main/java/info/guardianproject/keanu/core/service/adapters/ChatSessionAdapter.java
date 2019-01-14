@@ -724,12 +724,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     public void markAsRead() {
         if (mHasUnreadMessages) {
 
-            /**
-             * we want to keep the last message now
-            ContentValues values = new ContentValues(1);
-            values.put(Imps.Chats.LAST_UNREAD_MESSAGE, (String) null);
-            mConnection.getContext().getContentResolver().update(mChatURI, values, null, null);
-*/
             String baseUsername = mChatSession.getParticipant().getAddress().getBareAddress();
             mStatusBarNotifier.dismissChatNotification(mConnection.getProviderId(), baseUsername);
 

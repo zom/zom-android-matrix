@@ -266,7 +266,7 @@ public abstract class ChatGroupManager {
      * Notifies the InvitationListener that another user invited the current
      * logged user to join a group chat.
      */
-    protected synchronized void notifyGroupInvitation(Invitation invitation) {
+    public synchronized void notifyGroupInvitation(Invitation invitation) {
         mInvitations.put(invitation.getInviteID(), invitation);
         if (mInvitationListener != null) {
             mInvitationListener.onGroupInvitation(invitation);

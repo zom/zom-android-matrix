@@ -124,8 +124,6 @@
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:id="@+id/listEncryptionKey"
-            android:visibility="gone"
-
             >
 
             <ImageView
@@ -136,7 +134,25 @@
                 android:src="@drawable/qr"
                 android:layout_alignParentLeft="true"
                 />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_toRightOf="@+id/qrcode"
+                >
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:id="@+id/tvDeviceName"
+                android:selectAllOnFocus="true"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="6dp"
+                android:autoLink="none"
+                android:text="Device Name THat is Really Long Oh My Gosh"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?contactTextSecondary"
 
+                android:layout_centerVertical="true"
+                />
             <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:id="@+id/tvFingerprint"
                 android:selectAllOnFocus="true"
@@ -144,21 +160,22 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="6dp"
                 android:autoLink="none"
-                android:text=""
+                android:text="device fingerprint"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="?contactTextSecondary"
 
-                android:layout_toRightOf="@+id/qrcode"
                 android:layout_centerVertical="true"
                 />
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:id="@+id/qrshare"
+            </LinearLayout>
+            <Switch
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/switchVerified"
                 android:layout_alignParentRight="true"
-                android:src="@android:drawable/ic_menu_share"
                 android:padding="6dp"
                 android:layout_margin="1dp"
+                android:textOn="verified"
+                android:textOff="unverified"
                 />
 
         </RelativeLayout>

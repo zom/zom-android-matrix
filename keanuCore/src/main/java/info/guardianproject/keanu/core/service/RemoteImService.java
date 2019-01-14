@@ -148,6 +148,9 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
         mImService = this;
 
+        mStatusBarNotifier = new StatusBarNotifier(this);
+        mServiceHandler = new ServiceHandler();
+
         startForeground(notifyId, getForegroundNotification());
 
         final String prev = Debug.getTrail(this, SERVICE_CREATE_TRAIL_KEY);
@@ -173,8 +176,6 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         // leftovers from any previous crash.
         clearConnectionStatii();
 
-        mStatusBarNotifier = new StatusBarNotifier(this);
-        mServiceHandler = new ServiceHandler();
 
         mPluginHelper = ImPluginHelper.getInstance(this);
         mPluginHelper.loadAvailablePlugins();
@@ -243,7 +244,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         mNotifyBuilder.setOngoing(true);
         mNotifyBuilder.setWhen(System.currentTimeMillis());
         
-        Intent notificationIntent = new Intent(this, DummyActivity.class);
+        Intent notificationIntent = mStatusBarNotifier.getDefaultIntent(-1,-1);
         PendingIntent launchIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, 0);
 
         mNotifyBuilder.setContentIntent(launchIntent);
@@ -288,62 +289,6 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                 mNeedCheckAutoLogin = intent.getBooleanExtra(ImServiceConstants.EXTRA_CHECK_AUTO_LOGIN,
                         true);
 
-            if (HeartbeatService.HEARTBEAT_ACTION.equals(intent.getAction())) {
-
-                //sendHeartbeat();
-                /**
-              //  Log.d(TAG, "HEARTBEAT");
-                if (!mWakeLock.isHeld())
-                {
-                    try {
-                        mWakeLock.acquire();
-                        sendHeartbeat();
-                    } finally {
-                        mWakeLock.release();
-                    }
-                }**/
-
-                return START_REDELIVER_INTENT;
-            }
-
-
-            if (HeartbeatService.NETWORK_STATE_ACTION.equals(intent.getAction())) {
-
-                ConnectivityManager connectivityManager
-                        = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-                NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-                NetworkConnectivityReceiver.State networkState = NetworkConnectivityReceiver.State.values()[intent.getIntExtra(HeartbeatService.NETWORK_STATE_EXTRA, 0)];
-                networkStateChanged(activeNetworkInfo,networkState);
-
-                /**
-                if (intent.hasExtra(HeartbeatService.NETWORK_INFO_CONNECTED))
-                {
-
-                }
-                else {
-                    NetworkInfo networkInfo = (NetworkInfo) intent
-                            .getParcelableExtra(HeartbeatService.NETWORK_INFO_EXTRA);
-                    NetworkConnectivityReceiver.State networkState = NetworkConnectivityReceiver.State.values()[intent.getIntExtra(HeartbeatService.NETWORK_STATE_EXTRA, 0)];
-                    networkStateChanged(networkInfo, networkState);
-
-                    /**
-                    if (!mWakeLock.isHeld()) {
-                        try {
-                            mWakeLock.acquire();
-                            networkStateChanged(networkInfo, networkState);
-
-                        } finally {
-                            mWakeLock.release();
-                        }
-                    } else {
-                        networkStateChanged(networkInfo, networkState);
-
-                    }
-                }**/
-
-            }
-
-
             if (ImServiceConstants.EXTRA_CHECK_SHUTDOWN.equals((intent.getAction())))
             {
                 shutdown();
@@ -360,14 +305,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             mNeedCheckAutoLogin = !autoLogin();
         }
 
-        /**
-        try { HeartbeatService.startBeating(getApplicationContext()); }
-        catch (IllegalStateException ise){
-            debug("couldn't start Heartbeat service",ise);
-        }**/
 
-
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
 
@@ -567,7 +506,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     {
         Debug.recordTrail(this, SERVICE_DESTROY_TRAIL_TAG, new Date());
 
-        HeartbeatService.stopBeating(getApplicationContext());
+     //   HeartbeatService.stopBeating(getApplicationContext());
         stopService(new Intent(this, NetworkSchedulerService.class));
 
         debug("ImService stopped.");

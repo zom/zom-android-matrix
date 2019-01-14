@@ -66,6 +66,8 @@ public class ContactsPickerActivity extends BaseActivity {
     public final static String EXTRA_RESULT_ACCOUNT = "account";
     public final static String EXTRA_RESULT_MESSAGE = "message";
 
+    public final static String EXTRA_ADD_CONTACT = "contact";
+
     private int REQUEST_CODE_ADD_CONTACT = 9999;
 
     private ContactAdapter mAdapter;
@@ -224,6 +226,12 @@ public class ContactsPickerActivity extends BaseActivity {
         });
 
         doFilterAsync("");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 
     @Override
@@ -556,6 +564,7 @@ public class ContactsPickerActivity extends BaseActivity {
                 holder.mLine1.setTextColor(holder.mLine1.getCurrentTextColor() | 0xff000000);
             }
         }
+
     }
 
     class MyLoaderCallbacks implements LoaderCallbacks<Cursor> {
@@ -602,7 +611,7 @@ public class ContactsPickerActivity extends BaseActivity {
         public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
             mAdapter.swapCursor(newCursor);
 
-
+            mCursor = newCursor;
 
         }
 

@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,11 +22,14 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
@@ -63,7 +67,6 @@ public class ContactDisplayActivity extends BaseActivity {
     private long mAccountId = -1;
     private IImConnection mConn;
 
-    private String mRemoteOtrFingerprint;
     private List<String> mRemoteOmemoFingerprints;
 
     @Override
@@ -144,13 +147,6 @@ public class ContactDisplayActivity extends BaseActivity {
                 @Override
                 protected Boolean doInBackground(String... strings) {
 
-                    mRemoteOtrFingerprint = strings[0];
-
-                    if (mRemoteOtrFingerprint == null) {
-                        mRemoteOtrFingerprint = "";//OtrChatManager.getInstance().getRemoteKeyFingerprint(mUsername);
-                    }
-
-
                     try {
                         mRemoteOmemoFingerprints = mConn.getFingerprints(mUsername);
 
@@ -165,34 +161,54 @@ public class ContactDisplayActivity extends BaseActivity {
                 protected void onPostExecute(Boolean success) {
                     super.onPostExecute(success);
 
-                    if (mRemoteOmemoFingerprints == null ||
-                            mRemoteOmemoFingerprints.size() == 0)
-                        displayFingerprint(mRemoteOtrFingerprint);
-                    else
-                        displayFingerprint(mRemoteOmemoFingerprints.get(mRemoteOmemoFingerprints.size() - 1));
+                    if (mRemoteOmemoFingerprints != null)
+                         displayFingerprints(mRemoteOmemoFingerprints);
                 }
             }.execute(remoteFingerprint);
         }
 
     }
 
-    private void displayFingerprint (final String remoteFingerprint)
+    private void displayFingerprints (final List<String> remoteFingerprints)
     {
 
         try {
 
-            ImageView btnQrShare = (ImageView) findViewById(R.id.qrshare);
+         //   ImageView btnQrShare = (ImageView) findViewById(R.id.qrshare);
             ImageView iv = (ImageView)findViewById(R.id.qrcode);
-            TextView tv = (TextView)findViewById(R.id.tvFingerprint);
+            TextView tvDevice = (TextView)findViewById(R.id.tvDeviceName);
+            TextView tvKey = (TextView)findViewById(R.id.tvFingerprint);
+            Switch switchVerified = findViewById(R.id.switchVerified);
 
-           // ArrayList<String> fingerprints = OtrChatManager.getInstance().getRemoteKeyFingerprints(mUsername);
+            String remoteFingerprint = remoteFingerprints.get(0);
 
             if (!TextUtils.isEmpty(remoteFingerprint)) {
 
                 findViewById(R.id.listEncryptionKey).setVisibility(View.VISIBLE);
 
-                tv.setText(prettyPrintFingerprint(remoteFingerprint));
+                StringTokenizer st = new StringTokenizer(remoteFingerprint,"|");
+                String deviceName = st.nextToken();
+                final String deviceId = st.nextToken();
+                String deviceFingerprint = prettyPrintFingerprint(st.nextToken());
+                boolean isVerified = Boolean.parseBoolean(st.nextToken());
 
+                tvDevice.setText(deviceName);
+                tvKey.setText(deviceFingerprint);
+                switchVerified.setChecked(isVerified);
+
+                switchVerified.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (mConn != null) {
+                            try {
+                                mConn.setDeviceVerified(mUsername,deviceId,isChecked);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+                /**
                 iv.setOnClickListener(new View.OnClickListener() {
 
                     @Override
@@ -216,19 +232,20 @@ public class ContactDisplayActivity extends BaseActivity {
 
                 });
 
+
                 btnQrShare.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
 
                         try {
-                            String inviteLink = OnboardingManager.generateInviteLink(ContactDisplayActivity.this, mUsername, remoteFingerprint, mNickname);
+                            String inviteLink = OnboardingManager.generateInviteLink(ContactDisplayActivity.this, mUsername, deviceFingerprint, mNickname);
                             new QrShareAsyncTask(ContactDisplayActivity.this).execute(inviteLink, mNickname);
                         } catch (IOException ioe) {
                             Log.e(LOG_TAG, "couldn't generate QR code", ioe);
                         }
                     }
                 });
-
+                 **/
 
                 //if (!OtrChatManager.getInstance().isRemoteKeyVerified(mUsername, remoteFingerprint))
                  //   btnVerify.setVisibility(View.VISIBLE);
@@ -346,7 +363,7 @@ public class ContactDisplayActivity extends BaseActivity {
     private String prettyPrintFingerprint(String fingerprint) {
         StringBuffer spacedFingerprint = new StringBuffer();
 
-        for (int i = 0; i + 8 <= fingerprint.length(); i += 8) {
+        for (int i = 0; i + 4 <= fingerprint.length(); i += 8) {
             spacedFingerprint.append(fingerprint.subSequence(i, i + 8));
             spacedFingerprint.append(' ');
         }
@@ -398,6 +415,7 @@ public class ContactDisplayActivity extends BaseActivity {
         if (mConn == null)
             return;
 
+        /**
         try {
             IChatSessionManager manager = mConn.getChatSessionManager();
             if (manager != null) {
@@ -438,6 +456,12 @@ public class ContactDisplayActivity extends BaseActivity {
             startActivity(intent);
             finish();
         }
+        **/
+
+        Intent intent = new Intent(ContactDisplayActivity.this, ContactsPickerActivity.class);
+        intent.putExtra("id", mContactId);
+        intent.putExtra(ContactsPickerActivity.EXTRA_ADD_CONTACT,mUsername);
+        startActivity(intent);
 
     }
 

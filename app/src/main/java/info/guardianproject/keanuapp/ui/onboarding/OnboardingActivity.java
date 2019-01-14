@@ -769,31 +769,6 @@ public class OnboardingActivity extends BaseActivity {
         return false;
     }
 
-    //make sure it is valid, and that people aren't including unsupported domains
-    public static boolean verifyJabberID(String jid) {
-        if (jid != null) {
-            Pattern p = Pattern
-                    .compile("(?i)[a-z0-9\\-_\\.]++@[a-z0-9\\-_]++(\\.[a-z0-9\\-_]++)++");
-            Matcher m = p.matcher(jid);
-
-            if (!m.matches()) {
-                return false;
-            }
-            else if (jid.contains("gmail.com")||jid.contains("google.com"))
-            {
-                return false;
-            }
-            else if (jid.contains("facebook.com"))
-            {
-                return false;
-            }
-        } else {
-            return false;
-        }
-
-        return true;
-    }
-
 
     private class ExistingAccountTask extends AsyncTask<String, Void, OnboardingAccount> {
         @Override
@@ -879,9 +854,9 @@ public class OnboardingActivity extends BaseActivity {
                     return;
 
                 mCropImageView = new CropImageView(OnboardingActivity.this);// (CropImageView)view.findViewById(R.id.CropImageView);
-                mCropImageView.setAspectRatio(1, 1);
-                mCropImageView.setFixedAspectRatio(true);
-                mCropImageView.setCropShape(CropImageView.CropShape.OVAL);
+             //   mCropImageView.setAspectRatio(1, 1);
+             //   mCropImageView.setFixedAspectRatio(true);
+             //   mCropImageView.setCropShape(CropImageView.CropShape.OVAL);
               //  mCropImageView.setGuidelines(1);
 
                 try {
@@ -1023,7 +998,7 @@ public class OnboardingActivity extends BaseActivity {
         if (mOutputFileUri == null) {
             File photo = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "kavatar.jpg");
             mOutputFileUri = FileProvider.getUriForFile(this,
-                    BuildConfig.APPLICATION_ID + ".provider",
+                    getPackageName() + ".provider",
                     photo);
 
         }

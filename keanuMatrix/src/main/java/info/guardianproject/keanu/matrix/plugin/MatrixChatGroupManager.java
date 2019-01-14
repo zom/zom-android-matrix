@@ -10,6 +10,7 @@ import org.matrix.androidsdk.MXSession;
 import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.model.MatrixError;
+import org.matrix.androidsdk.rest.model.RoomMember;
 import org.w3c.dom.Text;
 
 import info.guardianproject.keanu.core.model.Address;
@@ -130,22 +131,52 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
     @Override
     public void deleteChatGroupAsync(ChatGroup group) {
-
+        Room room = mDataHandler.getRoom(group.getAddress().getAddress());
+        if (room != null)
+            mDataHandler.deleteRoom(room.getRoomId());
     }
 
     @Override
     protected void addGroupMemberAsync(ChatGroup group, Contact contact) {
-
+        inviteUserAsync(group, contact);
     }
 
     @Override
     public void removeGroupMemberAsync(ChatGroup group, Contact contact) {
-
+        Room room = mDataHandler.getRoom(group.getAddress().getAddress());
+        room.kick(contact.getAddress().getAddress(),":(",new BasicApiCallback("removeGroupMemberAsync"));
     }
 
     @Override
     public void joinChatGroupAsync(Address address, String subject) {
+        Room room = mDataHandler.getRoom(address.getAddress());
 
+        if (room != null && room.isInvited())
+            room.join(new ApiCallback<Void>() {
+                @Override
+                public void onNetworkError(Exception e) {
+                    mConn.debug("acceptInvitationAsync.join.onNetworkError");
+
+                }
+
+                @Override
+                public void onMatrixError(MatrixError matrixError) {
+                    mConn.debug("acceptInvitationAsync.join.onMatrixError");
+
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+                    mConn.debug("acceptInvitationAsync.join.onUnexpectedError");
+
+                }
+
+                @Override
+                public void onSuccess(Void aVoid) {
+                    mConn.debug("acceptInvitationAsync.join.onSuccess");
+
+                }
+            });
     }
 
     @Override
@@ -179,11 +210,44 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     @Override
     public void acceptInvitationAsync(Invitation invitation) {
 
+        Room room = mDataHandler.getRoom(invitation.getGroupAddress().getAddress());
+
+        if (room != null && room.isInvited())
+            room.join(new ApiCallback<Void>() {
+                @Override
+                public void onNetworkError(Exception e) {
+                    mConn.debug("acceptInvitationAsync.join.onNetworkError");
+
+                }
+
+                @Override
+                public void onMatrixError(MatrixError matrixError) {
+                    mConn.debug("acceptInvitationAsync.join.onMatrixError");
+
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+                    mConn.debug("acceptInvitationAsync.join.onUnexpectedError");
+
+                }
+
+                @Override
+                public void onSuccess(Void aVoid) {
+                    mConn.debug("acceptInvitationAsync.join.onSuccess");
+
+                }
+            });
+
+
     }
 
     @Override
     public void rejectInvitationAsync(Invitation invitation) {
-
+        Room room = mDataHandler.getRoom(invitation.getGroupAddress().getAddress());
+        if (room != null)
+            room.leave(new BasicApiCallback("rejectInvitationAsync.leave"));
+        //do nothing
     }
 
     @Override
@@ -204,6 +268,14 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
     @Override
     public void grantAdminAsync(ChatGroup group, Contact contact) {
+        Room room = mDataHandler.getRoom(group.getAddress().getAddress());
 
+        if (room != null)
+        {
+            RoomMember member = room.getMember(contact.getAddress().getAddress());
+            room.getState().getPowerLevels().setUserPowerLevel(member.getUserId(),room.getState().getPowerLevels().invite);
+
+            mConn.updateGroupMembers(room, group);
+        }
     }
 }

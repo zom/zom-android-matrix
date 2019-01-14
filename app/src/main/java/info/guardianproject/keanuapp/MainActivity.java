@@ -245,12 +245,6 @@ public class MainActivity extends BaseActivity {
 
         applyStyle();
 
-        /**
-        if (Preferences.doCheckBatteryOptimizations())
-        {
-            requestChangeBatteryOptimizations();
-            Preferences.checkedBatteryOptimizations();
-        }**/
     }
 
     private void installRingtones ()
@@ -338,6 +332,7 @@ public class MainActivity extends BaseActivity {
 
         handleIntent(getIntent());
 
+        /**
         if (mApp.getDefaultAccountId() == -1)
         {
             startActivity(new Intent(this,RouterActivity.class));
@@ -352,7 +347,7 @@ public class MainActivity extends BaseActivity {
             }, 5000); //Timer is in ms here.
 
 
-        }
+        }**/
 
     }
 
@@ -570,7 +565,6 @@ public class MainActivity extends BaseActivity {
 
     private void startGroupChat (ArrayList<String> invitees)
     {
-
 
         String chatRoom = "groupchat" + UUID.randomUUID().toString().substring(0,8);
         String chatServer = ""; //use the default
@@ -960,16 +954,9 @@ public class MainActivity extends BaseActivity {
 
         new AsyncTask<String, Long, String>() {
 
-            private ProgressDialog dialog;
-
 
             @Override
             protected void onPreExecute() {
-                dialog = new ProgressDialog(MainActivity.this);
-
-                dialog.setMessage(getString(R.string.connecting_to_group_chat_));
-                dialog.setCancelable(true);
-                dialog.show();
             }
 
             @Override
@@ -1031,9 +1018,6 @@ public class MainActivity extends BaseActivity {
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
 
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
 
                 if (result != null)
                 {

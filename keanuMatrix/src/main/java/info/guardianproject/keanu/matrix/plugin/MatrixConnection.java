@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.facebook.stetho.common.ArrayListAccumulator;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 
@@ -40,6 +41,7 @@ import org.matrix.androidsdk.rest.callback.SimpleApiCallback;
 import org.matrix.androidsdk.rest.client.LoginRestClient;
 import org.matrix.androidsdk.rest.model.Event;
 import org.matrix.androidsdk.rest.model.MatrixError;
+import org.matrix.androidsdk.rest.model.PowerLevels;
 import org.matrix.androidsdk.rest.model.ReceiptData;
 import org.matrix.androidsdk.rest.model.RoomMember;
 import org.matrix.androidsdk.rest.model.User;
@@ -80,6 +82,7 @@ import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.model.ImEntity;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.model.ImException;
+import info.guardianproject.keanu.core.model.Invitation;
 import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.model.Presence;
 import info.guardianproject.keanu.core.provider.Imps;
@@ -414,14 +417,20 @@ public class MatrixConnection extends ImConnection {
         setState(ImConnection.LOGGING_OUT, null);
 
         if (mSession.isAlive()) {
-            mSession.setIsOnline(false);
+
+            mSession.stopEventStream();
+            mSession.isOnline();
+            setState(ImConnection.DISCONNECTED, null);
+
+            /**
             mSession.logout(mContext, new SimpleApiCallback<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
 
                     setState(ImConnection.DISCONNECTED, null);
+
                 }
-            });
+            });**/
         }
         else
         {
@@ -514,7 +523,37 @@ public class MatrixConnection extends ImConnection {
 
     @Override
     public List getFingerprints(String address) {
-        return null;
+
+        ArrayList<String> result = null;
+
+        List<MXDeviceInfo> devices = mDataHandler.getCrypto().getUserDevices(address);
+        if (devices != null && devices.size() > 0)
+        {
+            result = new ArrayList<>();
+
+            for (MXDeviceInfo device : devices)
+            {
+
+                String deviceInfo = device.displayName()
+                        +'|' + device.deviceId
+                        +'|' + device.fingerprint()
+                        +'|' + device.isVerified();
+
+                result.add(deviceInfo);
+
+            }
+
+        }
+
+
+        return result;
+    }
+
+    @Override
+    public void setDeviceVerified (String address, String device, boolean verified)
+    {
+        mDataHandler.getCrypto().setDeviceVerification(verified ? MXDeviceInfo.DEVICE_VERIFICATION_VERIFIED : MXDeviceInfo.DEVICE_VERIFICATION_UNVERIFIED,
+                device, address, new BasicApiCallback("setDeviceVerified"));
     }
 
     @Override
@@ -568,6 +607,16 @@ public class MatrixConnection extends ImConnection {
         }
 
         final ChatGroup group = mChatGroupManager.getChatGroup(mAddr, subject);
+        updateGroupMembers (room, group);
+
+        checkRoomEncryption(room);
+
+        return group;
+    }
+
+    protected void updateGroupMembers (Room room, ChatGroup group)
+    {
+        final PowerLevels powerLevels = room.getState().getPowerLevels();
 
         room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
             @Override
@@ -590,7 +639,6 @@ public class MatrixConnection extends ImConnection {
             public void onSuccess(List<RoomMember> roomMembers) {
 
                 group.beginMemberUpdates();
-              //  group.clearMembers(true);
 
                 for (RoomMember member : roomMembers)
                 {
@@ -601,8 +649,9 @@ public class MatrixConnection extends ImConnection {
 
                         contact = new Contact(new MatrixAddress(member.getUserId()), member.getName(), Imps.Contacts.TYPE_NORMAL);
 
-                        //if this is a one-to-one room, add this person as a contact
-                        if (roomMembers.size() == 2) {
+                        //if this is a one-to-one room, add this person as a contact, as long as it isn't me
+                        if (roomMembers.size() == 2
+                                && (!member.getUserId().equals(mSession.getMyUserId()))) {
                             try {
                                 mContactListManager.doAddContactToListAsync(contact, null, true);
                             } catch (ImException e) {
@@ -612,20 +661,20 @@ public class MatrixConnection extends ImConnection {
 
                     }
 
-
                     group.notifyMemberJoined(member.getUserId(), contact);
-                    group.notifyMemberRoleUpdate(contact, "moderator", "owner");
 
+                    if (powerLevels != null) {
+                        if (powerLevels.getUserPowerLevel(member.getUserId()) > powerLevels.invite)
+                            group.notifyMemberRoleUpdate(contact, "moderator", "owner");
+                        else
+                            group.notifyMemberRoleUpdate(contact, "member", "member");
+                    }
                 }
 
                 group.endMemberUpdates();
 
             }
         });
-
-        checkRoomEncryption(room);
-
-        return group;
     }
 
     protected void checkRoomEncryption (Room room)
@@ -905,31 +954,14 @@ public class MatrixConnection extends ImConnection {
             debug ("onNewRoom: " + s);
 
             final Room room = mStore.getRoom(s);
+            ChatGroup group = addRoomContact(room);
+
             if (room.isInvited())
-                room.join(new ApiCallback<Void>() {
-                    @Override
-                    public void onNetworkError(Exception e) {
-
-                    }
-
-                    @Override
-                    public void onMatrixError(MatrixError matrixError) {
-
-                    }
-
-                    @Override
-                    public void onUnexpectedError(Exception e) {
-
-                    }
-
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        ChatGroup group = addRoomContact(room);
-
-                        mChatSessionManager.createChatSession(group,true);
-                    }
-                });
-
+            {
+                MatrixAddress addr = new MatrixAddress(s);
+                Invitation invite = new Invitation(s,addr,addr,room.getTopic());
+                mChatGroupManager.notifyGroupInvitation(invite);
+            }
 
         }
 
@@ -1011,22 +1043,27 @@ public class MatrixConnection extends ImConnection {
 
         @Override
         public void onNewGroupInvitation(final String s) {
+            Room room = mStore.getRoom(s);
+
+            if (room.isInvited())
+            {
+                onNewRoom(room.getRoomId());
+            }
+
+        }
+
+        @Override
+        public void onJoinGroup(String s) {
 
             mResponseHandler.post (new Runnable ()
             {
                 public void run ()
                 {
                     debug ("onNewGroupInvitation: " + s);
-                    mSession.joinRoom(s, new BasicApiCallback("onNewGroupInvitation"));
                     Room room = mStore.getRoom(s);
                     addRoomContact(room);
                 }
             });
-
-        }
-
-        @Override
-        public void onJoinGroup(String s) {
 
         }
 

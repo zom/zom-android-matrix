@@ -301,7 +301,7 @@ public class StatusBarNotifier {
 
     }
 
-    private Intent getDefaultIntent(long accountId, long providerId) {
+    public Intent getDefaultIntent(long accountId, long providerId) {
 
         Intent intent = null;
         try {

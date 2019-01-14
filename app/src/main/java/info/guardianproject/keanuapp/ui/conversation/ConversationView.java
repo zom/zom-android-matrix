@@ -340,6 +340,9 @@ public class ConversationView {
 
     private boolean checkConnection ()
     {
+        if (mProviderId == -1 || mAccountId == -1)
+            return false;
+
         if (mConn == null) {
             mConn = RemoteImService.getConnection(mProviderId, mAccountId);
 

@@ -626,6 +626,13 @@ public class ImConnectionAdapter extends IImConnection.Stub {
             return null;
     }
 
+    public void setDeviceVerified (String address, String device, boolean verified)
+    {
+        if (mConnection != null)
+            mConnection.setDeviceVerified(address, device, verified);
+
+    }
+
     /**
     public String sendMediaMessage (String recipient, Uri uriMedia, String fileName, String mimeType, long fileSize, boolean doEncryption, UploadProgressListener listener)
     {

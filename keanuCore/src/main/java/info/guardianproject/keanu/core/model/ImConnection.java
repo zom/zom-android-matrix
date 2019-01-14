@@ -268,6 +268,8 @@ public abstract class ImConnection {
 
     public abstract List getFingerprints (String address);
 
+    public abstract void setDeviceVerified (String address, String device, boolean verified);
+
     public abstract void broadcastMigrationIdentity (String newIdentity);
 
    // public abstract String sendMediaMessage (String recipient, Uri uriMedia, String fileName, String mimeType, long fileSize, boolean doEncryption, UploadProgressListener listener);

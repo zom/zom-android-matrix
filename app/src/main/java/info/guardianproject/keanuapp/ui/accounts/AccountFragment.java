@@ -47,7 +47,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import info.guardianproject.keanu.core.BuildConfig;
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IImConnection;
@@ -387,9 +386,9 @@ public class AccountFragment extends Fragment {
                 return;
 
             mCropImageView = new CropImageView(getActivity());// (CropImageView)view.findViewById(R.id.CropImageView);
-            mCropImageView.setAspectRatio(1, 1);
-            mCropImageView.setFixedAspectRatio(true);
-            mCropImageView.setCropShape(CropImageView.CropShape.OVAL);
+   //         mCropImageView.setAspectRatio(1, 1);
+    //        mCropImageView.setFixedAspectRatio(true);
+    //        mCropImageView.setCropShape(CropImageView.CropShape.OVAL);
 
             //  mCropImageView.setGuidelines(1);
 
@@ -533,7 +532,7 @@ public class AccountFragment extends Fragment {
         if (getImage != null) {
             getImage = (new File(getImage.getPath(), "pickImageResult.jpg"));
             outputFileUri = FileProvider.getUriForFile(getActivity(),
-                    BuildConfig.APPLICATION_ID + ".provider",
+                    getContext().getPackageName() + ".provider",
                     getImage);
         }
         return outputFileUri;

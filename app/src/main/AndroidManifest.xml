@@ -184,7 +184,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:exported="true"
             android:theme="@style/AppThemeNoAction">
             <intent-filter
