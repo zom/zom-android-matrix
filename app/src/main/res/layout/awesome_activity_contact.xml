@@ -117,6 +117,19 @@
             android:textColor="?contactTextSecondary"
             android:layout_gravity="start"
             />
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="none"
+                android:text="@string/action_verified"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="?contactTextSecondary"
+                android:layout_gravity="start"
+                android:layout_alignParentRight="true"
+
+                />
+
+
 </RelativeLayout>
 
         <RelativeLayout
@@ -127,18 +140,18 @@
             >
 
             <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:id="@+id/qrcode"
-                android:background="#dddddd"
-                android:src="@drawable/qr"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:id="@+id/verifiedIcon"
+                android:src="@drawable/ic_verified_user_white_48dp"
+                android:tint="@color/holo_grey_light"
                 android:layout_alignParentLeft="true"
                 />
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:layout_toRightOf="@+id/qrcode"
+                android:layout_toRightOf="@+id/verifiedIcon"
                 >
             <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:id="@+id/tvDeviceName"
@@ -147,7 +160,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="6dp"
                 android:autoLink="none"
-                android:text="Device Name THat is Really Long Oh My Gosh"
+                android:text="device name"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="?contactTextSecondary"
 
@@ -160,22 +173,20 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="6dp"
                 android:autoLink="none"
-                android:text="device fingerprint"
+                android:text="fingerprint"
                 android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textStyle="bold"
                 android:textColor="?contactTextSecondary"
-
                 android:layout_centerVertical="true"
                 />
             </LinearLayout>
-            <Switch
+            <android.support.v7.widget.SwitchCompat
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/switchVerified"
                 android:layout_alignParentRight="true"
                 android:padding="6dp"
                 android:layout_margin="1dp"
-                android:textOn="verified"
-                android:textOff="unverified"
                 />
 
         </RelativeLayout>

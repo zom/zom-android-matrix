@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -175,10 +176,10 @@ public class ContactDisplayActivity extends BaseActivity {
         try {
 
          //   ImageView btnQrShare = (ImageView) findViewById(R.id.qrshare);
-            ImageView iv = (ImageView)findViewById(R.id.qrcode);
+            ImageView ivIcon = (ImageView)findViewById(R.id.verifiedIcon);
             TextView tvDevice = (TextView)findViewById(R.id.tvDeviceName);
             TextView tvKey = (TextView)findViewById(R.id.tvFingerprint);
-            Switch switchVerified = findViewById(R.id.switchVerified);
+            SwitchCompat switchVerified = findViewById(R.id.switchVerified);
 
             String remoteFingerprint = remoteFingerprints.get(0);
 
@@ -196,12 +197,20 @@ public class ContactDisplayActivity extends BaseActivity {
                 tvKey.setText(deviceFingerprint);
                 switchVerified.setChecked(isVerified);
 
+                if (isVerified)
+                    ivIcon.setColorFilter(ContextCompat.getColor(this, R.color.holo_green_light), android.graphics.PorterDuff.Mode.MULTIPLY);
+
                 switchVerified.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (mConn != null) {
                             try {
                                 mConn.setDeviceVerified(mUsername,deviceId,isChecked);
+
+                                ivIcon.setColorFilter(ContextCompat.getColor(ContactDisplayActivity.this,
+                                        isChecked? R.color.holo_green_light : R.color.holo_grey_light), android.graphics.PorterDuff.Mode.MULTIPLY);
+
+
                             } catch (RemoteException e) {
                                 e.printStackTrace();
                             }
@@ -363,8 +372,10 @@ public class ContactDisplayActivity extends BaseActivity {
     private String prettyPrintFingerprint(String fingerprint) {
         StringBuffer spacedFingerprint = new StringBuffer();
 
-        for (int i = 0; i + 4 <= fingerprint.length(); i += 8) {
-            spacedFingerprint.append(fingerprint.subSequence(i, i + 8));
+        int groupSize = 4;
+
+        for (int i = 0; i + groupSize <= fingerprint.length(); i += groupSize) {
+            spacedFingerprint.append(fingerprint.subSequence(i, i + groupSize));
             spacedFingerprint.append(' ');
         }
 
