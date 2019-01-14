@@ -71,6 +71,7 @@ import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
 import info.guardianproject.keanuapp.tasks.SignInHelper;
 import info.guardianproject.keanuapp.ui.BaseActivity;
+import info.guardianproject.keanuapp.ui.contacts.AddContactActivity;
 import info.guardianproject.keanuapp.ui.legacy.SimpleAlertHandler;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
@@ -130,15 +131,15 @@ public class OnboardingActivity extends BaseActivity {
         View viewRegister =  findViewById(R.id.flipViewRegister);
         View viewCreate = findViewById(R.id.flipViewCreateNew);
         View viewLogin = findViewById(R.id.flipViewLogin);
-        View viewInvite = findViewById(R.id.flipViewInviteFriends);
+       // View viewInvite = findViewById(R.id.flipViewInviteFriends);
         View viewAdvanced  = findViewById(R.id.flipViewAdvanced);
 
 
         final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         int themeColorHeader = settings.getInt("themeColor",-1);
 
-        if (themeColorHeader != -1)
-            viewInvite.setBackgroundColor(themeColorHeader);
+     //   if (themeColorHeader != -1)
+       //     viewInvite.setBackgroundColor(themeColorHeader);
 
         mViewFlipper = (ViewFlipper) findViewById(R.id.viewFlipper1);
 
@@ -309,6 +310,7 @@ public class OnboardingActivity extends BaseActivity {
             }
         });
 
+        /**
         View btnInviteSms = viewInvite.findViewById(R.id.btnInviteSMS);
         btnInviteSms.setOnClickListener(new OnClickListener() {
 
@@ -345,7 +347,7 @@ public class OnboardingActivity extends BaseActivity {
                 
             }
             
-        });
+        });**/
 
 
         View btnSignIn = viewLogin.findViewById(R.id.btnSignIn);
@@ -626,7 +628,7 @@ public class OnboardingActivity extends BaseActivity {
                                             @Override
                                             public boolean onMenuItemClick(MenuItem item) {
 
-                                                showInviteScreen();
+                                                showMainScreen();
                                                 return false;
                                             }
                                         });
@@ -693,6 +695,7 @@ public class OnboardingActivity extends BaseActivity {
         }
       }
 
+      /**
     private void showInviteScreen ()
     {
         mViewFlipper.setDisplayedChild(5);
@@ -739,7 +742,7 @@ public class OnboardingActivity extends BaseActivity {
             e.printStackTrace();
         }
         
-    }
+    }**/
 
     private void showMainScreen ()
     {
@@ -747,7 +750,9 @@ public class OnboardingActivity extends BaseActivity {
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-
+        
+        intent = new Intent(this, AddContactActivity.class);
+        startActivity(intent);
     }
 
     private synchronized boolean doExistingAccountRegister ()
@@ -799,7 +804,7 @@ public class OnboardingActivity extends BaseActivity {
                 signInHelper.activateAccount(account.providerId, account.accountId);
                 signInHelper.signIn(account.password, account.providerId, account.accountId, true);
 
-                showInviteScreen();
+                showMainScreen();
 
                 mExistingAccountTask = null;
             }
@@ -821,7 +826,7 @@ public class OnboardingActivity extends BaseActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == OnboardingManager.REQUEST_SCAN) {
 
-                showInviteScreen();
+                showMainScreen();
 
                 ArrayList<String> resultScans = data.getStringArrayListExtra("result");
                 for (String resultScan : resultScans)
@@ -869,7 +874,7 @@ public class OnboardingActivity extends BaseActivity {
                             .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     setAvatar(mCropImageView.getCroppedImage(), mNewAccount);
-                                    showInviteScreen();
+                                    showMainScreen();
 
                                     delete(mOutputFileUri);
                                 }

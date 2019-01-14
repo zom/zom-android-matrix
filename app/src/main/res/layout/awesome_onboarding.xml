@@ -27,7 +27,7 @@
 
                 <include android:id="@+id/flipViewAdvanced" layout="@layout/awesome_onboarding_advanced"/>
 
-                <include android:id="@+id/flipViewInviteFriends" layout="@layout/awesome_onboarding_invite"/>
+            <!--    <include android:id="@+id/flipViewInviteFriends" layout="@layout/awesome_onboarding_invite"/>-->
 
 
             </ViewFlipper>
