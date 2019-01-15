@@ -498,10 +498,14 @@ public class AddContactActivity extends BaseActivity {
 
     ListPopupWindow mDomainList;
 
-    private synchronized void showUserSuggestions (ArrayList<String> suggestions)
+    private synchronized void showUserSuggestions (final Contact[] contacts)
     {
         if (mDomainList == null)
             mDomainList = new ListPopupWindow(this);
+
+        ArrayList<String> suggestions = new ArrayList<>(contacts.length);
+        for (Contact contact : contacts)
+            suggestions.add(contact.getName() + " (" + contact.getAddress().getAddress() + ")");
 
         mDomainList.setAdapter(new ArrayAdapter(
                 this,
@@ -516,7 +520,7 @@ public class AddContactActivity extends BaseActivity {
         mDomainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mNewAddress.setText(Server.getServersText(AddContactActivity.this)[position]);
+                mNewAddress.setText(contacts[position].getAddress().getAddress());
                 mDomainList.dismiss();
             }
         });
@@ -559,12 +563,9 @@ public class AddContactActivity extends BaseActivity {
                         public void onContactsPresenceUpdate(Contact[] contacts) throws RemoteException {
 
                             if (contacts != null && contacts.length > 0) {
-                                ArrayList<String> suggestions = new ArrayList<>(contacts.length);
-                                for (Contact contact : contacts) {
-                                    suggestions.add(contact.getName() + " (" + contact.getAddress().getAddress() + ")");
-                                }
 
-                                showUserSuggestions(suggestions);
+
+                                showUserSuggestions(contacts);
                             }
                         }
 
