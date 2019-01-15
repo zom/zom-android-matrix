@@ -46,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.provider.Imps;
@@ -247,8 +248,10 @@ public class AccountFragment extends Fragment {
                                 }
                             }
                         });
+
+                        StringTokenizer st = new StringTokenizer(mRemoteOmemoFingeprints.get(0),"|");
                         TextView tvFingerprint = (TextView) mView.findViewById(R.id.omemoFingerprint);
-                        tvFingerprint.setText(prettyPrintFingerprint(mRemoteOmemoFingeprints.get(0)));
+                        tvFingerprint.setText(st.nextToken()+ "\n" + prettyPrintFingerprint(st.nextToken()));
 
                         ImageView btnQrShare = (ImageView) mView.findViewById(R.id.omemoqrshare);
                         btnQrShare.setOnClickListener(new View.OnClickListener() {
@@ -582,8 +585,10 @@ public class AccountFragment extends Fragment {
     private String prettyPrintFingerprint(String fingerprint) {
         StringBuffer spacedFingerprint = new StringBuffer();
 
-        for (int i = 0; i + 8 <= fingerprint.length(); i += 8) {
-            spacedFingerprint.append(fingerprint.subSequence(i, i + 8));
+        int blockLength = 4;
+
+        for (int i = 0; i + blockLength <= fingerprint.length(); i += blockLength) {
+            spacedFingerprint.append(fingerprint.subSequence(i, i + blockLength));
             spacedFingerprint.append(' ');
         }
 

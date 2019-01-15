@@ -1595,24 +1595,27 @@ public class ConversationView {
 
     }
 
+    boolean showContactName = true;
+
     private synchronized void initSession ()
     {
         mHandler.post(mUpdateChatCallback);
 
-        new Thread ()
-        {
-            public void run ()
-            {
+        mCurrentChatSession = getChatSession();
 
-                mCurrentChatSession = getChatSession();
+        if (mCurrentChatSession == null)
+            mCurrentChatSession = createChatSession();
 
-                if (mCurrentChatSession == null)
-                    mCurrentChatSession = createChatSession();
-
-                mHandler.post(mUpdateChatCallback);
-
+        if (mCurrentChatSession != null) {
+            try {
+                showContactName = mCurrentChatSession.getParticipants().length > 2;
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
-        }.start();
+        }
+
+        mHandler.post(mUpdateChatCallback);
+
     }
 
 
@@ -2827,6 +2830,7 @@ public class ConversationView {
             }
 
 
+
             if (!mExpectingDelivery && isDelivered) {
                 mExpectingDelivery = true;
             } else if (cursor.getPosition() == cursor.getCount() - 1) {
@@ -2871,7 +2875,7 @@ public class ConversationView {
 
             switch (messageType) {
             case Imps.MessageType.INCOMING:
-                messageView.bindIncomingMessage(viewHolder,id, messageType, address, nickname, mimeType, body, date, mMarkup, false, encState, isGroupChat(), mPresenceStatus, mCurrentChatSession, packetId);
+                messageView.bindIncomingMessage(viewHolder,id, messageType, address, nickname, mimeType, body, date, mMarkup, false, encState, showContactName, mPresenceStatus, mCurrentChatSession, packetId);
 
                 break;
 

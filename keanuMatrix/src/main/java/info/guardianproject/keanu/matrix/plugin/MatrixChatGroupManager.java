@@ -128,7 +128,10 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                 @Override
                 public void onSuccess(String roomId) {
                     Room room = mDataHandler.getRoom(roomId);
-                    room.updateName(subject,new BasicApiCallback("RoomUpdate"));
+
+                    if (subject != null)
+                        room.updateName(subject,new BasicApiCallback("RoomUpdate"));
+
                     room.join(new BasicApiCallback("join room"));
                     room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("CreateRoomEncryption"));
 

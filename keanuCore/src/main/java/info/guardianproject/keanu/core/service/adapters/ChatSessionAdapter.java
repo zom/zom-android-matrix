@@ -756,14 +756,14 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             
             ChatGroup group = (ChatGroup) participant;
             Contact groupMember = group.getMember(username);
-            if (groupMember != null)
+            if (groupMember != null && groupMember.getName() != null)
             {
                 return groupMember.getName();
             }
             else {
                 // not found, impossible
-                String[] parts = username.split("/");
-                return parts[parts.length - 1];
+                String[] parts = username.split(":");
+                return parts[0];
             }
         } else {
             return ((Contact) participant).getName();
@@ -1149,15 +1149,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             String username = msg.getFrom().getAddress();
             String bareUsername = msg.getFrom().getAddress();
             String nickname = getNickName(username);
-
-            try {
-                Contact contact = mConnection.getContactListManager().getContactByAddress(bareUsername);
-                if (contact != null)
-                    nickname = contact.getName();
-
-            } catch (Exception e) {
-                return false;
-            }
 
             long time = msg.getDateTime().getTime();
 

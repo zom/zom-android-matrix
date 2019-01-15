@@ -567,18 +567,8 @@ public class MainActivity extends BaseActivity {
     private void startGroupChat (ArrayList<String> invitees)
     {
 
-
-        StringBuffer sbChatRoomName = new StringBuffer();
-        for (String invitee : invitees)
-        {
-            sbChatRoomName.append(invitee);
-            sbChatRoomName.append(',');
-        }
-
-        sbChatRoomName.deleteCharAt(sbChatRoomName.length()-1);
-
         IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(),mApp.getDefaultAccountId());
-        startGroupChat(sbChatRoomName.toString(), invitees, conn);
+        startGroupChat(null, invitees, conn);
 
 
     }
@@ -992,7 +982,10 @@ public class MainActivity extends BaseActivity {
 
                     IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
 
-                    String roomName = params[0];
+                    String roomName = null;
+
+                    if (params.length > 0)
+                        roomName = params[0];
 
                     String[] aInvitees = null;
 

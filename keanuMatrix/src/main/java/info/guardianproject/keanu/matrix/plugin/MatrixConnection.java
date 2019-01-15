@@ -542,7 +542,6 @@ public class MatrixConnection extends ImConnection {
 
             for (MXDeviceInfo device : devices)
             {
-
                 String deviceInfo = device.displayName()
                         +'|' + device.deviceId
                         +'|' + device.fingerprint()
@@ -656,8 +655,13 @@ public class MatrixConnection extends ImConnection {
                     debug ( "RoomMember: " + room.getRoomId() + ": " + member.getName() + " (" + member.getUserId() + ")");
 
                     Contact contact = mContactListManager.getContact(member.getUserId());
-                    if (contact == null)
-                        contact = new Contact(new MatrixAddress(member.getUserId()), member.getName(), Imps.Contacts.TYPE_NORMAL);
+
+                    if (contact == null) {
+                        if (member.getName() != null)
+                            contact = new Contact(new MatrixAddress(member.getUserId()), member.getName(), Imps.Contacts.TYPE_NORMAL);
+                        else
+                            contact = new Contact(new MatrixAddress(member.getUserId()));
+                    }
 
                     group.notifyMemberJoined(member.getUserId(), contact);
 
@@ -731,14 +735,14 @@ public class MatrixConnection extends ImConnection {
                      if (event.getContentAsJsonObject().has("last_active_ago"))
                          lastActiveAgo = event.getContentAsJsonObject().get("last_active_ago").getAsInt();
 
-                     // if (!mSession.getMediaCache().isAvatarThumbnailCached(user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT)) {
-                     ImageView iv = new ImageView(mContext);
-                     mSession.getMediaCache().loadAvatarThumbnail(mConfig, iv, user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT);
-                     if (iv.getDrawable() != null) {
-                         Bitmap bm = ((BitmapDrawable) iv.getDrawable()).getBitmap();
-                         setAvatar(user.user_id, bm);
+                     if (mSession.getMediaCache().isAvatarThumbnailCached(user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT)) {
+                         ImageView iv = new ImageView(mContext);
+                         mSession.getMediaCache().loadAvatarThumbnail(mConfig, iv, user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT);
+                         if (iv.getDrawable() != null) {
+                             Bitmap bm = ((BitmapDrawable) iv.getDrawable()).getBitmap();
+                             setAvatar(user.user_id, bm);
+                         }
                      }
-
 
                      if (currentlyActive)
                          contact.setPresence(new Presence(Presence.AVAILABLE));
@@ -1415,7 +1419,6 @@ public class MatrixConnection extends ImConnection {
     private void setAvatar(String address, Bitmap bmp) {
 
         BitmapDrawable avatar = new BitmapDrawable(bmp);
-
 
         try {
 
