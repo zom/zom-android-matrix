@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import info.guardianproject.keanu.core.service.IChatSessionListener;
+
 /**
  * ChatGroupManager manages the creating, removing and the member of ChatGroups.
  */
@@ -80,7 +82,7 @@ public abstract class ChatGroupManager {
      * @param address the name of the ChatGroup to be created.
      * @throws Exception
      */
-    public abstract ChatGroup createChatGroupAsync(String address, String subject, String nickname) throws Exception;
+    public abstract ChatGroup createChatGroupAsync(String address, String subject, String nickname, IChatSessionListener listener) throws Exception;
 
     /**
      * Deletes a certain {@link ChatGroup}. This method returns immediately and the

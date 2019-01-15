@@ -22,6 +22,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.provider.BaseColumns;
@@ -62,6 +63,7 @@ import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatListener;
 import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.service.IDataListener;
 import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.service.StatusBarNotifier;
@@ -117,7 +119,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     private boolean mEnableOmemoGroups = false;
     private String mNickname = null;
 
-    public ChatSessionAdapter(ChatSession chatSession, ImEntity participant, ImConnectionAdapter connection, boolean isNewSession) {
+    public ChatSessionAdapter(ChatSession chatSession, ChatGroup group, ImConnectionAdapter connection, boolean isNewSession) {
 
         mChatSession = chatSession;
         mConnection = connection;
@@ -131,11 +133,13 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
         mDataHandlerListener = new DataHandlerListenerImpl();
 
+        /**
         if (participant instanceof ChatGroup) {
             init((ChatGroup) participant,isNewSession);
         } else {
             init((Contact) participant,isNewSession);
-        }
+        }**/
+        init(group, isNewSession);
 
         initMuted();
         initUseEncryption();
@@ -193,6 +197,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         
     }
 
+    /**
     private void init(Contact contact, boolean isNewSession) {
         mIsGroupChat = false;
         mNickname = contact.getName();
@@ -212,7 +217,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         mContactStatusMap.put(contact.getName(), contact.getPresence().getStatus());
 
 
-    }
+    }**/
 
     public void reInit ()
     {
@@ -750,19 +755,10 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         if (mIsGroupChat) {
             
             ChatGroup group = (ChatGroup) participant;
-            /**
-            List<Contact> members = group.getMembers();
-            for (Contact c : members) {
-                if (username.equals(c.getAddress().getAddress())) {
-                    
-                    return c.getAddress().getResource();
-                        
-                }
-            }**/
             Contact groupMember = group.getMember(username);
             if (groupMember != null)
             {
-                return groupMember.getAddress().getAddress();
+                return groupMember.getName();
             }
             else {
                 // not found, impossible
@@ -1500,7 +1496,22 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             mGroupName = "G" + System.currentTimeMillis();
             try
             {
-                mGroupMgr.createChatGroupAsync(null, mGroupName, nickname);
+                mGroupMgr.createChatGroupAsync(null, mGroupName, nickname, new IChatSessionListener() {
+                    @Override
+                    public void onChatSessionCreated(IChatSession session) throws RemoteException {
+
+                    }
+
+                    @Override
+                    public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                    }
+
+                    @Override
+                    public IBinder asBinder() {
+                        return null;
+                    }
+                });
             }
             catch (Exception e){
                 e.printStackTrace();

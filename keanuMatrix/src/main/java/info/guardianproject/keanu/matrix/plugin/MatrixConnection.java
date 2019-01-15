@@ -4,6 +4,9 @@ import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -53,8 +56,10 @@ import org.matrix.androidsdk.rest.model.login.LoginFlow;
 import org.matrix.androidsdk.rest.model.login.RegistrationFlowResponse;
 import org.matrix.androidsdk.rest.model.login.RegistrationParams;
 import org.matrix.androidsdk.rest.model.message.FileMessage;
+import org.matrix.androidsdk.rest.model.search.SearchUsersResponse;
 import org.matrix.androidsdk.util.JsonUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -87,10 +92,13 @@ import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.model.Presence;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.service.IContactListListener;
+import info.guardianproject.keanu.core.util.DatabaseUtils;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.core.util.UploadProgressListener;
 
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
+import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_WIDTH;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 import static info.guardianproject.keanu.core.service.RemoteImService.debug;
 
@@ -188,6 +196,7 @@ public class MatrixConnection extends ImConnection {
         if (mSession != null)
             mSession.setIsOnline(true);
     }
+
 
     private Contact makeUser(Imps.ProviderSettings.QueryMap providerSettings, ContentResolver contentResolver) {
 
@@ -564,6 +573,8 @@ public class MatrixConnection extends ImConnection {
     @Override
     public void changeNickname(String nickname) {
 
+        mDataHandler.getMyUser().updateDisplayName(nickname,new BasicApiCallback("changeNickname"));
+
     }
 
     private void loadStateAsync ()
@@ -643,23 +654,10 @@ public class MatrixConnection extends ImConnection {
                 for (RoomMember member : roomMembers)
                 {
                     debug ( "RoomMember: " + room.getRoomId() + ": " + member.getName() + " (" + member.getUserId() + ")");
+
                     Contact contact = mContactListManager.getContact(member.getUserId());
-
-                    if (contact == null) {
-
+                    if (contact == null)
                         contact = new Contact(new MatrixAddress(member.getUserId()), member.getName(), Imps.Contacts.TYPE_NORMAL);
-
-                        //if this is a one-to-one room, add this person as a contact, as long as it isn't me
-                        if (roomMembers.size() == 2
-                                && (!member.getUserId().equals(mSession.getMyUserId()))) {
-                            try {
-                                mContactListManager.doAddContactToListAsync(contact, null, true);
-                            } catch (ImException e) {
-                                Log.e(TAG, "Error adding contact to list", e);
-                            }
-                        }
-
-                    }
 
                     group.notifyMemberJoined(member.getUserId(), contact);
 
@@ -716,40 +714,41 @@ public class MatrixConnection extends ImConnection {
         public void onPresenceUpdate(Event event, User user) {
              debug ("onPresenceUpdate : " + user.user_id + ": event=" + event.toString());
 
-            boolean currentlyActive = false;
-            int lastActiveAgo = -1;
+             //not me!
+             if (!user.user_id.equals(mDataHandler.getUserId())) {
 
-            if (event.getContentAsJsonObject().has("currently_active"))
-                currentlyActive = event.getContentAsJsonObject().get("currently_active").getAsBoolean();
+                 Contact contact = mContactListManager.getContact(user.user_id);
 
-            if (event.getContentAsJsonObject().has("last_active_ago"))
-                lastActiveAgo = event.getContentAsJsonObject().get("last_active_ago").getAsInt();
+                 if (contact != null) {
 
-            if (!mSession.getMediaCache().isAvatarThumbnailCached(user.getAvatarUrl(),DEFAULT_AVATAR_HEIGHT)) {
-                ImageView iv = new ImageView(mContext);
-                mSession.getMediaCache().loadAvatarThumbnail(mConfig, iv, user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT);
-            }
 
-            Contact contact = mContactListManager.getContact(user.user_id);
+                     boolean currentlyActive = false;
+                     int lastActiveAgo = -1;
 
-            if (contact == null) {
+                     if (event.getContentAsJsonObject().has("currently_active"))
+                         currentlyActive = event.getContentAsJsonObject().get("currently_active").getAsBoolean();
 
-                contact = new Contact(new MatrixAddress(event.getSender()), user.displayname, Imps.Contacts.TYPE_NORMAL);
-                try {
-                    mContactListManager.doAddContactToListAsync(contact, null, false);
-                } catch (ImException e) {
-                    e.printStackTrace();
-                }
+                     if (event.getContentAsJsonObject().has("last_active_ago"))
+                         lastActiveAgo = event.getContentAsJsonObject().get("last_active_ago").getAsInt();
 
-            }
+                     // if (!mSession.getMediaCache().isAvatarThumbnailCached(user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT)) {
+                     ImageView iv = new ImageView(mContext);
+                     mSession.getMediaCache().loadAvatarThumbnail(mConfig, iv, user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT);
+                     if (iv.getDrawable() != null) {
+                         Bitmap bm = ((BitmapDrawable) iv.getDrawable()).getBitmap();
+                         setAvatar(user.user_id, bm);
+                     }
 
-            if (currentlyActive)
-                contact.setPresence(new Presence(Presence.AVAILABLE));
-            else
-                contact.setPresence(new Presence(Presence.OFFLINE));
 
-            Contact[] contacts = {contact};
-            mContactListManager.notifyContactsPresenceUpdated(contacts);
+                     if (currentlyActive)
+                         contact.setPresence(new Presence(Presence.AVAILABLE));
+                     else
+                         contact.setPresence(new Presence(Presence.OFFLINE));
+
+                     Contact[] contacts = {contact};
+                     mContactListManager.notifyContactsPresenceUpdated(contacts);
+                 }
+             }
         }
 
         @Override
@@ -1106,27 +1105,21 @@ public class MatrixConnection extends ImConnection {
 
     private void handlePresence (Event event)
     {
-        Contact contact = mContactListManager.getContact(event.getSender());
-
-        if (contact == null) {
-
-            User user = mStore.getUser(event.getSender());
-            contact = new Contact(new MatrixAddress(event.getSender()), user.displayname, Imps.Contacts.TYPE_NORMAL);
-            try {
-                mContactListManager.doAddContactToListAsync(contact, null, false);
-            } catch (ImException e) {
-                e.printStackTrace();
-            }
-
-        }
-
         User user = mStore.getUser(event.getSender());
-        if (user.isActive())
-            contact.setPresence(new Presence(Presence.AVAILABLE));
-        else
-            contact.setPresence(new Presence(Presence.OFFLINE));
-        Contact[] contacts = {contact};
-        mContactListManager.notifyContactsPresenceUpdated(contacts);
+
+        if (!user.user_id.equals(mDataHandler.getUserId())) {
+            Contact contact = mContactListManager.getContact(event.getSender());
+
+            if (contact == null)
+                return;
+
+            if (user.isActive())
+                contact.setPresence(new Presence(Presence.AVAILABLE));
+            else
+                contact.setPresence(new Presence(Presence.OFFLINE));
+            Contact[] contacts = {contact};
+            mContactListManager.notifyContactsPresenceUpdated(contacts);
+        }
     }
 
     private void handleTyping (Event event)
@@ -1139,25 +1132,16 @@ public class MatrixConnection extends ImConnection {
             for (JsonElement element : userIds) {
                 String userId = element.getAsString();
                 if (!userId.equals(mSession.getMyUserId())) {
-                    contact = mContactListManager.getContact(userId);
-                    if (contact != null) {
 
-                        /**
-                        if (contact.getPresence() == null || (!contact.getPresence().isOnline())) {
-                            contact.setPresence(new Presence(Presence.AVAILABLE));
-                            Contact[] contacts = {contact};
-                            mContactListManager.notifyContactsPresenceUpdated(contacts);
-                        }**/
-
-                        IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
-                        if (csa != null) {
-                            try {
-                                csa.setContactTyping(contact, true);
-                            } catch (RemoteException e) {
-                                e.printStackTrace();
-                            }
+                    IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
+                    if (csa != null) {
+                        try {
+                            csa.setContactTyping(new Contact(new MatrixAddress(userId)), true);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
                         }
                     }
+
                 }
             }
         }
@@ -1172,110 +1156,83 @@ public class MatrixConnection extends ImConnection {
             String messageType = event.getContent().getAsJsonObject().get("msgtype").getAsString();
             String messageMimeType = null;
 
-            debug("MESSAGE: from=" + event.getSender() + " message=" + messageBody);
+            debug("MESSAGE: room=" + event.roomId + " from=" + event.getSender() + " message=" + messageBody);
 
-            User user = mStore.getUser(event.getSender());
             Room room = mStore.getRoom(event.roomId);
 
-            Contact contact = mContactListManager.getContact(event.sender);
+            if (room != null && room.isMember()) {
 
-            if (contact == null) {
+                MatrixAddress addrSender = new MatrixAddress(event.sender);
 
-                contact = new Contact(new MatrixAddress(event.getSender()), user.displayname, Imps.Contacts.TYPE_NORMAL);
-                try {
-                    mContactListManager.doAddContactToListAsync(contact, null, false);
-                } catch (ImException e) {
-                    e.printStackTrace();
-                }
+                if (messageType.equals("m.image")
+                        || messageType.equals("m.file")
+                        || messageType.equals("m.video")
+                        || messageType.equals("m.audio")) {
+                    FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
 
-            }
+                    String mediaUrl = fileMessage.getUrl();
+                    messageMimeType = fileMessage.getMimeType();
 
-            if (messageType.equals("m.image")
-                    || messageType.equals("m.file")
-                    || messageType.equals("m.video")
-                    || messageType.equals("m.audio"))
-            {
-                FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
+                    String localFolder = addrSender.getAddress();
+                    String localFileName = new Date().getTime() + '.' + messageBody;
+                    EncryptedFileInfo encryptedFileInfo = fileMessage.file;
 
-                String mediaUrl = fileMessage.getUrl();
-                messageMimeType = fileMessage.getMimeType();
+                    String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, null != encryptedFileInfo);
 
-                String localFolder = contact.getAddress().getAddress();
-                String localFileName = new Date().getTime() + '.' + messageBody;
-                EncryptedFileInfo encryptedFileInfo = fileMessage.file;
+                    try {
+                        MatrixDownloader dl = new MatrixDownloader();
+                        info.guardianproject.iocipher.File fileDownload = dl.openSecureStorageFile(localFolder, localFileName);
+                        OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
+                        boolean downloaded = dl.get(downloadableUrl, storageStream);
 
-                String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, null != encryptedFileInfo);
+                        if (encryptedFileInfo != null) {
+                            InputStream decryptedIs = MXEncryptedAttachments.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo);
+                            info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileName);
+                            SecureMediaStore.copyToVfs(decryptedIs, fileDownloadDecrypted.getAbsolutePath());
+                            fileDownload.delete();
+                            fileDownload = fileDownloadDecrypted;
+                        }
 
-                try {
-                    MatrixDownloader dl = new MatrixDownloader();
-                    info.guardianproject.iocipher.File fileDownload = dl.openSecureStorageFile( localFolder, localFileName);
-                    OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
-                    boolean downloaded = dl.get(downloadableUrl, storageStream);
+                        messageBody = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
 
-                    if (encryptedFileInfo != null) {
-                        InputStream decryptedIs = MXEncryptedAttachments.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo);
-                        info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile( localFolder, localFileName);
-                        SecureMediaStore.copyToVfs(decryptedIs, fileDownloadDecrypted.getAbsolutePath());
-                        fileDownload.delete();
-                        fileDownload = fileDownloadDecrypted;
+                    } catch (Exception e) {
+                        debug("Error downloading file: " + downloadableUrl, e);
                     }
 
-                    messageBody = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
 
-                } catch (Exception e) {
-                    debug ("Error downloading file: " + downloadableUrl,e);
                 }
 
+                ChatSession session = mChatSessionManager.getSession(event.roomId);
 
-            }
-
-            String subject = room.getRoomDisplayName(mContext);
-
-            ImEntity participant = null;
-
-            String userId = event.roomId;
-            if (room.getNumberOfMembers() == 2) {
-                userId = event.getSender();
-                participant = contact;
-            }
-            else {
-                participant = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId), subject);
-                if (participant == null)
-                    participant = addRoomContact(mStore.getRoom(event.roomId));
-            }
-
-
-            ChatSession session = mChatSessionManager.getSession(userId);
-
-            if (session == null)
-            {
-                session = mChatSessionManager.createChatSession(participant,false);
-            }
-
-            Message message = new Message(messageBody);
-            message.setID(event.eventId);
-            message.setFrom(contact.getAddress());
-            message.setDateTime(new Date());//use "age"?
-            message.setContentType(messageMimeType);
-
-            if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
-                message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
-            }
-            else
-                message.setType(Imps.MessageType.INCOMING);
-
-            session.onReceiveMessage(message, true);
-
-            IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
-            if (csa != null) {
-                try {
-                    csa.setContactTyping(contact, false);
-                } catch (RemoteException e) {
-                    e.printStackTrace();
+                if (session == null) {
+                    ImEntity participant = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId),null);
+                    session = mChatSessionManager.createChatSession(participant, false);
                 }
-            }
 
-            room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
+                Message message = new Message(messageBody);
+                message.setID(event.eventId);
+                message.setFrom(addrSender);
+                message.setDateTime(new Date());//use "age"?
+                message.setContentType(messageMimeType);
+
+                if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
+                    message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
+                } else
+                    message.setType(Imps.MessageType.INCOMING);
+
+                session.onReceiveMessage(message, true);
+
+                IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
+                if (csa != null) {
+                    try {
+                        csa.setContactTyping(new Contact(addrSender), false);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
+            }
         }
 
     }
@@ -1453,5 +1410,72 @@ public class MatrixConnection extends ImConnection {
                 mRequiredStages.add(LoginRestClient.LOGIN_FLOW_TYPE_MSISDN);
             }
         }
+    }
+
+    private void setAvatar(String address, Bitmap bmp) {
+
+        BitmapDrawable avatar = new BitmapDrawable(bmp);
+
+
+        try {
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bmp.compress(Bitmap.CompressFormat.JPEG, 90, stream);
+
+            byte[] avatarBytesCompressed = stream.toByteArray();
+            String avatarHash = "nohash";
+            int rowsUpdated = DatabaseUtils.updateAvatarBlob(mContext.getContentResolver(), Imps.Avatars.CONTENT_URI, avatarBytesCompressed, address);
+
+            if (rowsUpdated <= 0)
+                DatabaseUtils.insertAvatarBlob(mContext.getContentResolver(), Imps.Avatars.CONTENT_URI, mProviderId, mAccountId, avatarBytesCompressed, avatarHash, address);
+
+        } catch (Exception e) {
+            Log.w(LOG_TAG, "error loading image bytes", e);
+        }
+    }
+
+    @Override
+    public void searchForUser (String search, IContactListListener listener)
+    {
+        mSession.searchUsers(search, 10, null, new ApiCallback<SearchUsersResponse>() {
+            @Override
+            public void onNetworkError(Exception e) {
+
+            }
+
+            @Override
+            public void onMatrixError(MatrixError matrixError) {
+
+            }
+
+            @Override
+            public void onUnexpectedError(Exception e) {
+
+            }
+
+            @Override
+            public void onSuccess(SearchUsersResponse searchUsersResponse) {
+
+                if (searchUsersResponse != null && searchUsersResponse.results != null) {
+
+                    Contact[] contacts = new Contact[searchUsersResponse.results.size()];
+                    int i = 0;
+                    for (User user : searchUsersResponse.results) {
+                        contacts[i++] = new Contact(new MatrixAddress(user.user_id),user.displayname,Imps.Contacts.TYPE_NORMAL);
+                    }
+
+                    if (listener != null)
+                    {
+                        try {
+                            listener.onContactsPresenceUpdate(contacts);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+
+            }
+        });
     }
 }

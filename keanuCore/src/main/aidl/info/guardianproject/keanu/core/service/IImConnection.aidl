@@ -17,10 +17,13 @@
 
 package info.guardianproject.keanu.core.service;
 
+
 import info.guardianproject.keanu.core.service.IConnectionListener;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IContactListManager;
 import info.guardianproject.keanu.core.service.IInvitationListener;
+import info.guardianproject.keanu.core.service.IContactListListener;
+
 import info.guardianproject.keanu.core.model.Presence;
 
 interface IImConnection {
@@ -82,4 +85,6 @@ interface IImConnection {
     void broadcastMigrationIdentity (String address);
 
     void changeNickname (String name);
+
+    void searchForUser (String searchString, IContactListListener listener);
 }

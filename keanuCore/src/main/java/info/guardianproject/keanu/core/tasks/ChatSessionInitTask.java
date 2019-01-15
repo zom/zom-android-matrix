@@ -1,10 +1,14 @@
 package info.guardianproject.keanu.core.tasks;
 
 import android.os.AsyncTask;
+import android.os.IBinder;
+import android.os.RemoteException;
 
 import info.guardianproject.keanu.core.model.Contact;
+import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.RemoteImService;
 
@@ -44,7 +48,22 @@ public class ChatSessionInitTask extends AsyncTask<Contact, Long, Long> {
                     if (session == null)
                     {
                         if ((mContactType & Imps.Contacts.TYPE_MASK) == Imps.Contacts.TYPE_GROUP)
-                            session = conn.getChatSessionManager().createMultiUserChatSession(contact.getAddress().getAddress(), contact.getName(), null, mIsNewSession);
+                            conn.getChatSessionManager().createMultiUserChatSession(contact.getAddress().getAddress(), contact.getName(), null, mIsNewSession, null, new IChatSessionListener() {
+                                @Override
+                                public void onChatSessionCreated(IChatSession session) throws RemoteException {
+
+                                }
+
+                                @Override
+                                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                                }
+
+                                @Override
+                                public IBinder asBinder() {
+                                    return null;
+                                }
+                            });
                         else {
                             session = conn.getChatSessionManager().createChatSession(contact.getAddress().getAddress(), mIsNewSession);
                         }

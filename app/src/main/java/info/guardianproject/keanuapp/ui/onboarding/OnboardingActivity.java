@@ -750,7 +750,7 @@ public class OnboardingActivity extends BaseActivity {
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
-        
+
         intent = new Intent(this, AddContactActivity.class);
         startActivity(intent);
     }

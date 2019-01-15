@@ -43,6 +43,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.provider.Browser;
@@ -90,6 +91,7 @@ import java.util.Date;
 
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.impl.BaseAddress;
+import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.model.Address;
@@ -1892,11 +1894,24 @@ public class ConversationView {
 
                         if ((mContactType & Imps.Contacts.TYPE_MASK) == Imps.Contacts.TYPE_GROUP)
                         {
-                            //Contact contactGroup = new Contact(new XmppAddress(mRemoteAddress),mRemoteNickname,Imps.Contacts.TYPE_GROUP);
-                            session = sessionMgr.createMultiUserChatSession(mRemoteAddress,mRemoteNickname,null,false);
+                            sessionMgr.createMultiUserChatSession(mRemoteAddress, mRemoteNickname, null, false, null, new IChatSessionListener() {
+                                @Override
+                                public void onChatSessionCreated(IChatSession session) throws RemoteException {
 
-                            //new ChatSessionInitTask(((ImApp)mActivity.getApplication()),mProviderId, mAccountId, Imps.Contacts.TYPE_GROUP)
-                              //      .executeOnExecutor(ImApp.sThreadPoolExecutor,contactGroup);
+                                    mCurrentChatSession = session;
+                                }
+
+                                @Override
+                                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                                }
+
+                                @Override
+                                public IBinder asBinder() {
+                                    return null;
+                                }
+                            });
+
 
                         }
                         else

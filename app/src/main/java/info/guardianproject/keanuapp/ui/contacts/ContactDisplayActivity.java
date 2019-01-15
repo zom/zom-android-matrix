@@ -137,12 +137,6 @@ public class ContactDisplayActivity extends BaseActivity {
             }
         }
 
-        if (showAddFriends) {
-            Button btnAddAsFriend = findViewById(R.id.btnAddAsFriend);
-            btnAddAsFriend.setText(getString(R.string.add_x_as_friend, mNickname));
-            btnAddAsFriend.setVisibility(View.VISIBLE);
-        }
-
         if (mConn != null) {
             new AsyncTask<String, Void, Boolean>() {
                 @Override
@@ -270,64 +264,6 @@ public class ContactDisplayActivity extends BaseActivity {
 
     }
 
-
-    public void verifyClicked (View view)
-    {
-        verifyRemoteFingerprint();
-        findViewById(R.id.btnVerify).setVisibility(View.GONE);
-    }
-
-    public void addFriendClicked (final View view)
-    {
-        LayoutInflater factory = LayoutInflater.from(this);
-        final View dialogAddFriend = factory.inflate(R.layout.alert_dialog_add_friend, null);
-        TextView title = dialogAddFriend.findViewById(R.id.alertTitle);
-        title.setText(getString(R.string.add_x_as_friend_question, mNickname));
-
-        ImageView avatarView = dialogAddFriend.findViewById(R.id.imageAvatar);
-        avatarView.setVisibility(View.GONE);
-        try {
-            Drawable avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mUsername, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, true);
-            if (avatar != null) {
-                avatarView.setImageDrawable(avatar);
-                avatarView.setVisibility(View.VISIBLE);
-            }
-        } catch (Exception e) {
-        }
-
-
-        final AlertDialog dialog = new AlertDialog.Builder(this)
-                .setView(dialogAddFriend)
-                .create();
-        dialog.show();
-
-        View btnAdd = dialogAddFriend.findViewById(R.id.btnAdd);
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ImApp app = (ImApp)getApplication();
-                new AddContactAsyncTask(mProviderId, mAccountId).execute(mUsername, null, null);
-                dialog.dismiss();
-                view.setVisibility(View.GONE);
-                showFriendAddedView();
-            }
-        });
-
-        TextView btnCancel = dialogAddFriend.findViewById(R.id.btnCancel);
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        /**
-        Typeface typeface;
-        if ((typeface = CustomTypefaceManager.getCurrentTypeface(this))!=null) {
-            title.setTypeface(typeface);
-            btnCancel.setTypeface(typeface);
-        }**/
-    }
 
     private void showGallery (int contactId)
     {

@@ -45,6 +45,7 @@ import info.guardianproject.keanu.core.model.Presence;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IConnectionListener;
+import info.guardianproject.keanu.core.service.IContactListListener;
 import info.guardianproject.keanu.core.service.IContactListManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.IInvitationListener;
@@ -633,6 +634,11 @@ public class ImConnectionAdapter extends IImConnection.Stub {
 
     }
 
+    public void searchForUser (String searchString, IContactListListener listener)
+    {
+        if (mConnection != null)
+            mConnection.searchForUser(searchString, listener);
+    }
     /**
     public String sendMediaMessage (String recipient, Uri uriMedia, String fileName, String mimeType, long fileSize, boolean doEncryption, UploadProgressListener listener)
     {

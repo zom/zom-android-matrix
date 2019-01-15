@@ -129,7 +129,7 @@ public class ChatGroup extends ImEntity {
             //clearMembers(true);
         }
 
-        Contact contact = mMembers.get(newContact.getAddress().getBareAddress());
+        Contact contact = mMembers.get(newContact.getAddress().getAddress());
 
         if (contact == null) {
             mMembers.put(newContact.getAddress().getBareAddress(), newContact);
