@@ -718,41 +718,8 @@ public class MatrixConnection extends ImConnection {
         public void onPresenceUpdate(Event event, User user) {
              debug ("onPresenceUpdate : " + user.user_id + ": event=" + event.toString());
 
-             //not me!
-             if (!user.user_id.equals(mDataHandler.getUserId())) {
+             handlePresence(event);
 
-                 Contact contact = mContactListManager.getContact(user.user_id);
-
-                 if (contact != null) {
-
-
-                     boolean currentlyActive = false;
-                     int lastActiveAgo = -1;
-
-                     if (event.getContentAsJsonObject().has("currently_active"))
-                         currentlyActive = event.getContentAsJsonObject().get("currently_active").getAsBoolean();
-
-                     if (event.getContentAsJsonObject().has("last_active_ago"))
-                         lastActiveAgo = event.getContentAsJsonObject().get("last_active_ago").getAsInt();
-
-                     if (mSession.getMediaCache().isAvatarThumbnailCached(user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT)) {
-                         ImageView iv = new ImageView(mContext);
-                         mSession.getMediaCache().loadAvatarThumbnail(mConfig, iv, user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT);
-                         if (iv.getDrawable() != null) {
-                             Bitmap bm = ((BitmapDrawable) iv.getDrawable()).getBitmap();
-                             setAvatar(user.user_id, bm);
-                         }
-                     }
-
-                     if (currentlyActive)
-                         contact.setPresence(new Presence(Presence.AVAILABLE));
-                     else
-                         contact.setPresence(new Presence(Presence.OFFLINE));
-
-                     Contact[] contacts = {contact};
-                     mContactListManager.notifyContactsPresenceUpdated(contacts);
-                 }
-             }
         }
 
         @Override
@@ -1111,18 +1078,40 @@ public class MatrixConnection extends ImConnection {
     {
         User user = mStore.getUser(event.getSender());
 
+        //not me!
         if (!user.user_id.equals(mDataHandler.getUserId())) {
-            Contact contact = mContactListManager.getContact(event.getSender());
 
-            if (contact == null)
-                return;
+            Contact contact = mContactListManager.getContact(user.user_id);
 
-            if (user.isActive())
-                contact.setPresence(new Presence(Presence.AVAILABLE));
-            else
-                contact.setPresence(new Presence(Presence.OFFLINE));
-            Contact[] contacts = {contact};
-            mContactListManager.notifyContactsPresenceUpdated(contacts);
+            if (contact != null) {
+
+                boolean currentlyActive = false;
+                int lastActiveAgo = -1;
+
+                if (event.getContentAsJsonObject().has("currently_active"))
+                    currentlyActive = event.getContentAsJsonObject().get("currently_active").getAsBoolean();
+
+                if (event.getContentAsJsonObject().has("last_active_ago"))
+                    lastActiveAgo = event.getContentAsJsonObject().get("last_active_ago").getAsInt();
+
+
+                if (currentlyActive)
+                    contact.setPresence(new Presence(Presence.AVAILABLE));
+                else
+                    contact.setPresence(new Presence(Presence.OFFLINE));
+
+                Contact[] contacts = {contact};
+                mContactListManager.notifyContactsPresenceUpdated(contacts);
+            }
+
+            if (mSession.getMediaCache().isAvatarThumbnailCached(user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT)) {
+                ImageView iv = new ImageView(mContext);
+                mSession.getMediaCache().loadAvatarThumbnail(mConfig, iv, user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT);
+                if (iv.getDrawable() != null) {
+                    Bitmap bm = ((BitmapDrawable) iv.getDrawable()).getBitmap();
+                    setAvatar(user.user_id, bm);
+                }
+            }
         }
     }
 

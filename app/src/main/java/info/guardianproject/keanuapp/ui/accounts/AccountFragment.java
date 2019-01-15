@@ -251,7 +251,10 @@ public class AccountFragment extends Fragment {
 
                         StringTokenizer st = new StringTokenizer(mRemoteOmemoFingeprints.get(0),"|");
                         TextView tvFingerprint = (TextView) mView.findViewById(R.id.omemoFingerprint);
-                        tvFingerprint.setText(st.nextToken()+ "\n" + prettyPrintFingerprint(st.nextToken()));
+                        String deviceName = st.nextToken();
+                        String deviceId = st.nextToken();
+                        String deviceFingerprint = st.nextToken();
+                        tvFingerprint.setText(deviceName+ "\n" + prettyPrintFingerprint(deviceFingerprint));
 
                         ImageView btnQrShare = (ImageView) mView.findViewById(R.id.omemoqrshare);
                         btnQrShare.setOnClickListener(new View.OnClickListener() {

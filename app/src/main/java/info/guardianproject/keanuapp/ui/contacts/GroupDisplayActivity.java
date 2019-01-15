@@ -675,6 +675,8 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
                 inviteContacts(invitees);
 
+
+                updateMembers();
             }
         }
     }

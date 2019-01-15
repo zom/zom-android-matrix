@@ -304,7 +304,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         if (room != null)
         {
             RoomMember member = room.getMember(contact.getAddress().getAddress());
-            room.getState().getPowerLevels().setUserPowerLevel(member.getUserId(),room.getState().getPowerLevels().invite);
+            room.getState().getPowerLevels().setUserPowerLevel(member.getUserId(),100);
 
             mConn.updateGroupMembers(room, group);
         }
