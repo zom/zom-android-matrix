@@ -182,7 +182,7 @@ public class DeviceDisplayActivity extends BaseActivity {
                         h.imgVerifiedIcon.setColorFilter(ContextCompat.getColor(DeviceDisplayActivity.this, R.color.holo_green_light), android.graphics.PorterDuff.Mode.MULTIPLY);
                         h.scVerified.setChecked(deviceDisplay.isVerified);
                     }
-                    
+
                     h.scVerified.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                         @Override
                         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

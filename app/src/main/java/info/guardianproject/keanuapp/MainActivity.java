@@ -861,25 +861,6 @@ public class MainActivity extends BaseActivity {
 
         startGroupChat(sbChatRoomName.toString(), invitees, conn);
 
-
-        /**
-        if (username != null)
-            new ChatSessionInitTask(providerId, accountId, Imps.Contacts.TYPE_NORMAL, true)
-            {
-                @Override
-                protected void onPostExecute(Long chatId) {
-
-                    if (chatId != -1 && openChat) {
-                        Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
-                        intent.putExtra("id", chatId);
-                        startActivity(intent);
-                    }
-
-                    super.onPostExecute(chatId);
-                }
-
-            }.executeOnExecutor(ImApp.sThreadPoolExecutor,new Contact(new MatrixAddress(username)));
-         **/
     }
 
     public void showGroupChatDialog ()
@@ -915,14 +896,10 @@ public class MainActivity extends BaseActivity {
                          nickname = tv.getText().toString();
                          **/
 
-                        try {
-                            IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
-                            if (conn.getState() == ImConnection.LOGGED_IN)
-                                startGroupChat(chatRoomName, null, conn);
 
-                        } catch (RemoteException re) {
+                        IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
+                        startGroupChat(chatRoomName, null, conn);
 
-                        }
 
                         dialog.dismiss();
 
@@ -973,7 +950,7 @@ public class MainActivity extends BaseActivity {
     private IImConnection mLastConnGroup = null;
     private long mRequestedChatId = -1;
 
-    public void startGroupChat (String room, final ArrayList<String> invitees, IImConnection conn)
+    public void startGroupChat (String roomSubject, final ArrayList<String> invitees, IImConnection conn)
     {
         mLastConnGroup = conn;
 
@@ -992,17 +969,17 @@ public class MainActivity extends BaseActivity {
 
                     IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
 
-                    String roomName = null;
+                    String roomSubject = null;
 
                     if (params.length > 0)
-                        roomName = params[0];
+                        roomSubject = params[0];
 
                     String[] aInvitees = null;
 
                     if (invitees != null)
                         aInvitees = invitees.toArray(new String[invitees.size()]);
 
-                    manager.createMultiUserChatSession(null, roomName, null, true, aInvitees, new IChatSessionListener(){
+                    manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, new IChatSessionListener(){
 
                         @Override
                         public IBinder asBinder() {
@@ -1050,7 +1027,7 @@ public class MainActivity extends BaseActivity {
 
 
             }
-        }.executeOnExecutor(ImApp.sThreadPoolExecutor,room);
+        }.executeOnExecutor(ImApp.sThreadPoolExecutor,roomSubject);
 
 
     }
