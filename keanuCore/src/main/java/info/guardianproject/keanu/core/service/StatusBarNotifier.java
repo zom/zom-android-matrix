@@ -306,8 +306,8 @@ public class StatusBarNotifier {
         Intent intent = null;
         try {
             intent = new Intent(mContext,Class.forName(defaultMainClass));
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.setType(Imps.Contacts.CONTENT_TYPE);
+        //    intent.setAction(Intent.ACTION_VIEW);
+        //    intent.setType(Imps.Contacts.CONTENT_TYPE);
             intent.putExtra(ImServiceConstants.EXTRA_INTENT_ACCOUNT_ID, accountId);
             intent.putExtra(ImServiceConstants.EXTRA_INTENT_PROVIDER_ID, providerId);
         } catch (ClassNotFoundException e) {

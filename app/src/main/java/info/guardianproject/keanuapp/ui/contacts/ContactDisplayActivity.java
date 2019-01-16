@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import info.guardianproject.keanu.core.type.CustomTypefaceManager;
 import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.model.Contact;
@@ -100,12 +102,13 @@ public class ContactDisplayActivity extends BaseActivity {
         tv = (TextView) findViewById(R.id.tvUsername);
         tv.setText(mUsername);
 
-        View btn = findViewById(R.id.btnStartChat);
-        btn.setOnClickListener(new View.OnClickListener() {
+
+        View btnInviteChat = findViewById(R.id.btnStartChat);
+        btnInviteChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                startChat();
+                inviteContactToChat();
 
             }
         });
@@ -135,7 +138,18 @@ public class ContactDisplayActivity extends BaseActivity {
                 }
                 c.close();
             }
+            else
+            {
+                showAddFriends = true;
+            }
         }
+
+        if (showAddFriends) {
+            Button btnAddAsFriend = findViewById(R.id.btnAddAsFriend);
+            btnAddAsFriend.setText(getString(R.string.add_x_as_friend, mNickname));
+            btnAddAsFriend.setVisibility(View.VISIBLE);
+        }
+
 
         if (mConn != null) {
             new AsyncTask<String, Void, Boolean>() {
@@ -291,13 +305,6 @@ public class ContactDisplayActivity extends BaseActivity {
             case android.R.id.home:
                 finish();
                 return true;
-            case R.id.menu_verify_or_view:
-                verifyRemoteFingerprint();
-                return true;
-            /**
-            case R.id.menu_verify_question:
-                initSmpUI();
-                return true;**/
             case R.id.menu_remove_contact:
                 deleteContact();
                 return true;
@@ -357,116 +364,20 @@ public class ContactDisplayActivity extends BaseActivity {
         }
     }
 
-    public void startChat ()
+    public void inviteContactToChat ()
     {
-        if (mConn == null)
-            return;
 
-        /**
-        try {
-            IChatSessionManager manager = mConn.getChatSessionManager();
-            if (manager != null) {
-                IChatSession session = manager.getChatSession(mUsername);
-                if (session == null) {
-                    new ChatSessionInitTask(mProviderId, mAccountId, Imps.Contacts.TYPE_NORMAL, false)
-                    {
-                        @Override
-                        protected void onPostExecute(Long chatId) {
-                            super.onPostExecute(chatId);
-
-                            if (mContactId == -1) {
-                                Intent intent = new Intent(ContactDisplayActivity.this, ConversationDetailActivity.class);
-                                intent.putExtra("id", chatId);
-
-                                startActivity(intent);
-                                finish();
-                            }
-                        }
-                    }.executeOnExecutor(ImApp.sThreadPoolExecutor,new Contact(new MatrixAddress(mUsername)));
-                }
-                else
-                {
-                    Intent intent = new Intent(ContactDisplayActivity.this, ConversationDetailActivity.class);
-                    intent.putExtra("id", session.getId());
-                    startActivity(intent);
-                    finish();
-
-                }
-            }
-        }
-        catch (RemoteException re){}
-
-        if (mContactId != -1) {
-            Intent intent = new Intent(ContactDisplayActivity.this, ConversationDetailActivity.class);
-            intent.putExtra("id", mContactId);
-
-            startActivity(intent);
-            finish();
-        }
-        **/
-
-        Intent intent = new Intent(ContactDisplayActivity.this, ContactsPickerActivity.class);
+        Intent intent = new Intent(ContactDisplayActivity.this, MainActivity.class);
         intent.putExtra("id", mContactId);
-        intent.putExtra(ContactsPickerActivity.EXTRA_ADD_CONTACT,mUsername);
+        intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME,mUsername);
+        intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER,mProviderId);
+        intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT,mAccountId);
         startActivity(intent);
 
-    }
-
-
-
-    private void verifyRemoteFingerprint() {
-
-        new AsyncTask<String, Void, Boolean>()
-        {
-            @Override
-            protected Boolean doInBackground(String... strings) {
-
-
-                try {
-                    if (mConn != null) {
-                        IContactListManager listManager = mConn.getContactListManager();
-
-                        if (listManager != null)
-                            listManager.approveSubscription(new Contact(new MatrixAddress(mUsername), mNickname, Imps.Contacts.TYPE_NORMAL));
-
-                        IChatSessionManager manager = mConn.getChatSessionManager();
-
-                        if (manager != null) {
-                            IChatSession session = manager.getChatSession(mUsername);
-
-                            if (session != null) {
-
-                                /**
-                                IOtrChatSession otrChatSession = session.getDefaultOtrChatSession();
-
-                                if (otrChatSession != null) {
-                                    otrChatSession.verifyKey(otrChatSession.getRemoteUserId());
-                                    Snackbar.make(findViewById(R.id.main_content), getString(R.string.action_verified), Snackbar.LENGTH_LONG).show();
-                                }**/
-                            }
-                        }
-
-                    }
-
-                } catch (RemoteException e) {
-                    Log.e(LOG_TAG, "error init otr", e);
-
-                }
-
-                return true;
-            }
-
-            @Override
-            protected void onPostExecute(Boolean success) {
-                super.onPostExecute(success);
-
-
-            }
-        }.execute();
-
-
+        finish();
 
     }
+
 
 
     private void showFriendAddedView() {
@@ -509,5 +420,55 @@ public class ContactDisplayActivity extends BaseActivity {
         }, 3000);
     }
 
+    public void addFriendClicked (final View view)
+    {
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View dialogAddFriend = factory.inflate(R.layout.alert_dialog_add_friend, null);
+        TextView title = dialogAddFriend.findViewById(R.id.alertTitle);
+        title.setText(getString(R.string.add_x_as_friend_question, mNickname));
+
+        ImageView avatarView = dialogAddFriend.findViewById(R.id.imageAvatar);
+        avatarView.setVisibility(View.GONE);
+        try {
+            Drawable avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mUsername, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, true);
+            if (avatar != null) {
+                avatarView.setImageDrawable(avatar);
+                avatarView.setVisibility(View.VISIBLE);
+            }
+        } catch (Exception e) {
+        }
+
+
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogAddFriend)
+                .create();
+        dialog.show();
+
+        View btnAdd = dialogAddFriend.findViewById(R.id.btnAdd);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImApp app = (ImApp)getApplication();
+                new AddContactAsyncTask(mProviderId, mAccountId).execute(mUsername, null, null);
+                dialog.dismiss();
+                view.setVisibility(View.GONE);
+                showFriendAddedView();
+            }
+        });
+
+        TextView btnCancel = dialogAddFriend.findViewById(R.id.btnCancel);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        Typeface typeface;
+        if ((typeface = CustomTypefaceManager.getCurrentTypeface(this))!=null) {
+            title.setTypeface(typeface);
+            btnCancel.setTypeface(typeface);
+        }
+    }
 
 }

@@ -462,4 +462,13 @@ public class MatrixChatSessionManager extends ChatSessionManager {
             }
         });
     }
+
+    public void enableEncryption (ChatSession session, boolean enableEncryption)
+    {
+        Room room = getRoom(session);
+
+        if ((!room.isEncrypted()) && enableEncryption)
+            room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("CreateRoomEncryption"));
+
+    }
 }

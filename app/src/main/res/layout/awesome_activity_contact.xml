@@ -103,20 +103,27 @@
 
         </RelativeLayout>
 
+<LinearLayout
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/listEncryptionKey"
+    android:visibility="gone"
+    >
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp">
-        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:autoLink="none"
-            android:text="@string/security_code"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?contactTextSecondary"
-            android:layout_gravity="start"
-            />
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:autoLink="none"
+                android:text="@string/security_code"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textColor="?contactTextSecondary"
+                android:layout_gravity="start"
+                />
             <info.guardianproject.keanu.core.type.CustomTypefaceTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -130,13 +137,11 @@
                 />
 
 
-</RelativeLayout>
-
+        </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:id="@+id/listEncryptionKey"
             >
 
             <ImageView
@@ -190,24 +195,7 @@
                 />
 
         </RelativeLayout>
-        <!--
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp">
-            <info.guardianproject.keanu.core.type.CustomTypefaceButton android:id="@+id/btnVerify"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/menu_verify"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="?contactTextSecondary"
-                android:onClick="verifyClicked"
-                android:visibility="gone"
-                >
-
-            </info.guardianproject.keanu.core.type.CustomTypefaceButton>
-
-        </RelativeLayout>
+</LinearLayout>
 
         <info.guardianproject.keanu.core.type.CustomTypefaceButton android:id="@+id/btnAddAsFriend"
             android:layout_width="match_parent"
@@ -221,7 +209,7 @@
             android:onClick="addFriendClicked"
             android:visibility="visible"
             />
--->
+
     </LinearLayout>
 
     <LinearLayout

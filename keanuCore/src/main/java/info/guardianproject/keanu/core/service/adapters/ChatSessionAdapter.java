@@ -116,7 +116,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     private long mContactId;
     private boolean mIsMuted = false;
-    private boolean mEnableOmemoGroups = false;
+    private boolean mUseEncryption = false;
     private String mNickname = null;
 
     public ChatSessionAdapter(ChatSession chatSession, ChatGroup group, ImConnectionAdapter connection, boolean isNewSession) {
@@ -133,12 +133,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
         mDataHandlerListener = new DataHandlerListenerImpl();
 
-        /**
-        if (participant instanceof ChatGroup) {
-            init((ChatGroup) participant,isNewSession);
-        } else {
-            init((Contact) participant,isNewSession);
-        }**/
         init(group, isNewSession);
 
         initMuted();
@@ -815,7 +809,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         values.put(Imps.Chats.LAST_MESSAGE_DATE, System.currentTimeMillis());
         values.put(Imps.Chats.LAST_UNREAD_MESSAGE, message);
          values.put(Imps.Chats.GROUP_CHAT, mIsGroupChat);
-         values.put(Imps.Chats.USE_ENCRYPTION,mEnableOmemoGroups);
+         values.put(Imps.Chats.USE_ENCRYPTION,mUseEncryption);
 
          int result = mContentResolver.update(mChatURI, values, null, null);
 
@@ -1812,16 +1806,18 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     public boolean useEncryption (boolean useEncryption)
     {
-        mEnableOmemoGroups = useEncryption;
+        mUseEncryption = useEncryption;
         ContentValues values = new ContentValues();
         values.put(Imps.Chats.USE_ENCRYPTION,useEncryption ? 1 : 0);
         int rowsUpdate = mContentResolver.update(mChatURI,values,null,null);
+
+        mChatSession.setUseEncryption(useEncryption);
         return getUseEncryption();
     }
 
     public boolean getUseEncryption ()
     {
-        return mEnableOmemoGroups;
+        return mUseEncryption;
     }
 
     public boolean isEncrypted ()
@@ -1912,26 +1908,17 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         mIsMuted = type == Imps.ChatsColumns.CHAT_TYPE_MUTED;
     }
 
-
-    public boolean getOmemoGroupEnabled () {
-        return mEnableOmemoGroups;
-    }
-
-    public void setOmemoGroupEnabled (boolean omemoGroups)
-    {
-        mEnableOmemoGroups = omemoGroups;
-    }
-
     private void initUseEncryption () {
 
         String[] projection = {Imps.Chats.USE_ENCRYPTION};
         Cursor c = mContentResolver.query(mChatURI, projection, null, null, null);
         if (c != null) {
             if (c.moveToFirst()) {
-                mEnableOmemoGroups = c.getInt(0) > 0;
+                mUseEncryption = c.getInt(0) > 0;
             }
             c.close();
         }
+
 
 
     }

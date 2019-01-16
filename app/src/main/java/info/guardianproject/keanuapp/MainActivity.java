@@ -461,9 +461,19 @@ public class MainActivity extends BaseActivity {
             }
             else if (intent.hasExtra("username"))
             {
+
                 //launch a new chat based on the intent value
                 startChat(mApp.getDefaultProviderId(), mApp.getDefaultAccountId(), intent.getStringExtra("username"),  true);
             }
+            else if (intent.hasExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME))
+          {
+              String username = intent.getStringExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME);
+              long providerId = intent.getLongExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER,mApp.getDefaultProviderId());
+              long accountId = intent.getLongExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT,mApp.getDefaultAccountId());
+
+              startChat(providerId, accountId, username, true);
+
+          }
 
             setIntent(null);
         }
@@ -1001,6 +1011,8 @@ public class MainActivity extends BaseActivity {
 
                         @Override
                         public void onChatSessionCreated(IChatSession session) throws RemoteException {
+                            session.useEncryption(true);
+                            session.setLastMessage("New room created");
                             Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
                             intent.putExtra("id", session.getId());
                             startActivity(intent);

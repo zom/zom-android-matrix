@@ -51,7 +51,7 @@ public class ChatSession {
 
     public void setUseEncryption (boolean useEncryption)
     {
-        mManager.getAdapter().getChatSessionAdapter(this,false).useEncryption(useEncryption);
+        mManager.enableEncryption(this, useEncryption);
     }
 
     public boolean useEncryption ()
