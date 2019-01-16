@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+
+    <!-- Group name-->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_margin="@dimen/detail_view_padding"
+        android:paddingBottom="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:id="@+id/tvGroupName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:autoLink="none"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                tools:text="Group Name" />
+
+
+        </LinearLayout>
+
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+            android:id="@+id/tvGroupAddress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="none"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?contactTextSecondary"
+            tools:text="group.address@domain.com"
+            android:visibility="invisible"
+            />
+    </LinearLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+
+        android:padding="10dp">
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="none"
+            android:text="@string/security_code"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?contactTextSecondary"
+            android:layout_gravity="start"
+            />
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="none"
+            android:text="@string/action_verified"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?contactTextSecondary"
+            android:layout_gravity="start"
+            android:layout_alignParentRight="true"
+
+            />
+
+
+    </RelativeLayout>
+
+
+</LinearLayout>

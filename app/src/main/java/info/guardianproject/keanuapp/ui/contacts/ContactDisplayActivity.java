@@ -143,41 +143,22 @@ public class ContactDisplayActivity extends BaseActivity {
                 showAddFriends = true;
             }
         }
+        Button btnAddAsFriend = findViewById(R.id.btnAddAsFriend);
 
         if (showAddFriends) {
-            Button btnAddAsFriend = findViewById(R.id.btnAddAsFriend);
             btnAddAsFriend.setText(getString(R.string.add_x_as_friend, mNickname));
             btnAddAsFriend.setVisibility(View.VISIBLE);
         }
+        else
+            btnAddAsFriend.setVisibility(View.GONE);
 
 
-        if (mConn != null) {
-            new AsyncTask<String, Void, Boolean>() {
-                @Override
-                protected Boolean doInBackground(String... strings) {
 
-                    try {
-                        mRemoteOmemoFingerprints = mConn.getFingerprints(mUsername);
 
-                    } catch (RemoteException re) {
-
-                    }
-
-                    return true;
-                }
-
-                @Override
-                protected void onPostExecute(Boolean success) {
-                    super.onPostExecute(success);
-
-                    if (mRemoteOmemoFingerprints != null)
-                         displayFingerprints(mRemoteOmemoFingerprints);
-                }
-            }.execute(remoteFingerprint);
-        }
 
     }
 
+    /**
     private void displayFingerprints (final List<String> remoteFingerprints)
     {
 
@@ -225,44 +206,7 @@ public class ContactDisplayActivity extends BaseActivity {
                         }
                     }
                 });
-                /**
-                iv.setOnClickListener(new View.OnClickListener() {
 
-                    @Override
-                    public void onClick(View v) {
-
-                        String inviteString;
-                        try {
-                            inviteString = OnboardingManager.generateInviteLink(ContactDisplayActivity.this, mUsername, remoteFingerprint, mNickname);
-
-                            Intent intent = new Intent(ContactDisplayActivity.this, QrDisplayActivity.class);
-                            intent.putExtra(Intent.EXTRA_TEXT, inviteString);
-                            intent.setType("text/plain");
-                            startActivity(intent);
-
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                });
-
-
-                btnQrShare.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        try {
-                            String inviteLink = OnboardingManager.generateInviteLink(ContactDisplayActivity.this, mUsername, deviceFingerprint, mNickname);
-                            new QrShareAsyncTask(ContactDisplayActivity.this).execute(inviteLink, mNickname);
-                        } catch (IOException ioe) {
-                            Log.e(LOG_TAG, "couldn't generate QR code", ioe);
-                        }
-                    }
-                });
-                 **/
 
                 //if (!OtrChatManager.getInstance().isRemoteKeyVerified(mUsername, remoteFingerprint))
                  //   btnVerify.setVisibility(View.VISIBLE);
@@ -277,7 +221,7 @@ public class ContactDisplayActivity extends BaseActivity {
 
 
     }
-
+    **/
 
     private void showGallery (int contactId)
     {
@@ -419,6 +363,19 @@ public class ContactDisplayActivity extends BaseActivity {
             }
         }, 3000);
     }
+
+    public void viewDevicesClicked (final View view)
+    {
+        Intent intent = new Intent(this,DeviceDisplayActivity.class);
+        intent.putExtra("nickname",mNickname);
+        intent.putExtra("address",mUsername);
+        intent.putExtra("provider",mProviderId);
+        intent.putExtra("account",mAccountId);
+
+        startActivity(intent);
+
+    }
+
 
     public void addFriendClicked (final View view)
     {

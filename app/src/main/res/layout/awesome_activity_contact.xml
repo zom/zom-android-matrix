@@ -51,8 +51,7 @@
         android:layout_height="?attr/actionBarSize"
         android:orientation="horizontal"
         android:id="@+id/imageSpacer"
-        >
-        </LinearLayout>
+        />
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -89,8 +88,7 @@
                     android:hint="@string/account_setup_example_email_address"
                     android:autoLink="none"
                     android:cursorVisible="true"
-                    android:inputType="textEmailAddress"
-                    android:text="user@domain.com"
+                    android:text=""
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:textColor="?contactTextSecondary"
                     android:layout_below="@+id/tvNickname"
@@ -103,6 +101,31 @@
 
         </RelativeLayout>
 
+        <info.guardianproject.keanu.core.type.CustomTypefaceButton android:id="@+id/btnViewDevices"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:text="@string/action_view_devices"
+            android:padding="10dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?colorPrimary"
+            android:gravity="start|left"
+            android:onClick="viewDevicesClicked"
+            />
+        <info.guardianproject.keanu.core.type.CustomTypefaceButton android:id="@+id/btnAddAsFriend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            tools:text="Add X as Friend"
+            android:padding="10dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="?colorPrimary"
+            android:gravity="start|left"
+            android:onClick="addFriendClicked"
+            android:visibility="gone"
+            />
+
+        <!--
 <LinearLayout
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
@@ -196,19 +219,7 @@
 
         </RelativeLayout>
 </LinearLayout>
-
-        <info.guardianproject.keanu.core.type.CustomTypefaceButton android:id="@+id/btnAddAsFriend"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@null"
-            tools:text="Add X as Friend"
-            android:padding="10dp"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="?colorPrimary"
-            android:gravity="start|left"
-            android:onClick="addFriendClicked"
-            android:visibility="visible"
-            />
+-->
 
     </LinearLayout>
 
