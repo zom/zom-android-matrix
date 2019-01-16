@@ -93,6 +93,7 @@ import info.guardianproject.keanu.core.model.Presence;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IContactListListener;
+import info.guardianproject.keanu.core.service.adapters.ChatSessionAdapter;
 import info.guardianproject.keanu.core.util.DatabaseUtils;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.core.util.UploadProgressListener;
@@ -144,7 +145,7 @@ public class MatrixConnection extends ImConnection {
         super (context);
 
         mContactListManager = new MatrixContactListManager(context, this);
-        mChatGroupManager = new MatrixChatGroupManager(this);
+        mChatGroupManager = new MatrixChatGroupManager(context, this);
         mChatSessionManager = new MatrixChatSessionManager(context, this);
 
         mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
@@ -593,6 +594,7 @@ public class MatrixConnection extends ImConnection {
 
                     mChatSessionManager.createChatSession(group,false);
 
+
                 }
 
                 return null;
@@ -685,11 +687,10 @@ public class MatrixConnection extends ImConnection {
     protected void checkRoomEncryption (Room room)
     {
 
-        ChatSession session = mChatSessionManager.getSession(room.getRoomId());
-
-        if (session != null) {
+        ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
+        if (csa != null) {
             boolean isEncrypted = mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId());
-            session.setUseEncryption(isEncrypted);
+            csa.useEncryption(isEncrypted);
         }
     }
 

@@ -1,6 +1,7 @@
 package info.guardianproject.keanu.matrix.plugin;
 
 import android.app.backup.BackupDataInputStream;
+import android.content.Context;
 import android.opengl.Matrix;
 import android.os.RemoteException;
 import android.text.TextUtils;
@@ -34,8 +35,11 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     private MXSession mSession;
     private MatrixConnection mConn;
 
-    public MatrixChatGroupManager (MatrixConnection conn) {
+    private Context mContext;
+
+    public MatrixChatGroupManager (Context context, MatrixConnection conn) {
         mConn = conn;
+        mContext = context;
     }
 
     public void setDataHandler (MXDataHandler dataHandler)
@@ -56,7 +60,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     @Override
     public ChatGroup getChatGroup (Address addr)
     {
-        return getChatGroup(new MatrixAddress(addr.getAddress()),addr.getAddress());
+        return getChatGroup(new MatrixAddress(addr.getAddress()),null);
     }
 
     public ChatGroup getChatGroup (MatrixAddress addr, String subject)
@@ -65,6 +69,15 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
         if (result == null)
         {
+            if (TextUtils.isEmpty(subject))
+            {
+                Room room = mDataHandler.getRoom(addr.getBareAddress());
+                if (room != null)
+                    subject = room.getRoomDisplayName(mContext);
+                else
+                    subject = addr.getUser();
+            }
+
             result = new ChatGroup(addr,subject,this);
         }
         else
