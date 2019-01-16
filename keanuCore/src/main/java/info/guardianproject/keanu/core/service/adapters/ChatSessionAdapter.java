@@ -747,7 +747,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     String getNickName(String username) {
         ImEntity participant = mChatSession.getParticipant();
         if (mIsGroupChat) {
-            
             ChatGroup group = (ChatGroup) participant;
             Contact groupMember = group.getMember(username);
             if (groupMember != null && groupMember.getName() != null)
@@ -755,9 +754,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 return groupMember.getName();
             }
             else {
-                // not found, impossible
+                // group member name might be null!
                 String[] parts = username.split(":");
-                return parts[0];
+                return parts[0].substring(1);
             }
         } else {
             return ((Contact) participant).getName();

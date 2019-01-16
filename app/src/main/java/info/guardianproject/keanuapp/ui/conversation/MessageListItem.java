@@ -340,8 +340,7 @@ public class MessageListItem extends FrameLayout {
             String contact = null;
             if (showContact) {
                 if (nickname != null) {
-                    String[] nickParts = nickname.split("/");
-                    contact = nickParts[nickParts.length - 1];
+                    contact = nickname;
                 }
             }
 
