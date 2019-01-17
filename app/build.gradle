@@ -42,12 +42,9 @@ android {
          primary {// Assigns this product flavor to the "mode" flavor dimension.
              dimension "release"}
 
-
-
          altbrand {
              dimension "release"
-             applicationIdSuffix ".altbrand"
-             versionNameSuffix "-altbrand"
+	     applicationId "im.zom.matrix"
          }
 
      }
