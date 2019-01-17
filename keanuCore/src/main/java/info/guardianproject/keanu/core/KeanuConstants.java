@@ -10,11 +10,11 @@ public interface KeanuConstants {
     String IMPS_CATEGORY = "org.awesomeapp.info.guardianproject.keanuapp.service.IMPS_CATEGORY";
     String ACTION_QUIT = "org.awesomeapp.info.guardianproject.keanuapp.service.QUIT";
 
-    int SMALL_AVATAR_WIDTH = 48;
-    int SMALL_AVATAR_HEIGHT = 48;
+    int SMALL_AVATAR_WIDTH = 64;
+    int SMALL_AVATAR_HEIGHT = 64;
 
-    int DEFAULT_AVATAR_WIDTH = 196;
-    int DEFAULT_AVATAR_HEIGHT = 196;
+    int DEFAULT_AVATAR_WIDTH = 512;
+    int DEFAULT_AVATAR_HEIGHT = 512;
 
     String DEFAULT_TIMEOUT_CACHEWORD = "-1"; //one day
 

@@ -60,6 +60,7 @@ import org.matrix.androidsdk.rest.model.search.SearchUsersResponse;
 import org.matrix.androidsdk.util.JsonUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -95,6 +96,7 @@ import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IContactListListener;
 import info.guardianproject.keanu.core.service.adapters.ChatSessionAdapter;
 import info.guardianproject.keanu.core.util.DatabaseUtils;
+import info.guardianproject.keanu.core.util.Downloader;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.core.util.UploadProgressListener;
 
@@ -618,6 +620,14 @@ public class MatrixConnection extends ImConnection {
 
         checkRoomEncryption(room);
 
+       if (!hasAvatar(room.getRoomId()))
+       {
+            String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(room.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+
+            if (!TextUtils.isEmpty(downloadUrl))
+                downloadAvatar(room.getRoomId(),downloadUrl);
+       }
+
         return group;
     }
 
@@ -675,6 +685,14 @@ public class MatrixConnection extends ImConnection {
                             group.notifyMemberRoleUpdate(contact, "moderator", "owner");
                         else
                             group.notifyMemberRoleUpdate(contact, "member", "member");
+                    }
+
+                    if (!hasAvatar(member.getUserId()))
+                    {
+                        String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(member.getUserId(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+
+                        if (!TextUtils.isEmpty(downloadUrl))
+                            downloadAvatar(member.getUserId(),downloadUrl);
                     }
                 }
 
@@ -1126,13 +1144,12 @@ public class MatrixConnection extends ImConnection {
                 mContactListManager.notifyContactsPresenceUpdated(contacts);
             }
 
-            if (mSession.getMediaCache().isAvatarThumbnailCached(user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT)) {
-                ImageView iv = new ImageView(mContext);
-                mSession.getMediaCache().loadAvatarThumbnail(mConfig, iv, user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT);
-                if (iv.getDrawable() != null) {
-                    Bitmap bm = ((BitmapDrawable) iv.getDrawable()).getBitmap();
-                    setAvatar(user.user_id, bm);
-                }
+            if (!hasAvatar(user.user_id))
+            {
+                String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+
+                if (!TextUtils.isEmpty(downloadUrl))
+                    downloadAvatar(user.user_id,downloadUrl);
             }
         }
     }
@@ -1427,16 +1444,38 @@ public class MatrixConnection extends ImConnection {
         }
     }
 
-    private void setAvatar(String address, Bitmap bmp) {
+    private void downloadAvatar (final String address, final String url)
+    {
+        mExecutor.execute(new Runnable ()
+        {
+            public void run ()
+            {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                try {
+                    new Downloader().get(url,baos);
 
-        BitmapDrawable avatar = new BitmapDrawable(bmp);
+                    if (baos != null && baos.size() > 0)
+                        setAvatar(address, baos.toByteArray());
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+    }
+
+    private boolean hasAvatar (String address)
+    {
+        return DatabaseUtils.hasAvatarContact(mContext.getContentResolver(),Imps.Avatars.CONTENT_URI,address);
+    }
+
+    private void setAvatar(String address, byte[] avatarBytesCompressed) {
 
         try {
 
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bmp.compress(Bitmap.CompressFormat.JPEG, 90, stream);
 
-            byte[] avatarBytesCompressed = stream.toByteArray();
             String avatarHash = "nohash";
             int rowsUpdated = DatabaseUtils.updateAvatarBlob(mContext.getContentResolver(), Imps.Avatars.CONTENT_URI, avatarBytesCompressed, address);
 

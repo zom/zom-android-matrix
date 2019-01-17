@@ -63,6 +63,8 @@ import info.guardianproject.keanuapp.ui.qr.QrShareAsyncTask;
 import info.guardianproject.keanuapp.ui.widgets.GroupAvatar;
 import info.guardianproject.keanuapp.ui.widgets.LetterAvatar;
 
+import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
+import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_WIDTH;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.SMALL_AVATAR_HEIGHT;
 import static info.guardianproject.keanu.core.KeanuConstants.SMALL_AVATAR_WIDTH;
@@ -165,9 +167,29 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
                 if (holder instanceof HeaderViewHolder) {
                     final HeaderViewHolder h = (HeaderViewHolder)holder;
-                    GroupAvatar avatar = new GroupAvatar(mAddress.split("@")[0]);
-                    avatar.setRounded(false);
-                    h.avatar.setImageDrawable(avatar);
+
+                    Drawable avatar = null;
+                    if (DatabaseUtils.hasAvatarContact(getContentResolver(),Imps.Avatars.CONTENT_URI,mAddress))
+                    {
+                        try {
+
+                            avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT);
+
+                            if (avatar != null)
+                                h.avatar.setImageDrawable(avatar);
+
+                        } catch (Exception e) {
+                            //problem decoding avatar
+                            Log.e(LOG_TAG, "error decoding avatar", e);
+
+                        }
+                    }
+
+                    if (avatar == null)
+                    {
+                        avatar = new GroupAvatar(mAddress.split("@")[0],false);
+                        h.avatar.setImageDrawable(avatar);
+                    }
 
                     h.qr.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -400,11 +422,13 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     @Override
     protected void onResume() {
         super.onResume();
+
         try {
             mConn.getChatSessionManager().registerChatSessionListener(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         if (mSession != null && !mChatListenerRegistered) {
             try {
                 mSession.registerChatListener(mChatListener);
@@ -412,10 +436,9 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
-        } else {
-            updateSession();
         }
-        updateMembers();
+
+        updateSession();
     }
 
     @Override
@@ -685,6 +708,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
         final ImageView avatar;
         final ImageView qr;
         final TextView groupName;
+        final EditText groupNameEdit;
         final View editGroupName;
         final TextView groupAddress;
         final TextView actionShare;
@@ -699,6 +723,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             avatar = (ImageView) view.findViewById(R.id.ivAvatar);
             qr = (ImageView) view.findViewById(R.id.qrcode);
             groupName = (TextView) view.findViewById(R.id.tvGroupName);
+            groupNameEdit = view.findViewById(R.id.tvGroupNameEdit);
             editGroupName = view.findViewById(R.id.edit_group_subject);
             groupAddress = (TextView) view.findViewById(R.id.tvGroupAddress);
             actionShare = (TextView) view.findViewById(R.id.tvActionShare);
@@ -735,6 +760,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     }
 
     private void editGroupSubject() {
+
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
         // Set an EditText view to get user input

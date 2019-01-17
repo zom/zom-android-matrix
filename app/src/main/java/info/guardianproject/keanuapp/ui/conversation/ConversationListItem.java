@@ -144,63 +144,49 @@ public class ConversationListItem extends FrameLayout {
 
         if (holder.mAvatar != null)
         {
-            if (Imps.Contacts.TYPE_GROUP == (contactType & Imps.Contacts.TYPE_MASK)) {
+            holder.mAvatar.setVisibility(View.VISIBLE);
 
-                holder.mAvatar.setVisibility(View.VISIBLE);
-                try {
-                    String groupId = address.split("@")[0];
-                    Drawable avatar = new GroupAvatar(groupId);
-                    holder.mAvatar.setImageDrawable(avatar);
-                } catch (Exception ignored) {
-                    if (AVATAR_DEFAULT_GROUP == null)
-                        AVATAR_DEFAULT_GROUP = new RoundedAvatarDrawable(BitmapFactory.decodeResource(getResources(),
-                                R.drawable.group_chat));
-                    holder.mAvatar.setImageDrawable(AVATAR_DEFAULT_GROUP);
-                }
+            Drawable avatar = null;
+
+            try
+            {
+
+                avatar = DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
+                // avatar = DatabaseUtils.getAvatarFromCursor(cursor, COLUMN_AVATAR_DATA, ImApp.SMALL_AVATAR_WIDTH, ImApp.SMALL_AVATAR_HEIGHT);
             }
-         //   else if (cursor.getColumnIndex(Imps.Contacts.AVATAR_DATA)!=-1)
-           else {
-//                holder.mAvatar.setVisibility(View.GONE);
+            catch (Exception e)
+            {
+                //problem decoding avatar
+                Log.e(LOG_TAG,"error decoding avatar",e);
 
-                Drawable avatar = null;
+            }
 
-                try
-                {
-                    avatar = DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
-                  // avatar = DatabaseUtils.getAvatarFromCursor(cursor, COLUMN_AVATAR_DATA, ImApp.SMALL_AVATAR_WIDTH, ImApp.SMALL_AVATAR_HEIGHT);
-                }
-                catch (Exception e)
-                {
-                    //problem decoding avatar
-                    Log.e(LOG_TAG,"error decoding avatar",e);
-                }
+            if (avatar != null)
+            {
+                holder.mAvatar.setImageDrawable(avatar);
+            }
+            else {
 
-                try
-                {
-                    if (avatar != null)
-                    {
-                        //if (avatar instanceof RoundedAvatarDrawable)
-                          //  setAvatarBorder(presence,(RoundedAvatarDrawable)avatar);
+                if (Imps.Contacts.TYPE_GROUP == (contactType & Imps.Contacts.TYPE_MASK)) {
 
+                    try {
+                        String groupId = address.split("@")[0];
+                        avatar = new GroupAvatar(groupId);
                         holder.mAvatar.setImageDrawable(avatar);
+                    } catch (Exception ignored) {
+                        if (AVATAR_DEFAULT_GROUP == null)
+                            AVATAR_DEFAULT_GROUP = new RoundedAvatarDrawable(BitmapFactory.decodeResource(getResources(),
+                                    R.drawable.group_chat));
+                        holder.mAvatar.setImageDrawable(AVATAR_DEFAULT_GROUP);
                     }
-                    else
-                    {
-                       // int color = getAvatarBorder(presence);
-                        int padding = 24;
-                        LetterAvatar lavatar = new LetterAvatar(getContext(), nickname, padding);
-                        
-                        holder.mAvatar.setImageDrawable(lavatar);
+                } else {
 
-                    }
+                    // int color = getAvatarBorder(presence);
+                    int padding = 24;
+                    LetterAvatar lavatar = new LetterAvatar(getContext(), nickname, padding);
+                    holder.mAvatar.setImageDrawable(lavatar);
 
-                    holder.mAvatar.setVisibility(View.VISIBLE);
                 }
-                catch (OutOfMemoryError ome)
-                {
-                    //this seems to happen now and then even on tiny images; let's catch it and just not set an avatar
-                }
-
             }
         }
 

@@ -27,6 +27,14 @@ public class GroupAvatar extends ColorDrawable {
         rounded = true; // default rounded
     }
 
+    public GroupAvatar(String groupId, boolean rounded) {
+        super();
+        this.groupId = groupId;
+        paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        this.rounded = rounded;
+    }
+
     public boolean isRounded() {
         return this.rounded;
     }

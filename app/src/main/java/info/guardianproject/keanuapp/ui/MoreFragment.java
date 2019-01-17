@@ -81,7 +81,7 @@ public class MoreFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                ((MainActivity)getActivity()).showGroupChatDialog();
+                ((MainActivity)getActivity()).startGroupChat();
 
             }
         });

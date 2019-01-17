@@ -863,6 +863,13 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    public void startGroupChat ()
+    {
+        IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
+        startGroupChat(null, null, conn);
+    }
+
+    /**
     public void showGroupChatDialog ()
     {
 
@@ -883,18 +890,9 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
 
-                    /* User clicked OK so do some stuff */
 
                         TextView tv = (TextView) dialogGroup.findViewById(R.id.chat_room);
                         String chatRoomName = tv.getText().toString();
-
-                        /**
-                         tv = (TextView) dialogGroup.findViewById(R.id.chat_server);
-                         chatServer = tv.getText().toString();
-
-                         tv = (TextView) dialogGroup.findViewById(R.id.nickname);
-                         nickname = tv.getText().toString();
-                         **/
 
 
                         IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
@@ -909,43 +907,15 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
 
-                    /* User clicked cancel so do some stuff */
+
                         dialog.dismiss();
                     }
                 })
                 .create();
         dialog.show();
 
-        /**
-        Typeface typeface;
 
-        if ((typeface = CustomTypefaceManager.getCurrentTypeface(this))!=null) {
-            TextView textView = (TextView) dialog.findViewById(android.R.id.message);
-            if (textView != null)
-                textView.setTypeface(typeface);
-
-            textView = (TextView) dialog.findViewById(R.id.alertTitle);
-            if (textView != null)
-                textView.setTypeface(typeface);
-
-            Button btn = (Button)dialog.findViewById(android.R.id.button1);
-            if (btn != null)
-                btn.setTypeface(typeface);
-
-            btn = (Button)dialog.findViewById(android.R.id.button2);
-            if (btn != null)
-                btn.setTypeface(typeface);
-
-
-            btn = (Button)dialog.findViewById(android.R.id.button3);
-            if (btn != null)
-                btn.setTypeface(typeface);
-
-
-        }
-
-        **/
-    }
+    }**/
 
     private IImConnection mLastConnGroup = null;
     private long mRequestedChatId = -1;
@@ -992,6 +962,7 @@ public class MainActivity extends BaseActivity {
                             session.setLastMessage("New room created");
                             Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
                             intent.putExtra("id", session.getId());
+                            intent.putExtra("isNew",true);
                             startActivity(intent);
                         }
 
