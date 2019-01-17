@@ -34,6 +34,8 @@ public class ChatGroup extends ImEntity {
     private HashMap<String, Contact> mMembers;
     private HashMap<String, Contact> mGroupAddressToContactMap;
 
+    private boolean mAreJoined = true; //by default assume we are joined
+
     /** Store the role and affiliation for a contact in a pair data structure, the first being
      * the role and the second the affiliation.
      */
@@ -51,6 +53,16 @@ public class ChatGroup extends ImEntity {
         mGroupAddressToContactMap = new HashMap<>();
 
         mMemberListeners = new CopyOnWriteArrayList<GroupMemberListener>();
+    }
+
+    public void setJoined (boolean areJoined)
+    {
+        mAreJoined = areJoined;
+    }
+
+    public boolean isJoined ()
+    {
+        return mAreJoined;
     }
 
     @Override

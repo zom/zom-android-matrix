@@ -82,8 +82,6 @@ import info.guardianproject.keanuapp.ui.widgets.ShareRequest;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
-//import com.bumptech.glide.Glide;
-
 public class ConversationDetailActivity extends BaseActivity {
 
     private long mChatId = -1;

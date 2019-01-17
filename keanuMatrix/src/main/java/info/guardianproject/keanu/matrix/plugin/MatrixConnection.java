@@ -928,13 +928,31 @@ public class MatrixConnection extends ImConnection {
             debug ("onNewRoom: " + s);
 
             final Room room = mStore.getRoom(s);
-            ChatGroup group = addRoomContact(room);
 
             if (room.isInvited())
             {
                 MatrixAddress addr = new MatrixAddress(s);
-                Invitation invite = new Invitation(s,addr,addr,room.getTopic());
+
+                Invitation invite = new Invitation(s,addr,addr,room.getRoomDisplayName(mContext));
+
                 mChatGroupManager.notifyGroupInvitation(invite);
+
+                ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(new MatrixAddress(room.getRoomId()),room.getRoomDisplayName(mContext));
+                participant.setJoined(false);
+                ChatSession session = mChatSessionManager.createChatSession(participant, true);
+                ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
+                csa.setLastMessage("You were invited");
+
+            }
+            else if (room.isMember())
+            {
+                ChatGroup group = addRoomContact(room);
+                ChatSession session = mChatSessionManager.getSession(room.getRoomId());
+
+                if (session == null) {
+                    ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(new MatrixAddress(room.getRoomId()),room.getRoomDisplayName(mContext));
+                    session = mChatSessionManager.createChatSession(participant, true);
+                }
             }
 
         }

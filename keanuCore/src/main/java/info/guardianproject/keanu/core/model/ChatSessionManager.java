@@ -96,6 +96,11 @@ public abstract class ChatSessionManager {
             mSessions.put(participant.getAddress().getAddress(),sessionAdapter);
 
         }
+        else
+        {
+            sessionAdapter.update();
+        }
+
 
         return sessionAdapter.getChatSession();
     }

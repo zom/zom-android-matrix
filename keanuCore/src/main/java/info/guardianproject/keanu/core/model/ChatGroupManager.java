@@ -68,7 +68,7 @@ public abstract class ChatGroupManager {
      *
      * @param listener the {@link InvitationListener}.
      */
-    public synchronized void setInvitationListener(InvitationListener listener) {
+    public void setInvitationListener(InvitationListener listener) {
         mInvitationListener = listener;
     }
 
@@ -268,7 +268,7 @@ public abstract class ChatGroupManager {
      * Notifies the InvitationListener that another user invited the current
      * logged user to join a group chat.
      */
-    public synchronized void notifyGroupInvitation(Invitation invitation) {
+    public void notifyGroupInvitation(Invitation invitation) {
         mInvitations.put(invitation.getInviteID(), invitation);
         if (mInvitationListener != null) {
             mInvitationListener.onGroupInvitation(invitation);

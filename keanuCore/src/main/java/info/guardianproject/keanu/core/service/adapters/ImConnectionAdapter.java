@@ -88,11 +88,10 @@ public class ImConnectionAdapter extends IImConnection.Stub {
         mService = service;
         mConnectionListener = new ConnectionListenerAdapter();
         mConnection.addConnectionListener(mConnectionListener);
-        if ((connection.getCapability() & ImConnection.CAPABILITY_GROUP_CHAT) != 0) {
-            mGroupManager = mConnection.getChatGroupManager();
-            mInvitationListener = new InvitationListenerAdapter();
-            mGroupManager.setInvitationListener(mInvitationListener);
-        }
+
+        mGroupManager = mConnection.getChatGroupManager();
+        mInvitationListener = new InvitationListenerAdapter();
+        mGroupManager.setInvitationListener(mInvitationListener);
 
         mChatSessionManager = new ChatSessionManagerAdapter(this);
         mContactListManager = new ContactListManagerAdapter(this);
@@ -595,7 +594,7 @@ public class ImConnectionAdapter extends IImConnection.Stub {
             // No listener registered or failed to notify the listener, send a
             // notification instead.
             mService.getStatusBarNotifier().notifyGroupInvitation(mProviderId, mAccountId, id,
-                    sender);
+                    invitation);
         }
     }
 

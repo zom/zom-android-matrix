@@ -727,6 +727,8 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
     public boolean setDefaultAccount (long providerId, long accountId)
     {
+        mDefaultProviderId = providerId;
+        mDefaultAccountId = accountId;
 
         final Uri uri = Imps.Provider.CONTENT_URI_WITH_ACCOUNT;
         String[] PROVIDER_PROJECTION = {

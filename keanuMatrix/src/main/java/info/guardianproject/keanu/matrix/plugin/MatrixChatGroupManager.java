@@ -63,6 +63,11 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         return getChatGroup(new MatrixAddress(addr.getAddress()),null);
     }
 
+    public ChatGroup getChatGroup (String addr)
+    {
+        return getChatGroup(new MatrixAddress(addr),null);
+    }
+
     public ChatGroup getChatGroup (MatrixAddress addr, String subject)
     {
         ChatGroup result = super.getChatGroup(addr);
@@ -255,6 +260,9 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     public void acceptInvitationAsync(Invitation invitation) {
 
         Room room = mDataHandler.getRoom(invitation.getGroupAddress().getAddress());
+        ChatGroup group = getChatGroup(room.getRoomId());
+        group.setJoined(true);
+        notifyJoinedGroup(group);
 
         if (room != null && room.isInvited())
             room.join(new ApiCallback<Void>() {
