@@ -280,8 +280,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         startForeground(notifyId, getForegroundNotification());
 
         //if the service restarted, then we need to reconnect/reinit to info.guardianproject.keanu.core.cacheword
-//        if ((flags & START_FLAG_REDELIVERY)!=0)  // if crash restart..
-        connectToCacheWord();
+       if ((flags & START_FLAG_REDELIVERY)!=0)  // if crash restart..
+            connectToCacheWord();
 
         if (intent != null)
         {
@@ -305,8 +305,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             mNeedCheckAutoLogin = !autoLogin();
         }
 
-
-        return START_NOT_STICKY;
+        return START_STICKY_COMPATIBILITY;
     }
 
 
@@ -355,7 +354,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                    If the event is TRIM_MEMORY_RUNNING_CRITICAL, then the system will
                    begin killing background processes.
                 */
-                clearMemoryMedium();
+
 
                 break;
 
@@ -370,7 +369,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                    If the event is TRIM_MEMORY_COMPLETE, the process will be one of
                    the first to be terminated.
                 */
-                clearMemoryComplete();
+
 
 
                 break;
@@ -385,42 +384,6 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         }
     }
 
-    private void clearMemoryMedium ()
-    {
-
-        for (ImConnectionAdapter conn : mConnections.values())
-        {
-            conn.clearMemory();
-        }
-
-        for (ImConnectionAdapter conn : mConnectionsByUser.values())
-        {
-            conn.clearMemory();
-        }
-
-        System.gc();
-    }
-
-    private void clearMemoryComplete ()
-    {
-        clearMemoryMedium ();
-
-        /**
-        for (ImConnectionAdapter conn : mConnections.values())
-        {
-            conn.suspend();
-        }
-
-        for (ImConnectionAdapter conn : mConnectionsByUser.values())
-        {
-            conn.suspend();
-        }**/
-
-        SecureMediaStore.unmount();
-        System.gc();
-        openEncryptedStores(tempKey,true);
-
-    }
 
     private void clearConnectionStatii() {
         ContentResolver cr = getContentResolver();
