@@ -69,6 +69,7 @@ import info.guardianproject.keanu.core.util.XmppUriHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -503,13 +504,13 @@ public class AddContactActivity extends BaseActivity {
         if (mDomainList == null)
             mDomainList = new ListPopupWindow(this);
 
-        ArrayList<String> suggestions = new ArrayList<>(contacts.length);
+        HashMap<String, String> suggestions = new HashMap<>();
         for (Contact contact : contacts)
-            suggestions.add(contact.getName() + " (" + contact.getAddress().getAddress() + ")");
+            suggestions.put(contact.getAddress().getAddress(), contact.getName() + " (" + contact.getAddress().getAddress() + ")");
 
         mDomainList.setAdapter(new ArrayAdapter(
                 this,
-                android.R.layout.simple_dropdown_item_1line, suggestions));
+                android.R.layout.simple_dropdown_item_1line, suggestions.values().toArray()));
         mDomainList.setAnchorView(mNewAddress);
         mDomainList.setWidth(ListPopupWindow.WRAP_CONTENT);
         mDomainList.setHeight(400);
