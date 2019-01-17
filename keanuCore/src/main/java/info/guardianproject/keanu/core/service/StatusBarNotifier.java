@@ -164,8 +164,10 @@ public class StatusBarNotifier {
     public void notifyGroupInvitation(long providerId, long accountId, long invitationId,
             Invitation invitation) {
 
-        Intent intent = new Intent(Intent.ACTION_VIEW, ContentUris.withAppendedId(
-                Imps.Invitation.CONTENT_URI, invitationId));
+        Intent intent = getDefaultIntent(accountId, providerId);//new Intent(Intent.ACTION_VIEW);
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(ContentUris.withAppendedId(Imps.Chats.CONTENT_URI, invitationId),Imps.Chats.CONTENT_ITEM_TYPE);
+        intent.addCategory(IMPS_CATEGORY);
 
         String title = mContext.getString(R.string.notify_groupchat_label);
         String message = mContext.getString(R.string.invitation_prompt, invitation.getReason());
