@@ -142,131 +142,17 @@
 			                               </RelativeLayout>
 
 
-
-
-
-        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:autoLink="none"
-            android:text="@string/security_code"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?contactTextSecondary"
-            android:layout_gravity="start"
-            />
-
-			<!--
-	<RelativeLayout
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:orientation="horizontal"
-		android:gravity="left"
-		>
-
-
-
-			<ImageView
-				android:layout_width="64dp"
-				android:layout_height="64dp"
-				android:id="@+id/qrcode"
-				android:background="#dddddd"
-				android:src="@drawable/qr"
-				android:layout_alignParentLeft="true"
-				/>
-
-		<info.guardianproject.keanu.core.type.CustomTypefaceTextView android:id="@+id/tvFingerprint"
-		                       android:selectAllOnFocus="true"
-		                       android:layout_width="200dp"
-		                       android:layout_height="wrap_content"
-								android:layout_marginLeft="6dp"
-		                       android:autoLink="none"
-		                       android:text=""
-		                       android:textAppearance="?android:attr/textAppearanceSmall"
-		                       android:textColor="?contactTextSecondary"
-
-			android:layout_toRightOf="@+id/qrcode"
-			android:layout_centerVertical="true"
-			/>
-		<ImageView
-			android:layout_width="48dp"
-			android:layout_height="48dp"
-			android:id="@+id/qrshare"
-			android:layout_centerVertical="true"
-
-			android:layout_alignParentRight="true"
-			android:src="@android:drawable/ic_menu_share"
-			/>
-
-	</RelativeLayout>
-	-->
-
-		<RelativeLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:gravity="left"
-            android:id="@+id/omemodisplay"
-            android:layout_marginTop="6dp"
-			>
-
-
-			<ImageView
-				android:layout_width="64dp"
-				android:layout_height="64dp"
-				android:id="@+id/omemoqrcode"
-				android:background="#dddddd"
-				android:src="@drawable/qr"
-				android:layout_alignParentLeft="true"
-				/>
-
-			<info.guardianproject.keanu.core.type.CustomTypefaceTextView android:id="@+id/omemoFingerprint"
-				android:selectAllOnFocus="true"
-				android:layout_width="200dp"
+			<info.guardianproject.keanu.core.type.CustomTypefaceButton android:id="@+id/btnViewDevices"
+				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"
-				android:layout_marginLeft="6dp"
-				android:autoLink="none"
-				android:text=""
-				android:textAppearance="?android:attr/textAppearanceSmall"
-				android:textColor="?contactTextSecondary"
-
-				android:layout_toRightOf="@+id/omemoqrcode"
-				android:layout_centerVertical="true"
-				/>
-			<ImageView
-				android:layout_width="48dp"
-				android:layout_height="48dp"
-				android:id="@+id/omemoqrshare"
-				android:layout_centerVertical="true"
-
-				android:layout_alignParentRight="true"
-				android:src="@android:drawable/ic_menu_share"
+				android:background="@null"
+				android:text="@string/action_view_devices"
+				android:padding="10dp"
+				android:textAppearance="?android:attr/textAppearanceMedium"
+				android:textColor="?colorPrimary"
+				android:gravity="start|left"
 				/>
 
-		</RelativeLayout>
-
-		<!--
-		<LinearLayout
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:orientation="vertical"
-			android:layout_marginTop="5dp"
-            android:layout_margin="10dp"
-			>
-		<Button android:id="@+id/btnLock"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:text="@string/lock_app"
-			android:drawableLeft="@drawable/ic_menu_encrypt"
-			android:textAppearance="?android:attr/textAppearanceMediumInverse"
-			android:background="?toolbarBackground"
-			android:padding="6dp"
-            android:layout_margin="1dp"
-
-			/>
-
-		</LinearLayout>
--->
-
-        </LinearLayout>
+</LinearLayout>
 	</LinearLayout>
 </ScrollView>

@@ -57,6 +57,7 @@ import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.tasks.SignInHelper;
+import info.guardianproject.keanuapp.ui.contacts.DeviceDisplayActivity;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
 import info.guardianproject.keanuapp.ui.qr.QrDisplayActivity;
 import info.guardianproject.keanuapp.ui.qr.QrShareAsyncTask;
@@ -201,87 +202,19 @@ public class AccountFragment extends Fragment {
             tvUsername.setText(mUserAddress);
             mTvNickname.setText(mNickname);
 
-            setFingerprints();
+            mView.findViewById(R.id.btnViewDevices).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewDevicesClicked();
+                }
+            });
         }
 
 
         return mView;
     }
 
-    private List<String> mRemoteOmemoFingeprints;
 
-    private void setFingerprints ()
-    {
-        new AsyncTask<String, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(String... strings) {
-
-                try {
-                    mRemoteOmemoFingeprints = mConn.getFingerprints(mUserAddress);
-                    return true;
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                    return false;
-                }
-
-
-            }
-
-            @Override
-            protected void onPostExecute(Boolean success) {
-                super.onPostExecute(success);
-
-                if (success) {
-                    if (mRemoteOmemoFingeprints != null && mRemoteOmemoFingeprints.size() > 0) {
-
-                        ImageView btnQrDisplay = (ImageView) mView.findViewById(R.id.omemoqrcode);
-                        btnQrDisplay.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                try {
-                                    String xmppLink = OnboardingManager.generateMatrixLink(mUserAddress, mRemoteOmemoFingeprints.get(0));
-                                    Intent intent = new Intent(getActivity(), QrDisplayActivity.class);
-                                    intent.putExtra(Intent.EXTRA_TEXT, xmppLink);
-                                    getActivity().startActivity(intent);
-                                } catch (IOException ioe) {
-                                    Log.e(LOG_TAG, "couldn't generate QR code", ioe);
-                                }
-                            }
-                        });
-
-                        StringTokenizer st = new StringTokenizer(mRemoteOmemoFingeprints.get(0),"|");
-                        TextView tvFingerprint = (TextView) mView.findViewById(R.id.omemoFingerprint);
-                        String deviceName = st.nextToken();
-                        String deviceId = st.nextToken();
-                        String deviceFingerprint = st.nextToken();
-                        tvFingerprint.setText(deviceName+ "\n" + prettyPrintFingerprint(deviceFingerprint));
-
-                        ImageView btnQrShare = (ImageView) mView.findViewById(R.id.omemoqrshare);
-                        btnQrShare.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                                try {
-                                    String inviteLink = OnboardingManager.generateInviteLink(getActivity(), mUserAddress, mRemoteOmemoFingeprints.get(0), mNickname);
-                                    new QrShareAsyncTask(getActivity()).execute(inviteLink, mNickname);
-                                } catch (IOException ioe) {
-                                    Log.e(LOG_TAG, "couldn't generate QR code", ioe);
-                                }
-                            }
-                        });
-                    } else {
-                        mView.findViewById(R.id.omemodisplay).setVisibility(View.GONE);
-                    }
-                }
-
-            }
-        }.execute();
-
-
-
-
-
-    }
 
     private void showChangeNickname ()
     {
@@ -730,5 +663,18 @@ public class AccountFragment extends Fragment {
 
         }
     }
+
+    public void viewDevicesClicked ()
+    {
+        Intent intent = new Intent(getActivity(),DeviceDisplayActivity.class);
+        intent.putExtra("nickname",mNickname);
+        intent.putExtra("address",mUserAddress);
+        intent.putExtra("provider",mProviderId);
+        intent.putExtra("account",mAccountId);
+
+        startActivity(intent);
+
+    }
+
 
 }
