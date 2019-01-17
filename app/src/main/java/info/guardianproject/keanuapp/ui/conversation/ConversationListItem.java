@@ -112,15 +112,8 @@ public class ConversationListItem extends FrameLayout {
 
     public void bind(ConversationViewHolder holder, long contactId, long providerId, long accountId, String address, String nickname, int contactType, String message, long messageDate, String messageType, int presence, int subscription, String underLineText, boolean showChatMsg, boolean scrolling, boolean isMuted, boolean isEncrypted) {
 
-        //applyStyleColors(holder);
-
-        if (nickname == null)
-        {
-            nickname = address.split("@")[0].split("\\.")[0];
-        }
-        else
-        {
-            nickname = nickname.split("@")[0].split("\\.")[0];
+        if (nickname == null) {
+            nickname = address.split(":")[0];
         }
 
         if (isMuted)
