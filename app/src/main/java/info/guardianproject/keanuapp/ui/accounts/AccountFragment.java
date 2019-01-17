@@ -239,7 +239,7 @@ public class AccountFragment extends Fragment {
                             @Override
                             public void onClick(View view) {
                                 try {
-                                    String xmppLink = OnboardingManager.generateXmppLink(mUserAddress, mRemoteOmemoFingeprints.get(0));
+                                    String xmppLink = OnboardingManager.generateMatrixLink(mUserAddress, mRemoteOmemoFingeprints.get(0));
                                     Intent intent = new Intent(getActivity(), QrDisplayActivity.class);
                                     intent.putExtra(Intent.EXTRA_TEXT, xmppLink);
                                     getActivity().startActivity(intent);

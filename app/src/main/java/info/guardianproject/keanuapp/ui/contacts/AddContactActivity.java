@@ -304,7 +304,7 @@ public class AddContactActivity extends BaseActivity {
                     ImApp app = ((ImApp) getApplication());
 
                     try {
-                        String xmppLink = OnboardingManager.generateXmppLink(app.getDefaultUsername(), fingerprint);
+                        String xmppLink = OnboardingManager.generateMatrixLink(app.getDefaultUsername(), fingerprint);
                         OnboardingManager.inviteScan(AddContactActivity.this, xmppLink);
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
@@ -323,7 +323,7 @@ public class AddContactActivity extends BaseActivity {
             public void onClick(View v) {
                 try {
                     ImApp app = ((ImApp) getApplication());
-                    String xmppLink = OnboardingManager.generateXmppLink(app.getDefaultUsername(), fingerprint);
+                    String xmppLink = OnboardingManager.generateMatrixLink(app.getDefaultUsername(), fingerprint);
                     OnboardingManager.inviteNearby(AddContactActivity.this, xmppLink);
                 }
                 catch (IOException ioe)
