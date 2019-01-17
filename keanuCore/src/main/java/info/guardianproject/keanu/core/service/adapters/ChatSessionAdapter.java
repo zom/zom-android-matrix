@@ -948,7 +948,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
             ContentValues values = new ContentValues(4);
             values.put(Imps.GroupMembers.USERNAME, username);
-            values.put(Imps.GroupMembers.NICKNAME, nickname);
+
+            if (!TextUtils.isEmpty(nickname))
+                values.put(Imps.GroupMembers.NICKNAME, nickname);
 
             long groupId = ContentUris.parseId(mChatURI);
             Uri uri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, groupId);
