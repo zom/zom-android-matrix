@@ -891,7 +891,10 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         // Insert a record in contacts table
         ContentValues values = new ContentValues();
         values.put(Imps.Contacts.USERNAME, group.getAddress().getAddress());
-        values.put(Imps.Contacts.NICKNAME, group.getName());
+
+        if (!TextUtils.isEmpty(group.getName()))
+            values.put(Imps.Contacts.NICKNAME, group.getName());
+
         values.put(Imps.Contacts.CONTACTLIST, ContactListManagerAdapter.LOCAL_GROUP_LIST_ID);
         if (isNewSession) {
             values.put(Imps.Contacts.TYPE, Imps.Contacts.TYPE_GROUP | Imps.Contacts.TYPE_FLAG_UNSEEN);
