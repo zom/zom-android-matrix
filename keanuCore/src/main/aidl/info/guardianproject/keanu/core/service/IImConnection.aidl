@@ -17,10 +17,13 @@
 
 package info.guardianproject.keanu.core.service;
 
+
 import info.guardianproject.keanu.core.service.IConnectionListener;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IContactListManager;
 import info.guardianproject.keanu.core.service.IInvitationListener;
+import info.guardianproject.keanu.core.service.IContactListListener;
+
 import info.guardianproject.keanu.core.model.Presence;
 
 interface IImConnection {
@@ -77,8 +80,11 @@ interface IImConnection {
     void sendTypingStatus (in String to, boolean isTyping);
 
     List getFingerprints (String address);
+    void setDeviceVerified (String address, String device, boolean verified);
 
     void broadcastMigrationIdentity (String address);
 
     void changeNickname (String name);
+
+    void searchForUser (String searchString, IContactListListener listener);
 }

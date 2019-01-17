@@ -39,7 +39,7 @@ public class ChatSession {
      * @param participant the participant with who the user communicates.
      * @param manager the underlying network connection.
      */
-    ChatSession(ImEntity participant, ChatSessionManager manager) {
+    ChatSession(ChatGroup participant, ChatSessionManager manager) {
 
         if (participant == null)
             throw new RuntimeException ("participant cannot be null");
@@ -51,7 +51,7 @@ public class ChatSession {
 
     public void setUseEncryption (boolean useEncryption)
     {
-        mManager.getAdapter().getChatSessionAdapter(this,false).useEncryption(useEncryption);
+        mManager.enableEncryption(this, useEncryption);
     }
 
     public boolean useEncryption ()

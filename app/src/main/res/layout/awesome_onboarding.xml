@@ -21,13 +21,15 @@
 
                 <include android:id="@+id/flipViewRegister" layout="@layout/awesome_onboarding_register"/>
 
-                <include android:id="@+id/flipViewCreateNew" layout="@layout/awesome_onboarding_create"/>
+          <!--      <include android:id="@+id/flipViewCreateNew" layout="@layout/awesome_onboarding_create"/>-->
 
                 <include android:id="@+id/flipViewLogin" layout="@layout/awesome_onboarding_login"/>
 
                 <include android:id="@+id/flipViewAdvanced" layout="@layout/awesome_onboarding_advanced"/>
+                <include android:id="@+id/flipViewProgress" layout="@layout/awesome_onboarding_progress"/>
+                <include android:id="@+id/flipViewSuccess" layout="@layout/awesome_onboarding_success"/>
 
-                <include android:id="@+id/flipViewInviteFriends" layout="@layout/awesome_onboarding_invite"/>
+            <!--    <include android:id="@+id/flipViewInviteFriends" layout="@layout/awesome_onboarding_invite"/>-->
 
 
             </ViewFlipper>

@@ -42,6 +42,7 @@ import info.guardianproject.keanu.core.KeanuConstants;
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.R;
 import info.guardianproject.keanu.core.model.Contact;
+import info.guardianproject.keanu.core.model.Invitation;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.ui.DummyActivity;
 import info.guardianproject.keanu.core.util.DatabaseUtils;
@@ -70,7 +71,7 @@ public class StatusBarNotifier {
     private VibrationEffect mVibeEffect;
     private final static long[] VIBRATION_TIMINGS = {0,500,100,100,1000};
 
-    public static String defaultMainClass = "info.guardianproject.keanu.core.ui.DummyActivity";
+    public static String defaultMainClass = "info.guardianproject.keanuapp.MainActivity";
 
     public StatusBarNotifier(Context context) {
         mContext = context;
@@ -161,14 +162,16 @@ public class StatusBarNotifier {
 
 
     public void notifyGroupInvitation(long providerId, long accountId, long invitationId,
-            String username) {
+            Invitation invitation) {
 
-        Intent intent = new Intent(Intent.ACTION_VIEW, ContentUris.withAppendedId(
-                Imps.Invitation.CONTENT_URI, invitationId));
+        Intent intent = getDefaultIntent(accountId, providerId);//new Intent(Intent.ACTION_VIEW);
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setDataAndType(ContentUris.withAppendedId(Imps.Chats.CONTENT_URI, invitationId),Imps.Chats.CONTENT_ITEM_TYPE);
+        intent.addCategory(IMPS_CATEGORY);
 
         String title = mContext.getString(R.string.notify_groupchat_label);
-        String message = mContext.getString(R.string.group_chat_invite_notify_text, username);
-        notify(username, title, message, message, providerId, accountId, intent, false, R.drawable.group_chat, true);
+        String message = mContext.getString(R.string.invitation_prompt, invitation.getReason());
+        notify(invitation.getSender().getAddress(), title, message, message, providerId, accountId, intent, false, R.drawable.ic_people_white_24dp, true);
     }
 
     public void notifyLoggedIn(long providerId, long accountId) {
@@ -301,13 +304,12 @@ public class StatusBarNotifier {
 
     }
 
-    private Intent getDefaultIntent(long accountId, long providerId) {
+    public Intent getDefaultIntent(long accountId, long providerId) {
 
         Intent intent = null;
         try {
             intent = new Intent(mContext,Class.forName(defaultMainClass));
             intent.setAction(Intent.ACTION_VIEW);
-            intent.setType(Imps.Contacts.CONTENT_TYPE);
             intent.putExtra(ImServiceConstants.EXTRA_INTENT_ACCOUNT_ID, accountId);
             intent.putExtra(ImServiceConstants.EXTRA_INTENT_PROVIDER_ID, providerId);
         } catch (ClassNotFoundException e) {

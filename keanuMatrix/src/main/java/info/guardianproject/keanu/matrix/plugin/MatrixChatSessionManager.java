@@ -114,6 +114,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                                 mRoomMap.put(member.getUserId(),thisRoom);
                                 mSessions.put(member.getUserId(),adapter);
                             }
+
                         }
                     });
                 }
@@ -454,12 +455,21 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                 mRoomMap.put(contactId, room);
              //   room.updateName(addr.getUser(),new BasicApiCallback("RoomUpdate"));
                 room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("CreateRoomEncryption"));
-                ChatGroup chatGroup = new ChatGroup(new MatrixAddress(roomId), null, mConn.getChatGroupManager());
+                ChatGroup chatGroup = new ChatGroup(new MatrixAddress(roomId), room.getRoomDisplayName(mContext), mConn.getChatGroupManager());
                 ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
                 session.setUseEncryption(true);
                 room.invite(contactId, new BasicApiCallback("RoomInvite"));
                 mConn.addRoomContact(room);
             }
         });
+    }
+
+    public void enableEncryption (ChatSession session, boolean enableEncryption)
+    {
+        Room room = getRoom(session);
+
+        if ((!room.isEncrypted()) && enableEncryption)
+            room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("CreateRoomEncryption"));
+
     }
 }

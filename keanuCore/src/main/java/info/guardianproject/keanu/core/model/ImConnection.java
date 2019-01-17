@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import info.guardianproject.keanu.core.service.IContactListListener;
 import info.guardianproject.keanu.core.util.UploadProgressListener;
 
 
@@ -268,9 +269,14 @@ public abstract class ImConnection {
 
     public abstract List getFingerprints (String address);
 
+    public abstract void setDeviceVerified (String address, String device, boolean verified);
+
     public abstract void broadcastMigrationIdentity (String newIdentity);
 
    // public abstract String sendMediaMessage (String recipient, Uri uriMedia, String fileName, String mimeType, long fileSize, boolean doEncryption, UploadProgressListener listener);
 
     public abstract void changeNickname (String nickname);
+
+    public abstract void searchForUser (String searchString, IContactListListener listener);
+
 }

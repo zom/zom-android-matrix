@@ -22,6 +22,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import info.guardianproject.keanu.core.service.adapters.ChatSessionAdapter;
 import info.guardianproject.keanu.core.service.adapters.ChatSessionManagerAdapter;
+import info.guardianproject.keanu.core.util.SecureMediaStore;
 
 
 /**
@@ -78,14 +79,14 @@ public abstract class ChatSessionManager {
      * @param participant the participant.
      * @return the created ChatSession.
      */
-    public synchronized ChatSession createChatSession(ImEntity participant, boolean isNewSession) {
+    public ChatSession createChatSession(ImEntity participant, boolean isNewSession) {
 
         ChatSessionAdapter sessionAdapter = mSessions.get(participant.getAddress().getAddress());
 
         if (sessionAdapter == null)
         {
 
-            ChatSession session = new ChatSession(participant, this);
+            ChatSession session = new ChatSession((ChatGroup)participant, this);
             sessionAdapter = mAdapter.getChatSessionAdapter(session, isNewSession);
 
             for (ChatSessionListener listener : mListeners) {
@@ -95,8 +96,18 @@ public abstract class ChatSessionManager {
             mSessions.put(participant.getAddress().getAddress(),sessionAdapter);
 
         }
+        else
+        {
+            sessionAdapter.update();
+        }
+
 
         return sessionAdapter.getChatSession();
+    }
+
+    public ChatSessionAdapter getChatSessionAdapter (String address)
+    {
+        return mSessions.get(address);
     }
 
     /**
@@ -117,5 +128,7 @@ public abstract class ChatSessionManager {
      * @param message the message to send.
      */
     public abstract void sendMessageAsync(ChatSession session, Message message, ChatSessionListener listener);
+
+    public abstract void enableEncryption (ChatSession session, boolean encryption);
 
 }

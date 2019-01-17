@@ -43,6 +43,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.provider.Browser;
@@ -90,6 +91,7 @@ import java.util.Date;
 
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.impl.BaseAddress;
+import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.model.Address;
@@ -340,6 +342,9 @@ public class ConversationView {
 
     private boolean checkConnection ()
     {
+        if (mProviderId == -1 || mAccountId == -1)
+            return false;
+
         if (mConn == null) {
             mConn = RemoteImService.getConnection(mProviderId, mAccountId);
 
@@ -655,32 +660,6 @@ public class ConversationView {
         }
     };
 
-    private ISubscriptionListener mSubscriptionListener = new ISubscriptionListener.Stub()
-    {
-        @Override
-        public void onSubScriptionChanged(Contact from, long providerId, long accountId, int subType, int subStatus) throws RemoteException {
-            if (from.getAddress().getBareAddress().equals(mRemoteAddress)) {
-                mSubscriptionType = subType;
-                mSubscriptionStatus = subStatus;
-                showSubscriptionUI();
-            }
-        }
-
-        @Override
-        public void onSubScriptionRequest(Contact from, long providerId, long accountId) throws RemoteException {
-
-        }
-
-        @Override
-        public void onSubscriptionApproved(Contact from, long providerId, long accountId) throws RemoteException {
-
-        }
-
-        @Override
-        public void onSubscriptionDeclined(Contact from, long providerId, long accountId) throws RemoteException {
-
-        }
-    };
 
     private IContactListListener mContactListListener = new IContactListListener.Stub() {
         public void onAllContactListsLoaded() {
@@ -863,15 +842,15 @@ public class ConversationView {
             }
 
         });
-        /**
+
         mActivity.findViewById(R.id.btnAttachFile).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                mActivity.startFilePicker();
+                mActivity.startFilePicker("*/*");
             }
 
-        });**/
+        });
 
         mActivity.findViewById(R.id.btnAttachSticker).setOnClickListener(new View.OnClickListener() {
 
@@ -1012,7 +991,7 @@ public class ConversationView {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                sendTypingStatus (true);
+                sendTypingStatus (mComposeMessage.getText().length() > 0);
 
                 return false;
             }
@@ -1022,7 +1001,7 @@ public class ConversationView {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
 
-                 sendTypingStatus (hasFocus);
+                sendTypingStatus (hasFocus && (mComposeMessage.getText().length() > 0));
 
             }
         });
@@ -1110,17 +1089,15 @@ public class ConversationView {
 
     private void sendTypingStatus (boolean isTyping) {
 
-        if (mSubscriptionStatus != Imps.Contacts.SUBSCRIPTION_STATUS_SUBSCRIBE_PENDING) {
-            if (mLastIsTyping != isTyping) {
-                try {
-                    if (mConn != null)
-                        mConn.sendTypingStatus(mRemoteAddress, isTyping);
-                } catch (Exception ie) {
-                    Log.e(LOG_TAG, "error sending typing status", ie);
-                }
-
-                mLastIsTyping = isTyping;
+      if (mLastIsTyping != isTyping) {
+            try {
+                if (mConn != null)
+                    mConn.sendTypingStatus(mRemoteAddress, isTyping);
+            } catch (Exception ie) {
+                Log.e(LOG_TAG, "error sending typing status", ie);
             }
+
+            mLastIsTyping = isTyping;
         }
 
     }
@@ -1294,144 +1271,54 @@ public class ConversationView {
 
             mSubscriptionStatus = c.getInt(SUBSCRIPTION_STATUS_COLUMN);
 
-            showSubscriptionUI();
             showJoinGroupUI();
 
         }
 
     }
 
-    private void showSubscriptionUI ()
-    {
-
-        if (isGroupChat())
-            return;
-
-        mHandler.post(new Runnable() {
-
-            public void run () {
-
-                if (mSubscriptionStatus == Imps.Contacts.SUBSCRIPTION_STATUS_SUBSCRIBE_PENDING) {
-                    if (mSubscriptionType == Imps.Contacts.SUBSCRIPTION_TYPE_FROM) {
-                        Snackbar sb = Snackbar.make(mHistory, mContext.getString(R.string.subscription_prompt, mRemoteNickname), Snackbar.LENGTH_INDEFINITE);
-                        sb.setAction(mActivity.getString(R.string.approve_subscription), new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                approveSubscription();
-                            }
-                        });
-                        sb.show();
-                    }
-                    else if (mSubscriptionType == Imps.Contacts.SUBSCRIPTION_TYPE_TO) {
-                        /**
-                        mActivity.findViewById(R.id.waiting_view).setVisibility(View.VISIBLE);
-                        final View buttonRefresh = mActivity.findViewById(R.id.waiting_refresh_background);
-                        final ImageView iconRefresh = (ImageView) mActivity.findViewById(R.id.waiting_refresh);
-
-                        buttonRefresh.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Animation rotate = new RotateAnimation(0,360,Animation.RELATIVE_TO_SELF,0.5f,Animation.RELATIVE_TO_SELF,0.5f);
-                                rotate.setRepeatCount(4);
-                                rotate.setInterpolator(new LinearInterpolator());
-                                rotate.setDuration(800);
-                                rotate.setAnimationListener(new Animation.AnimationListener() {
-                                    @Override
-                                    public void onAnimationStart(Animation animation) {
-
-                                    }
-
-                                    @Override
-                                    public void onAnimationEnd(Animation animation) {
-                                        iconRefresh.clearAnimation();
-                                        Drawable check = ContextCompat.getDrawable(iconRefresh.getContext(), R.drawable.ic_check_white_24dp).mutate();
-                                        DrawableCompat.setTint(check, ContextCompat.getColor(iconRefresh.getContext(), R.color.zom_primary));
-                                        iconRefresh.setImageDrawable(check);
-                                        Drawable back = buttonRefresh.getBackground().mutate();
-                                        DrawableCompat.setTint(back, Color.WHITE);
-                                        ViewCompat.setBackground(buttonRefresh, back);
-                                        buttonRefresh.setEnabled(false);
-                                        mActivity.findViewById(R.id.waiting_view).setVisibility(View.GONE);
-
-                                    }
-
-                                    @Override
-                                    public void onAnimationRepeat(Animation animation) {
-
-                                    }
-                                });
-                                resendFriendRequest();
-                                iconRefresh.startAnimation(rotate);
-                            }
-                        });**/
-
-                    }
-                    else {
-                        mActivity.findViewById(R.id.waiting_view).setVisibility(View.GONE);
-                    }
-                }
-            }
-
-        });
-
-    }
-
-    private void resendFriendRequest ()
-    {
-        //if not group chat, then send the contact another friend request
-        if (!isGroupChat())
-            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(mRemoteAddress, null, null);
-
-    }
 
     private void showJoinGroupUI ()
     {
-        if (!isGroupChat())
-            return;
+        final View joinGroupView = mActivity.findViewById(R.id.join_group_view);
 
-        mHandler.post(new Runnable() {
+            if (mSubscriptionStatus == Imps.Contacts.SUBSCRIPTION_STATUS_SUBSCRIBE_PENDING) {
+                joinGroupView.setVisibility(View.VISIBLE);
 
-            public void run () {
-                if ((mContactType & Imps.Contacts.TYPE_FLAG_UNSEEN) != 0) {
-                    final View joinGroupView = mActivity.findViewById(R.id.join_group_view);
-                    joinGroupView.setVisibility(View.VISIBLE);
+                final View btnJoinAccept = joinGroupView.findViewById(R.id.btnJoinAccept);
+                final View btnJoinDecline = joinGroupView.findViewById(R.id.btnJoinDecline);
+                final TextView title = joinGroupView.findViewById(R.id.room_join_title);
 
-                    final View btnJoinAccept = joinGroupView.findViewById(R.id.btnJoinAccept);
-                    final View btnJoinDecline = joinGroupView.findViewById(R.id.btnJoinDecline);
-                    final TextView title = joinGroupView.findViewById(R.id.room_join_title);
+                title.setText(title.getContext().getString(R.string.room_invited, mRemoteNickname));
 
-                    title.setText(title.getContext().getString(R.string.room_invited, mRemoteNickname));
+                btnJoinAccept.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        setGroupSeen();
+                        joinGroupView.setVisibility(View.GONE);
+                    }
+                });
+                btnJoinDecline.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        try {
+                            if (mCurrentChatSession != null) {
+                                mCurrentChatSession.leave();
 
-                    btnJoinAccept.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            setGroupSeen();
-                            joinGroupView.setVisibility(View.GONE);
-                        }
-                    });
-                    btnJoinDecline.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            try {
-                                if (mCurrentChatSession != null) {
-                                    mCurrentChatSession.leave();
-
-                                    //clear the stack and go back to the main activity
-                                    Intent intent = new Intent(v.getContext(), MainActivity.class);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    v.getContext().startActivity(intent);
-                                }
-                            } catch (RemoteException e) {
-                                e.printStackTrace();
+                                //clear the stack and go back to the main activity
+                                Intent intent = new Intent(v.getContext(), MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                v.getContext().startActivity(intent);
                             }
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
                         }
-                    });
-                } else {
-                    mActivity.findViewById(R.id.join_group_view).setVisibility(View.GONE);
-                }
+                    }
+                });
+            } else {
+                joinGroupView.setVisibility(View.GONE);
             }
 
-        });
 
     }
 
@@ -1461,6 +1348,8 @@ public class ConversationView {
     {
         return mRemoteHeader;
     }
+
+
 
     private void setGroupSeen() {
         if (isGroupChat()) {
@@ -1590,24 +1479,27 @@ public class ConversationView {
 
     }
 
+    boolean showContactName = true;
+
     private synchronized void initSession ()
     {
         mHandler.post(mUpdateChatCallback);
 
-        new Thread ()
-        {
-            public void run ()
-            {
+        mCurrentChatSession = getChatSession();
 
-                mCurrentChatSession = getChatSession();
+        if (mCurrentChatSession == null)
+            mCurrentChatSession = createChatSession();
 
-                if (mCurrentChatSession == null)
-                    mCurrentChatSession = createChatSession();
-
-                mHandler.post(mUpdateChatCallback);
-
+        if (mCurrentChatSession != null) {
+            try {
+                showContactName = mCurrentChatSession.getParticipants().length > 2;
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
-        }.start();
+        }
+
+        mHandler.post(mUpdateChatCallback);
+
     }
 
 
@@ -1889,11 +1781,24 @@ public class ConversationView {
 
                         if ((mContactType & Imps.Contacts.TYPE_MASK) == Imps.Contacts.TYPE_GROUP)
                         {
-                            //Contact contactGroup = new Contact(new XmppAddress(mRemoteAddress),mRemoteNickname,Imps.Contacts.TYPE_GROUP);
-                            session = sessionMgr.createMultiUserChatSession(mRemoteAddress,mRemoteNickname,null,false);
+                            sessionMgr.createMultiUserChatSession(mRemoteAddress, mRemoteNickname, null, false, null, new IChatSessionListener() {
+                                @Override
+                                public void onChatSessionCreated(IChatSession session) throws RemoteException {
 
-                            //new ChatSessionInitTask(((ImApp)mActivity.getApplication()),mProviderId, mAccountId, Imps.Contacts.TYPE_GROUP)
-                              //      .executeOnExecutor(ImApp.sThreadPoolExecutor,contactGroup);
+                                    mCurrentChatSession = session;
+                                }
+
+                                @Override
+                                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                                }
+
+                                @Override
+                                public IBinder asBinder() {
+                                    return null;
+                                }
+                            });
+
 
                         }
                         else
@@ -2154,7 +2059,6 @@ public class ConversationView {
             {
                 IContactListManager listMgr = mConn.getContactListManager();
                 listMgr.registerContactListListener(mContactListListener);
-                listMgr.registerSubscriptionListener(mSubscriptionListener);
 
             }
 
@@ -2176,7 +2080,6 @@ public class ConversationView {
             if (mConn != null) {
                 IContactListManager listMgr = mConn.getContactListManager();
                 listMgr.unregisterContactListListener(mContactListListener);
-                listMgr.unregisterSubscriptionListener(mSubscriptionListener);
 
             }
         } catch (Exception e) {
@@ -2253,6 +2156,7 @@ public class ConversationView {
                 getChatSession().markAsRead();
                 //updateWarningView();
 
+                sendTypingStatus(mComposeMessage.getText().length() > 0);
             } catch (RemoteException e) {
 
                 mHandler.showServiceErrorAlert(e.getLocalizedMessage());
@@ -2809,6 +2713,7 @@ public class ConversationView {
             }
 
 
+
             if (!mExpectingDelivery && isDelivered) {
                 mExpectingDelivery = true;
             } else if (cursor.getPosition() == cursor.getCount() - 1) {
@@ -2853,7 +2758,7 @@ public class ConversationView {
 
             switch (messageType) {
             case Imps.MessageType.INCOMING:
-                messageView.bindIncomingMessage(viewHolder,id, messageType, address, nickname, mimeType, body, date, mMarkup, false, encState, isGroupChat(), mPresenceStatus, mCurrentChatSession, packetId);
+                messageView.bindIncomingMessage(viewHolder,id, messageType, address, nickname, mimeType, body, date, mMarkup, false, encState, showContactName, mPresenceStatus, mCurrentChatSession, packetId);
 
                 break;
 

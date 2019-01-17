@@ -45,6 +45,7 @@ import info.guardianproject.keanu.core.model.Presence;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IConnectionListener;
+import info.guardianproject.keanu.core.service.IContactListListener;
 import info.guardianproject.keanu.core.service.IContactListManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.IInvitationListener;
@@ -87,11 +88,10 @@ public class ImConnectionAdapter extends IImConnection.Stub {
         mService = service;
         mConnectionListener = new ConnectionListenerAdapter();
         mConnection.addConnectionListener(mConnectionListener);
-        if ((connection.getCapability() & ImConnection.CAPABILITY_GROUP_CHAT) != 0) {
-            mGroupManager = mConnection.getChatGroupManager();
-            mInvitationListener = new InvitationListenerAdapter();
-            mGroupManager.setInvitationListener(mInvitationListener);
-        }
+
+        mGroupManager = mConnection.getChatGroupManager();
+        mInvitationListener = new InvitationListenerAdapter();
+        mGroupManager.setInvitationListener(mInvitationListener);
 
         mChatSessionManager = new ChatSessionManagerAdapter(this);
         mContactListManager = new ContactListManagerAdapter(this);
@@ -594,7 +594,7 @@ public class ImConnectionAdapter extends IImConnection.Stub {
             // No listener registered or failed to notify the listener, send a
             // notification instead.
             mService.getStatusBarNotifier().notifyGroupInvitation(mProviderId, mAccountId, id,
-                    sender);
+                    invitation);
         }
     }
 
@@ -626,6 +626,18 @@ public class ImConnectionAdapter extends IImConnection.Stub {
             return null;
     }
 
+    public void setDeviceVerified (String address, String device, boolean verified)
+    {
+        if (mConnection != null)
+            mConnection.setDeviceVerified(address, device, verified);
+
+    }
+
+    public void searchForUser (String searchString, IContactListListener listener)
+    {
+        if (mConnection != null)
+            mConnection.searchForUser(searchString, listener);
+    }
     /**
     public String sendMediaMessage (String recipient, Uri uriMedia, String fileName, String mimeType, long fileSize, boolean doEncryption, UploadProgressListener listener)
     {

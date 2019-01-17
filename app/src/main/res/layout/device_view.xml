@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+ * Copyright (C) 2008 Esmertec AG.
+ * Copyright (C) 2008 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+-->
+<view xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    class="info.guardianproject.keanuapp.ui.contacts.ContactListItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="3dp"
+     >
+     
+
+        
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            >
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:id="@+id/verifiedIcon"
+                android:src="@drawable/ic_verified_user_white_48dp"
+                android:tint="@color/holo_grey_light"
+                android:layout_alignParentLeft="true"
+                />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_toRightOf="@+id/verifiedIcon"
+                >
+                <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                    android:id="@+id/tvDeviceName"
+                    android:selectAllOnFocus="true"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:autoLink="none"
+                    android:text="device name"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textColor="?contactTextSecondary"
+
+                    android:layout_centerVertical="true"
+                    />
+                <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                    android:id="@+id/tvDeviceFingerprint"
+                    android:selectAllOnFocus="true"
+                    android:layout_width="250dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="6dp"
+                    android:autoLink="none"
+                    android:text="fingerprint"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:textStyle="bold"
+                    android:textColor="?contactTextSecondary"
+                    android:layout_centerVertical="true"
+                    />
+            </LinearLayout>
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/switchVerified"
+                android:layout_alignParentRight="true"
+                android:padding="6dp"
+                android:layout_margin="1dp"
+                />
+
+        </RelativeLayout>
+
+<!--
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+            android:id="@+id/line3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="?contactTextSecondary"
+            android:text="line 3 text here"
+
+            />
+-->
+
+
+
+</view>

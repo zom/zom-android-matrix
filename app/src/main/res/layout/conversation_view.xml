@@ -121,7 +121,6 @@
         android:layout_height="48dp"
         android:scaleType="centerCrop"
         android:layout_margin="3dp"
-        android:visibility="gone"
         android:layout_gravity="left|top"
         />
 

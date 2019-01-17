@@ -71,6 +71,7 @@ import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
 import info.guardianproject.keanuapp.tasks.SignInHelper;
 import info.guardianproject.keanuapp.ui.BaseActivity;
+import info.guardianproject.keanuapp.ui.contacts.AddContactActivity;
 import info.guardianproject.keanuapp.ui.legacy.SimpleAlertHandler;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
@@ -78,7 +79,7 @@ import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 public class OnboardingActivity extends BaseActivity {
 
     private ViewFlipper mViewFlipper;
-    private EditText mEditUsername;
+   // private EditText mEditUsername;
     private View mSetupProgress;
     //private View mSetupButton;
     private ImageView mImageAvatar;
@@ -128,21 +129,21 @@ public class OnboardingActivity extends BaseActivity {
 
         View viewSplash = findViewById(R.id.flipViewMain);
         View viewRegister =  findViewById(R.id.flipViewRegister);
-        View viewCreate = findViewById(R.id.flipViewCreateNew);
+      //  View viewCreate = findViewById(R.id.flipViewCreateNew);
         View viewLogin = findViewById(R.id.flipViewLogin);
-        View viewInvite = findViewById(R.id.flipViewInviteFriends);
+       // View viewInvite = findViewById(R.id.flipViewInviteFriends);
         View viewAdvanced  = findViewById(R.id.flipViewAdvanced);
 
 
         final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
         int themeColorHeader = settings.getInt("themeColor",-1);
 
-        if (themeColorHeader != -1)
-            viewInvite.setBackgroundColor(themeColorHeader);
+     //   if (themeColorHeader != -1)
+       //     viewInvite.setBackgroundColor(themeColorHeader);
 
         mViewFlipper = (ViewFlipper) findViewById(R.id.viewFlipper1);
 
-        mEditUsername = (EditText)viewCreate.findViewById(R.id.edtNewName);
+     //   mEditUsername = (EditText)viewCreate.findViewById(R.id.edtNewName);
         mSpinnerDomains = (EditText)viewAdvanced.findViewById(R.id.spinnerDomains);
      //   ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
        //         android.R.layout.simple_dropdown_item_1line, OnboardingManager.getServers(this));
@@ -178,7 +179,7 @@ public class OnboardingActivity extends BaseActivity {
             }
         });
 
-        mImageAvatar = (ImageView) viewCreate.findViewById(R.id.imageAvatar);
+        mImageAvatar = (ImageView) findViewById(R.id.imageAvatar);
         mImageAvatar.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -234,6 +235,7 @@ public class OnboardingActivity extends BaseActivity {
 
         });
 
+        /**
         View btnShowAdvanced = viewCreate.findViewById(R.id.btnAdvanced);
         btnShowAdvanced.setOnClickListener(new OnClickListener() {
 
@@ -243,7 +245,7 @@ public class OnboardingActivity extends BaseActivity {
                 showAdvancedScreen();
             }
 
-        });
+        });**/
 
         // set up language chooser button
         View languageButton = viewSplash.findViewById(R.id.languageButton);
@@ -269,6 +271,7 @@ public class OnboardingActivity extends BaseActivity {
             }
         });
 
+        /**
         mEditUsername.setOnEditorActionListener(new OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -295,7 +298,7 @@ public class OnboardingActivity extends BaseActivity {
 
                 return false;
             }
-        });
+        });**/
 
         View btnCreateAdvanced = viewAdvanced.findViewById(R.id.btnNewRegister);
         btnCreateAdvanced.setOnClickListener(new OnClickListener() {
@@ -309,6 +312,7 @@ public class OnboardingActivity extends BaseActivity {
             }
         });
 
+        /**
         View btnInviteSms = viewInvite.findViewById(R.id.btnInviteSMS);
         btnInviteSms.setOnClickListener(new OnClickListener() {
 
@@ -345,7 +349,7 @@ public class OnboardingActivity extends BaseActivity {
                 
             }
             
-        });
+        });**/
 
 
         View btnSignIn = viewLogin.findViewById(R.id.btnSignIn);
@@ -435,10 +439,11 @@ public class OnboardingActivity extends BaseActivity {
             else
                 finish();
         }
+        /**
         else if (mViewFlipper.getCurrentView().getId()==R.id.flipViewCreateNew)
         {
             showOnboarding();
-        }
+        }**/
         else if (mViewFlipper.getCurrentView().getId()==R.id.flipViewLogin)
         {
             showOnboarding();
@@ -470,7 +475,7 @@ public class OnboardingActivity extends BaseActivity {
     private void showSetupScreen ()
     {
 
-        mViewFlipper.setDisplayedChild(2);
+        mViewFlipper.setDisplayedChild(3);
         getSupportActionBar().show();
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -479,7 +484,7 @@ public class OnboardingActivity extends BaseActivity {
     private void showLoginScreen ()
     {
 
-        mViewFlipper.setDisplayedChild(3);
+        mViewFlipper.setDisplayedChild(2);
         findViewById(R.id.progressExistingUser).setVisibility(View.GONE);
         findViewById(R.id.progressExistingImage).setVisibility(View.GONE);
 
@@ -497,11 +502,13 @@ public class OnboardingActivity extends BaseActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
     }
 
+    private void showSuccess ()
+    {
+        mViewFlipper.setDisplayedChild(5);
+
+    }
     private void startAdvancedSetup ()
     {
-        mSetupProgress = findViewById(R.id.progressNewUser);
-        mSetupProgress.setVisibility(View.VISIBLE);
-
         mNickname = ((EditText)findViewById(R.id.edtNameAdvanced)).getText().toString();
         String username = mNickname.replaceAll(USERNAME_ONLY_ALPHANUM, "").toLowerCase();
 
@@ -514,9 +521,7 @@ public class OnboardingActivity extends BaseActivity {
 
         String password = ((EditText)findViewById(R.id.edtNewPass)).getText().toString();
 
-        mViewFlipper.setDisplayedChild(2);
-
-        showSetupProgress();
+        mViewFlipper.setDisplayedChild(4);
 
         if (mCurrentFindServerTask != null)
             mCurrentFindServerTask.cancel(true);
@@ -530,7 +535,7 @@ public class OnboardingActivity extends BaseActivity {
     {
         setAnimLeft();
 
-        showSetupProgress ();
+        startAdvancedSetup ();
 
         String username = mNickname.replaceAll(USERNAME_ONLY_ALPHANUM, "").toLowerCase();
 
@@ -542,24 +547,6 @@ public class OnboardingActivity extends BaseActivity {
 
         mCurrentFindServerTask = new FindServerTask ();
         mCurrentFindServerTask.execute(mNickname,username);
-    }
-
-    private void showSetupForm ()
-    {
-        View viewCreate = findViewById(R.id.flipViewCreateNew);
-        viewCreate.findViewById(R.id.viewProgress).setVisibility(View.GONE);
-        viewCreate.findViewById(R.id.viewCreate).setVisibility(View.VISIBLE);
-        viewCreate.findViewById(R.id.btnAdvanced).setVisibility(View.VISIBLE);
-
-    }
-
-    private void showSetupProgress ()
-    {
-        View viewCreate = findViewById(R.id.flipViewCreateNew);
-        viewCreate.findViewById(R.id.viewProgress).setVisibility(View.VISIBLE);
-        viewCreate.findViewById(R.id.viewCreate).setVisibility(View.GONE);
-        viewCreate.findViewById(R.id.btnAdvanced).setVisibility(View.GONE);
-
     }
 
     private class FindServerTask extends AsyncTask<String, Void, OnboardingAccount> {
@@ -605,14 +592,11 @@ public class OnboardingActivity extends BaseActivity {
 
                                     public void run ()
                                     {
-                                        View viewCreate = findViewById(R.id.flipViewCreateNew);
-                                        viewCreate.findViewById(R.id.progressImage).setVisibility(View.GONE);
 
                                         mUsername = '@' + account.username + ':' + account.domain;
                                         mNewAccount = account;
 
-                                        viewCreate.findViewById(R.id.viewProgress).setVisibility(View.GONE);
-                                        viewCreate.findViewById(R.id.viewSuccess).setVisibility(View.VISIBLE);
+                                        showSuccess();
 
                                         ImApp mApp = (ImApp)getApplication();
                                         mApp.setDefaultAccount(account.providerId,account.accountId);
@@ -626,7 +610,7 @@ public class OnboardingActivity extends BaseActivity {
                                             @Override
                                             public boolean onMenuItemClick(MenuItem item) {
 
-                                                showInviteScreen();
+                                                showMainScreen();
                                                 return false;
                                             }
                                         });
@@ -644,17 +628,16 @@ public class OnboardingActivity extends BaseActivity {
 
                                     public void run ()
                                     {
-                                        View viewCreate = findViewById(R.id.flipViewCreateNew);
-                                        viewCreate.findViewById(R.id.progressImage).setVisibility(View.GONE);
+                                        findViewById(R.id.progressImage).setVisibility(View.GONE);
 
-                                        viewCreate.findViewById(R.id.viewProgress).setVisibility(View.GONE);
-                                        viewCreate.findViewById(R.id.viewCreate).setVisibility(View.VISIBLE);
-                                        viewCreate.findViewById(R.id.btnAdvanced).setVisibility(View.VISIBLE);
+                                        findViewById(R.id.viewProgress).setVisibility(View.GONE);
+                                        findViewById(R.id.viewCreate).setVisibility(View.VISIBLE);
+                                        findViewById(R.id.btnAdvanced).setVisibility(View.VISIBLE);
 
                                         StringBuffer sb = new StringBuffer();
                                         sb.append(getString(R.string.account_setup_error_server));
                                         sb.append(": ").append(err);
-                                        TextView status = (TextView)viewCreate.findViewById(R.id.statusError);
+                                        TextView status = (TextView)findViewById(R.id.statusError);
                                         status.setText(sb.toString());
 
 
@@ -676,14 +659,14 @@ public class OnboardingActivity extends BaseActivity {
         protected void onCancelled(OnboardingAccount onboardingAccount) {
             super.onCancelled(onboardingAccount);
 
-            showSetupForm ();
+            startAdvancedSetup ();
         }
 
         @Override
         protected void onCancelled() {
             super.onCancelled();
 
-            showSetupForm ();
+            startAdvancedSetup ();
         }
 
         @Override
@@ -693,6 +676,7 @@ public class OnboardingActivity extends BaseActivity {
         }
       }
 
+      /**
     private void showInviteScreen ()
     {
         mViewFlipper.setDisplayedChild(5);
@@ -739,7 +723,7 @@ public class OnboardingActivity extends BaseActivity {
             e.printStackTrace();
         }
         
-    }
+    }**/
 
     private void showMainScreen ()
     {
@@ -748,6 +732,8 @@ public class OnboardingActivity extends BaseActivity {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
 
+        intent = new Intent(this, AddContactActivity.class);
+        startActivity(intent);
     }
 
     private synchronized boolean doExistingAccountRegister ()
@@ -767,31 +753,6 @@ public class OnboardingActivity extends BaseActivity {
         }
 
         return false;
-    }
-
-    //make sure it is valid, and that people aren't including unsupported domains
-    public static boolean verifyJabberID(String jid) {
-        if (jid != null) {
-            Pattern p = Pattern
-                    .compile("(?i)[a-z0-9\\-_\\.]++@[a-z0-9\\-_]++(\\.[a-z0-9\\-_]++)++");
-            Matcher m = p.matcher(jid);
-
-            if (!m.matches()) {
-                return false;
-            }
-            else if (jid.contains("gmail.com")||jid.contains("google.com"))
-            {
-                return false;
-            }
-            else if (jid.contains("facebook.com"))
-            {
-                return false;
-            }
-        } else {
-            return false;
-        }
-
-        return true;
     }
 
 
@@ -824,7 +785,7 @@ public class OnboardingActivity extends BaseActivity {
                 signInHelper.activateAccount(account.providerId, account.accountId);
                 signInHelper.signIn(account.password, account.providerId, account.accountId, true);
 
-                showInviteScreen();
+                showMainScreen();
 
                 mExistingAccountTask = null;
             }
@@ -846,7 +807,7 @@ public class OnboardingActivity extends BaseActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == OnboardingManager.REQUEST_SCAN) {
 
-                showInviteScreen();
+                showMainScreen();
 
                 ArrayList<String> resultScans = data.getStringArrayListExtra("result");
                 for (String resultScan : resultScans)
@@ -879,9 +840,9 @@ public class OnboardingActivity extends BaseActivity {
                     return;
 
                 mCropImageView = new CropImageView(OnboardingActivity.this);// (CropImageView)view.findViewById(R.id.CropImageView);
-                mCropImageView.setAspectRatio(1, 1);
-                mCropImageView.setFixedAspectRatio(true);
-                mCropImageView.setCropShape(CropImageView.CropShape.OVAL);
+             //   mCropImageView.setAspectRatio(1, 1);
+             //   mCropImageView.setFixedAspectRatio(true);
+             //   mCropImageView.setCropShape(CropImageView.CropShape.OVAL);
               //  mCropImageView.setGuidelines(1);
 
                 try {
@@ -894,7 +855,7 @@ public class OnboardingActivity extends BaseActivity {
                             .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     setAvatar(mCropImageView.getCroppedImage(), mNewAccount);
-                                    showInviteScreen();
+                                    showMainScreen();
 
                                     delete(mOutputFileUri);
                                 }
@@ -1023,7 +984,7 @@ public class OnboardingActivity extends BaseActivity {
         if (mOutputFileUri == null) {
             File photo = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "kavatar.jpg");
             mOutputFileUri = FileProvider.getUriForFile(this,
-                    BuildConfig.APPLICATION_ID + ".provider",
+                    getPackageName() + ".provider",
                     photo);
 
         }

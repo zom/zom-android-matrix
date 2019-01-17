@@ -22,6 +22,7 @@ import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.provider.BaseColumns;
@@ -62,6 +63,7 @@ import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatListener;
 import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.service.IDataListener;
 import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.service.StatusBarNotifier;
@@ -114,10 +116,10 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     private long mContactId;
     private boolean mIsMuted = false;
-    private boolean mEnableOmemoGroups = false;
+    private boolean mUseEncryption = false;
     private String mNickname = null;
 
-    public ChatSessionAdapter(ChatSession chatSession, ImEntity participant, ImConnectionAdapter connection, boolean isNewSession) {
+    public ChatSessionAdapter(ChatSession chatSession, ChatGroup group, ImConnectionAdapter connection, boolean isNewSession) {
 
         mChatSession = chatSession;
         mConnection = connection;
@@ -131,11 +133,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
         mDataHandlerListener = new DataHandlerListenerImpl();
 
-        if (participant instanceof ChatGroup) {
-            init((ChatGroup) participant,isNewSession);
-        } else {
-            init((Contact) participant,isNewSession);
-        }
+        init(group, isNewSession);
 
         initMuted();
         initUseEncryption();
@@ -175,7 +173,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
         try {
             mChatURI = ContentUris.withAppendedId(Imps.Chats.CONTENT_URI, mContactId);
-            mChatSessionManager.getChatGroupManager().joinChatGroupAsync(group.getAddress(),group.getName());
         
             mMessageURI = Imps.Messages.getContentUriByThreadId(mContactId);
             if (isNewSession)
@@ -189,10 +186,16 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         
     }
 
+    public void update ()
+    {
+        mContactId = insertOrUpdateGroupContactInDb((ChatGroup)mChatSession.getParticipant(), false);
+    }
+
+    /**
     private void init(Contact contact, boolean isNewSession) {
         mIsGroupChat = false;
         mNickname = contact.getName();
@@ -212,7 +215,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         mContactStatusMap.put(contact.getName(), contact.getPresence().getStatus());
 
 
-    }
+    }**/
 
     public void reInit ()
     {
@@ -237,14 +240,18 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             Contact self = mConnection.getLoginUser();
             ChatGroup group = (ChatGroup) mChatSession.getParticipant();
             List<Contact> members = group.getMembers();
-            String[] result = new String[members.size() - 1];
-            int index = 0;
-            for (Contact c : members) {
-                if (!c.equals(self)) {
-                    result[index++] = c.getAddress().getAddress();
+            if (members.size() > 0) {
+                String[] result = new String[members.size() - 1];
+                int index = 0;
+                for (Contact c : members) {
+                    if (!c.equals(self)) {
+                        result[index++] = c.getAddress().getAddress();
+                    }
                 }
+                return result;
             }
-            return result;
+            else
+                return null;
         } else {
 
             return new String[] { mChatSession.getParticipant().getAddress().getAddress() };
@@ -724,12 +731,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     public void markAsRead() {
         if (mHasUnreadMessages) {
 
-            /**
-             * we want to keep the last message now
-            ContentValues values = new ContentValues(1);
-            values.put(Imps.Chats.LAST_UNREAD_MESSAGE, (String) null);
-            mConnection.getContext().getContentResolver().update(mChatURI, values, null, null);
-*/
             String baseUsername = mChatSession.getParticipant().getAddress().getBareAddress();
             mStatusBarNotifier.dismissChatNotification(mConnection.getProviderId(), baseUsername);
 
@@ -745,7 +746,10 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 int type = c.getInt(0);
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(Imps.Contacts.TYPE, type & (~Imps.Contacts.TYPE_FLAG_UNSEEN));
+                contentValues.put(Imps.Contacts.SUBSCRIPTION_STATUS,Imps.Contacts.SUBSCRIPTION_STATUS_NONE);
                 mContentResolver.update(uriContact, contentValues, null, null);
+
+                mChatSessionManager.getChatGroupManager().acceptInvitationAsync(getAddress());
             }
             c.close();
         }
@@ -754,26 +758,16 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     String getNickName(String username) {
         ImEntity participant = mChatSession.getParticipant();
         if (mIsGroupChat) {
-            
             ChatGroup group = (ChatGroup) participant;
-            /**
-            List<Contact> members = group.getMembers();
-            for (Contact c : members) {
-                if (username.equals(c.getAddress().getAddress())) {
-                    
-                    return c.getAddress().getResource();
-                        
-                }
-            }**/
             Contact groupMember = group.getMember(username);
-            if (groupMember != null)
+            if (groupMember != null && groupMember.getName() != null)
             {
-                return groupMember.getAddress().getAddress();
+                return groupMember.getName();
             }
             else {
-                // not found, impossible
-                String[] parts = username.split("/");
-                return parts[parts.length - 1];
+                // group member name might be null!
+                String[] parts = username.split(":");
+                return parts[0].substring(1);
             }
         } else {
             return ((Contact) participant).getName();
@@ -825,7 +819,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         values.put(Imps.Chats.LAST_MESSAGE_DATE, System.currentTimeMillis());
         values.put(Imps.Chats.LAST_UNREAD_MESSAGE, message);
          values.put(Imps.Chats.GROUP_CHAT, mIsGroupChat);
-         values.put(Imps.Chats.USE_ENCRYPTION,mEnableOmemoGroups);
+         values.put(Imps.Chats.USE_ENCRYPTION,mUseEncryption);
 
          int result = mContentResolver.update(mChatURI, values, null, null);
 
@@ -895,19 +889,25 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     private long insertOrUpdateGroupContactInDb(ChatGroup group, boolean isNewSession) {
         // Insert a record in contacts table
-        ContentValues values = new ContentValues(4);
+        ContentValues values = new ContentValues();
         values.put(Imps.Contacts.USERNAME, group.getAddress().getAddress());
-        values.put(Imps.Contacts.NICKNAME, group.getName());
+
+        if (!TextUtils.isEmpty(group.getName()))
+            values.put(Imps.Contacts.NICKNAME, group.getName());
+
         values.put(Imps.Contacts.CONTACTLIST, ContactListManagerAdapter.LOCAL_GROUP_LIST_ID);
         if (isNewSession) {
             values.put(Imps.Contacts.TYPE, Imps.Contacts.TYPE_GROUP | Imps.Contacts.TYPE_FLAG_UNSEEN);
         } else {
             values.put(Imps.Contacts.TYPE, Imps.Contacts.TYPE_GROUP);
         }
-        Uri contactUri = ContentUris.withAppendedId(
-                ContentUris.withAppendedId(Imps.Contacts.CONTENT_URI, mConnection.mProviderId),
-                mConnection.mAccountId);
-      
+
+        if (group.isJoined())
+            values.put(Imps.Contacts.SUBSCRIPTION_STATUS,Imps.Contacts.SUBSCRIPTION_STATUS_NONE);
+        else
+            values.put(Imps.Contacts.SUBSCRIPTION_STATUS,Imps.Contacts.SUBSCRIPTION_STATUS_SUBSCRIBE_PENDING);
+
+
         ContactListManagerAdapter listManager = (ContactListManagerAdapter) mConnection
                 .getContactListManager();
         
@@ -915,7 +915,16 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         
         if (id == -1)
         {
+            Uri contactUri = ContentUris.withAppendedId(
+                    ContentUris.withAppendedId(Imps.Contacts.CONTENT_URI, mConnection.mProviderId),
+                    mConnection.mAccountId);
+
             id = ContentUris.parseId(mContentResolver.insert(contactUri, values));
+        }
+        else
+        {
+            Uri uriContact = ContentUris.withAppendedId(Imps.Contacts.CONTENT_URI, mContactId);
+            mContentResolver.update(uriContact, values, null, null);
         }
 
         for (Contact member : group.getMembers()) {
@@ -939,7 +948,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
             ContentValues values = new ContentValues(4);
             values.put(Imps.GroupMembers.USERNAME, username);
-            values.put(Imps.GroupMembers.NICKNAME, nickname);
+
+            if (!TextUtils.isEmpty(nickname))
+                values.put(Imps.GroupMembers.NICKNAME, nickname);
 
             long groupId = ContentUris.parseId(mChatURI);
             Uri uri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, groupId);
@@ -1159,15 +1170,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             String username = msg.getFrom().getAddress();
             String bareUsername = msg.getFrom().getAddress();
             String nickname = getNickName(username);
-
-            try {
-                Contact contact = mConnection.getContactListManager().getContactByAddress(bareUsername);
-                if (contact != null)
-                    nickname = contact.getName();
-
-            } catch (Exception e) {
-                return false;
-            }
 
             long time = msg.getDateTime().getTime();
 
@@ -1506,7 +1508,22 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             mGroupName = "G" + System.currentTimeMillis();
             try
             {
-                mGroupMgr.createChatGroupAsync(null, mGroupName, nickname);
+                mGroupMgr.createChatGroupAsync(null, mGroupName, nickname, new IChatSessionListener() {
+                    @Override
+                    public void onChatSessionCreated(IChatSession session) throws RemoteException {
+
+                    }
+
+                    @Override
+                    public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                    }
+
+                    @Override
+                    public IBinder asBinder() {
+                        return null;
+                    }
+                });
             }
             catch (Exception e){
                 e.printStackTrace();
@@ -1816,16 +1833,18 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     public boolean useEncryption (boolean useEncryption)
     {
-        mEnableOmemoGroups = useEncryption;
+        mUseEncryption = useEncryption;
         ContentValues values = new ContentValues();
         values.put(Imps.Chats.USE_ENCRYPTION,useEncryption ? 1 : 0);
         int rowsUpdate = mContentResolver.update(mChatURI,values,null,null);
+
+        mChatSession.setUseEncryption(useEncryption);
         return getUseEncryption();
     }
 
     public boolean getUseEncryption ()
     {
-        return mEnableOmemoGroups;
+        return mUseEncryption;
     }
 
     public boolean isEncrypted ()
@@ -1842,9 +1861,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 getGroupManager().setGroupSubject(group, subject);
 
                 //update the database
-                ContentValues values1 = new ContentValues(1);
-                values1.put(Imps.Contacts.NICKNAME,subject);
-                ContentValues values = values1;
+                ContentValues values = new ContentValues(1);
+                values.put(Imps.Contacts.NICKNAME,subject);
 
                 Uri uriContact = ContentUris.withAppendedId(Imps.Contacts.CONTENT_URI, mContactId);
                 mContentResolver.update(uriContact, values, null, null);
@@ -1916,26 +1934,17 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         mIsMuted = type == Imps.ChatsColumns.CHAT_TYPE_MUTED;
     }
 
-
-    public boolean getOmemoGroupEnabled () {
-        return mEnableOmemoGroups;
-    }
-
-    public void setOmemoGroupEnabled (boolean omemoGroups)
-    {
-        mEnableOmemoGroups = omemoGroups;
-    }
-
     private void initUseEncryption () {
 
         String[] projection = {Imps.Chats.USE_ENCRYPTION};
         Cursor c = mContentResolver.query(mChatURI, projection, null, null, null);
         if (c != null) {
             if (c.moveToFirst()) {
-                mEnableOmemoGroups = c.getInt(0) > 0;
+                mUseEncryption = c.getInt(0) > 0;
             }
             c.close();
         }
+
 
 
     }

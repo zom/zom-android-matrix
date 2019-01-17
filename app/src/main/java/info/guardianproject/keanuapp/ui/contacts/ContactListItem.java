@@ -122,18 +122,11 @@ public class ContactListItem extends FrameLayout {
 
         String statusText = "";
 
-        //   nickname += " " + holder.mContactId + " " + holder.mAccountId + " " + holder.mProviderId;
-
 
         if (TextUtils.isEmpty(nickname))
         {
-            nickname = address.split("@")[0].split("\\.")[0];
+            nickname = address.split(":")[0];
         }
-        else
-        {
-            nickname = nickname.split("@")[0].split("\\.")[0];
-        }
-
 
         //    nickname += " " + subType;// + " " + subStatus;
          holder.mLine1.setText(nickname);
@@ -159,23 +152,22 @@ public class ContactListItem extends FrameLayout {
 
                 Drawable avatar = null;
 
-                try
-                {
-                    avatar = DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
+                if (DatabaseUtils.hasAvatarContact(getContext().getContentResolver(),Imps.Avatars.CONTENT_URI,address)) {
+                    try {
+                        avatar = DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
 
-                }
-                catch (Exception e)
-                {
-                    //problem decoding avatar
-                    Log.e(LOG_TAG,"error decoding avatar",e);
+                    } catch (Exception e) {
+                        //problem decoding avatar
+                        Log.e(LOG_TAG, "error decoding avatar", e);
+                    }
                 }
 
                 try
                 {
                     if (avatar != null)
                     {
-                        if (avatar instanceof RoundedAvatarDrawable)
-                            setAvatarBorder(presence,(RoundedAvatarDrawable)avatar);
+                        //if (avatar instanceof RoundedAvatarDrawable)
+                         //   setAvatarBorder(presence,(RoundedAvatarDrawable)avatar);
 
                         holder.mAvatar.setImageDrawable(avatar);
                     }
@@ -183,9 +175,8 @@ public class ContactListItem extends FrameLayout {
                     {
                         //int color = getAvatarBorder(presence);
                         int padding = 24;
-                        LetterAvatar lavatar = new LetterAvatar(getContext(), nickname, padding);
-
-                        holder.mAvatar.setImageDrawable(lavatar);
+                        avatar = new LetterAvatar(getContext(), nickname, padding);
+                        holder.mAvatar.setImageDrawable(avatar);
 
                     }
 
@@ -194,6 +185,7 @@ public class ContactListItem extends FrameLayout {
                 catch (OutOfMemoryError ome)
                 {
                     //this seems to happen now and then even on tiny images; let's catch it and just not set an avatar
+                    ome.printStackTrace();
                 }
 
             }

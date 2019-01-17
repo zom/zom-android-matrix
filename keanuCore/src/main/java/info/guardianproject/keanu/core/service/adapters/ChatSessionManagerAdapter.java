@@ -17,6 +17,7 @@
 
 package info.guardianproject.keanu.core.service.adapters;
 
+import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.util.Log;
@@ -95,18 +96,38 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
     }
 
-    public IChatSession createMultiUserChatSession(String roomAddress, String subject, String nickname, boolean isNewChat)
+    public void createMultiUserChatSession(String roomAddress, String subject, String nickname, boolean isNewChat, String[] invitees, final IChatSessionListener listener)
     {
 
         try
         {
             ChatGroupManager groupMan = mConnection.getAdaptee().getChatGroupManager();
-            ChatGroup group = groupMan.createChatGroupAsync(roomAddress, subject, nickname);
+            ChatGroup group = groupMan.createChatGroupAsync(roomAddress, subject, nickname, new IChatSessionListener() {
+                @Override
+                public void onChatSessionCreated(IChatSession session) throws RemoteException {
 
-            if (group != null) {
-                ChatSession session = getChatSessionManager().createChatSession(group, isNewChat);
-                return getChatSessionAdapter(session, isNewChat);
-            }
+                    if (invitees != null)
+                        for (String invitee : invitees)
+                            session.inviteContact(invitee);
+
+                    if (listener != null)
+                        listener.onChatSessionCreated(session);
+                }
+
+                @Override
+                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                    if (listener != null)
+                        listener.onChatSessionCreateError(name, error);
+                }
+
+                @Override
+                public IBinder asBinder() {
+                    return null;
+                }
+            });
+
+
         }
         catch (Exception e)
         {
@@ -114,7 +135,6 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
         }
 
-        return null;
     }
 
     public void closeChatSession(ChatSessionAdapter adapter) {
@@ -176,13 +196,13 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
         }
     }
 
-    public synchronized ChatSessionAdapter getChatSessionAdapter(ChatSession session, boolean isNewSession) {
+    public ChatSessionAdapter getChatSessionAdapter(ChatSession session, boolean isNewSession) {
 
         Address participantAddress = session.getParticipant().getAddress();
         ChatSessionAdapter adapter = mActiveChatSessionAdapters.get(participantAddress.getAddress());
 
         if (adapter == null) {
-            adapter = new ChatSessionAdapter(session, session.getParticipant(), mConnection, isNewSession);
+            adapter = new ChatSessionAdapter(session, (ChatGroup)session.getParticipant(), mConnection, isNewSession);
             mActiveChatSessionAdapters.put(participantAddress.getAddress(), adapter);
         }
 

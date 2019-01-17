@@ -69,6 +69,7 @@ import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IConnectionListener;
 import info.guardianproject.keanu.core.service.IImConnection;
@@ -133,8 +134,6 @@ public class MainActivity extends BaseActivity {
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-
-        StatusBarNotifier.defaultMainClass = getClass().getCanonicalName();
 
         if (Preferences.doBlockScreenshots()) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
@@ -245,12 +244,6 @@ public class MainActivity extends BaseActivity {
 
         applyStyle();
 
-        /**
-        if (Preferences.doCheckBatteryOptimizations())
-        {
-            requestChangeBatteryOptimizations();
-            Preferences.checkedBatteryOptimizations();
-        }**/
     }
 
     private void installRingtones ()
@@ -338,6 +331,7 @@ public class MainActivity extends BaseActivity {
 
         handleIntent(getIntent());
 
+        /**
         if (mApp.getDefaultAccountId() == -1)
         {
             startActivity(new Intent(this,RouterActivity.class));
@@ -352,7 +346,7 @@ public class MainActivity extends BaseActivity {
             }, 5000); //Timer is in ms here.
 
 
-        }
+        }**/
 
     }
 
@@ -465,9 +459,19 @@ public class MainActivity extends BaseActivity {
             }
             else if (intent.hasExtra("username"))
             {
+
                 //launch a new chat based on the intent value
                 startChat(mApp.getDefaultProviderId(), mApp.getDefaultAccountId(), intent.getStringExtra("username"),  true);
             }
+            else if (intent.hasExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME))
+          {
+              String username = intent.getStringExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME);
+              long providerId = intent.getLongExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER,mApp.getDefaultProviderId());
+              long accountId = intent.getLongExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT,mApp.getDefaultAccountId());
+
+              startChat(providerId, accountId, username, true);
+
+          }
 
             setIntent(null);
         }
@@ -571,21 +575,10 @@ public class MainActivity extends BaseActivity {
     private void startGroupChat (ArrayList<String> invitees)
     {
 
+        IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(),mApp.getDefaultAccountId());
+        startGroupChat(null, invitees, conn);
 
-        String chatRoom = "groupchat" + UUID.randomUUID().toString().substring(0,8);
-        String chatServer = ""; //use the default
-        String nickname = mApp.getDefaultUsername().split("@")[0];
-        try
-        {
-            IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(),mApp.getDefaultAccountId());
-            if (conn.getState() == ImConnection.LOGGED_IN)
-            {
-                this.startGroupChat(chatRoom, chatServer, nickname, invitees, conn);
 
-            }
-        } catch (RemoteException re) {
-
-        }
     }
 
     @Override
@@ -840,25 +833,41 @@ public class MainActivity extends BaseActivity {
     {
 
         //startCrypto is not actually used anymore, as we move to OMEMO
+        StringBuffer sbChatRoomName = new StringBuffer();
 
-        if (username != null)
-            new ChatSessionInitTask(providerId, accountId, Imps.Contacts.TYPE_NORMAL, true)
+        ArrayList<String> invitees = new ArrayList<>();
+        invitees.add(username);
+
+        IImConnection conn = RemoteImService.getConnection(providerId, accountId);
+
+        try {
+            Contact contact = conn.getContactListManager().getContactByAddress(username);
+
+            if (contact != null)
             {
-                @Override
-                protected void onPostExecute(Long chatId) {
+                sbChatRoomName.append(contact.getName());
+            }
+            else
+            {
+                sbChatRoomName.append(username);
+            }
 
-                    if (chatId != -1 && openChat) {
-                        Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
-                        intent.putExtra("id", chatId);
-                        startActivity(intent);
-                    }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
 
-                    super.onPostExecute(chatId);
-                }
 
-            }.executeOnExecutor(ImApp.sThreadPoolExecutor,new Contact(new MatrixAddress(username)));
+        startGroupChat(sbChatRoomName.toString(), invitees, conn);
+
     }
 
+    public void startGroupChat ()
+    {
+        IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
+        startGroupChat(null, null, conn);
+    }
+
+    /**
     public void showGroupChatDialog ()
     {
 
@@ -879,31 +888,14 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
 
-                    /* User clicked OK so do some stuff */
-
-                        String chatRoom = null;
-                        String chatServer = "";
-                        String nickname = "";
 
                         TextView tv = (TextView) dialogGroup.findViewById(R.id.chat_room);
-                        chatRoom = tv.getText().toString();
+                        String chatRoomName = tv.getText().toString();
 
-                        /**
-                         tv = (TextView) dialogGroup.findViewById(R.id.chat_server);
-                         chatServer = tv.getText().toString();
 
-                         tv = (TextView) dialogGroup.findViewById(R.id.nickname);
-                         nickname = tv.getText().toString();
-                         **/
+                        IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
+                        startGroupChat(chatRoomName, null, conn);
 
-                        try {
-                            IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
-                            if (conn.getState() == ImConnection.LOGGED_IN)
-                                startGroupChat(chatRoom, chatServer, nickname, null, conn);
-
-                        } catch (RemoteException re) {
-
-                        }
 
                         dialog.dismiss();
 
@@ -913,106 +905,70 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int whichButton) {
 
-                    /* User clicked cancel so do some stuff */
+
                         dialog.dismiss();
                     }
                 })
                 .create();
         dialog.show();
 
-        /**
-        Typeface typeface;
 
-        if ((typeface = CustomTypefaceManager.getCurrentTypeface(this))!=null) {
-            TextView textView = (TextView) dialog.findViewById(android.R.id.message);
-            if (textView != null)
-                textView.setTypeface(typeface);
-
-            textView = (TextView) dialog.findViewById(R.id.alertTitle);
-            if (textView != null)
-                textView.setTypeface(typeface);
-
-            Button btn = (Button)dialog.findViewById(android.R.id.button1);
-            if (btn != null)
-                btn.setTypeface(typeface);
-
-            btn = (Button)dialog.findViewById(android.R.id.button2);
-            if (btn != null)
-                btn.setTypeface(typeface);
-
-
-            btn = (Button)dialog.findViewById(android.R.id.button3);
-            if (btn != null)
-                btn.setTypeface(typeface);
-
-
-        }
-
-        **/
-    }
+    }**/
 
     private IImConnection mLastConnGroup = null;
     private long mRequestedChatId = -1;
 
-    public void startGroupChat (String room, String server, String nickname, final ArrayList<String> invitees, IImConnection conn)
+    public void startGroupChat (String roomSubject, final ArrayList<String> invitees, IImConnection conn)
     {
         mLastConnGroup = conn;
 
         new AsyncTask<String, Long, String>() {
 
-            private ProgressDialog dialog;
-
 
             @Override
             protected void onPreExecute() {
-                dialog = new ProgressDialog(MainActivity.this);
-
-                dialog.setMessage(getString(R.string.connecting_to_group_chat_));
-                dialog.setCancelable(true);
-                dialog.show();
             }
 
             @Override
             protected String doInBackground(String... params) {
 
-                String subject = params[0];
-                String server = params[1];
-
 
                 try {
 
-                    IChatSession session = null;
                     IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
 
-                    String roomAddress = null;
-                    String nickname = params[2];
-                    manager.createMultiUserChatSession(roomAddress, subject, nickname, true);
+                    String roomSubject = null;
 
-                    /**
-                    if (session != null)
-                    {
-                        mRequestedChatId = session.getId();
-                        session.markAsSeen(); // We created this, so mark as seen
-                        session.sendTypingStatus(true);
-                        session.setMuted(false);
-                        session.setGroupChatSubject(subject);
-                        publishProgress(mRequestedChatId);
+                    if (params.length > 0)
+                        roomSubject = params[0];
 
-                    } else {
-                        return getString(R.string.unable_to_create_or_join_group_chat);
-                    }**/
+                    String[] aInvitees = null;
 
-                    if (session != null) {
+                    if (invitees != null)
+                        aInvitees = invitees.toArray(new String[invitees.size()]);
 
-                        if ( invitees != null && invitees.size() > 0) {
+                    manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, new IChatSessionListener(){
 
-                            for (String invitee : invitees)
-                                session.inviteContact(invitee);
-
+                        @Override
+                        public IBinder asBinder() {
+                            return null;
                         }
 
-                        session.sendMessage(":)",false);
-                    }
+                        @Override
+                        public void onChatSessionCreated(IChatSession session) throws RemoteException {
+                            session.useEncryption(true);
+                            session.setLastMessage("New room created");
+                            Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
+                            intent.putExtra("id", session.getId());
+                            intent.putExtra("isNew",true);
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                        }
+                    });
 
                     return null;
 
@@ -1031,9 +987,6 @@ public class MainActivity extends BaseActivity {
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
 
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
 
                 if (result != null)
                 {
@@ -1043,7 +996,7 @@ public class MainActivity extends BaseActivity {
 
 
             }
-        }.executeOnExecutor(ImApp.sThreadPoolExecutor,room, server, nickname);
+        }.executeOnExecutor(ImApp.sThreadPoolExecutor,roomSubject);
 
 
     }

@@ -22,17 +22,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-             <item android:id="@+id/menu_verify_or_view"
-        android:title="@string/menu_verify"
-         app:showAsAction="never"
-         />
 
-    <!--
-    <item android:id="@+id/menu_verify_question"
-        android:title="@string/otr_qa_title"
-        app:showAsAction="never"
-        />
--->
 
     <item android:id="@+id/menu_remove_contact"
         android:title="@string/menu_remove_contact"

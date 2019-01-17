@@ -49,6 +49,9 @@ public class GeneralJobIntentService extends JobIntentService {
                 if (Imps.isUnencrypted(context) || prefs.contains(PREFERENCE_KEY_TEMP_PASS)) {
                     Log.d(LOG_TAG, "autostart");
 
+                    //show unlock notification
+                    Log.d("Keanu","started from boot");
+
                     Intent serviceIntent = new Intent(context, RemoteImService.class);
                     //   serviceIntent.setComponent(ImServiceConstants.IM_SERVICE_COMPONENT);
                     serviceIntent.putExtra(ImServiceConstants.EXTRA_CHECK_AUTO_LOGIN, true);

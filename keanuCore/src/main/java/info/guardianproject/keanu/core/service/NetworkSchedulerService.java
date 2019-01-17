@@ -58,12 +58,14 @@ public class NetworkSchedulerService extends JobService implements
 
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
+
         Intent intent = new Intent(NETWORK_STATE_ACTION, null, this, RemoteImService.class);
         intent.putExtra(NETWORK_INFO_CONNECTED, isConnected);
 
         NetworkConnectivityReceiver.State stateExtra = isConnected ? NetworkConnectivityReceiver.State.CONNECTED : NetworkConnectivityReceiver.State.NOT_CONNECTED;
         intent.putExtra(NETWORK_STATE_EXTRA,stateExtra.ordinal());
         ContextCompat.startForegroundService(this,intent);
+
 
     }
 }

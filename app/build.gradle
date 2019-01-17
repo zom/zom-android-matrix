@@ -12,15 +12,15 @@ android {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 103
-        versionName "0.0.1-alpha-3"
+        versionCode 108
+        versionName "0.0.1-alpha-8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
     }
 
     dexOptions {
-        javaMaxHeapSize "3g"
+        javaMaxHeapSize "2g"
         preDexLibraries true
     }
 

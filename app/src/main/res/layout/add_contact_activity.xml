@@ -69,7 +69,6 @@
                 android:backgroundTint="@color/black_or_gray_selector"
                 android:focusableInTouchMode="true"
                 android:gravity="center_horizontal"
-                android:hint="@string/hint_add_friend"
                 android:imeOptions="actionSend"
                 android:inputType="textEmailAddress"
                 android:nextFocusLeft="@id/email"

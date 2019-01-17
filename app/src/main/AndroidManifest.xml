@@ -184,7 +184,7 @@
         </activity>
         <activity
             android:name=".MainActivity"
-            android:launchMode="singleInstance"
+            android:launchMode="singleTask"
             android:exported="true"
             android:theme="@style/AppThemeNoAction">
             <intent-filter
@@ -348,7 +348,13 @@
             android:name=".ui.contacts.ContactDisplayActivity"
             android:exported="false"
             android:theme="@style/AppThemeNoAction" />
-        <activity android:name=".ui.contacts.GroupDisplayActivity" />
+        <activity android:name=".ui.contacts.GroupDisplayActivity"
+            android:exported="false"
+            />
+        <activity android:name=".ui.contacts.DeviceDisplayActivity"
+            android:exported="false"
+            />
+
         <activity
             android:name=".ui.accounts.AccountsActivity"
             android:label="@string/accounts"

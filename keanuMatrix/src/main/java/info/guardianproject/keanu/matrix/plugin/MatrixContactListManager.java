@@ -111,6 +111,17 @@ public class MatrixContactListManager extends ContactListManager {
 
     }
 
+    protected boolean saveContact (Contact contact)
+    {
+        try {
+            addContactToListAsync(contact, mDefaultContactList, true);
+            return true;
+        } catch (ImException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     protected void updateContactList ()
     {
         notifyContactListLoaded(mDefaultContactList);

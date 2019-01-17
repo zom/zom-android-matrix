@@ -6,5 +6,6 @@
     <string name="app_name">Keanu</string>
     <string name="im_label">Keanu</string>
     <string name="status_no_internet">No Internet</string>
+    <string name="action_view_devices">View Devices and Keys</string>
 
 </resources>

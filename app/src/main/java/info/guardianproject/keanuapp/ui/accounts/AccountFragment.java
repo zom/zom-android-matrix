@@ -46,8 +46,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
-import info.guardianproject.keanu.core.BuildConfig;
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IImConnection;
@@ -57,6 +57,7 @@ import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.tasks.SignInHelper;
+import info.guardianproject.keanuapp.ui.contacts.DeviceDisplayActivity;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
 import info.guardianproject.keanuapp.ui.qr.QrDisplayActivity;
 import info.guardianproject.keanuapp.ui.qr.QrShareAsyncTask;
@@ -201,82 +202,19 @@ public class AccountFragment extends Fragment {
             tvUsername.setText(mUserAddress);
             mTvNickname.setText(mNickname);
 
-            setFingerprints();
+            mView.findViewById(R.id.btnViewDevices).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    viewDevicesClicked();
+                }
+            });
         }
 
 
         return mView;
     }
 
-    private List<String> mRemoteOmemoFingeprints;
 
-    private void setFingerprints ()
-    {
-        new AsyncTask<String, Void, Boolean>() {
-            @Override
-            protected Boolean doInBackground(String... strings) {
-
-                try {
-                    mRemoteOmemoFingeprints = mConn.getFingerprints(mUserAddress);
-                    return true;
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                    return false;
-                }
-
-
-            }
-
-            @Override
-            protected void onPostExecute(Boolean success) {
-                super.onPostExecute(success);
-
-                if (success) {
-                    if (mRemoteOmemoFingeprints != null && mRemoteOmemoFingeprints.size() > 0) {
-
-                        ImageView btnQrDisplay = (ImageView) mView.findViewById(R.id.omemoqrcode);
-                        btnQrDisplay.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                try {
-                                    String xmppLink = OnboardingManager.generateXmppLink(mUserAddress, mRemoteOmemoFingeprints.get(0));
-                                    Intent intent = new Intent(getActivity(), QrDisplayActivity.class);
-                                    intent.putExtra(Intent.EXTRA_TEXT, xmppLink);
-                                    getActivity().startActivity(intent);
-                                } catch (IOException ioe) {
-                                    Log.e(LOG_TAG, "couldn't generate QR code", ioe);
-                                }
-                            }
-                        });
-                        TextView tvFingerprint = (TextView) mView.findViewById(R.id.omemoFingerprint);
-                        tvFingerprint.setText(prettyPrintFingerprint(mRemoteOmemoFingeprints.get(0)));
-
-                        ImageView btnQrShare = (ImageView) mView.findViewById(R.id.omemoqrshare);
-                        btnQrShare.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-
-                                try {
-                                    String inviteLink = OnboardingManager.generateInviteLink(getActivity(), mUserAddress, mRemoteOmemoFingeprints.get(0), mNickname);
-                                    new QrShareAsyncTask(getActivity()).execute(inviteLink, mNickname);
-                                } catch (IOException ioe) {
-                                    Log.e(LOG_TAG, "couldn't generate QR code", ioe);
-                                }
-                            }
-                        });
-                    } else {
-                        mView.findViewById(R.id.omemodisplay).setVisibility(View.GONE);
-                    }
-                }
-
-            }
-        }.execute();
-
-
-
-
-
-    }
 
     private void showChangeNickname ()
     {
@@ -387,9 +325,9 @@ public class AccountFragment extends Fragment {
                 return;
 
             mCropImageView = new CropImageView(getActivity());// (CropImageView)view.findViewById(R.id.CropImageView);
-            mCropImageView.setAspectRatio(1, 1);
-            mCropImageView.setFixedAspectRatio(true);
-            mCropImageView.setCropShape(CropImageView.CropShape.OVAL);
+   //         mCropImageView.setAspectRatio(1, 1);
+    //        mCropImageView.setFixedAspectRatio(true);
+    //        mCropImageView.setCropShape(CropImageView.CropShape.OVAL);
 
             //  mCropImageView.setGuidelines(1);
 
@@ -441,7 +379,6 @@ public class AccountFragment extends Fragment {
 
             if (rowsUpdated <= 0)
                 DatabaseUtils.insertAvatarBlob(getActivity().getContentResolver(), Imps.Avatars.CONTENT_URI, mProviderId, mAccountId, avatarBytesCompressed, avatarHash, mUserAddress);
-
             if (mConn != null) {
                 try {
                     //this will also trigger an update of the avatar
@@ -533,7 +470,7 @@ public class AccountFragment extends Fragment {
         if (getImage != null) {
             getImage = (new File(getImage.getPath(), "pickImageResult.jpg"));
             outputFileUri = FileProvider.getUriForFile(getActivity(),
-                    BuildConfig.APPLICATION_ID + ".provider",
+                    getContext().getPackageName() + ".provider",
                     getImage);
         }
         return outputFileUri;
@@ -584,8 +521,10 @@ public class AccountFragment extends Fragment {
     private String prettyPrintFingerprint(String fingerprint) {
         StringBuffer spacedFingerprint = new StringBuffer();
 
-        for (int i = 0; i + 8 <= fingerprint.length(); i += 8) {
-            spacedFingerprint.append(fingerprint.subSequence(i, i + 8));
+        int blockLength = 4;
+
+        for (int i = 0; i + blockLength <= fingerprint.length(); i += blockLength) {
+            spacedFingerprint.append(fingerprint.subSequence(i, i + blockLength));
             spacedFingerprint.append(' ');
         }
 
@@ -724,5 +663,18 @@ public class AccountFragment extends Fragment {
 
         }
     }
+
+    public void viewDevicesClicked ()
+    {
+        Intent intent = new Intent(getActivity(),DeviceDisplayActivity.class);
+        intent.putExtra("nickname",mNickname);
+        intent.putExtra("address",mUserAddress);
+        intent.putExtra("provider",mProviderId);
+        intent.putExtra("account",mAccountId);
+
+        startActivity(intent);
+
+    }
+
 
 }

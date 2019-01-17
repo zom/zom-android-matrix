@@ -4,12 +4,15 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.RemoteException;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.SwitchCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
@@ -21,12 +24,16 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.StringTokenizer;
 
+import info.guardianproject.keanu.core.type.CustomTypefaceManager;
 import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.model.Contact;
@@ -63,7 +70,6 @@ public class ContactDisplayActivity extends BaseActivity {
     private long mAccountId = -1;
     private IImConnection mConn;
 
-    private String mRemoteOtrFingerprint;
     private List<String> mRemoteOmemoFingerprints;
 
     @Override
@@ -96,12 +102,13 @@ public class ContactDisplayActivity extends BaseActivity {
         tv = (TextView) findViewById(R.id.tvUsername);
         tv.setText(mUsername);
 
-        View btn = findViewById(R.id.btnStartChat);
-        btn.setOnClickListener(new View.OnClickListener() {
+
+        View btnInviteChat = findViewById(R.id.btnStartChat);
+        btnInviteChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                startChat();
+                inviteContactToChat();
 
             }
         });
@@ -131,100 +138,71 @@ public class ContactDisplayActivity extends BaseActivity {
                 }
                 c.close();
             }
+            else
+            {
+                showAddFriends = true;
+            }
         }
+        Button btnAddAsFriend = findViewById(R.id.btnAddAsFriend);
 
         if (showAddFriends) {
-            Button btnAddAsFriend = findViewById(R.id.btnAddAsFriend);
             btnAddAsFriend.setText(getString(R.string.add_x_as_friend, mNickname));
             btnAddAsFriend.setVisibility(View.VISIBLE);
         }
-
-        if (mConn != null) {
-            new AsyncTask<String, Void, Boolean>() {
-                @Override
-                protected Boolean doInBackground(String... strings) {
-
-                    mRemoteOtrFingerprint = strings[0];
-
-                    if (mRemoteOtrFingerprint == null) {
-                        mRemoteOtrFingerprint = "";//OtrChatManager.getInstance().getRemoteKeyFingerprint(mUsername);
-                    }
+        else
+            btnAddAsFriend.setVisibility(View.GONE);
 
 
-                    try {
-                        mRemoteOmemoFingerprints = mConn.getFingerprints(mUsername);
 
-                    } catch (RemoteException re) {
 
-                    }
-
-                    return true;
-                }
-
-                @Override
-                protected void onPostExecute(Boolean success) {
-                    super.onPostExecute(success);
-
-                    if (mRemoteOmemoFingerprints == null ||
-                            mRemoteOmemoFingerprints.size() == 0)
-                        displayFingerprint(mRemoteOtrFingerprint);
-                    else
-                        displayFingerprint(mRemoteOmemoFingerprints.get(mRemoteOmemoFingerprints.size() - 1));
-                }
-            }.execute(remoteFingerprint);
-        }
 
     }
 
-    private void displayFingerprint (final String remoteFingerprint)
+    /**
+    private void displayFingerprints (final List<String> remoteFingerprints)
     {
 
         try {
 
-            ImageView btnQrShare = (ImageView) findViewById(R.id.qrshare);
-            ImageView iv = (ImageView)findViewById(R.id.qrcode);
-            TextView tv = (TextView)findViewById(R.id.tvFingerprint);
+         //   ImageView btnQrShare = (ImageView) findViewById(R.id.qrshare);
+            ImageView ivIcon = (ImageView)findViewById(R.id.verifiedIcon);
+            TextView tvDevice = (TextView)findViewById(R.id.tvDeviceName);
+            TextView tvKey = (TextView)findViewById(R.id.tvFingerprint);
+            SwitchCompat switchVerified = findViewById(R.id.switchVerified);
 
-           // ArrayList<String> fingerprints = OtrChatManager.getInstance().getRemoteKeyFingerprints(mUsername);
+            String remoteFingerprint = remoteFingerprints.get(0);
 
             if (!TextUtils.isEmpty(remoteFingerprint)) {
 
                 findViewById(R.id.listEncryptionKey).setVisibility(View.VISIBLE);
 
-                tv.setText(prettyPrintFingerprint(remoteFingerprint));
+                StringTokenizer st = new StringTokenizer(remoteFingerprint,"|");
+                String deviceName = st.nextToken();
+                final String deviceId = st.nextToken();
+                String deviceFingerprint = prettyPrintFingerprint(st.nextToken());
+                boolean isVerified = Boolean.parseBoolean(st.nextToken());
 
-                iv.setOnClickListener(new View.OnClickListener() {
+                tvDevice.setText(deviceName);
+                tvKey.setText(deviceFingerprint);
+                switchVerified.setChecked(isVerified);
 
+                if (isVerified)
+                    ivIcon.setColorFilter(ContextCompat.getColor(this, R.color.holo_green_light), android.graphics.PorterDuff.Mode.MULTIPLY);
+
+                switchVerified.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (mConn != null) {
+                            try {
+                                mConn.setDeviceVerified(mUsername,deviceId,isChecked);
 
-                        String inviteString;
-                        try {
-                            inviteString = OnboardingManager.generateInviteLink(ContactDisplayActivity.this, mUsername, remoteFingerprint, mNickname);
+                                ivIcon.setColorFilter(ContextCompat.getColor(ContactDisplayActivity.this,
+                                        isChecked? R.color.holo_green_light : R.color.holo_grey_light), android.graphics.PorterDuff.Mode.MULTIPLY);
 
-                            Intent intent = new Intent(ContactDisplayActivity.this, QrDisplayActivity.class);
-                            intent.putExtra(Intent.EXTRA_TEXT, inviteString);
-                            intent.setType("text/plain");
-                            startActivity(intent);
 
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-
-                    }
-
-                });
-
-                btnQrShare.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        try {
-                            String inviteLink = OnboardingManager.generateInviteLink(ContactDisplayActivity.this, mUsername, remoteFingerprint, mNickname);
-                            new QrShareAsyncTask(ContactDisplayActivity.this).execute(inviteLink, mNickname);
-                        } catch (IOException ioe) {
-                            Log.e(LOG_TAG, "couldn't generate QR code", ioe);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 });
@@ -243,65 +221,7 @@ public class ContactDisplayActivity extends BaseActivity {
 
 
     }
-
-
-    public void verifyClicked (View view)
-    {
-        verifyRemoteFingerprint();
-        findViewById(R.id.btnVerify).setVisibility(View.GONE);
-    }
-
-    public void addFriendClicked (final View view)
-    {
-        LayoutInflater factory = LayoutInflater.from(this);
-        final View dialogAddFriend = factory.inflate(R.layout.alert_dialog_add_friend, null);
-        TextView title = dialogAddFriend.findViewById(R.id.alertTitle);
-        title.setText(getString(R.string.add_x_as_friend_question, mNickname));
-
-        ImageView avatarView = dialogAddFriend.findViewById(R.id.imageAvatar);
-        avatarView.setVisibility(View.GONE);
-        try {
-            Drawable avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mUsername, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, true);
-            if (avatar != null) {
-                avatarView.setImageDrawable(avatar);
-                avatarView.setVisibility(View.VISIBLE);
-            }
-        } catch (Exception e) {
-        }
-
-
-        final AlertDialog dialog = new AlertDialog.Builder(this)
-                .setView(dialogAddFriend)
-                .create();
-        dialog.show();
-
-        View btnAdd = dialogAddFriend.findViewById(R.id.btnAdd);
-        btnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ImApp app = (ImApp)getApplication();
-                new AddContactAsyncTask(mProviderId, mAccountId).execute(mUsername, null, null);
-                dialog.dismiss();
-                view.setVisibility(View.GONE);
-                showFriendAddedView();
-            }
-        });
-
-        TextView btnCancel = dialogAddFriend.findViewById(R.id.btnCancel);
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        /**
-        Typeface typeface;
-        if ((typeface = CustomTypefaceManager.getCurrentTypeface(this))!=null) {
-            title.setTypeface(typeface);
-            btnCancel.setTypeface(typeface);
-        }**/
-    }
+    **/
 
     private void showGallery (int contactId)
     {
@@ -329,13 +249,6 @@ public class ContactDisplayActivity extends BaseActivity {
             case android.R.id.home:
                 finish();
                 return true;
-            case R.id.menu_verify_or_view:
-                verifyRemoteFingerprint();
-                return true;
-            /**
-            case R.id.menu_verify_question:
-                initSmpUI();
-                return true;**/
             case R.id.menu_remove_contact:
                 deleteContact();
                 return true;
@@ -346,8 +259,10 @@ public class ContactDisplayActivity extends BaseActivity {
     private String prettyPrintFingerprint(String fingerprint) {
         StringBuffer spacedFingerprint = new StringBuffer();
 
-        for (int i = 0; i + 8 <= fingerprint.length(); i += 8) {
-            spacedFingerprint.append(fingerprint.subSequence(i, i + 8));
+        int groupSize = 4;
+
+        for (int i = 0; i + groupSize <= fingerprint.length(); i += groupSize) {
+            spacedFingerprint.append(fingerprint.subSequence(i, i + groupSize));
             spacedFingerprint.append(' ');
         }
 
@@ -393,109 +308,20 @@ public class ContactDisplayActivity extends BaseActivity {
         }
     }
 
-    public void startChat ()
+    public void inviteContactToChat ()
     {
-        if (mConn == null)
-            return;
 
-        try {
-            IChatSessionManager manager = mConn.getChatSessionManager();
-            if (manager != null) {
-                IChatSession session = manager.getChatSession(mUsername);
-                if (session == null) {
-                    new ChatSessionInitTask(mProviderId, mAccountId, Imps.Contacts.TYPE_NORMAL, false)
-                    {
-                        @Override
-                        protected void onPostExecute(Long chatId) {
-                            super.onPostExecute(chatId);
+        Intent intent = new Intent(ContactDisplayActivity.this, MainActivity.class);
+        intent.putExtra("id", mContactId);
+        intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME,mUsername);
+        intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER,mProviderId);
+        intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT,mAccountId);
+        startActivity(intent);
 
-                            if (mContactId == -1) {
-                                Intent intent = new Intent(ContactDisplayActivity.this, ConversationDetailActivity.class);
-                                intent.putExtra("id", chatId);
-
-                                startActivity(intent);
-                                finish();
-                            }
-                        }
-                    }.executeOnExecutor(ImApp.sThreadPoolExecutor,new Contact(new MatrixAddress(mUsername)));
-                }
-                else
-                {
-                    Intent intent = new Intent(ContactDisplayActivity.this, ConversationDetailActivity.class);
-                    intent.putExtra("id", session.getId());
-                    startActivity(intent);
-                    finish();
-
-                }
-            }
-        }
-        catch (RemoteException re){}
-
-        if (mContactId != -1) {
-            Intent intent = new Intent(ContactDisplayActivity.this, ConversationDetailActivity.class);
-            intent.putExtra("id", mContactId);
-
-            startActivity(intent);
-            finish();
-        }
+        finish();
 
     }
 
-
-
-    private void verifyRemoteFingerprint() {
-
-        new AsyncTask<String, Void, Boolean>()
-        {
-            @Override
-            protected Boolean doInBackground(String... strings) {
-
-
-                try {
-                    if (mConn != null) {
-                        IContactListManager listManager = mConn.getContactListManager();
-
-                        if (listManager != null)
-                            listManager.approveSubscription(new Contact(new MatrixAddress(mUsername), mNickname, Imps.Contacts.TYPE_NORMAL));
-
-                        IChatSessionManager manager = mConn.getChatSessionManager();
-
-                        if (manager != null) {
-                            IChatSession session = manager.getChatSession(mUsername);
-
-                            if (session != null) {
-
-                                /**
-                                IOtrChatSession otrChatSession = session.getDefaultOtrChatSession();
-
-                                if (otrChatSession != null) {
-                                    otrChatSession.verifyKey(otrChatSession.getRemoteUserId());
-                                    Snackbar.make(findViewById(R.id.main_content), getString(R.string.action_verified), Snackbar.LENGTH_LONG).show();
-                                }**/
-                            }
-                        }
-
-                    }
-
-                } catch (RemoteException e) {
-                    Log.e(LOG_TAG, "error init otr", e);
-
-                }
-
-                return true;
-            }
-
-            @Override
-            protected void onPostExecute(Boolean success) {
-                super.onPostExecute(success);
-
-
-            }
-        }.execute();
-
-
-
-    }
 
 
     private void showFriendAddedView() {
@@ -538,5 +364,68 @@ public class ContactDisplayActivity extends BaseActivity {
         }, 3000);
     }
 
+    public void viewDevicesClicked (final View view)
+    {
+        Intent intent = new Intent(this,DeviceDisplayActivity.class);
+        intent.putExtra("nickname",mNickname);
+        intent.putExtra("address",mUsername);
+        intent.putExtra("provider",mProviderId);
+        intent.putExtra("account",mAccountId);
+
+        startActivity(intent);
+
+    }
+
+
+    public void addFriendClicked (final View view)
+    {
+        LayoutInflater factory = LayoutInflater.from(this);
+        final View dialogAddFriend = factory.inflate(R.layout.alert_dialog_add_friend, null);
+        TextView title = dialogAddFriend.findViewById(R.id.alertTitle);
+        title.setText(getString(R.string.add_x_as_friend_question, mNickname));
+
+        ImageView avatarView = dialogAddFriend.findViewById(R.id.imageAvatar);
+        avatarView.setVisibility(View.GONE);
+        try {
+            Drawable avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mUsername, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, true);
+            if (avatar != null) {
+                avatarView.setImageDrawable(avatar);
+                avatarView.setVisibility(View.VISIBLE);
+            }
+        } catch (Exception e) {
+        }
+
+
+        final AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogAddFriend)
+                .create();
+        dialog.show();
+
+        View btnAdd = dialogAddFriend.findViewById(R.id.btnAdd);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImApp app = (ImApp)getApplication();
+                new AddContactAsyncTask(mProviderId, mAccountId).execute(mUsername, null, null);
+                dialog.dismiss();
+                view.setVisibility(View.GONE);
+                showFriendAddedView();
+            }
+        });
+
+        TextView btnCancel = dialogAddFriend.findViewById(R.id.btnCancel);
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        Typeface typeface;
+        if ((typeface = CustomTypefaceManager.getCurrentTypeface(this))!=null) {
+            title.setTypeface(typeface);
+            btnCancel.setTypeface(typeface);
+        }
+    }
 
 }

@@ -1,15 +1,19 @@
 package info.guardianproject.keanuapp.ui.widgets;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -187,27 +191,47 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
         return super.onOptionsItemSelected(item);
     }
 
+    private boolean checkPermissions ()
+    {
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+
+        if (permissionCheck ==PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    1);
+            return false;
+        }
+
+        return true;
+    }
+
     public void sendNearby ()
     {
-        int currentItem = viewPagerPhotos.getCurrentItem();
-        if (currentItem >= 0 && currentItem < uris.size()) {
-            String resharePath = uris.get(currentItem).toString();
-            Intent shareIntent = new Intent(this, NearbyShareActivity.class);
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.setDataAndType(Uri.parse(resharePath), mimeTypes.get(currentItem));
-            startActivity(shareIntent);
+        if (checkPermissions()) {
+
+            int currentItem = viewPagerPhotos.getCurrentItem();
+            if (currentItem >= 0 && currentItem < uris.size()) {
+                String resharePath = uris.get(currentItem).toString();
+                Intent shareIntent = new Intent(this, NearbyShareActivity.class);
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.setDataAndType(Uri.parse(resharePath), mimeTypes.get(currentItem));
+                startActivity(shareIntent);
+            }
         }
 
     }
 
 
     public void exportMediaFile ()
-    {
+    { if (checkPermissions()) {
         int currentItem = viewPagerPhotos.getCurrentItem();
         if (currentItem >= 0 && currentItem < uris.size()) {
             java.io.File exportPath = SecureMediaStore.exportPath(mimeTypes.get(currentItem), uris.get(currentItem));
             exportMediaFile(mimeTypes.get(currentItem), uris.get(currentItem), exportPath);
         }
+    }
     };
 
     private void exportMediaFile (String mimeType, Uri mediaUri, java.io.File exportPath)

@@ -82,8 +82,6 @@ import info.guardianproject.keanuapp.ui.widgets.ShareRequest;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
-//import com.bumptech.glide.Glide;
-
 public class ConversationDetailActivity extends BaseActivity {
 
     private long mChatId = -1;
@@ -136,7 +134,7 @@ public class ConversationDetailActivity extends BaseActivity {
         }
     };
 
-
+    /**
     private BroadcastReceiver receiver = new BroadcastReceiver() {
         public void onReceive(final Context context, final Intent intent) {
             //check if the broadcast is our desired one
@@ -150,6 +148,7 @@ public class ConversationDetailActivity extends BaseActivity {
             }
 
         }};
+        **/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -267,25 +266,27 @@ public class ConversationDetailActivity extends BaseActivity {
 
         mApp = (ImApp)getApplication();
 
-        mChatId = intent.getLongExtra("id", -1);
+        if (intent != null) {
+            mChatId = intent.getLongExtra("id", -1);
 
-        mAddress = intent.getStringExtra("address");
-        mNickname = intent.getStringExtra("nickname");
+            mAddress = intent.getStringExtra("address");
+            mNickname = intent.getStringExtra("nickname");
 
-        if (mChatId != -1) {
-            boolean bound = mConvoView.bindChat(mChatId, mAddress, mNickname);
+            if (mChatId != -1) {
+                boolean bound = mConvoView.bindChat(mChatId, mAddress, mNickname);
 
-            if (bound) {
-                mConvoView.startListening();
-                applyStyleForToolbar();
-            }
-            else
+                if (bound) {
+                    mConvoView.startListening();
+                    applyStyleForToolbar();
+
+                    if (intent.getBooleanExtra("isNew", false))
+                        mConvoView.showGroupInfo();
+                } else
+                    finish();
+            } else {
                 finish();
+            }
         }
-        else {
-            finish ();
-        }
-
     }
 
     public void collapseToolbar(){
@@ -304,13 +305,16 @@ public class ConversationDetailActivity extends BaseActivity {
 
         Intent intent = getIntent();
         processIntent(intent);
+        setIntent(null);
 
         mConvoView.setSelected(true);
 
+        /**
         IntentFilter regFilter = new IntentFilter();
         regFilter .addAction(Intent.ACTION_SCREEN_OFF);
         regFilter .addAction(Intent.ACTION_SCREEN_ON);
         registerReceiver(receiver, regFilter);
+            **/
 
         // Set last read date now!
         if (mChatId != -1) {
@@ -329,7 +333,7 @@ public class ConversationDetailActivity extends BaseActivity {
 
         mConvoView.setSelected(false);
 
-        unregisterReceiver(receiver);
+       // unregisterReceiver(receiver);
 
         // Set last read date now!
         if (mChatId != -1) {
@@ -363,9 +367,6 @@ public class ConversationDetailActivity extends BaseActivity {
             case R.id.menu_end_conversation:
                 mConvoView.closeChatSession(true);
                 finish();
-                return true;
-            case R.id.menu_verify_or_view:
-                mConvoView.showVerifyDialog();
                 return true;
             case R.id.menu_group_info:
                 mConvoView.showGroupInfo();

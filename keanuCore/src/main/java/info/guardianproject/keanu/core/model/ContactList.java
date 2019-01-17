@@ -83,7 +83,7 @@ public class ContactList extends ImEntity {
      * @throws NullPointerException if the address string is null
      * @throws ImException if the contact is not allowed to be added
      */
-    public synchronized void addContact(final String address, final String nickname) throws ImException {
+    public void addContact(final String address, final String nickname) throws ImException {
 
         if (null == address) {
             throw new NullPointerException();

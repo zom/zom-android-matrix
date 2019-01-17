@@ -35,10 +35,11 @@
                 <action android:name="info.guardianproject.keanu.core.server.SERVICE" />
             </intent-filter>
         </service>
+        <!--
         <service
             android:name=".service.HeartbeatService"
             android:exported="false" />
-
+        -->
         <provider
             android:name=".provider.ImpsProvider"
             android:authorities="${applicationId}.provider.Imps"

@@ -25,11 +25,11 @@ public class Invitation implements Parcelable {
     private Address mSender;
     private String mReason;
 
-    public Invitation(String id, Address groupAddress, Address sender, String resean) {
+    public Invitation(String id, Address groupAddress, Address sender, String reason) {
         mId = id;
         mGroupAddress = groupAddress;
         mSender = sender;
-        mReason = resean;
+        mReason = reason;
     }
 
     public Invitation(Parcel source) {

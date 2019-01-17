@@ -12,7 +12,7 @@ import android.content.Intent;
 public class BootCompletedReceiver extends BroadcastReceiver {
 
     @Override
-    public synchronized void onReceive(Context context, Intent intent) {
+    public void onReceive(Context context, Intent intent) {
            if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction())) {
                GeneralJobIntentService.enqueueWork(context, intent);
            }

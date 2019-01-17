@@ -40,6 +40,8 @@ public class OnboardingManager {
 
     public final static String BASE_INVITE_URL = "https://keanu.guardianproject.info/i/#";
 
+    public final static String DEFAULT_SCHEME = "keanu";
+
     public static void inviteSMSContact (Activity context, String phoneNumber, String message)
     {
 
@@ -112,7 +114,7 @@ public class OnboardingManager {
         {
             StringBuffer resp = new StringBuffer();
 
-            resp.append(nickname).append(R.string.is_inviting_you);
+            resp.append(nickname).append(context.getString(R.string.is_inviting_you));
             
             resp.append(generateInviteLink(context,username,fingerprint,nickname));
             
@@ -133,11 +135,11 @@ public class OnboardingManager {
 
         if (code.length == 1
                 && inviteLink.getScheme() != null
-                && inviteLink.getScheme().toLowerCase().equals("xmpp")) {
+                && inviteLink.getScheme().toLowerCase().equals(DEFAULT_SCHEME)) {
 
             diLink = new DecodedInviteLink();
 
-            String parseLink = link.substring(5);
+            String parseLink = link.substring(DEFAULT_SCHEME.length());
 
             int idx = -1;
 
@@ -210,10 +212,11 @@ public class OnboardingManager {
 
     }
 
-    public static String generateXmppLink (String username, String fingerprint) throws IOException
+    public static String generateMatrixLink (String username, String fingerprint) throws IOException
     {
         StringBuffer inviteUrl = new StringBuffer();
-        inviteUrl.append("xmpp:");
+        inviteUrl.append(DEFAULT_SCHEME);
+        inviteUrl.append(":");
         inviteUrl.append(username);
         inviteUrl.append("?subscribe");
         inviteUrl.append("&otr-fingerprint=").append(fingerprint);
@@ -227,6 +230,25 @@ public class OnboardingManager {
     }
 
     public static String generateInviteLink (Context context, String username, String fingerprint, String nickname, boolean isMigrateLink) throws IOException
+    {
+        StringBuffer inviteUrl = new StringBuffer();
+        inviteUrl.append(DEFAULT_SCHEME).append(":");
+
+        StringBuffer code = new StringBuffer();
+        code.append(username);
+        code.append("?otr=").append(fingerprint);
+
+        if (nickname != null)
+            code.append("&nickname=").append(nickname);
+
+        if (isMigrateLink)
+            code.append("&m=1");
+
+        inviteUrl.append(Base64.encodeToString(code.toString().getBytes(), Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING));
+        return inviteUrl.toString();
+    }
+
+    public static String generateInviteLinkFull (Context context, String username, String fingerprint, String nickname, boolean isMigrateLink) throws IOException
     {
         StringBuffer inviteUrl = new StringBuffer();
         inviteUrl.append(BASE_INVITE_URL);

@@ -136,7 +136,7 @@
     <string name="delete">Delete</string>
     <string name="export_media">Export Media File?</string>
     <!-- Views: Chat: Group -->
-    <string name="invitation_prompt"><xliff:g id="user">%1$s</xliff:g> has invited you to join a group chat.</string>
+    <string name="invitation_prompt">You have been invited to join <xliff:g id="user">%1$s</xliff:g></string>
     <string name="accept_invitation">Accept</string>
     <string name="decline_invitation">Decline</string>
     <string name="connecting_to_group_chat_">Connecting to group chat…</string>

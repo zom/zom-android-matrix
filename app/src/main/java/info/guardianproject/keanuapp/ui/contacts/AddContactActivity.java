@@ -34,6 +34,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.widget.ListPopupWindow;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -47,14 +48,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImConnection;
+import info.guardianproject.keanu.core.model.ImErrorInfo;
+import info.guardianproject.keanu.core.model.Server;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IContactList;
+import info.guardianproject.keanu.core.service.IContactListListener;
 import info.guardianproject.keanu.core.service.IContactListManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.RemoteImService;
@@ -62,6 +69,7 @@ import info.guardianproject.keanu.core.util.XmppUriHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -75,6 +83,7 @@ import info.guardianproject.keanuapp.ui.BaseActivity;
 import info.guardianproject.keanuapp.ui.accounts.AccountListItem;
 import info.guardianproject.keanuapp.ui.accounts.AccountsActivity;
 import info.guardianproject.keanuapp.ui.legacy.SimpleAlertHandler;
+import info.guardianproject.keanuapp.ui.onboarding.OnboardingActivity;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
 
 import static info.guardianproject.keanu.core.KeanuConstants.IMPS_CATEGORY;
@@ -94,8 +103,7 @@ public class AddContactActivity extends BaseActivity {
     ImApp mApp;
     SimpleAlertHandler mHandler;
 
-    private Cursor mCursorProviders;
-    private long mProviderId, mAccountId;
+    private IImConnection mConn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +115,8 @@ public class AddContactActivity extends BaseActivity {
         setTitle("");
 
         mApp = (ImApp)getApplication();
+
+        mConn = RemoteImService.getConnection(mApp.getDefaultProviderId(),mApp.getDefaultAccountId());
 
         mHandler = new SimpleAlertHandler(this);
 
@@ -295,7 +305,7 @@ public class AddContactActivity extends BaseActivity {
                     ImApp app = ((ImApp) getApplication());
 
                     try {
-                        String xmppLink = OnboardingManager.generateXmppLink(app.getDefaultUsername(), fingerprint);
+                        String xmppLink = OnboardingManager.generateMatrixLink(app.getDefaultUsername(), fingerprint);
                         OnboardingManager.inviteScan(AddContactActivity.this, xmppLink);
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
@@ -314,7 +324,7 @@ public class AddContactActivity extends BaseActivity {
             public void onClick(View v) {
                 try {
                     ImApp app = ((ImApp) getApplication());
-                    String xmppLink = OnboardingManager.generateXmppLink(app.getDefaultUsername(), fingerprint);
+                    String xmppLink = OnboardingManager.generateMatrixLink(app.getDefaultUsername(), fingerprint);
                     OnboardingManager.inviteNearby(AddContactActivity.this, xmppLink);
                 }
                 catch (IOException ioe)
@@ -352,61 +362,10 @@ public class AddContactActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         
-        if (mCursorProviders != null && (!mCursorProviders.isClosed()))
-                mCursorProviders.close();
-        
     }
 
 
 
-    private void setupAccountSpinner ()
-    {
-        final Uri uri = Imps.Provider.CONTENT_URI_WITH_ACCOUNT;
-
-        mCursorProviders = managedQuery(uri,  PROVIDER_PROJECTION,
-        Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" /* selection */,
-        new String[] { IMPS_CATEGORY } /* selection args */,
-        Imps.Provider.DEFAULT_SORT_ORDER);
-        
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(this,
-                android.R.layout.simple_spinner_item, mCursorProviders, 
-                new String[] { 
-                       Imps.Provider.ACTIVE_ACCOUNT_USERNAME
-                       },
-                new int[] { android.R.id.text1 });
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        
-        // TODO Something is causing the managedQuery() to return null, use null guard for now
-        if (mCursorProviders != null && mCursorProviders.getCount() > 0)
-        {
-            mCursorProviders.moveToFirst();
-            mProviderId = mCursorProviders.getLong(PROVIDER_ID_COLUMN);
-            mAccountId = mCursorProviders.getLong(ACTIVE_ACCOUNT_ID_COLUMN);
-        }
-
-        /**
-        mListSpinner.setAdapter(adapter);
-        mListSpinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-
-            @Override
-            public void onItemSelected(AdapterView<?> arg0, View arg1,
-                    int arg2, long arg3) {
-                if (mCursorProviders == null)
-                    return;
-                mCursorProviders.moveToPosition(arg2);
-                mProviderId = mCursorProviders.getLong(PROVIDER_ID_COLUMN);
-                mAccountId = mCursorProviders.getLong(ACTIVE_ACCOUNT_ID_COLUMN);
-             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> arg0) {
-                // TODO Auto-generated method stub
-
-            }
-        });
-*/
-    }
-    
     public class ProviderListItemFactory implements LayoutInflater.Factory {
         @Override
         public View onCreateView(String name, Context context, AttributeSet attrs) {
@@ -464,12 +423,13 @@ public class AddContactActivity extends BaseActivity {
 
             addAddress = address;
 
-            if (!address.startsWith("@"))
-                addAddress = '@' + address + ':' + getString(R.string.default_server);
+            if (addAddress.trim().length() > 0) {
+                if (!address.startsWith("@"))
+                    addAddress = '@' + address + ':' + getString(R.string.default_server);
 
-            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(addAddress);
-            foundOne = true;
-
+                new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(addAddress);
+                foundOne = true;
+            }
         }
 
         if (foundOne) {
@@ -511,37 +471,7 @@ public class AddContactActivity extends BaseActivity {
 
     }
 
-    private IContactList getContactList(IImConnection conn) {
-        if (conn == null) {
-            return null;
-        }
 
-        try {
-            IContactListManager contactListMgr = conn.getContactListManager();
-            String listName = "";//getSelectedListName();
-
-            if (!TextUtils.isEmpty(listName)) {
-                return contactListMgr.getContactList(listName);
-            } else {
-                // Use the default list
-                List<IBinder> lists = contactListMgr.getContactLists();
-                for (IBinder binder : lists) {
-                    IContactList list = IContactList.Stub.asInterface(binder);
-                    if (list.isDefault()) {
-                        return list;
-                    }
-                }
-                // No default list, use the first one as default list
-                if (!lists.isEmpty()) {
-                    return IContactList.Stub.asInterface(lists.get(0));
-                }
-                return null;
-            }
-        } catch (RemoteException e) {
-            // If the service has died, there is no list for now.
-            return null;
-        }
-    }
 
     /**
     private String getSelectedListName() {
@@ -567,17 +497,95 @@ public class AddContactActivity extends BaseActivity {
         }
     };
 
+    ListPopupWindow mDomainList;
+
+    private synchronized void showUserSuggestions (final Contact[] contacts)
+    {
+        if (mDomainList == null)
+            mDomainList = new ListPopupWindow(this);
+
+        HashMap<String, String> suggestions = new HashMap<>();
+        for (Contact contact : contacts)
+            suggestions.put(contact.getAddress().getAddress(), contact.getName() + " (" + contact.getAddress().getAddress() + ")");
+
+        mDomainList.setAdapter(new ArrayAdapter(
+                this,
+                android.R.layout.simple_dropdown_item_1line, suggestions.values().toArray()));
+        mDomainList.setAnchorView(mNewAddress);
+        mDomainList.setWidth(ListPopupWindow.WRAP_CONTENT);
+        mDomainList.setHeight(400);
+
+        mDomainList.setModal(false);
+        mDomainList.show();
+
+        mDomainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mNewAddress.setText(contacts[position].getAddress().getAddress());
+                mDomainList.dismiss();
+            }
+        });
+    }
+
     private TextWatcher mTextWatcher = new TextWatcher() {
         public void afterTextChanged(Editable s) {
+
 
         }
 
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             // noop
+
+
         }
 
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             // noop
+
+            try {
+
+                if (mDomainList != null)
+                    mDomainList.dismiss();
+
+                String searchString = mNewAddress.getText().toString();
+                if (searchString.length() > 3) {
+                    mConn.searchForUser(mNewAddress.getText().toString(), new IContactListListener() {
+                        @Override
+                        public void onContactChange(int type, IContactList list, Contact contact) throws RemoteException {
+
+                        }
+
+                        @Override
+                        public void onAllContactListsLoaded() throws RemoteException {
+
+                        }
+
+                        @Override
+                        public void onContactsPresenceUpdate(Contact[] contacts) throws RemoteException {
+
+                            if (contacts != null && contacts.length > 0) {
+
+
+                                showUserSuggestions(contacts);
+                            }
+                        }
+
+                        @Override
+                        public void onContactError(int errorType, ImErrorInfo error, String listName, Contact contact) throws RemoteException {
+
+                        }
+
+                        @Override
+                        public IBinder asBinder() {
+                            return null;
+                        }
+                    });
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+
+
         }
     };
 
