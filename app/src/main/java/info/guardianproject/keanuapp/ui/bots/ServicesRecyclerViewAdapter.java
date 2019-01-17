@@ -28,7 +28,7 @@ import info.guardianproject.keanuapp.R;
  * Created by N-Pex on 2018-02-12.
  */
 
-public class ZomServicesRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class ServicesRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final List<Object> mValues;
 
     public interface ServiceItemCallback {
@@ -37,7 +37,7 @@ public class ZomServicesRecyclerViewAdapter extends RecyclerView.Adapter<Recycle
 
     public ServiceItemCallback listener;
 
-    public ZomServicesRecyclerViewAdapter(Context context, ServiceItemCallback listener) {
+    public ServicesRecyclerViewAdapter(Context context, ServiceItemCallback listener) {
         super();
         this.listener = listener;
         mValues = new ArrayList<>();

@@ -43,6 +43,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
@@ -61,6 +62,8 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Browser;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -666,6 +669,8 @@ public class MessageListItem extends FrameLayout {
 
     public void exportMediaFile ()
     {
+        
+
         if (mimeType != null && mediaUri != null) {
             java.io.File exportPath = SecureMediaStore.exportPath(mimeType, mediaUri);
             exportMediaFile(mimeType, mediaUri, exportPath, true);

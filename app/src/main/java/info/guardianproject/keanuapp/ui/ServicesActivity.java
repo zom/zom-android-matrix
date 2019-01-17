@@ -17,7 +17,6 @@
 package info.guardianproject.keanuapp.ui;
 
 import android.app.ProgressDialog;
-import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
@@ -33,9 +32,9 @@ import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
-import info.guardianproject.keanuapp.ui.bots.ZomServicesRecyclerViewAdapter;
+import info.guardianproject.keanuapp.ui.bots.ServicesRecyclerViewAdapter;
 
-public class ServicesActivity extends BaseActivity implements ZomServicesRecyclerViewAdapter.ServiceItemCallback {
+public class ServicesActivity extends BaseActivity implements ServicesRecyclerViewAdapter.ServiceItemCallback {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,7 +48,7 @@ public class ServicesActivity extends BaseActivity implements ZomServicesRecycle
 
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recyclerServices);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        recyclerView.setAdapter(new ZomServicesRecyclerViewAdapter(this, this));
+        recyclerView.setAdapter(new ServicesRecyclerViewAdapter(this, this));
     }
 
 

@@ -842,15 +842,15 @@ public class ConversationView {
             }
 
         });
-        /**
+
         mActivity.findViewById(R.id.btnAttachFile).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                mActivity.startFilePicker();
+                mActivity.startFilePicker("*/*");
             }
 
-        });**/
+        });
 
         mActivity.findViewById(R.id.btnAttachSticker).setOnClickListener(new View.OnClickListener() {
 

@@ -664,6 +664,8 @@ class KeanuRoomMediaMessagesSender {
             ImageMessage imageMessage = new ImageMessage();
             imageMessage.url = mediaUrl;
             imageMessage.body = roomMediaMessage.getFileName(mContext);
+            if (imageMessage.body == null)
+                imageMessage.body = Uri.parse(mediaUrl).getLastPathSegment();
 
             if (TextUtils.isEmpty(imageMessage.body)) {
                 imageMessage.body = "Image";
@@ -727,6 +729,8 @@ class KeanuRoomMediaMessagesSender {
             VideoMessage videoMessage = new VideoMessage();
             videoMessage.url = mediaUrl;
             videoMessage.body = roomMediaMessage.getFileName(mContext);
+            if (videoMessage.body == null)
+                videoMessage.body = Uri.parse(mediaUrl).getLastPathSegment();
 
             Uri videoUri = Uri.parse(mediaUrl);
             Uri thumbnailUri = (null != thumbnailUrl) ? Uri.parse(thumbnailUrl) : null;
@@ -765,6 +769,9 @@ class KeanuRoomMediaMessagesSender {
 
             fileMessage.url = mediaUrl;
             fileMessage.body = roomMediaMessage.getFileName(mContext);
+            if (fileMessage.body == null)
+                fileMessage.body = Uri.parse(mediaUrl).getLastPathSegment();
+
             Uri uri = Uri.parse(mediaUrl);
             Room.fillFileInfo(mContext, fileMessage, uri, mimeType);
 
