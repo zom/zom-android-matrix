@@ -991,7 +991,7 @@ public class ConversationView {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                sendTypingStatus (true);
+                sendTypingStatus (mComposeMessage.getText().length() > 0);
 
                 return false;
             }
@@ -1001,7 +1001,7 @@ public class ConversationView {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
 
-                 sendTypingStatus (hasFocus);
+                sendTypingStatus (hasFocus && (mComposeMessage.getText().length() > 0));
 
             }
         });
@@ -2156,6 +2156,7 @@ public class ConversationView {
                 getChatSession().markAsRead();
                 //updateWarningView();
 
+                sendTypingStatus(mComposeMessage.getText().length() > 0);
             } catch (RemoteException e) {
 
                 mHandler.showServiceErrorAlert(e.getLocalizedMessage());
