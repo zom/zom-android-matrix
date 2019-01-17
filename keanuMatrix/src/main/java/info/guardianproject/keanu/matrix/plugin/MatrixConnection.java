@@ -632,13 +632,11 @@ public class MatrixConnection extends ImConnection {
 
         checkRoomEncryption(room);
 
-       if (!hasAvatar(room.getRoomId()))
-       {
-            String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(room.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+       String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(room.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
 
-            if (!TextUtils.isEmpty(downloadUrl))
-                downloadAvatar(room.getRoomId(),downloadUrl);
-       }
+        if (!TextUtils.isEmpty(downloadUrl))
+            downloadAvatar(room.getRoomId(),downloadUrl);
+
 
         return group;
     }
@@ -699,13 +697,11 @@ public class MatrixConnection extends ImConnection {
                             group.notifyMemberRoleUpdate(contact, "member", "member");
                     }
 
-                    if (!hasAvatar(member.getUserId()))
-                    {
-                        String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(member.getUserId(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+                    String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(member.getUserId(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
 
-                        if (!TextUtils.isEmpty(downloadUrl))
-                            downloadAvatar(member.getUserId(),downloadUrl);
-                    }
+                    if (!TextUtils.isEmpty(downloadUrl))
+                        downloadAvatar(member.getUserId(),downloadUrl);
+
                 }
 
                 group.endMemberUpdates();
