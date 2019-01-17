@@ -135,8 +135,6 @@ public class MainActivity extends BaseActivity {
 
         super.onCreate(savedInstanceState);
 
-        StatusBarNotifier.defaultMainClass = getClass().getCanonicalName();
-
         if (Preferences.doBlockScreenshots()) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
                     WindowManager.LayoutParams.FLAG_SECURE);

@@ -151,6 +151,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         mStatusBarNotifier = new StatusBarNotifier(this);
         mServiceHandler = new ServiceHandler();
 
+       // mStatusBarNotifier.notifyError("System","Service created!");
+
         startForeground(notifyId, getForegroundNotification());
 
         final String prev = Debug.getTrail(this, SERVICE_CREATE_TRAIL_KEY);
@@ -221,15 +223,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
 
     }**/
-    
-    private void connectToCacheWord ()
-    {
-        if (mCacheWord == null) {
-            mCacheWord = new CacheWordHandler(this, (ICacheWordSubscriber) this);
-            mCacheWord.connectToService();
-        }
 
-    }
 
     private Notification getForegroundNotification() {
        
@@ -244,23 +238,22 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         mNotifyBuilder.setOngoing(true);
         mNotifyBuilder.setWhen(System.currentTimeMillis());
         
-        Intent notificationIntent = mStatusBarNotifier.getDefaultIntent(-1,-1);
-        PendingIntent launchIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, 0);
+        //Intent notificationIntent = mStatusBarNotifier.getDefaultIntent(-1,-1);
+        //PendingIntent launchIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, 0)
+        //mNotifyBuilder.setContentIntent(launchIntent);
 
-        mNotifyBuilder.setContentIntent(launchIntent);
         mNotifyBuilder.setContentText(getString(R.string.app_unlocked));
 
-        return mNotifyBuilder.build();
+        Notification not = mNotifyBuilder.build();
+        return not;
 
     }
 
     public void sendHeartbeat() {
         Debug.onHeartbeat();
         try {
-            if (mNeedCheckAutoLogin && mNetworkState != NetworkConnectivityReceiver.State.NOT_CONNECTED) {
-                debug("autoLogin from heartbeat");
-                mNeedCheckAutoLogin = !autoLogin();;
-            }
+            if (mNeedCheckAutoLogin)
+                mNeedCheckAutoLogin = !autoLogin();
 
             mHeartbeatInterval = Preferences.getHeartbeatInterval();
             debug("heartbeat interval: " + mHeartbeatInterval);
@@ -279,9 +272,9 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
         startForeground(notifyId, getForegroundNotification());
 
-        //if the service restarted, then we need to reconnect/reinit to info.guardianproject.keanu.core.cacheword
-       if ((flags & START_FLAG_REDELIVERY)!=0)  // if crash restart..
-            connectToCacheWord();
+     //   mStatusBarNotifier.notifyError("System","Service onStartCommand!");
+
+        connectToCacheWord();
 
         if (intent != null)
         {
@@ -300,7 +293,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         debug("ImService.onStart, checkAutoLogin=" + mNeedCheckAutoLogin + " intent =" + intent
                 + " startId =" + startId);
 
-        if (mNeedCheckAutoLogin && mNetworkState != NetworkConnectivityReceiver.State.NOT_CONNECTED) {
+        if (mNeedCheckAutoLogin) {
             debug("autoLogin from heartbeat");
             mNeedCheckAutoLogin = !autoLogin();
         }
@@ -851,22 +844,6 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
     private boolean mKillProcessOnStop = false;
 
-    /*
-     //the concept of "background data is deprecated from Android
-     // the only thing that matters is checking if Network is available and connected
-    private final class SettingsMonitor extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-
-            if (ConnectivityManager.ACTION_BACKGROUND_DATA_SETTING_CHANGED.equals(action)) {
-                ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-                setBackgroundData(manager.getBackgroundDataSetting());
-                handleBackgroundDataSettingChange();
-            }
-        }
-    }
-    */
     private final class ServiceHandler extends Handler {
         public ServiceHandler() {
         }
@@ -895,11 +872,25 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
     }
-    
+
+
+    private void connectToCacheWord ()
+    {
+        if (mCacheWord == null) {
+         //   mStatusBarNotifier.notifyError("System","Service connectToCacheWord!");
+
+            mCacheWord = new CacheWordHandler(this, (ICacheWordSubscriber) this);
+            mCacheWord.connectToService();
+            onCacheWordLocked();
+        }
+
+    }
+
     @Override
     public void onCacheWordLocked() {
 
         debug("got info.guardianproject.keanu.core.cacheword locked");
+      //  mStatusBarNotifier.notifyError("System","Service onCacheWordLocked!");
 
         //do nothing here?
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -925,9 +916,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
             // Check and login accounts if network is ready, otherwise it's checked
             // when the network becomes available.
-            if (mNeedCheckAutoLogin && mNetworkState != NetworkConnectivityReceiver.State.NOT_CONNECTED) {
+            if (mNeedCheckAutoLogin)
                 mNeedCheckAutoLogin = !autoLogin();
-            }
         }
 
     }
@@ -938,6 +928,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     public void onCacheWordOpened() {
 
         debug("info.guardianproject.keanu.core.cacheword is opened");
+   //     mStatusBarNotifier.notifyError("System","Service onCacheWordOpened!");
 
        tempKey = mCacheWord.getEncryptionKey();
        openEncryptedStores(tempKey, true);
@@ -947,9 +938,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
         // Check and login accounts if network is ready, otherwise it's checked
         // when the network becomes available.
-        if (mNeedCheckAutoLogin && mNetworkState != NetworkConnectivityReceiver.State.NOT_CONNECTED) {
+        if (mNeedCheckAutoLogin)
             mNeedCheckAutoLogin = !autoLogin();
-        }
 
 //        checkUpgrade();
 
@@ -962,10 +952,12 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     }
 
     private boolean openEncryptedStores(byte[] key, boolean allowCreate) {
+    //    mStatusBarNotifier.notifyError("System","Service openEncryptedStores");
 
         SecureMediaStore.init(this, key);
 
         if (Imps.isUnlocked(this)) {
+      //      mStatusBarNotifier.notifyError("System","Service Imps.isUnlocked!");
 
             return true;
         } else {

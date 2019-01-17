@@ -334,6 +334,8 @@ public class MatrixConnection extends ImConnection {
             @Override
             public void onSuccess(Credentials credentials) {
 
+                setState(ImConnection.LOGGING_IN, null);
+
                 mCredentials = credentials;
                 mCredentials.deviceId = mDeviceId;
                 mConfig.setCredentials(mCredentials);
@@ -344,7 +346,6 @@ public class MatrixConnection extends ImConnection {
                 mChatGroupManager.setSession(mSession);
                 mChatSessionManager.setSession(mSession);
 
-                setState(ImConnection.LOGGING_IN, null);
                 mSession.startEventStream(initialToken);
                 setState(LOGGED_IN, null);
                 mSession.setIsOnline(true);
@@ -353,6 +354,7 @@ public class MatrixConnection extends ImConnection {
                     @Override
                     public void onNetworkError(Exception e) {
                             debug("getCrypto().start.onNetworkError",e);
+
                     }
 
                     @Override
@@ -385,6 +387,16 @@ public class MatrixConnection extends ImConnection {
                 super.onNetworkError(e);
 
                 debug("loginWithUser: OnNetworkError",e);
+
+                setState(ImConnection.SUSPENDED, null);
+
+                mResponseHandler.postDelayed(new Runnable ()
+                {
+                    public void run ()
+                    {
+                        loginAsync(null);
+                    }
+                },10000);
 
             }
 

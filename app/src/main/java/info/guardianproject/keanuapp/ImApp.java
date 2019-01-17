@@ -184,6 +184,8 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
         Imps.appId = BuildConfig.APPLICATION_ID;//"info.guardianproject.keanuapp";
 
+        StatusBarNotifier.defaultMainClass = "info.guardianproject.keanuapp.MainActivity";
+
         Preferences.setup(this);
         initChannel();
 
