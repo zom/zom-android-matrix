@@ -578,14 +578,17 @@ public class OnboardingActivity extends BaseActivity {
                 String nickname = setupValues[0];
                 String username = setupValues[1];
 
-                if (TextUtils.isEmpty(password))
-                    password = OnboardingManager.generatePassword();
-
                 OnboardingManager.registerAccount(
                         OnboardingActivity.this, nickname, username, password, myServer.domain, myServer.domain, myServer.port,
                         new OnboardingListener() {
                             @Override
                             public void registrationSuccessful(final OnboardingAccount account) {
+
+                                mUsername = '@' + account.username + ':' + account.domain;
+                                mNewAccount = account;
+
+                                ImApp mApp = (ImApp)getApplication();
+                                mApp.setDefaultAccount(account.providerId,account.accountId);
 
                                 mOnboardingHandler.post(new Runnable ()
                                 {
@@ -593,28 +596,24 @@ public class OnboardingActivity extends BaseActivity {
                                     public void run ()
                                     {
 
-                                        mUsername = '@' + account.username + ':' + account.domain;
-                                        mNewAccount = account;
 
                                         showSuccess();
 
-                                        ImApp mApp = (ImApp)getApplication();
-                                        mApp.setDefaultAccount(account.providerId,account.accountId);
-
-                                        SignInHelper signInHelper = new SignInHelper(OnboardingActivity.this, mHandler);
-                                        signInHelper.activateAccount(account.providerId, account.accountId);
-                                        signInHelper.signIn(account.password, account.providerId, account.accountId, true);
 
                                         mItemSkip.setVisible(true);
                                         mItemSkip.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                                             @Override
                                             public boolean onMenuItemClick(MenuItem item) {
 
-                                                showMainScreen();
+                                                showMainScreen(true);
                                                 return false;
                                             }
                                         });
 
+
+                                        SignInHelper signInHelper = new SignInHelper(OnboardingActivity.this, mHandler);
+                                        signInHelper.activateAccount(account.providerId, account.accountId);
+                                        signInHelper.signIn(account.password, account.providerId, account.accountId, true);
                                     }
                                 });
 
@@ -725,15 +724,17 @@ public class OnboardingActivity extends BaseActivity {
         
     }**/
 
-    private void showMainScreen ()
+    private void showMainScreen (boolean isNewAccount)
     {
         finish();
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
 
-        intent = new Intent(this, AddContactActivity.class);
-        startActivity(intent);
+        if (isNewAccount) {
+            intent = new Intent(this, AddContactActivity.class);
+            startActivity(intent);
+        }
     }
 
     private synchronized boolean doExistingAccountRegister ()
@@ -776,7 +777,7 @@ public class OnboardingActivity extends BaseActivity {
         protected void onPostExecute(OnboardingAccount account) {
 
             if (account != null) {
-                mUsername = account.username + '@' + account.domain;
+                mUsername = "@" + account.username + ":" + account.domain;
 
                 ImApp mApp = (ImApp) getApplication();
                 mApp.setDefaultAccount(account.providerId, account.accountId);
@@ -785,7 +786,7 @@ public class OnboardingActivity extends BaseActivity {
                 signInHelper.activateAccount(account.providerId, account.accountId);
                 signInHelper.signIn(account.password, account.providerId, account.accountId, true);
 
-                showMainScreen();
+                showMainScreen(false);
 
                 mExistingAccountTask = null;
             }
@@ -807,7 +808,7 @@ public class OnboardingActivity extends BaseActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == OnboardingManager.REQUEST_SCAN) {
 
-                showMainScreen();
+                showMainScreen(false);
 
                 ArrayList<String> resultScans = data.getStringArrayListExtra("result");
                 for (String resultScan : resultScans)
@@ -829,7 +830,7 @@ public class OnboardingActivity extends BaseActivity {
 
                 if (resultScans.size() > 0)
                 {
-                    showMainScreen ();
+                    showMainScreen (true);
                 }
             }
             else if (requestCode == OnboardingManager.REQUEST_CHOOSE_AVATAR)
@@ -855,7 +856,7 @@ public class OnboardingActivity extends BaseActivity {
                             .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
                                     setAvatar(mCropImageView.getCroppedImage(), mNewAccount);
-                                    showMainScreen();
+                                    showMainScreen(true);
 
                                     delete(mOutputFileUri);
                                 }

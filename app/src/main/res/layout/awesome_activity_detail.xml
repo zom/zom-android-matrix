@@ -216,7 +216,7 @@
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     />
-
+<!--
                 <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
                     android:id="@+id/btnAttachFile"
                     android:src="@drawable/ic_insert_drive_file_white_36dp"
@@ -225,7 +225,7 @@
                     app:circleColor="@android:color/holo_red_light"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
-                    />
+                    />-->
 
             </LinearLayout>
         </HorizontalScrollView>

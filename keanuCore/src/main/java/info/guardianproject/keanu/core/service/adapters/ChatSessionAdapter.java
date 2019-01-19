@@ -817,7 +817,13 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     {
         String[] projection = {LAST_UNREAD_MESSAGE};
         Cursor cursor = mContentResolver.query(mChatURI,projection,null,null,null);
-        return cursor != null && cursor.getCount() > 0;
+        if (cursor != null) {
+            boolean hasLast = cursor.getCount() > 0;
+            cursor.close();
+            return hasLast;
+        }
+
+        return false;
 
     }
 

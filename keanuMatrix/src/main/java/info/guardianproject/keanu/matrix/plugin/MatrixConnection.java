@@ -1319,6 +1319,7 @@ public class MatrixConnection extends ImConnection {
                 @Override
                 public void onNetworkError(Exception e) {
                     debug ("register:onNetworkError",e);
+                    listener.onRegistrationFailed("Network error occured: " + e.toString());
 
                 }
 
@@ -1345,14 +1346,14 @@ public class MatrixConnection extends ImConnection {
                     } else if (TextUtils.equals(e.errcode, MatrixError.RESOURCE_LIMIT_EXCEEDED)) {
                         listener.onResourceLimitExceeded(e);
                     } else {
-                       listener.onRegistrationFailed("");
+                       listener.onRegistrationFailed(e.toString());
                     }
                 }
 
                 @Override
                 public void onUnexpectedError(Exception e) {
                     debug ("register:onUnexpectedError",e);
-
+                    listener.onRegistrationFailed(e.toString());
                 }
             });
         }
