@@ -72,6 +72,7 @@ import info.guardianproject.keanu.core.util.UploadProgressListener;
 
 import static cz.msebera.android.httpclient.conn.ssl.SSLConnectionSocketFactory.TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanu.core.provider.Imps.ChatsColumns.LAST_UNREAD_MESSAGE;
 
 public class ChatSessionAdapter extends IChatSession.Stub {
 
@@ -175,8 +176,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             mChatURI = ContentUris.withAppendedId(Imps.Chats.CONTENT_URI, mContactId);
         
             mMessageURI = Imps.Messages.getContentUriByThreadId(mContactId);
-            if (isNewSession)
-                setLastMessage("");
+            if (!hasLastMessage())
+                setLastMessage(" ");
 
             for (Contact c : group.getMembers()) {
                 mContactStatusMap.put(c.getName(), c.getPresence().getStatus());
@@ -812,12 +813,20 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         setLastMessageForUri(message);
     }
 
+    private boolean hasLastMessage ()
+    {
+        String[] projection = {LAST_UNREAD_MESSAGE};
+        Cursor cursor = mContentResolver.query(mChatURI,projection,null,null,null);
+        return cursor != null && cursor.getCount() > 0;
+
+    }
+
     private Uri setLastMessageForUri(String message) {
 
         ContentValues values = new ContentValues(4);
 
         values.put(Imps.Chats.LAST_MESSAGE_DATE, System.currentTimeMillis());
-        values.put(Imps.Chats.LAST_UNREAD_MESSAGE, message);
+        values.put(LAST_UNREAD_MESSAGE, message);
          values.put(Imps.Chats.GROUP_CHAT, mIsGroupChat);
          values.put(Imps.Chats.USE_ENCRYPTION,mUseEncryption);
 
@@ -1858,6 +1867,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         try {
             if (isGroupChatSession()) {
                 ChatGroup group = (ChatGroup)mChatSession.getParticipant();
+                group.setName(subject);
                 getGroupManager().setGroupSubject(group, subject);
 
                 //update the database

@@ -337,7 +337,11 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         if (room != null ) {
 
             room.invite(invitee.getAddress().getAddress(),new BasicApiCallback("InviteRoom"));
+
+            mConn.updateGroupMembers(room, group);
         }
+
+
     }
 
     @Override

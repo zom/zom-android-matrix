@@ -375,6 +375,7 @@ public class MatrixConnection extends ImConnection {
                         debug("getCrypto().start.onSuccess");
 
                         mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
+                        loadStateAsync();
                     }
                 });
 
@@ -604,10 +605,10 @@ public class MatrixConnection extends ImConnection {
 
                 for (Room room : rooms)
                 {
-                    ChatGroup group = addRoomContact (room);
-
-                    mChatSessionManager.createChatSession(group,false);
-
+                    if (room.isMember() && room.getNumberOfMembers() > 1) {
+                        ChatGroup group = addRoomContact(room);
+                        mChatSessionManager.createChatSession(group, true);
+                    }
 
                 }
 
@@ -622,8 +623,12 @@ public class MatrixConnection extends ImConnection {
 
         String subject = room.getRoomDisplayName(mContext);
 
-        if (TextUtils.isEmpty(subject))
-            subject = room.getRoomId();// room.getRoomDisplayName(mContext);
+        if (TextUtils.isEmpty(subject)) {
+            subject = room.getTopic();
+
+            if (TextUtils.isEmpty(subject))
+                subject = room.getRoomId();
+        }
 
         MatrixAddress mAddr = new MatrixAddress(room.getRoomId());
 
@@ -708,6 +713,8 @@ public class MatrixConnection extends ImConnection {
 
             }
         });
+
+
     }
 
     protected void checkRoomEncryption (Room room)
@@ -967,10 +974,10 @@ public class MatrixConnection extends ImConnection {
                 participant.setJoined(false);
                 ChatSession session = mChatSessionManager.createChatSession(participant, true);
                 ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
-                csa.setLastMessage("You were invited");
+                csa.setLastMessage(" ");
 
             }
-            else if (room.isMember())
+            else if (room.isMember() && room.getNumberOfMembers() > 1)
             {
                 ChatGroup group = addRoomContact(room);
                 ChatSession session = mChatSessionManager.getSession(room.getRoomId());

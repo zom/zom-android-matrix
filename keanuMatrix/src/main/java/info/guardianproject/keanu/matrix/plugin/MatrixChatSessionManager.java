@@ -85,39 +85,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
             if (participant instanceof ChatGroup) {
                 room = mDataHandler.getRoom(session.getParticipant().getAddress().getAddress());
-
-                if (room.getNumberOfMembers() == 2)
-                {
-                    final Room thisRoom = room;
-
-                    room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
-                        @Override
-                        public void onNetworkError(Exception e) {
-
-                        }
-
-                        @Override
-                        public void onMatrixError(MatrixError matrixError) {
-
-                        }
-
-                        @Override
-                        public void onUnexpectedError(Exception e) {
-
-                        }
-
-                        @Override
-                        public void onSuccess(List<RoomMember> roomMembers) {
-                            ChatSessionAdapter adapter = mSessions.get(participant.getAddress().getAddress());
-                            for (RoomMember member : roomMembers)
-                            {
-                                mRoomMap.put(member.getUserId(),thisRoom);
-                                mSessions.put(member.getUserId(),adapter);
-                            }
-
-                        }
-                    });
-                }
+               // mConn.addRoomContact(room);
 
             } else if (participant instanceof Contact) {
 

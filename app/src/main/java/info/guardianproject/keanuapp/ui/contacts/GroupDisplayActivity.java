@@ -560,6 +560,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             }
 
             mRecyclerView.getAdapter().notifyDataSetChanged();
+            ;
 
         }
         catch (Exception e)
@@ -582,15 +583,11 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
             View content = LayoutInflater.from(this).inflate(R.layout.group_member_operations, null);
 
-            // Populate the contact view part (nickname and avatar)
-            //
             MemberViewHolder h = new MemberViewHolder(content);
             String nickname = member.nickname;
-            if (TextUtils.isEmpty(nickname)) {
-                nickname = member.username.split("@")[0].split("\\.")[0];
-            } else {
-                nickname = nickname.split("@")[0].split("\\.")[0];
-            }
+            if (TextUtils.isEmpty(nickname))
+                nickname = member.username;
+
             h.line1.setText(nickname);
             h.line2.setText(member.username);
             if (member.affiliation != null && (member.affiliation.contentEquals("owner") || member.affiliation.contentEquals("admin"))) {
