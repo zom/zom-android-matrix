@@ -77,7 +77,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
     }
 
     @Override
-    public synchronized ChatSession createChatSession(final ImEntity participant, boolean isNewSession) {
+    public ChatSession createChatSession(final ImEntity participant, boolean isNewSession) {
         ChatSession session = super.createChatSession(participant, isNewSession);
 
         Room room =  mRoomMap.get(participant.getAddress().getAddress());
@@ -150,13 +150,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
         if (room == null)
         {
-            if (userId.startsWith("@"))
-            {
-                createOneToOneRoom(userId);
-            }
-            else {
-                room = mDataHandler.getRoom(userId);
-            }
+            room = mDataHandler.getRoom(userId);
 
             if (room != null)
                 mRoomMap.put(userId,room);
@@ -428,9 +422,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
     private void createOneToOneRoom (final String contactId)
     {
 
-        final MatrixAddress addr = new MatrixAddress(contactId);
-
-        mSession.createDirectMessageRoom(addr.getUser(),new ApiCallback<String>() {
+        mSession.createDirectMessageRoom(contactId,new ApiCallback<String>() {
             @Override
             public void onNetworkError(Exception e) {
                 mConn.debug("createChatGroupAsync:onNetworkError: " + e);

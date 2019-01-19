@@ -103,6 +103,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     private static final int EVENT_SHOW_TOAST = 100;
 
     private static RemoteImService mImService;
+    private boolean isFirstTime = true;
 
     private StatusBarNotifier mStatusBarNotifier;
     private Handler mServiceHandler;
@@ -270,9 +271,10 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        startForeground(notifyId, getForegroundNotification());
-
-     //   mStatusBarNotifier.notifyError("System","Service onStartCommand!");
+        if (isFirstTime) {
+            startForeground(notifyId, getForegroundNotification());
+            isFirstTime = false;
+        }
 
         connectToCacheWord();
 

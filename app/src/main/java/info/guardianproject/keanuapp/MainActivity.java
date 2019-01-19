@@ -937,7 +937,7 @@ public class MainActivity extends BaseActivity {
 
                     IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
 
-                    String roomSubject = null;
+                   String roomSubject = null;
 
                     if (params.length > 0)
                         roomSubject = params[0];
@@ -947,7 +947,7 @@ public class MainActivity extends BaseActivity {
                     if (invitees != null)
                         aInvitees = invitees.toArray(new String[invitees.size()]);
 
-                    manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, new IChatSessionListener(){
+                    manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, new IChatSessionListener() {
 
                         @Override
                         public IBinder asBinder() {
@@ -957,10 +957,12 @@ public class MainActivity extends BaseActivity {
                         @Override
                         public void onChatSessionCreated(IChatSession session) throws RemoteException {
                             session.useEncryption(true);
-                            session.setLastMessage("New room created");
+                            session.setLastMessage(" ");
                             Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
                             intent.putExtra("id", session.getId());
-                            intent.putExtra("isNew",true);
+
+                            boolean isEmptyGroup = invitees == null || invitees.size() == 0;
+                            intent.putExtra("isNew", isEmptyGroup);
                             startActivity(intent);
                         }
 
@@ -969,6 +971,7 @@ public class MainActivity extends BaseActivity {
 
                         }
                     });
+
 
                     return null;
 

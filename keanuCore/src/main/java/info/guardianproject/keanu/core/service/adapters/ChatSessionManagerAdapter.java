@@ -78,7 +78,7 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
         return mConnection.getAdaptee().getChatSessionManager();
     }
 
-    public IChatSession createChatSession(String contactAddress, boolean isNewSession) {
+    public IChatSession createChatSession(String contactAddress, boolean isNewSession, IChatSessionListener listener) {
 
         ContactListManagerAdapter listManager = (ContactListManagerAdapter) mConnection
                 .getContactListManager();
@@ -89,8 +89,17 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
             contact = new Contact (new BaseAddress(contactAddress));
 
         ChatSession session = getChatSessionManager().createChatSession(contact, isNewSession);
-        if (session != null)
-            return getChatSessionAdapter(session, isNewSession);
+
+
+        if (session != null) {
+            ChatSessionAdapter csa = getChatSessionAdapter(session, isNewSession);
+            try {
+                listener.onChatSessionCreated(csa);
+            } catch (RemoteException e) {
+                Log.e(getClass().getName(),"error creating session",e);
+            }
+            return csa;
+        }
         else
             return null;
 
@@ -102,7 +111,12 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
         try
         {
             ChatGroupManager groupMan = mConnection.getAdaptee().getChatGroupManager();
-            ChatGroup group = groupMan.createChatGroupAsync(roomAddress, subject, nickname, new IChatSessionListener() {
+
+            boolean isDirect = invitees != null && invitees.length == 1;
+            if (isDirect)
+                subject = invitees[0];
+
+            groupMan.createChatGroupAsync(subject, isDirect, new IChatSessionListener() {
                 @Override
                 public void onChatSessionCreated(IChatSession session) throws RemoteException {
 

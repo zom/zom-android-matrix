@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.text.TextUtils;
@@ -42,9 +43,11 @@ import java.util.UUID;
 
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImConnection;
+import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.ImServiceConstants;
@@ -347,16 +350,31 @@ public class ImUrlActivity extends Activity {
             IChatSessionManager manager = mConn.getChatSessionManager();
             IChatSession session = manager.getChatSession(mToAddress);
             if (session == null) {
-                session = manager.createChatSession(mToAddress,false);
+                manager.createChatSession(mToAddress, false, new IChatSessionListener() {
+                    @Override
+                    public void onChatSessionCreated(IChatSession session) throws RemoteException {
+                        Uri data = ContentUris.withAppendedId(Imps.Chats.CONTENT_URI, session.getId());
+                        Intent intent = new Intent(Intent.ACTION_VIEW, data);
+                        intent.putExtra(ImServiceConstants.EXTRA_INTENT_FROM_ADDRESS, mToAddress);
+                        intent.putExtra(ImServiceConstants.EXTRA_INTENT_PROVIDER_ID, provider);
+                        intent.putExtra(ImServiceConstants.EXTRA_INTENT_ACCOUNT_ID, account);
+                        intent.addCategory(IMPS_CATEGORY);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                    }
+
+                    @Override
+                    public IBinder asBinder() {
+                        return null;
+                    }
+                });
             }
 
-            Uri data = ContentUris.withAppendedId(Imps.Chats.CONTENT_URI, session.getId());
-            Intent intent = new Intent(Intent.ACTION_VIEW, data);
-            intent.putExtra(ImServiceConstants.EXTRA_INTENT_FROM_ADDRESS, mToAddress);
-            intent.putExtra(ImServiceConstants.EXTRA_INTENT_PROVIDER_ID, provider);
-            intent.putExtra(ImServiceConstants.EXTRA_INTENT_ACCOUNT_ID, account);
-            intent.addCategory(IMPS_CATEGORY);
-            startActivity(intent);
+
         } catch (RemoteException e) {
             // Ouch!  Service died!  We'll just disappear.
             Log.w("ImUrlActivity", "Connection disappeared!");
@@ -814,7 +832,22 @@ public class ImUrlActivity extends Activity {
                 IChatSession session = mChatSessionManager.getChatSession(username);
 
                 if (session == null)
-                    session = mChatSessionManager.createChatSession(username,false);
+                    session = mChatSessionManager.createChatSession(username, false, new IChatSessionListener() {
+                        @Override
+                        public void onChatSessionCreated(IChatSession session) throws RemoteException {
+
+                        }
+
+                        @Override
+                        public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                        }
+
+                        @Override
+                        public IBinder asBinder() {
+                            return null;
+                        }
+                    });
 
                 return session;
             } catch (RemoteException e) {

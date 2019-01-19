@@ -65,7 +65,22 @@ public class ChatSessionInitTask extends AsyncTask<Contact, Long, Long> {
                                 }
                             });
                         else {
-                            session = conn.getChatSessionManager().createChatSession(contact.getAddress().getAddress(), mIsNewSession);
+                            session = conn.getChatSessionManager().createChatSession(contact.getAddress().getAddress(), mIsNewSession, new IChatSessionListener() {
+                                @Override
+                                public void onChatSessionCreated(IChatSession session) throws RemoteException {
+
+                                }
+
+                                @Override
+                                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                                }
+
+                                @Override
+                                public IBinder asBinder() {
+                                    return null;
+                                }
+                            });
                         }
 
                     }

@@ -1805,7 +1805,22 @@ public class ConversationView {
                         {
                             //remoteAddress = Address.stripResource(mRemoteAddress);
 
-                            session = sessionMgr.createChatSession(remoteAddress,false);
+                            session = sessionMgr.createChatSession(remoteAddress, false, new IChatSessionListener() {
+                                @Override
+                                public void onChatSessionCreated(IChatSession session) throws RemoteException {
+
+                                }
+
+                                @Override
+                                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                                }
+
+                                @Override
+                                public IBinder asBinder() {
+                                    return null;
+                                }
+                            });
                         }
 
                         return session;
@@ -1834,7 +1849,22 @@ public class ConversationView {
                         IChatSession session = sessionMgr.getChatSession(mRemoteAddress);
 
                         if (session == null)
-                            sessionMgr.createChatSession(mRemoteAddress,false);
+                            sessionMgr.createChatSession(mRemoteAddress, false, new IChatSessionListener() {
+                                @Override
+                                public void onChatSessionCreated(IChatSession session) throws RemoteException {
+
+                                }
+
+                                @Override
+                                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                                }
+
+                                @Override
+                                public IBinder asBinder() {
+                                    return null;
+                                }
+                            });
                         
                         return session;
 

@@ -895,7 +895,27 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             IChatSession session = manager.getChatSession(mAddress);
 
             if (session == null)
-                session = manager.createChatSession(mAddress,true);
+                session = manager.createChatSession(mAddress, true, new IChatSessionListener() {
+                    @Override
+                    public void onChatSessionCreated(IChatSession session) throws RemoteException {
+                        session.leave();
+
+                        //clear the stack and go back to the main activity
+                        Intent intent = new Intent(GroupDisplayActivity.this, MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                    }
+
+                    @Override
+                    public IBinder asBinder() {
+                        return null;
+                    }
+                });
 
             if (session != null) {
                 session.leave();
