@@ -648,7 +648,7 @@ public class MatrixConnection extends ImConnection {
     {
         final PowerLevels powerLevels = room.getState().getPowerLevels();
 
-        room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
+        mDataHandler.getMembersAsync(room.getRoomId(), new ApiCallback<List<RoomMember>>() {
             @Override
             public void onNetworkError(Exception e) {
                 debug ("Network error syncing active members",e);

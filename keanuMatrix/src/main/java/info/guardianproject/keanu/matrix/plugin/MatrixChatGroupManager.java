@@ -335,15 +335,38 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     }
 
     @Override
-    public void inviteUserAsync(ChatGroup group, Contact invitee) {
+    public void inviteUserAsync(final ChatGroup group, Contact invitee) {
 
-        Room room = mDataHandler.getRoom(group.getAddress().getAddress());
+        final Room room = mDataHandler.getRoom(group.getAddress().getAddress());
 
         if (room != null ) {
 
-            room.invite(invitee.getAddress().getAddress(),new BasicApiCallback("InviteRoom"));
+            room.invite(invitee.getAddress().getAddress(), new ApiCallback<Void>() {
+                @Override
+                public void onNetworkError(Exception e) {
+
+                }
+
+                @Override
+                public void onMatrixError(MatrixError matrixError) {
+
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+
+                }
+
+                @Override
+                public void onSuccess(Void aVoid) {
+                    mConn.updateGroupMembers(room, group);
+
+                }
+            });
 
             mConn.updateGroupMembers(room, group);
+
+
         }
 
 

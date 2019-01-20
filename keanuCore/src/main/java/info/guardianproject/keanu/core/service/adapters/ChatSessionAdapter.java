@@ -301,8 +301,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         if (!mIsGroupChat) {
             return;
         }
-        ContactListManagerAdapter listManager = (ContactListManagerAdapter) mConnection
-                .getContactListManager();
         Contact invitee = new Contact(new BaseAddress(contact),contact,Imps.Contacts.TYPE_NORMAL);
         getGroupManager().inviteUserAsync((ChatGroup) mChatSession.getParticipant(), invitee);
 

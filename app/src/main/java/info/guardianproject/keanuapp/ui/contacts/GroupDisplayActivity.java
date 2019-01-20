@@ -560,7 +560,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             }
 
             mRecyclerView.getAdapter().notifyDataSetChanged();
-            ;
+
 
         }
         catch (Exception e)
@@ -696,7 +696,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 inviteContacts(invitees);
 
 
-                updateMembers();
+               // updateMembers();
             }
         }
     }
