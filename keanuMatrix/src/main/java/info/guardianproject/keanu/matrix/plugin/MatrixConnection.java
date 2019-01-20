@@ -666,48 +666,55 @@ public class MatrixConnection extends ImConnection {
             }
 
             @Override
-            public void onSuccess(List<RoomMember> roomMembers) {
+            public void onSuccess(final List<RoomMember> roomMembers) {
 
-                group.beginMemberUpdates();
-
-                for (RoomMember member : roomMembers)
-                {
-                    debug ( "RoomMember: " + room.getRoomId() + ": " + member.getName() + " (" + member.getUserId() + ")");
-
-                    Contact contact = mContactListManager.getContact(member.getUserId());
-
-                    if (contact == null) {
-                        if (member.getName() != null)
-                            contact = new Contact(new MatrixAddress(member.getUserId()), member.getName(), Imps.Contacts.TYPE_NORMAL);
-                        else
-                            contact = new Contact(new MatrixAddress(member.getUserId()));
-                    }
-
-                    if (roomMembers.size() == 2)
+                mExecutor.execute(new Runnable (){
+                    public void run ()
                     {
-                        if (!member.getUserId().equals(mDataHandler.getUserId()))
+                        group.beginMemberUpdates();
+
+                        for (RoomMember member : roomMembers)
                         {
-                            mContactListManager.saveContact(contact);
+                            debug ( "RoomMember: " + room.getRoomId() + ": " + member.getName() + " (" + member.getUserId() + ")");
+
+                            Contact contact = mContactListManager.getContact(member.getUserId());
+
+                            if (contact == null) {
+                                if (member.getName() != null)
+                                    contact = new Contact(new MatrixAddress(member.getUserId()), member.getName(), Imps.Contacts.TYPE_NORMAL);
+                                else
+                                    contact = new Contact(new MatrixAddress(member.getUserId()));
+                            }
+
+                            if (roomMembers.size() == 2)
+                            {
+                                if (!member.getUserId().equals(mDataHandler.getUserId()))
+                                {
+                                    mContactListManager.saveContact(contact);
+                                }
+                            }
+
+                            group.notifyMemberJoined(member.getUserId(), contact);
+
+                            if (powerLevels != null) {
+                                if (powerLevels.getUserPowerLevel(member.getUserId()) > powerLevels.invite)
+                                    group.notifyMemberRoleUpdate(contact, "moderator", "owner");
+                                else
+                                    group.notifyMemberRoleUpdate(contact, "member", "member");
+                            }
+
+                            String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(member.getUserId(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+
+                            if (!TextUtils.isEmpty(downloadUrl))
+                                downloadAvatar(member.getUserId(),downloadUrl);
+
                         }
+
+                        group.endMemberUpdates();
+
                     }
+                });
 
-                    group.notifyMemberJoined(member.getUserId(), contact);
-
-                    if (powerLevels != null) {
-                        if (powerLevels.getUserPowerLevel(member.getUserId()) > powerLevels.invite)
-                            group.notifyMemberRoleUpdate(contact, "moderator", "owner");
-                        else
-                            group.notifyMemberRoleUpdate(contact, "member", "member");
-                    }
-
-                    String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(member.getUserId(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
-
-                    if (!TextUtils.isEmpty(downloadUrl))
-                        downloadAvatar(member.getUserId(),downloadUrl);
-
-                }
-
-                group.endMemberUpdates();
 
             }
         });

@@ -47,6 +47,7 @@
             android:exported="false"
             android:grantUriPermissions="false" />
 
+        <!--
         <receiver
             android:name=".service.NetworkConnectivityReceiver"
             android:enabled="true"
@@ -54,7 +55,7 @@
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
-        </receiver>
+        </receiver>-->
         <receiver
             android:name=".service.BootCompletedReceiver"
             android:enabled="true"
@@ -64,12 +65,10 @@
             </intent-filter>
         </receiver>
 
-        <!--
         <service
             android:name=".service.NetworkSchedulerService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
-            -->
 
         <service
             android:name=".service.GeneralJobIntentService"

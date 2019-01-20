@@ -13,8 +13,6 @@ public class CacheWordManager {
 
     private ICachedSecrets mSecrets = null;
 
-    private Notification mNotification;
-    private PendingIntent mTimeoutIntent;
     private int mTimeout = CacheWordHandler.DEFAULT_TIMEOUT_SECONDS;
     private Intent mBroadcastIntent = new Intent(Constants.INTENT_NEW_SECRETS);
 
@@ -101,13 +99,7 @@ public class CacheWordManager {
         if (!SecretsManager.isInitialized(mContext)) {
             return;
         }
-        if (mNotification != null) {
-            mIsForegrounded = true;
-        } else {
-            if (mIsForegrounded) {
-                mIsForegrounded = false;
-            }
-        }
+
         resetTimeout();
 
     }
@@ -139,8 +131,5 @@ public class CacheWordManager {
 
     }
 
-    public void setNotification(Notification notification) {
-        mNotification = notification;
-    }
 
 }

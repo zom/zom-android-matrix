@@ -154,7 +154,7 @@ public class CacheWordHandler {
 
         mCacheWordService.attachSubscriber();
         mCacheWordService.setTimeout(mTimeout);
-        mCacheWordService.setNotification(mNotification);
+     //   mCacheWordService.setNotification(mNotification);
         mConnectionState = ServiceConnectionState.CONNECTION_ACTIVE;
         mBoundState = BindState.BIND_COMPLETED;
         checkCacheWordState();
@@ -325,16 +325,7 @@ public class CacheWordHandler {
         return mCacheWordService.getTimeout();
     }
 
-    /**
-     * Set the {@link Notification} used by {@link CacheWordService} when it
-     * runs as a foreground {@link Service}. If this is set to {@code null},
-     * then {@link CacheWordService} will run as a background {@link Service}.
-     *
-     * @param notification
-     */
-    public void setNotification(Notification notification) {
-        mNotification = notification;
-    }
+
 
     /**
      * Create a blank intent to start an instance of {@link CacheWordService}.

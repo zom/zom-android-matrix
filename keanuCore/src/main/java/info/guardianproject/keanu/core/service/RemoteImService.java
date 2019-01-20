@@ -18,6 +18,7 @@
 package info.guardianproject.keanu.core.service;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -194,6 +195,21 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             scheduleNetworkJob();
         }
 
+        enableHeartbeat ();
+
+    }
+
+    private void enableHeartbeat ()
+    {
+        Intent intentService = new Intent(this, RemoteImService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intentService, 0);
+        AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        Date now = new Date();
+
+        //start every 5 seconds
+        int timeInterval = 60;
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, now.getTime(), timeInterval*1000, pendingIntent);
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -234,16 +250,18 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             .setContentTitle(getString(R.string.app_name))
             .setSmallIcon(R.drawable.notify_app);
 
-        mNotifyBuilder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
-        mNotifyBuilder.setPriority(NotificationCompat.PRIORITY_MIN);
+      //  mNotifyBuilder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
+      //  mNotifyBuilder.setPriority(NotificationCompat.PRIORITY_MIN);
         mNotifyBuilder.setOngoing(true);
+        mNotifyBuilder.setAutoCancel(false);
         mNotifyBuilder.setWhen(System.currentTimeMillis());
-        
-        Intent notificationIntent = mStatusBarNotifier.getDefaultIntent(-1,-1);
-        PendingIntent launchIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, 0);
-        mNotifyBuilder.setContentIntent(launchIntent);
 
         mNotifyBuilder.setContentText(getString(R.string.app_unlocked));
+
+        Intent notificationIntent = mStatusBarNotifier.getDefaultIntent(-1,-1);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mNotifyBuilder.setContentIntent(contentIntent);
 
         Notification not = mNotifyBuilder.build();
         return not;
@@ -300,7 +318,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             mNeedCheckAutoLogin = !autoLogin();
         }
 
-        return START_STICKY_COMPATIBILITY;
+        return START_STICKY;
     }
 
 
@@ -457,12 +475,16 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
     @Override
     public void onDestroy() {
+    //    mStatusBarNotifier.notifyError("System", "onDestory()");
+
         shutdown();
     }
 
     private void shutdown ()
     {
         Debug.recordTrail(this, SERVICE_DESTROY_TRAIL_TAG, new Date());
+
+      //  mStatusBarNotifier.notifyError("System", "shutdown init!");
 
      //   HeartbeatService.stopBeating(getApplicationContext());
         stopService(new Intent(this, NetworkSchedulerService.class));
