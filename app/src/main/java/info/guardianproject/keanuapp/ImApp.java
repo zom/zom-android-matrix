@@ -97,7 +97,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
     public static ImApp sImApp;
 
-    private static IRemoteImService mImService;
+  //  private static IRemoteImService mImService;
 
     MyConnListener mConnectionListener;
 
@@ -281,11 +281,11 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         Configuration config = getResources().getConfiguration();
         getResources().updateConfiguration(config, getResources().getDisplayMetrics());
 
-        if (mImService != null)
+        if (RemoteImService.mImService != null)
         {
             boolean debugOn = settings.getBoolean("prefDebug", false);
             try {
-                mImService.enableDebugLogging(debugOn);
+                RemoteImService.mImService.enableDebugLogging(debugOn);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -339,7 +339,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
     public boolean hasActiveConnections ()
     {
         try {
-            return !mImService.getActiveConnections().isEmpty();
+            return !RemoteImService.mImService.getActiveConnections().isEmpty();
         }
         catch (RemoteException re)
         {
@@ -367,16 +367,13 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
             log("stop ImService");
 
         try {
-            if (mImService != null)
-                mImService.shutdownAndLock();
+            if (RemoteImService.mImService != null)
+                RemoteImService.mImService.shutdownAndLock();
         }
         catch (RemoteException re)
         {
 
         }
-
-        mImService = null;
-
 
 
         Intent serviceIntent = new Intent(this, RemoteImService.class);
@@ -420,7 +417,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
     };**/
 
     public boolean serviceConnected() {
-        return mImService != null;
+        return RemoteImService.mImService != null;
     }
 
     public static long insertOrUpdateAccount(ContentResolver cr, long providerId, long accountId, String nickname, String username,
@@ -474,7 +471,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
     public Collection<IImConnection> getActiveConnections() {
 
         try {
-            return mImService.getActiveConnections();
+            return RemoteImService.mImService.getActiveConnections();
         }
         catch (RemoteException re)
         {
@@ -560,18 +557,18 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
     }
 
     public void dismissChatNotification(long providerId, String username) {
-        if (mImService != null) {
+        if (RemoteImService.mImService != null) {
             try {
-                mImService.dismissChatNotification(providerId, username);
+                RemoteImService.mImService.dismissChatNotification(providerId, username);
             } catch (RemoteException e) {
             }
         }
     }
 
     public void dismissNotification(long providerId) {
-        if (mImService != null) {
+        if (RemoteImService.mImService != null) {
             try {
-                mImService.dismissNotifications(providerId);
+                RemoteImService.mImService.dismissNotifications(providerId);
             } catch (RemoteException e) {
             }
         }

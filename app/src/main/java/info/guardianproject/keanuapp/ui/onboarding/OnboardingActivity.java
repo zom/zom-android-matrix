@@ -166,6 +166,9 @@ public class OnboardingActivity extends BaseActivity {
             }
         });
 
+        mSpinnerDomains.setText(Server.getServersText(OnboardingActivity.this)[0]);
+
+
         mSpinnerDomains.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 mDomainList.show();

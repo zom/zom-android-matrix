@@ -110,8 +110,9 @@ android:paddingTop="40dp"
             android:layout_marginTop="20dp"
             android:textColor="?messageTextPrimary"
             android:inputType="textFilter|textNoSuggestions"
-
+            android:visibility="gone"
             />
+
         <info.guardianproject.keanu.core.type.CustomTypefaceTextView
             android:id="@+id/statusError"
             android:layout_width="wrap_content"

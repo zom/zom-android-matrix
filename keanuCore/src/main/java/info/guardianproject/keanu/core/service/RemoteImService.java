@@ -102,7 +102,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
     private static final int EVENT_SHOW_TOAST = 100;
 
-    private static RemoteImService mImService;
+    public static IRemoteImService mImService;
     private boolean isFirstTime = true;
 
     private StatusBarNotifier mStatusBarNotifier;
@@ -147,7 +147,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     public void onCreate() {
         debug("ImService started");
 
-        mImService = this;
+        mImService = mBinder;
 
         mStatusBarNotifier = new StatusBarNotifier(this);
         mServiceHandler = new ServiceHandler();
@@ -239,9 +239,9 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         mNotifyBuilder.setOngoing(true);
         mNotifyBuilder.setWhen(System.currentTimeMillis());
         
-        //Intent notificationIntent = mStatusBarNotifier.getDefaultIntent(-1,-1);
-        //PendingIntent launchIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, 0)
-        //mNotifyBuilder.setContentIntent(launchIntent);
+        Intent notificationIntent = mStatusBarNotifier.getDefaultIntent(-1,-1);
+        PendingIntent launchIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, 0);
+        mNotifyBuilder.setContentIntent(launchIntent);
 
         mNotifyBuilder.setContentText(getString(R.string.app_unlocked));
 
@@ -975,7 +975,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             return null;
         }
 
-        IImConnection conn = mImService.mBinder.createConnection(providerId, accountId);
+        IImConnection conn = mImService.createConnection(providerId, accountId);
 
         return conn;
     }
@@ -988,7 +988,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                 throw new RuntimeException("getConnection() needs valid values: " + providerId + "," + accountId);
 
             if (mImService != null) {
-                IImConnection im = mImService.mBinder.getConnection(providerId, accountId);
+                IImConnection im = mImService.getConnection(providerId, accountId);
 
                 if (im != null) {
 

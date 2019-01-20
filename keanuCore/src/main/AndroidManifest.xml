@@ -64,10 +64,12 @@
             </intent-filter>
         </receiver>
 
+        <!--
         <service
             android:name=".service.NetworkSchedulerService"
             android:exported="true"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+            -->
 
         <service
             android:name=".service.GeneralJobIntentService"

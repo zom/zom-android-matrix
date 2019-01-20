@@ -223,32 +223,14 @@ public class AccountAdapter extends CursorAdapter implements AccountListItem.Sig
         if (accountId <= 0) {
             return;
         }
-        Cursor cursor = getCursor();
 
-        if (cursor == null || cursor.isClosed()) {
-            Log.w(getClass().getName(),"unable to sign in, since cursor is closed");
-            return;
-        }
-
-        cursor.moveToFirst();
-        while (!cursor.isAfterLast())
-        {
-            long cAccountId = cursor.getLong(ACTIVE_ACCOUNT_ID_COLUMN);
-
-            if (cAccountId == accountId)
-                break;
-
-            cursor.moveToNext();
-        }
+        String password = Imps.Account.getPassword(mContext.getContentResolver(), accountId);
 
         // Remember that the user signed in.
         setKeepSignedIn(accountId, true);
 
-        String password = cursor.getString(ACTIVE_ACCOUNT_PW_COLUMN);
-
         new SignInHelper(mActivity, sHandler).signIn(password, providerId, accountId, true);
 
-        cursor.moveToPosition(-1);
     }
 
 
