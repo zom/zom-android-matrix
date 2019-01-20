@@ -102,8 +102,11 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         if (isDirect)
         {
             List<String> rooms = mDataHandler.getDirectChatRoomIdsList(subject);
+
             if (rooms != null && rooms.size() > 0)
             {
+                //found an existing room!
+
                 Room room = mDataHandler.getRoom(rooms.get(0));
                 room.join(new BasicApiCallback("join room"));
                 room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
@@ -125,6 +128,8 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                         e.printStackTrace();
                     }
                 }
+
+                return;
             }
 
             mSession.createDirectMessageRoom(subject, new ApiCallback<String>() {
