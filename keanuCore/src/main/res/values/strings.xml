@@ -616,6 +616,6 @@
     <string name="pref_enable_proof_mode_title">Photo Verification</string>
     <string name="pref_enable_proof_mode_summary">Add extra proof data to your photos to make it easier for people to verify the authenticity</string>
     <string name="login_info">You can use an existing account on any server you would like.</string>
-    <string name="is_inviting_you">is inviting you to Zom:</string>
+    <string name="is_inviting_you">is inviting you to connect:</string>
 
 </resources>

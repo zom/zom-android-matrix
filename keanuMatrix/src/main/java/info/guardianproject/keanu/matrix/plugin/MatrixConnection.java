@@ -312,8 +312,6 @@ public class MatrixConnection extends ImConnection {
         mLoginRestClient = new LoginRestClient(mConfig);
 
 
-
-
     }
 
     private void loginAsync (String password)
