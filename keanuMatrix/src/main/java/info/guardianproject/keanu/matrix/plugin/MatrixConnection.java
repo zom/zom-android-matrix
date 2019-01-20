@@ -337,45 +337,54 @@ public class MatrixConnection extends ImConnection {
                 mCredentials = credentials;
                 mCredentials.deviceId = mDeviceId;
                 mConfig.setCredentials(mCredentials);
-                mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
-                        .withFileEncryption(enableEncryption)
-                        .build();
 
-                mChatGroupManager.setSession(mSession);
-                mChatSessionManager.setSession(mSession);
+                mExecutor.execute(new Runnable ()
+                {
+                    public void run ()
+                    {
+                        mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
+                                .withFileEncryption(enableEncryption)
+                                .build();
 
-                mSession.startEventStream(initialToken);
-                setState(LOGGED_IN, null);
-                mSession.setIsOnline(true);
+                        mChatGroupManager.setSession(mSession);
+                        mChatSessionManager.setSession(mSession);
 
-                mSession.enableCrypto(true, new ApiCallback<Void>() {
-                    @Override
-                    public void onNetworkError(Exception e) {
-                            debug("getCrypto().start.onNetworkError",e);
+                        mSession.startEventStream(initialToken);
+                        setState(LOGGED_IN, null);
+                        mSession.setIsOnline(true);
 
-                    }
+                        mSession.enableCrypto(true, new ApiCallback<Void>() {
+                            @Override
+                            public void onNetworkError(Exception e) {
+                                debug("getCrypto().start.onNetworkError",e);
 
-                    @Override
-                    public void onMatrixError(MatrixError matrixError) {
-                        debug("getCrypto().start.onMatrixError",matrixError);
+                            }
 
-                    }
+                            @Override
+                            public void onMatrixError(MatrixError matrixError) {
+                                debug("getCrypto().start.onMatrixError",matrixError);
 
-                    @Override
-                    public void onUnexpectedError(Exception e) {
-                        debug("getCrypto().start.onUnexpectedError",e);
+                            }
 
-                    }
+                            @Override
+                            public void onUnexpectedError(Exception e) {
+                                debug("getCrypto().start.onUnexpectedError",e);
 
-                    @Override
-                    public void onSuccess(Void aVoid) {
+                            }
 
-                        debug("getCrypto().start.onSuccess");
+                            @Override
+                            public void onSuccess(Void aVoid) {
 
-                        mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
-                        loadStateAsync();
+                                debug("getCrypto().start.onSuccess");
+
+                                mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
+                                loadStateAsync();
+                            }
+                        });
                     }
                 });
+
+
 
             }
 
