@@ -304,12 +304,15 @@ public class MatrixConnection extends ImConnection {
 
         mDataHandler = new MXDataHandler(mStore, mCredentials);
         mDataHandler.addListener(mEventListener);
+        mDataHandler.setLazyLoadingEnabled(true);
+
         mStore.setDataHandler(mDataHandler);
 
         mChatSessionManager.setDataHandler(mDataHandler);
         mChatGroupManager.setDataHandler(mDataHandler);
 
         mLoginRestClient = new LoginRestClient(mConfig);
+
 
 
     }
@@ -1480,15 +1483,19 @@ public class MatrixConnection extends ImConnection {
         {
             public void run ()
             {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                try {
-                    new Downloader().get(url,baos);
+                boolean hasAvatar = DatabaseUtils.doesAvatarHashExist(mContext.getContentResolver(),Imps.Avatars.CONTENT_URI,address,url);
 
-                    if (baos != null && baos.size() > 0)
-                        setAvatar(address, baos.toByteArray());
+                if (!hasAvatar) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        new Downloader().get(url, baos);
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                        if (baos != null && baos.size() > 0)
+                            setAvatar(address, baos.toByteArray(), url);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
@@ -1501,12 +1508,10 @@ public class MatrixConnection extends ImConnection {
         return DatabaseUtils.hasAvatarContact(mContext.getContentResolver(),Imps.Avatars.CONTENT_URI,address);
     }
 
-    private void setAvatar(String address, byte[] avatarBytesCompressed) {
+    private void setAvatar(String address, byte[] avatarBytesCompressed, String avatarHash) {
 
         try {
 
-
-            String avatarHash = "nohash";
             int rowsUpdated = DatabaseUtils.updateAvatarBlob(mContext.getContentResolver(), Imps.Avatars.CONTENT_URI, avatarBytesCompressed, address);
 
             if (rowsUpdated <= 0)
