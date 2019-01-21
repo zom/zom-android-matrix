@@ -99,6 +99,7 @@ import info.guardianproject.keanu.core.util.DatabaseUtils;
 import info.guardianproject.keanu.core.util.Downloader;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.core.util.UploadProgressListener;
+import info.guardianproject.keanu.matrix.R;
 
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_WIDTH;
@@ -991,7 +992,7 @@ public class MatrixConnection extends ImConnection {
                 participant.setJoined(false);
                 ChatSession session = mChatSessionManager.createChatSession(participant, true);
                 ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
-                csa.setLastMessage(" ");
+                csa.setLastMessage(mContext.getString(R.string.room_invited));
 
             }
             else if (room.isMember() && room.getNumberOfMembers() > 1)
@@ -1494,7 +1495,7 @@ public class MatrixConnection extends ImConnection {
                             setAvatar(address, baos.toByteArray(), url);
 
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        debug("downloadAvatar error",e);
                     }
                 }
             }
