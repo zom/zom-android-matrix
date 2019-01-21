@@ -46,8 +46,6 @@
             android:directBootAware="true"
             android:exported="false"
             android:grantUriPermissions="false" />
-
-        <!--
         <receiver
             android:name=".service.NetworkConnectivityReceiver"
             android:enabled="true"
@@ -55,7 +53,7 @@
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
-        </receiver>-->
+        </receiver>
         <receiver
             android:name=".service.BootCompletedReceiver"
             android:enabled="true"
