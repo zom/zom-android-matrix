@@ -304,7 +304,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
             if (ImServiceConstants.EXTRA_CHECK_SHUTDOWN.equals((intent.getAction())))
             {
-                shutdown();
+                //                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              shutdown();
                 stopSelf();
             }
 
@@ -477,17 +477,18 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     public void onDestroy() {
     //    mStatusBarNotifier.notifyError("System", "onDestory()");
 
-        shutdown();
+//        shutdown();
     }
 
+    /**
     private void shutdown ()
     {
-        Debug.recordTrail(this, SERVICE_DESTROY_TRAIL_TAG, new Date());
+     //   Debug.recordTrail(this, SERVICE_DESTROY_TRAIL_TAG, new Date());
 
       //  mStatusBarNotifier.notifyError("System", "shutdown init!");
 
      //   HeartbeatService.stopBeating(getApplicationContext());
-        stopService(new Intent(this, NetworkSchedulerService.class));
+       // stopService(new Intent(this, NetworkSchedulerService.class));
 
         debug("ImService stopped.");
         for (ImConnectionAdapter conn : mConnections.values()) {
@@ -499,8 +500,6 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
         stopForeground(true);
 
-         /* ignore unmount errors and quit ASAP. Threads actively using the VFS will
-             * cause IOCipher's VirtualFileSystem.unmount() to throw an IllegalStateException */
         try {
             if (SecureMediaStore.isMounted())
                 SecureMediaStore.unmount();
@@ -514,7 +513,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         }
 
 
-    }
+    }**/
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -862,7 +861,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         @Override
         public void shutdownAndLock ()
         {
-            shutdown();
+           // shutdown();
         }
     };
 
@@ -886,6 +885,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
 
 
+    /**
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void onTaskRemoved(Intent rootIntent) {
@@ -895,7 +895,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         if (Build.VERSION.SDK_INT >= 11)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-    }
+    }**/
 
 
     private void connectToCacheWord ()
