@@ -89,7 +89,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/ic_launcher_name"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon,android:allowBackup,android:label">
+        tools:replace="android:icon,android:allowBackup,android:label"
+        android:largeHeap="true"
+        >
 
         <activity
             android:name=".RouterActivity"
@@ -97,60 +99,11 @@
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
                 <action android:name="info.guardianproject.panic.action.TRIGGER" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SENDTO" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="info.guardianproject.otr.app.im.category.XMPP" />
-
-                <data android:scheme="im" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SENDTO" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data
-                    android:host="xmpp"
-                    android:scheme="imto" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SENDTO" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data
-                    android:host="jabber"
-                    android:scheme="imto" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SENDTO" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="immu" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.INSERT" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="ima" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.SENDTO" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="otr-in-band" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
@@ -167,8 +120,9 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.DEFAULT" />
 
-                <data android:scheme="xmpp" />
-                <data android:scheme="im" />
+                <data android:scheme="keanu" />
+                <data android:scheme="matrix" />
+
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -178,6 +132,18 @@
 
                 <data
                     android:host="matrix.org"
+                    android:pathPrefix="/i/"
+                    android:scheme="https" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="keanu.im"
                     android:pathPrefix="/i/"
                     android:scheme="https" />
             </intent-filter>

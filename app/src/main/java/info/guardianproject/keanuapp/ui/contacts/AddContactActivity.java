@@ -86,6 +86,7 @@ import info.guardianproject.keanuapp.ui.legacy.SimpleAlertHandler;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingActivity;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
 
+import static android.view.Gravity.CENTER_HORIZONTAL;
 import static info.guardianproject.keanu.core.KeanuConstants.IMPS_CATEGORY;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
@@ -505,15 +506,19 @@ public class AddContactActivity extends BaseActivity {
             mDomainList = new ListPopupWindow(this);
 
         HashMap<String, String> suggestions = new HashMap<>();
-        for (Contact contact : contacts)
-            suggestions.put(contact.getAddress().getAddress(), contact.getName() + " (" + contact.getAddress().getAddress() + ")");
+        for (Contact contact : contacts) {
+            suggestions.put(contact.getAddress().getAddress(), contact.getAddress().getUser());
+        }
+
+        final String[] sorted = suggestions.values().toArray(new String[suggestions.size()]);
 
         mDomainList.setAdapter(new ArrayAdapter(
                 this,
-                android.R.layout.simple_dropdown_item_1line, suggestions.values().toArray()));
+                android.R.layout.simple_dropdown_item_1line,sorted));
         mDomainList.setAnchorView(mNewAddress);
         mDomainList.setWidth(ListPopupWindow.WRAP_CONTENT);
-        mDomainList.setHeight(400);
+        mDomainList.setHeight(ListPopupWindow.WRAP_CONTENT);
+        mDomainList.setDropDownGravity(CENTER_HORIZONTAL);
 
         mDomainList.setModal(false);
         mDomainList.show();
@@ -521,7 +526,7 @@ public class AddContactActivity extends BaseActivity {
         mDomainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mNewAddress.setText(contacts[position].getAddress().getAddress());
+                mNewAddress.setText(sorted[position]);
                 mDomainList.dismiss();
             }
         });
@@ -548,7 +553,7 @@ public class AddContactActivity extends BaseActivity {
                     mDomainList.dismiss();
 
                 String searchString = mNewAddress.getText().toString();
-                if (searchString.length() > 3) {
+                if (searchString.length() > 1) {
                     mConn.searchForUser(mNewAddress.getText().toString(), new IContactListListener() {
                         @Override
                         public void onContactChange(int type, IContactList list, Contact contact) throws RemoteException {
@@ -564,7 +569,6 @@ public class AddContactActivity extends BaseActivity {
                         public void onContactsPresenceUpdate(Contact[] contacts) throws RemoteException {
 
                             if (contacts != null && contacts.length > 0) {
-
 
                                 showUserSuggestions(contacts);
                             }
@@ -604,20 +608,22 @@ public class AddContactActivity extends BaseActivity {
                 {
 
                     try {
-                        if (resultScan.startsWith("xmpp:"))
+                        if (resultScan.startsWith("keanu://"))
                         {
-                            String address = XmppUriHelper.parse(Uri.parse(resultScan)).get(XmppUriHelper.KEY_ADDRESS);
-                            String fingerprint =  XmppUriHelper.getOtrFingerprint(resultScan);
+                            List<String> params = Uri.parse(resultScan).getQueryParameters("id");
 
-                            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(address, fingerprint);
+                            if (params.size() > 0) {
+                                String address = params.get(0);
 
-                            Intent intent=new Intent();
-                            intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, address);
-                            intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER, mApp.getDefaultProviderId());
-                            intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT, mApp.getDefaultAccountId());
+                                new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(address, null);
 
-                            setResult(RESULT_OK, intent);
+                                Intent intent = new Intent();
+                                intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, address);
+                                intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER, mApp.getDefaultProviderId());
+                                intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT, mApp.getDefaultAccountId());
 
+                                setResult(RESULT_OK, intent);
+                            }
                         }
                         else {
                             //parse each string and if they are for a new user then add the user

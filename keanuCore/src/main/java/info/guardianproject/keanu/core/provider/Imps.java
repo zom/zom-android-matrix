@@ -1943,7 +1943,7 @@ public class Imps {
                 ProviderSettings.setXmppResource(mContentResolver, mProviderId, resource);
             }
 
-            public String getDeviceName() {
+            public synchronized String getDeviceName() {
                 String currentResource = getString(XMPP_RESOURCE, DEFAULT_DEVICE_NAME);
                 String defaultResource;
                 if (currentResource.equals(DEFAULT_DEVICE_NAME)) {

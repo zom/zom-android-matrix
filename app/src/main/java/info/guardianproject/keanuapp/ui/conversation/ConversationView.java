@@ -843,14 +843,15 @@ public class ConversationView {
 
         });
 
+        /**
         mActivity.findViewById(R.id.btnAttachFile).setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                mActivity.startFilePicker("*/*");
+                mActivity.startFilePicker("*");
             }
 
-        });
+        });**/
 
         mActivity.findViewById(R.id.btnAttachSticker).setOnClickListener(new View.OnClickListener() {
 
@@ -1466,11 +1467,6 @@ public class ConversationView {
             } else {
                 if (mRemoteNickname == null)
                     mRemoteNickname = name;
-                try {
-                    mRemoteNickname = mRemoteNickname.split("@")[0].split("\\.")[0];
-                } catch (Exception e) {
-                    //handle glitches in unicode nicknames
-                }
             }
 
             return true;
@@ -1488,15 +1484,7 @@ public class ConversationView {
         mCurrentChatSession = getChatSession();
 
         if (mCurrentChatSession == null)
-            mCurrentChatSession = createChatSession();
-
-        if (mCurrentChatSession != null) {
-            try {
-                showContactName = mCurrentChatSession.getParticipants().length > 2;
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-        }
+            createChatSession();
 
         mHandler.post(mUpdateChatCallback);
 
@@ -1766,7 +1754,7 @@ public class ConversationView {
         return mLastChatId;
     }
 
-    private IChatSession createChatSession() {
+    private void createChatSession() {
 
         try
         {
@@ -1775,40 +1763,23 @@ public class ConversationView {
             if (mConn != null) {
                     IChatSessionManager sessionMgr = mConn.getChatSessionManager();
                     if (sessionMgr != null) {
+                        sessionMgr.createChatSession(mRemoteAddress, false, new IChatSessionListener() {
+                            @Override
+                            public void onChatSessionCreated(IChatSession session) throws RemoteException {
+                                mCurrentChatSession = session;
+                            }
 
-                        String remoteAddress = mRemoteAddress;
-                        IChatSession session = null;
+                            @Override
+                            public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
 
-                        if ((mContactType & Imps.Contacts.TYPE_MASK) == Imps.Contacts.TYPE_GROUP)
-                        {
-                            sessionMgr.createMultiUserChatSession(mRemoteAddress, mRemoteNickname, null, false, null, new IChatSessionListener() {
-                                @Override
-                                public void onChatSessionCreated(IChatSession session) throws RemoteException {
+                            }
 
-                                    mCurrentChatSession = session;
-                                }
+                            @Override
+                            public IBinder asBinder() {
+                                return null;
+                            }
+                        });
 
-                                @Override
-                                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
-
-                                }
-
-                                @Override
-                                public IBinder asBinder() {
-                                    return null;
-                                }
-                            });
-
-
-                        }
-                        else
-                        {
-                            //remoteAddress = Address.stripResource(mRemoteAddress);
-
-                            session = sessionMgr.createChatSession(remoteAddress,false);
-                        }
-
-                        return session;
 
                     }
             }
@@ -1819,7 +1790,6 @@ public class ConversationView {
             LogCleaner.error(LOG_TAG, "issue getting chat session", e);
         }
 
-        return null;
     }
 
     public IChatSession getChatSession() {
@@ -1834,7 +1804,22 @@ public class ConversationView {
                         IChatSession session = sessionMgr.getChatSession(mRemoteAddress);
 
                         if (session == null)
-                            sessionMgr.createChatSession(mRemoteAddress,false);
+                            sessionMgr.createChatSession(mRemoteAddress, false, new IChatSessionListener() {
+                                @Override
+                                public void onChatSessionCreated(IChatSession session) throws RemoteException {
+
+                                }
+
+                                @Override
+                                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                                }
+
+                                @Override
+                                public IBinder asBinder() {
+                                    return null;
+                                }
+                            });
                         
                         return session;
 
@@ -1978,9 +1963,8 @@ public class ConversationView {
         IChatSession session = getChatSession();
 
         if (session == null)
-            session = createChatSession();
-
-        if (session != null) {
+            createChatSession();
+        else {
             try {
                 session.sendMessage(msg, isResend);
                 return true;

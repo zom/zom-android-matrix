@@ -18,6 +18,7 @@
 package info.guardianproject.keanu.core.service;
 
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -102,7 +103,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
     private static final int EVENT_SHOW_TOAST = 100;
 
-    private static RemoteImService mImService;
+    public static IRemoteImService mImService;
+    private boolean isFirstTime = true;
 
     private StatusBarNotifier mStatusBarNotifier;
     private Handler mServiceHandler;
@@ -146,7 +148,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     public void onCreate() {
         debug("ImService started");
 
-        mImService = this;
+        mImService = mBinder;
 
         mStatusBarNotifier = new StatusBarNotifier(this);
         mServiceHandler = new ServiceHandler();
@@ -193,6 +195,21 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             scheduleNetworkJob();
         }
 
+        enableHeartbeat ();
+
+    }
+
+    private void enableHeartbeat ()
+    {
+        Intent intentService = new Intent(this, RemoteImService.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, intentService, 0);
+        AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+        Date now = new Date();
+
+        //start every 5 seconds
+        int timeInterval = 60;
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, now.getTime(), timeInterval*1000, pendingIntent);
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -233,16 +250,18 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             .setContentTitle(getString(R.string.app_name))
             .setSmallIcon(R.drawable.notify_app);
 
-        mNotifyBuilder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
-        mNotifyBuilder.setPriority(NotificationCompat.PRIORITY_MIN);
+      //  mNotifyBuilder.setVisibility(NotificationCompat.VISIBILITY_PRIVATE);
+      //  mNotifyBuilder.setPriority(NotificationCompat.PRIORITY_MIN);
         mNotifyBuilder.setOngoing(true);
+        mNotifyBuilder.setAutoCancel(false);
         mNotifyBuilder.setWhen(System.currentTimeMillis());
-        
-        //Intent notificationIntent = mStatusBarNotifier.getDefaultIntent(-1,-1);
-        //PendingIntent launchIntent = PendingIntent.getActivity(getApplicationContext(), 0, notificationIntent, 0)
-        //mNotifyBuilder.setContentIntent(launchIntent);
 
         mNotifyBuilder.setContentText(getString(R.string.app_unlocked));
+
+        Intent notificationIntent = mStatusBarNotifier.getDefaultIntent(-1,-1);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+                notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mNotifyBuilder.setContentIntent(contentIntent);
 
         Notification not = mNotifyBuilder.build();
         return not;
@@ -270,9 +289,10 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        startForeground(notifyId, getForegroundNotification());
-
-     //   mStatusBarNotifier.notifyError("System","Service onStartCommand!");
+        if (isFirstTime) {
+            startForeground(notifyId, getForegroundNotification());
+            isFirstTime = false;
+        }
 
         connectToCacheWord();
 
@@ -284,7 +304,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
             if (ImServiceConstants.EXTRA_CHECK_SHUTDOWN.equals((intent.getAction())))
             {
-                shutdown();
+                //                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              shutdown();
                 stopSelf();
             }
 
@@ -298,7 +318,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             mNeedCheckAutoLogin = !autoLogin();
         }
 
-        return START_STICKY_COMPATIBILITY;
+        return START_STICKY;
     }
 
 
@@ -455,15 +475,20 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
     @Override
     public void onDestroy() {
-        shutdown();
+    //    mStatusBarNotifier.notifyError("System", "onDestory()");
+
+//        shutdown();
     }
 
+    /**
     private void shutdown ()
     {
-        Debug.recordTrail(this, SERVICE_DESTROY_TRAIL_TAG, new Date());
+     //   Debug.recordTrail(this, SERVICE_DESTROY_TRAIL_TAG, new Date());
+
+      //  mStatusBarNotifier.notifyError("System", "shutdown init!");
 
      //   HeartbeatService.stopBeating(getApplicationContext());
-        stopService(new Intent(this, NetworkSchedulerService.class));
+       // stopService(new Intent(this, NetworkSchedulerService.class));
 
         debug("ImService stopped.");
         for (ImConnectionAdapter conn : mConnections.values()) {
@@ -475,8 +500,6 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
         stopForeground(true);
 
-         /* ignore unmount errors and quit ASAP. Threads actively using the VFS will
-             * cause IOCipher's VirtualFileSystem.unmount() to throw an IllegalStateException */
         try {
             if (SecureMediaStore.isMounted())
                 SecureMediaStore.unmount();
@@ -490,7 +513,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         }
 
 
-    }
+    }**/
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -838,7 +861,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         @Override
         public void shutdownAndLock ()
         {
-            shutdown();
+           // shutdown();
         }
     };
 
@@ -862,6 +885,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
 
 
+    /**
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
     public void onTaskRemoved(Intent rootIntent) {
@@ -871,7 +895,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         if (Build.VERSION.SDK_INT >= 11)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-    }
+    }**/
 
 
     private void connectToCacheWord ()
@@ -973,7 +997,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             return null;
         }
 
-        IImConnection conn = mImService.mBinder.createConnection(providerId, accountId);
+        IImConnection conn = mImService.createConnection(providerId, accountId);
 
         return conn;
     }
@@ -986,7 +1010,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                 throw new RuntimeException("getConnection() needs valid values: " + providerId + "," + accountId);
 
             if (mImService != null) {
-                IImConnection im = mImService.mBinder.getConnection(providerId, accountId);
+                IImConnection im = mImService.getConnection(providerId, accountId);
 
                 if (im != null) {
 

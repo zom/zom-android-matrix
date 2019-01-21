@@ -15,6 +15,8 @@ import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.rest.model.RoomMember;
 import org.w3c.dom.Text;
 
+import java.util.List;
+
 import info.guardianproject.keanu.core.model.Address;
 import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
@@ -23,6 +25,7 @@ import info.guardianproject.keanu.core.model.ChatSessionListener;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.Invitation;
 import info.guardianproject.keanu.core.model.Message;
+import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IChatSessionListener;
 
@@ -94,19 +97,107 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     }
 
     @Override
-    public ChatGroup createChatGroupAsync(final String address, final String subject, String nickname, IChatSessionListener listener) throws Exception {
+    public void createChatGroupAsync(final String subject, boolean isDirect, IChatSessionListener listener) throws Exception {
 
-
-        if (!TextUtils.isEmpty(address))
+        if (isDirect)
         {
-            Room room = mDataHandler.getRoom(address);
-            ChatGroup chatGroup = mConn.addRoomContact(room);
-            ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, false);
-            return chatGroup;
+            List<String> rooms = mDataHandler.getDirectChatRoomIdsList(subject);
+
+            if (rooms != null && rooms.size() > 0)
+            {
+                //found an existing room!
+
+                Room room = mDataHandler.getRoom(rooms.get(0));
+                room.join(new BasicApiCallback("join room"));
+                room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
+
+                ChatGroup chatGroup = mConn.addRoomContact(room);
+                ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
+                IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
+                try {
+                    iSession.useEncryption(room.isEncrypted());
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+
+                if (listener != null) {
+
+                    try {
+                        listener.onChatSessionCreated(iSession);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                return;
+            }
+
+            mSession.createDirectMessageRoom(subject, new ApiCallback<String>() {
+                @Override
+                public void onNetworkError(Exception e) {
+                    mConn.debug("createChatGroupAsync:onNetworkError: " + e);
+                    if (listener != null) {
+                        try {
+                            listener.onChatSessionCreateError(e.toString(), null);
+                        } catch (RemoteException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onMatrixError(MatrixError e) {
+                    mConn.debug("createChatGroupAsync:onMatrixError: " + e);
+                    if (listener != null) {
+                        try {
+                            listener.onChatSessionCreateError(e.toString(), null);
+                        } catch (RemoteException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+                    mConn.debug("createChatGroupAsync:onUnexpectedError: " + e);
+                    if (listener != null) {
+                        try {
+                            listener.onChatSessionCreateError(e.toString(), null);
+                        } catch (RemoteException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+
+                @Override
+                public void onSuccess(String roomId) {
+                    Room room = mDataHandler.getRoom(roomId);
+
+                    room.join(new BasicApiCallback("join room"));
+                    room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
+
+                    ChatGroup chatGroup = mConn.addRoomContact(room);
+                    ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
+                    IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(roomId);
+                    try {
+                        iSession.useEncryption(true);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (listener != null) {
+
+                        try {
+                            listener.onChatSessionCreated(iSession);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
         }
         else {
-
-            mSession.createRoom(subject, subject, null, new ApiCallback<String>() {
+            mSession.createRoom(null, subject, null, new ApiCallback<String>() {
                 @Override
                 public void onNetworkError(Exception e) {
                     mConn.debug("createChatGroupAsync:onNetworkError: " + e);
@@ -148,10 +239,10 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                     Room room = mDataHandler.getRoom(roomId);
 
                     if (subject != null)
-                        room.updateName(subject,new BasicApiCallback("RoomUpdate"));
+                        room.updateName(subject, new BasicApiCallback("RoomUpdate"));
 
                     room.join(new BasicApiCallback("join room"));
-                    room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("CreateRoomEncryption"));
+                    room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
 
                     ChatGroup chatGroup = mConn.addRoomContact(room);
                     ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
@@ -174,8 +265,6 @@ public class MatrixChatGroupManager extends ChatGroupManager {
             });
         }
 
-
-        return null;
     }
 
     @Override
@@ -246,14 +335,41 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     }
 
     @Override
-    public void inviteUserAsync(ChatGroup group, Contact invitee) {
+    public void inviteUserAsync(final ChatGroup group, Contact invitee) {
 
-        Room room = mDataHandler.getRoom(group.getAddress().getAddress());
+        final Room room = mDataHandler.getRoom(group.getAddress().getAddress());
 
         if (room != null ) {
 
-            room.invite(invitee.getAddress().getAddress(),new BasicApiCallback("InviteRoom"));
+            room.invite(invitee.getAddress().getAddress(), new ApiCallback<Void>() {
+                @Override
+                public void onNetworkError(Exception e) {
+
+                }
+
+                @Override
+                public void onMatrixError(MatrixError matrixError) {
+
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+
+                }
+
+                @Override
+                public void onSuccess(Void aVoid) {
+                    mConn.updateGroupMembers(room, group);
+
+                }
+            });
+
+            mConn.updateGroupMembers(room, group);
+
+
         }
+
+
     }
 
     @Override

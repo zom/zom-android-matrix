@@ -190,7 +190,7 @@ public class ConversationListItem extends FrameLayout {
             }
         }
 
-        if (showChatMsg && message != null) {
+        if (showChatMsg && message != null && (!TextUtils.isEmpty(message.trim()))) {
 
             holder.mMediaThumb.setScaleType(ImageView.ScaleType.FIT_CENTER);
             holder.mMediaThumb.setVisibility(View.GONE);
@@ -347,7 +347,7 @@ public class ConversationListItem extends FrameLayout {
         }
         else if (holder.mLine2 != null)
         {
-            holder.mLine2.setText(address);
+            holder.mLine2.setText("");
 
             if (holder.mMediaThumb != null)
                 holder.mMediaThumb.setVisibility(View.GONE);

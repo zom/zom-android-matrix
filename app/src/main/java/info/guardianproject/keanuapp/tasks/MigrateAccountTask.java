@@ -24,6 +24,7 @@ import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.model.Server;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IContactList;
 import info.guardianproject.keanu.core.service.IContactListManager;
@@ -159,14 +160,29 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
                             IChatSession session = sessionMgr.getChatSession(contact);
 
                             if (session == null) {
-                                session = sessionMgr.createChatSession(contact, true);
+                                sessionMgr.createChatSession(contact, true, new IChatSessionListener() {
+                                    @Override
+                                    public void onChatSessionCreated(IChatSession session) throws RemoteException {
+
+                                        session.sendMessage(migrateMessage, false);
+
+
+                                        //archive existing contact
+                                        clManager.archiveContact(contact, session.isGroupChatSession() ? Imps.Contacts.TYPE_NORMAL : Imps.Contacts.TYPE_GROUP, true);
+                                    }
+
+                                    @Override
+                                    public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                                    }
+
+                                    @Override
+                                    public IBinder asBinder() {
+                                        return null;
+                                    }
+                                });
                             }
 
-                            session.sendMessage(migrateMessage, false);
-
-
-                            //archive existing contact
-                            clManager.archiveContact(contact, session.isGroupChatSession() ? Imps.Contacts.TYPE_NORMAL : Imps.Contacts.TYPE_GROUP, true);
                         }
 
                     }

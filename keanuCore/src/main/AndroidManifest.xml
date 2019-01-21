@@ -46,7 +46,6 @@
             android:directBootAware="true"
             android:exported="false"
             android:grantUriPermissions="false" />
-
         <receiver
             android:name=".service.NetworkConnectivityReceiver"
             android:enabled="true"

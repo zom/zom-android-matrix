@@ -16,9 +16,11 @@
 
 package info.guardianproject.keanuapp;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -40,6 +42,7 @@ import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -315,6 +318,18 @@ public class MainActivity extends BaseActivity {
     public void onResume() {
         super.onResume();
 
+        /**
+        if (getIntent() != null) {
+            Uri uriRef = ActivityCompat.getReferrer(this);
+            ComponentName aCalling = getCallingActivity();
+
+            Log.d("Main", "Calling Referrer: " + uriRef);
+            Log.d("Main", "Calling Activity: " + aCalling);
+
+            StatusBarNotifier sb = new StatusBarNotifier(this);
+            sb.notifyError("System", "calling: " + aCalling + " & " + uriRef);
+        }**/
+
         applyStyleColors ();
 
         //if VFS is not mounted, then send to WelcomeActivity
@@ -544,11 +559,12 @@ public class MainActivity extends BaseActivity {
 
                         String address = null;
 
-                        if (resultScan.startsWith("xmpp:"))
+                        if (resultScan.startsWith("keanu:"))
                         {
-                            address = XmppUriHelper.parse(Uri.parse(resultScan)).get(XmppUriHelper.KEY_ADDRESS);
-                            String fingerprint =  XmppUriHelper.getOtrFingerprint(resultScan);
-                            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(address, fingerprint);
+                            List<String> lAddr = Uri.parse(resultScan).getQueryParameters("id");
+
+                            if (lAddr != null && lAddr.size() > 0)
+                            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(lAddr.get(0), null);
 
                         }
                         else {
@@ -937,7 +953,7 @@ public class MainActivity extends BaseActivity {
 
                     IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
 
-                    String roomSubject = null;
+                   String roomSubject = null;
 
                     if (params.length > 0)
                         roomSubject = params[0];
@@ -947,7 +963,7 @@ public class MainActivity extends BaseActivity {
                     if (invitees != null)
                         aInvitees = invitees.toArray(new String[invitees.size()]);
 
-                    manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, new IChatSessionListener(){
+                    manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, new IChatSessionListener() {
 
                         @Override
                         public IBinder asBinder() {
@@ -957,10 +973,12 @@ public class MainActivity extends BaseActivity {
                         @Override
                         public void onChatSessionCreated(IChatSession session) throws RemoteException {
                             session.useEncryption(true);
-                            session.setLastMessage("New room created");
+                            session.setLastMessage(" ");
                             Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
                             intent.putExtra("id", session.getId());
-                            intent.putExtra("isNew",true);
+
+                            boolean isEmptyGroup = invitees == null || invitees.size() == 0;
+                            intent.putExtra("isNew", isEmptyGroup);
                             startActivity(intent);
                         }
 
@@ -969,6 +987,7 @@ public class MainActivity extends BaseActivity {
 
                         }
                     });
+
 
                     return null;
 

@@ -114,9 +114,10 @@ public class OnboardingManager {
         {
             StringBuffer resp = new StringBuffer();
 
-            resp.append(nickname).append(context.getString(R.string.is_inviting_you));
-            
-            resp.append(generateInviteLink(context,username,fingerprint,nickname));
+            resp.append(nickname)
+                    .append(context.getString(R.string.is_inviting_you))
+                    .append(" ")
+                    .append(generateInviteLink(context,username,fingerprint,nickname));
             
             return resp.toString();
         } catch (Exception e)
@@ -216,10 +217,8 @@ public class OnboardingManager {
     {
         StringBuffer inviteUrl = new StringBuffer();
         inviteUrl.append(DEFAULT_SCHEME);
-        inviteUrl.append(":");
+        inviteUrl.append("://invite?id=");
         inviteUrl.append(username);
-        inviteUrl.append("?subscribe");
-        inviteUrl.append("&otr-fingerprint=").append(fingerprint);
 
         return inviteUrl.toString();
     }
@@ -232,19 +231,22 @@ public class OnboardingManager {
     public static String generateInviteLink (Context context, String username, String fingerprint, String nickname, boolean isMigrateLink) throws IOException
     {
         StringBuffer inviteUrl = new StringBuffer();
-        inviteUrl.append(DEFAULT_SCHEME).append(":");
+        inviteUrl.append(DEFAULT_SCHEME)
+                .append("://").append("invite?");
 
-        StringBuffer code = new StringBuffer();
-        code.append(username);
-        code.append("?otr=").append(fingerprint);
+        //StringBuffer code = new StringBuffer();
+        inviteUrl.append("id=");
+        inviteUrl.append(username);
 
-        if (nickname != null)
-            code.append("&nickname=").append(nickname);
+        //code.append("?otr=").append(fingerprint);
 
-        if (isMigrateLink)
-            code.append("&m=1");
+        //if (nickname != null)
+          //  code.append("&nickname=").append(nickname);
 
-        inviteUrl.append(Base64.encodeToString(code.toString().getBytes(), Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING));
+        //if (isMigrateLink)
+          //  code.append("&m=1");
+
+      //  inviteUrl.append(Base64.encodeToString(code.toString().getBytes(), Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING));
         return inviteUrl.toString();
     }
 

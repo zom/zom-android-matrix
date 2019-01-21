@@ -79,10 +79,9 @@ public abstract class ChatGroupManager {
      * temporary group and will be automatically deleted when all joined users
      * have left.
      *
-     * @param address the name of the ChatGroup to be created.
      * @throws Exception
      */
-    public abstract ChatGroup createChatGroupAsync(String address, String subject, String nickname, IChatSessionListener listener) throws Exception;
+    public abstract void createChatGroupAsync(String subject, boolean isDirect, IChatSessionListener listener) throws Exception;
 
     /**
      * Deletes a certain {@link ChatGroup}. This method returns immediately and the

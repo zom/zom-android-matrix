@@ -21,9 +21,6 @@ public class ProviderManager {
 
     private static synchronized void loadImProviderSettings(Context context) {
 
-        if (mProviders != null)
-            return;
-
         mProviders = new HashMap<Long, ProviderDef>();
         ContentResolver cr = context.getContentResolver();
 

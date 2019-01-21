@@ -222,7 +222,7 @@ public class SignInHelper {
                 if (mSignInListener != null)
                     mSignInListener.stateChanged(state, accountId);
 
-                if (state != ImConnection.DISCONNECTED) {
+                if (state == ImConnection.LOGGED_IN || state == ImConnection.LOGGING_IN) {
                     // already signed in or in the process
                     if (state == ImConnection.LOGGED_IN) {
                         connections.remove(conn);
