@@ -66,8 +66,6 @@ public class AddContactAsyncTask extends AsyncTask<String, Void, Integer> {
                         //what to do here?
                     }
 
-
-
             }
 
         } catch (RemoteException re) {

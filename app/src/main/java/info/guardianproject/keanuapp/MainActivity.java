@@ -848,6 +848,9 @@ public class MainActivity extends BaseActivity {
     public void startChat (long providerId, long accountId, String username, final boolean openChat)
     {
 
+        if (!checkConnection())
+            return;
+
         //startCrypto is not actually used anymore, as we move to OMEMO
         StringBuffer sbChatRoomName = new StringBuffer();
 
@@ -856,25 +859,23 @@ public class MainActivity extends BaseActivity {
 
         IImConnection conn = RemoteImService.getConnection(providerId, accountId);
 
-        try {
-            Contact contact = conn.getContactListManager().getContactByAddress(username);
+        if (conn != null) {
+            try {
+                Contact contact = conn.getContactListManager().getContactByAddress(username);
 
-            if (contact != null)
-            {
-                sbChatRoomName.append(contact.getName());
-            }
-            else
-            {
-                sbChatRoomName.append(username);
+                if (contact != null) {
+                    sbChatRoomName.append(contact.getName());
+                } else {
+                    sbChatRoomName.append(username);
+                }
+
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
 
-        } catch (RemoteException e) {
-            e.printStackTrace();
+
+            startGroupChat(sbChatRoomName.toString(), invitees, conn);
         }
-
-
-        startGroupChat(sbChatRoomName.toString(), invitees, conn);
-
     }
 
     public void startGroupChat ()
@@ -938,86 +939,44 @@ public class MainActivity extends BaseActivity {
     {
         mLastConnGroup = conn;
 
-        new AsyncTask<String, Long, String>() {
+        try {
 
+            IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
 
-            @Override
-            protected void onPreExecute() {
-            }
+            String[] aInvitees = null;
 
-            @Override
-            protected String doInBackground(String... params) {
+            if (invitees != null)
+                aInvitees = invitees.toArray(new String[invitees.size()]);
 
+            manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, new IChatSessionListener() {
 
-                try {
-
-                    IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
-
-                   String roomSubject = null;
-
-                    if (params.length > 0)
-                        roomSubject = params[0];
-
-                    String[] aInvitees = null;
-
-                    if (invitees != null)
-                        aInvitees = invitees.toArray(new String[invitees.size()]);
-
-                    manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, new IChatSessionListener() {
-
-                        @Override
-                        public IBinder asBinder() {
-                            return null;
-                        }
-
-                        @Override
-                        public void onChatSessionCreated(IChatSession session) throws RemoteException {
-                            session.useEncryption(true);
-                            session.setLastMessage(" ");
-                            Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
-                            intent.putExtra("id", session.getId());
-
-                            boolean isEmptyGroup = invitees == null || invitees.size() == 0;
-                            intent.putExtra("isNew", isEmptyGroup);
-                            startActivity(intent);
-                        }
-
-                        @Override
-                        public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
-
-                        }
-                    });
-
-
+                @Override
+                public IBinder asBinder() {
                     return null;
-
-                } catch (RemoteException e) {
-                    return e.toString();
                 }
 
-            }
+                @Override
+                public void onChatSessionCreated(IChatSession session) throws RemoteException {
+                    session.useEncryption(true);
+                    session.setLastMessage(" ");
+                    Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
+                    intent.putExtra("id", session.getId());
 
-            @Override
-            protected void onProgressUpdate(Long... showChatId) {
-                showChat(showChatId[0]);
-            }
-
-            @Override
-            protected void onPostExecute(String result) {
-                super.onPostExecute(result);
-
-
-                if (result != null)
-                {
-                 //   mHandler.showServiceErrorAlert(result);
-
+                    boolean isEmptyGroup = invitees == null || invitees.size() == 0;
+                    intent.putExtra("isNew", isEmptyGroup);
+                    startActivity(intent);
                 }
 
+                @Override
+                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
 
-            }
-        }.executeOnExecutor(ImApp.sThreadPoolExecutor,roomSubject);
+                }
+            });
 
 
+        } catch (RemoteException e) {
+           e.printStackTrace();
+        }
     }
 
     private void showChat (long chatId)
