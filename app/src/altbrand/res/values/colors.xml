@@ -65,6 +65,16 @@
      
     <color name="zom_primary">#E7275A</color>
 
+    <!-- colorPrimary is used for the default action bar background -->
+    <color name="app_primary">@color/zom_primary</color>
+
+    <!-- colorPrimaryDark is used for the status bar -->
+    <color name="app_primary_dark">#BF204B</color>
+
+    <!-- colorAccent is used as the default value for colorControlActivated,
+         which is used to tint widgets -->
+    <color name="app_accent">#FF2b63</color>
+
     <array name="zom_colors">
         <item>@color/zom_primary</item>
         <item>@color/holo_grey_light</item>
