@@ -166,19 +166,8 @@ public class AddContactActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        if (!checkConnection())
-        {
-            Snackbar sb = Snackbar.make(findViewById(R.id.main_content), R.string.error_suspended_connection, Snackbar.LENGTH_LONG);
-            sb.setAction(getString(R.string.connect), new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent i = new Intent(AddContactActivity.this, AccountsActivity.class);
-                    startActivity(i);
-                }
-            });
-            sb.show();
+        checkConnection();
 
-        }
     }
 
     private String getInviteMessage() {
@@ -499,53 +488,63 @@ public class AddContactActivity extends BaseActivity {
     };
 
     ListPopupWindow mDomainList;
+    ArrayList<String> sortedSuggestions;
 
     private synchronized void showUserSuggestions (final Contact[] contacts)
     {
-        if (mDomainList == null)
+        if (contacts == null || contacts.length == 0)
+        {
+            if (mDomainList != null && mDomainList.isShowing())
+                mDomainList.dismiss();
+            return;
+        }
+
+        if (mDomainList == null) {
             mDomainList = new ListPopupWindow(this);
+            mDomainList.setAnchorView(mNewAddress);
+            mDomainList.setWidth(ListPopupWindow.WRAP_CONTENT);
+            mDomainList.setHeight(ListPopupWindow.WRAP_CONTENT);
+            mDomainList.setDropDownGravity(CENTER_HORIZONTAL);
+
+            mDomainList.setModal(false);
+
+            mDomainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    mDomainList.dismiss();
+                    mNewAddress.setText(sortedSuggestions.get(position));
+                    mNewAddress.setSelection(mNewAddress.length());
+                }
+            });
+        }
 
         HashMap<String, String> suggestions = new HashMap<>();
         for (Contact contact : contacts) {
-            suggestions.put(contact.getAddress().getAddress(), contact.getAddress().getUser());
+
+            if (!mNewAddress.getText().toString().equals(contact.getAddress().getUser()))
+                suggestions.put(contact.getAddress().getAddress(), contact.getAddress().getUser());
         }
 
-        final String[] sorted = suggestions.values().toArray(new String[suggestions.size()]);
+        if (suggestions.size() > 0) {
 
-        mDomainList.setAdapter(new ArrayAdapter(
-                this,
-                android.R.layout.simple_dropdown_item_1line,sorted));
-        mDomainList.setAnchorView(mNewAddress);
-        mDomainList.setWidth(ListPopupWindow.WRAP_CONTENT);
-        mDomainList.setHeight(ListPopupWindow.WRAP_CONTENT);
-        mDomainList.setDropDownGravity(CENTER_HORIZONTAL);
+            sortedSuggestions = new ArrayList<>(suggestions.values());
 
-        mDomainList.setModal(false);
-        mDomainList.show();
+            mDomainList.setAdapter(new ArrayAdapter(
+                    this,
+                    android.R.layout.simple_dropdown_item_1line, sortedSuggestions));
 
-        mDomainList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                mNewAddress.setText(sorted[position]);
-                mDomainList.dismiss();
-            }
-        });
+            mDomainList.show();
+
+
+        }
+        else if (mDomainList != null && mDomainList.isShowing())
+        {
+            mDomainList.dismiss();
+        }
     }
 
     private TextWatcher mTextWatcher = new TextWatcher() {
         public void afterTextChanged(Editable s) {
-
-
-        }
-
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            // noop
-
-
-        }
-
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-            // noop
 
             try {
 
@@ -588,6 +587,18 @@ public class AddContactActivity extends BaseActivity {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
+        }
+
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            // noop
+
+
+        }
+
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            // noop
+
+
 
 
         }
