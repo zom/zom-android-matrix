@@ -604,7 +604,9 @@ public class OnboardingActivity extends BaseActivity {
                                     public void run ()
                                     {
 
+                                        showMainScreen(true);
 
+                                        /**
                                         showSuccess();
 
 
@@ -613,10 +615,10 @@ public class OnboardingActivity extends BaseActivity {
                                             @Override
                                             public boolean onMenuItemClick(MenuItem item) {
 
-                                                showMainScreen(true);
+
                                                 return false;
                                             }
-                                        });
+                                        });**/
 
 
                                         SignInHelper signInHelper = new SignInHelper(OnboardingActivity.this, mHandler);
