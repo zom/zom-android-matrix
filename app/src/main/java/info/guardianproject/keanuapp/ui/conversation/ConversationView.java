@@ -41,6 +41,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -346,10 +347,21 @@ public class ConversationView {
             return false;
 
         if (mConn == null) {
-            mConn = RemoteImService.getConnection(mProviderId, mAccountId);
 
-            if (mConn == null)
-                return false;
+            if (RemoteImService.mImService == null)
+            {
+                mActivity.startService(new Intent(mActivity,RemoteImService.class));
+            }
+
+            while (true) {
+
+                mConn = RemoteImService.getConnection(mProviderId, mAccountId);
+
+                if (mConn != null)
+                    break;
+
+                try { Thread.sleep (3000);}catch(Exception e){}
+            }
 
         }
 
@@ -1237,13 +1249,9 @@ public class ConversationView {
     void updateChat() {
         setViewType(VIEW_TYPE_CHAT);
 
-        //mHistory.invalidate();
         checkConnection();
 
         startQuery(getChatId());
-        // This is not needed, now that there is a ChatView per fragment.  It also causes a spurious detection of user action
-        // on fragments adjacent to the current one, when they get initialized.
-        //mComposeMessage.setText("");
 
         updateWarningView();
 
@@ -1758,8 +1766,6 @@ public class ConversationView {
 
         try
         {
-            checkConnection();
-
             if (mConn != null) {
                     IChatSessionManager sessionMgr = mConn.getChatSessionManager();
                     if (sessionMgr != null) {
@@ -1934,16 +1940,27 @@ public class ConversationView {
 
         //new SendMessageAsyncTask().execute(msg);
 
-        new Thread ()
+        new AsyncTask<String, Void, Boolean>()
         {
-            public void run ()
-            {
-                sendMessage(msg,false);
-            }
-        }.start();
 
-        mComposeMessage.setText("");
-        mComposeMessage.requestFocus();
+            @Override
+            protected Boolean doInBackground(String[] msgs) {
+                return sendMessage(msgs[0],false);
+            }
+
+            @Override
+            protected void onPostExecute(Boolean aBoolean) {
+                super.onPostExecute(aBoolean);
+
+                if (aBoolean.booleanValue())
+                {
+                    mComposeMessage.setText("");
+                    mComposeMessage.requestFocus();
+                }
+            }
+        }.execute(msg);
+
+
     }
 
     boolean sendMessage(String msg, boolean isResend) {
@@ -1953,11 +1970,7 @@ public class ConversationView {
             return false;
         }
 
-        //if the message starts with a command (just /giphy for now) do something else
-        if (msg.startsWith("/giphy "))
-        {
-            return doGiphy(msg);
-        }
+        checkConnection();
 
         //otherwise get the session, create if necessary, and then send
         IChatSession session = getChatSession();
@@ -2033,7 +2046,6 @@ public class ConversationView {
         }
         try {
 
-            checkConnection();
 
             if (getChatSession() != null) {
                 getChatSession().registerChatListener(mChatListener);
@@ -2059,7 +2071,6 @@ public class ConversationView {
             if (getChatSession() != null) {
                 getChatSession().unregisterChatListener(mChatListener);
             }
-            checkConnection ();
 
             if (mConn != null) {
                 IContactListManager listMgr = mConn.getContactListManager();
@@ -2079,7 +2090,6 @@ public class ConversationView {
 
 
         try {
-            checkConnection();
             isConnected = (mConn == null) ? false : mConn.getState() == ImConnection.LOGGED_IN;
 
         } catch (Exception e) {
