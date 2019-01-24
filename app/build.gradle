@@ -78,7 +78,7 @@ dependencies {
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.google.zxing:core:3.3.0'
+    implementation 'com.google.zxing:core:3.3.2'
     implementation 'info.guardianproject.panic:panic:0.5'
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.0.0'
@@ -121,4 +121,8 @@ dependencies {
 
     //support for in app PDF viewing
     implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
+
+    //support for in app video playback
+    implementation 'com.google.android.exoplayer:exoplayer:2.6.0'
+    implementation 'org.nanohttpd:nanohttpd:2.2.0'
 }

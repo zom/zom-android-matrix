@@ -35,6 +35,7 @@ import info.guardianproject.keanuapp.ui.widgets.ImageViewActivity;
 import info.guardianproject.keanuapp.ui.widgets.LetterAvatar;
 import info.guardianproject.keanuapp.ui.widgets.MessageViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.PdfViewActivity;
+import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -569,6 +570,11 @@ public class MessageListItem extends FrameLayout {
         }
         else if (mimeType.contains("pdf")) {
             Intent intent = new Intent(context, PdfViewActivity.class);
+            intent.setDataAndType(mediaUri,mimeType);
+            context.startActivity(intent);
+        }
+        else if (mimeType.contains("video")) {
+            Intent intent = new Intent(context, VideoViewActivity.class);
             intent.setDataAndType(mediaUri,mimeType);
             context.startActivity(intent);
         }
