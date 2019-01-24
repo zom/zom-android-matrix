@@ -379,9 +379,10 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     }
 
-    private Message storeMediaMessage(String mediaPath, String mimeType) {
+    private Message storeMediaMessage(String mediaPath, String mimeType, String fileName) {
 
-        Message msg = new Message(mediaPath);
+        String msgBody = mediaPath;
+        Message msg = new Message(msgBody);
         msg.setID(nextID());
 
         msg.setFrom(mConnection.getLoginUser().getAddress());
@@ -391,8 +392,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
         long sendTime = System.currentTimeMillis();
 
-        insertMessageInDb(null, mediaPath, sendTime, msg.getType(), 0, msg.getID(), mimeType);
-        setLastMessage(mediaPath);
+        insertMessageInDb(null, msgBody, sendTime, msg.getType(), 0, msg.getID(), mimeType);
+        setLastMessage(msgBody);
 
         return msg;
     }
@@ -467,6 +468,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 try {
                     fis = new FileInputStream(fileLocal);
                     fileLength = fileLocal.length();
+                    fileName = fileLocal.getName();
                 } catch (FileNotFoundException fe) {
                     Log.w(TAG, "file system file not found on import: " + mediaUri);
                     return false;
@@ -497,7 +499,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
                 String sendFileName = fileName;
 
-                final Message msgMedia = storeMediaMessage(mediaPath, mimeType);
+                final Message msgMedia = storeMediaMessage(mediaPath, mimeType, fileName);
 
                 if (!sendFileName.contains("."))
                 {

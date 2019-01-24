@@ -110,7 +110,7 @@ public class GalleryMediaViewHolder extends MediaViewHolder
         }
         else
         {
-            mMediaThumbnail.setImageResource(R.drawable.ic_file); // generic file icon
+            mMediaThumbnail.setImageResource(R.drawable.file_unknown); // generic file icon
 
         }
 

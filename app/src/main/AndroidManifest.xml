@@ -275,7 +275,12 @@
             android:configChanges="keyboardHidden|orientation|screenSize" />
         <activity
             android:name=".ui.widgets.ImageViewActivity"
-            android:theme="@style/AppTheme.Transparent" />
+            android:theme="@style/AppTheme.Transparent"
+            android:exported="false"/>
+        <activity
+            android:name=".ui.widgets.PdfViewActivity"
+            android:exported="false"
+            />
         <activity android:name=".ui.widgets.SecureCameraActivity" />
 
         <activity

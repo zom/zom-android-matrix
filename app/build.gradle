@@ -119,5 +119,6 @@ dependencies {
     implementation 'net.zetetic:android-database-sqlcipher:3.5.4@aar'
     implementation 'info.guardianproject.iocipher:IOCipher:0.4'
 
-
+    //support for in app PDF viewing
+    implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
 }
