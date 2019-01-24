@@ -204,13 +204,11 @@ public class StickerManager {
 		try {
 
 			AssetManager aMan = activity.getAssets();
+			String basePath = "stickers";
+			String[] stickers = aMan.list(basePath);
 
-			/**
-            String basePath = "stickers/foo";
-            String category = activity.getString(R.string.stickers_foo);
-            loadStickers(activity,category,basePath,aMan.list(basePath));
-
-			**/
+			for (String stickerPack : stickers)
+				loadStickers(activity,stickerPack,basePath + '/' + stickerPack,aMan.list(basePath + '/' + stickerPack));
 
 
 		} catch (Exception fe) {

@@ -12,35 +12,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_margin="@dimen/detail_view_padding"
-        android:paddingBottom="10dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
-                android:id="@+id/tvGroupName"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:autoLink="none"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                tools:text="Group Name" />
+        android:layout_margin="@dimen/detail_view_padding">
 
 
-        </LinearLayout>
 
         <info.guardianproject.keanu.core.type.CustomTypefaceTextView
-            android:id="@+id/tvGroupAddress"
+            android:id="@+id/tvUserAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:autoLink="none"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="?contactTextSecondary"
-            tools:text="group.address@domain.com"
-            android:visibility="invisible"
             />
     </LinearLayout>
 

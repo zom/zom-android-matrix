@@ -117,6 +117,8 @@ public class DeviceDisplayActivity extends BaseActivity {
 
         providerSettings.close();
 
+       getSupportActionBar().setTitle(mName);
+
         mRecyclerView = findViewById(R.id.rvRoot);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setAdapter(new RecyclerView.Adapter() {
@@ -150,10 +152,7 @@ public class DeviceDisplayActivity extends BaseActivity {
                 if (holder instanceof HeaderViewHolder) {
                     final HeaderViewHolder h = (HeaderViewHolder)holder;
 
-
-                    h.groupName.setText(mName);
-                    h.groupAddress.setText(mAddress);
-
+                    h.userAddress.setText(mAddress);
 
 
                 } else if (holder instanceof FooterViewHolder) {
@@ -296,15 +295,13 @@ public class DeviceDisplayActivity extends BaseActivity {
     private class HeaderViewHolder extends RecyclerView.ViewHolder {
         final ImageView avatar;
         final ImageView qr;
-        final TextView groupName;
-        final TextView groupAddress;
+        final TextView userAddress;
 
         HeaderViewHolder(View view) {
             super(view);
             avatar = (ImageView) view.findViewById(R.id.ivAvatar);
             qr = (ImageView) view.findViewById(R.id.qrcode);
-            groupName = (TextView) view.findViewById(R.id.tvGroupName);
-            groupAddress = (TextView) view.findViewById(R.id.tvGroupAddress);
+            userAddress = (TextView) view.findViewById(R.id.tvUserAddress);
         }
     }
 

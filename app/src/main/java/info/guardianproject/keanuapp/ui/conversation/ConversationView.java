@@ -3042,17 +3042,6 @@ public class ConversationView {
                         public void onStickerSelected(Sticker s) {
 
                             sendStickerCode(s.assetUri);
-                            /**
-                             if (isGroupChat())
-                             {
-                             sendStickerCode(s.assetUri);
-
-                             }
-                             else
-                             {
-                             mActivity.handleSendDelete(s.assetUri,"image/png", false, false, true);
-                             }*/
-                            //   mActivity.handleSendData(Uri.parse(s.assetPath),"image/png");
 
                             mViewAttach.setVisibility(View.INVISIBLE);
                             showStickers();
