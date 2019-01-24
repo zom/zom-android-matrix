@@ -34,6 +34,8 @@ import info.guardianproject.keanuapp.ui.widgets.GlideUtils;
 import info.guardianproject.keanuapp.ui.widgets.ImageViewActivity;
 import info.guardianproject.keanuapp.ui.widgets.LetterAvatar;
 import info.guardianproject.keanuapp.ui.widgets.MessageViewHolder;
+import info.guardianproject.keanuapp.ui.widgets.PdfViewActivity;
+import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -42,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.StringTokenizer;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -246,7 +249,7 @@ public class MessageListItem extends FrameLayout {
                 } else {
                     mHolder.mTextViewForMessages.setVisibility(View.GONE);
                     boolean isJpeg = mimeType.contains("jpg")||mimeType.contains("jpeg");
-                    cmdSuccess = showMediaThumbnail(mimeType, mediaUri, id, mHolder, isJpeg);
+                    cmdSuccess = showMediaThumbnail(mediaUri.getLastPathSegment(),mimeType, mediaUri, id, mHolder, isJpeg);
                     mHolder.mMediaContainer.setVisibility(View.VISIBLE);
 
                 }
@@ -276,7 +279,7 @@ public class MessageListItem extends FrameLayout {
                     Uri mediaUri = Uri.parse("asset://localhost/" + assetPath);
 
                     //now load the thumbnail
-                    cmdSuccess = showMediaThumbnail(mimeTypeSticker, mediaUri, id, mHolder, false);
+                    cmdSuccess = showMediaThumbnail(mediaUri.getLastPathSegment(), mimeTypeSticker, mediaUri, id, mHolder, false);
                 }
                 catch (Exception e)
                 {
@@ -311,7 +314,7 @@ public class MessageListItem extends FrameLayout {
                     Uri mediaUri = Uri.parse("asset://localhost/" + stickerPath);
 
                     //now load the thumbnail
-                    cmdSuccess = showMediaThumbnail(mimeTypeSticker, mediaUri, id, mHolder, false);
+                    cmdSuccess = showMediaThumbnail(mediaUri.getLastPathSegment(), mimeTypeSticker, mediaUri, id, mHolder, false);
                 } catch (Exception e) {
                     cmdSuccess = false;
                 }
@@ -410,7 +413,7 @@ public class MessageListItem extends FrameLayout {
 
     }
 
-    private boolean showMediaThumbnail (String mimeType, Uri mediaUri, int id, MessageViewHolder holder, boolean centerCrop)
+    private boolean showMediaThumbnail (String displayName, String mimeType, Uri mediaUri, int id, MessageViewHolder holder, boolean centerCrop)
     {
         this.mediaUri = mediaUri;
         this.mimeType = mimeType;
@@ -473,9 +476,19 @@ public class MessageListItem extends FrameLayout {
             holder.mAvatar.setVisibility(View.VISIBLE);
             holder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
             holder.mMediaThumbnail.setScaleType(ImageView.ScaleType.FIT_START);
-            holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_SMALL;
-            holder.mMediaThumbnail.setImageResource(R.drawable.ic_file); // generic file icon
-            holder.mTextViewForMessages.setText(mediaUri.getLastPathSegment() + " (" + mimeType + ")");
+            holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
+
+
+            if (TextUtils.isEmpty(mimeType))
+                holder.mMediaThumbnail.setImageResource(R.drawable.file_unknown); // generic file icon
+            else if (mimeType.contains("pdf"))
+                holder.mMediaThumbnail.setImageResource(R.drawable.file_pdf); // generic file icon
+            else if (mimeType.contains("doc")||mimeType.contains("word"))
+                holder.mMediaThumbnail.setImageResource(R.drawable.file_doc); // generic file icon
+            else if (mimeType.contains("zip"))
+                holder.mMediaThumbnail.setImageResource(R.drawable.file_zip); // generic file icon
+
+            holder.mTextViewForMessages.setText(displayName);
             holder.mTextViewForMessages.setVisibility(View.VISIBLE);
         }
 
@@ -555,6 +568,47 @@ public class MessageListItem extends FrameLayout {
             context.startActivity(intent);
 
         }
+        else if (mimeType.contains("pdf")) {
+            Intent intent = new Intent(context, PdfViewActivity.class);
+            intent.setDataAndType(mediaUri,mimeType);
+            context.startActivity(intent);
+        }
+        else if (mimeType.contains("video")) {
+            Intent intent = new Intent(context, VideoViewActivity.class);
+            intent.setDataAndType(mediaUri,mimeType);
+            context.startActivity(intent);
+        }
+        else if (mediaUri.getScheme().equals("content"))
+        {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (Build.VERSION.SDK_INT >= 11)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+            //set a general mime type not specific
+            intent.setDataAndType(mediaUri, mimeType);
+
+            Context context = getContext();
+
+            if (isIntentAvailable(context, intent))
+            {
+                context.startActivity(intent);
+            }
+            else
+            {
+
+                intent = new Intent(Intent.ACTION_SEND);
+                intent.setDataAndType(mediaUri, mimeType);
+
+                if (isIntentAvailable(context, intent))
+                {
+                    context.startActivity(intent);
+                }
+                else {
+                    Toast.makeText(getContext(), R.string.there_is_no_viewer_available_for_this_file_format, Toast.LENGTH_LONG).show();
+                }
+            }
+        }
         else
         {
             exportMediaFile();
@@ -573,27 +627,7 @@ public class MessageListItem extends FrameLayout {
             //set a general mime type not specific
             intent.setDataAndType(Uri.parse(body), mimeType);
 
-
-            Context context = getContext().getApplicationContext();
-
-            if (isIntentAvailable(context, intent))
-            {
-                context.startActivity(intent);
-            }
-            else
-            {
-
-                intent = new Intent(Intent.ACTION_SEND);
-                intent.setDataAndType(Uri.parse(body), mimeType);
-
-                if (isIntentAvailable(context, intent))
-                {
-                    context.startActivity(intent);
-                }
-                else {
-                    Toast.makeText(getContext(), R.string.there_is_no_viewer_available_for_this_file_format, Toast.LENGTH_LONG).show();
-                }
-            }**/
+            **/
         }
     }
 
@@ -819,7 +853,10 @@ public class MessageListItem extends FrameLayout {
                 mHolder.mMediaContainer.setVisibility(View.VISIBLE);
 
                 boolean isJpeg = mimeType.contains("jpg")||mimeType.contains("jpeg");
-                showMediaThumbnail(mimeType, mediaUri, id, mHolder, isJpeg);
+
+                String displayName = mediaUri.getLastPathSegment();
+
+                showMediaThumbnail(displayName,mimeType, mediaUri, id, mHolder, isJpeg);
 
             }
 
@@ -842,7 +879,7 @@ public class MessageListItem extends FrameLayout {
                     Uri mediaUri = Uri.parse("asset://localhost/" + cmds[1].toLowerCase());
 
                     //now load the thumbnail
-                    cmdSuccess = showMediaThumbnail(mimeTypeSticker, mediaUri, id, mHolder, false);
+                    cmdSuccess = showMediaThumbnail(mediaUri.getLastPathSegment(), mimeTypeSticker, mediaUri, id, mHolder, false);
                 } catch (Exception e) {
                     cmdSuccess = false;
                 }
@@ -873,7 +910,7 @@ public class MessageListItem extends FrameLayout {
                     Uri mediaUri = Uri.parse("asset://localhost/" + stickerPath);
 
                     //now load the thumbnail
-                    cmdSuccess = showMediaThumbnail(mimeTypeSticker, mediaUri, id, mHolder, false);
+                    cmdSuccess = showMediaThumbnail(mediaUri.getLastPathSegment(), mimeTypeSticker, mediaUri, id, mHolder, false);
                 } catch (Exception e) {
                     cmdSuccess = false;
                 }

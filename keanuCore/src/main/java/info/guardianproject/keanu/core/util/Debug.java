@@ -20,7 +20,7 @@ import info.guardianproject.keanu.core.BuildConfig;
 
 public class Debug {
 
-    public static boolean DEBUG_ENABLED = false|| BuildConfig.DEBUG;
+    public static boolean DEBUG_ENABLED = BuildConfig.DEBUG;
     public static final boolean DEBUGGER_ATTACH_ENABLED = false;
     public static final boolean DEBUG_INJECT_ERRORS = false;
     private static int injectCount = 0;

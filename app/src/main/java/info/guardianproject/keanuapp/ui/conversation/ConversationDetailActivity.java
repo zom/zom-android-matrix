@@ -47,6 +47,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -703,13 +704,7 @@ public class ConversationDetailActivity extends BaseActivity {
                 catch (Exception e){
                     Log.w(LOG_TAG,"error setting media draft",e);
                 }
-                /**
-                boolean deleteFile = false;
-                boolean resizeImage = true;
-                boolean importContent = true;
 
-                handleSendDelete(uri, "image/jpeg", deleteFile, resizeImage, importContent);
-                 **/
             }
             else if (requestCode == REQUEST_SEND_FILE || requestCode == REQUEST_SEND_AUDIO) {
 
@@ -727,7 +722,7 @@ public class ConversationDetailActivity extends BaseActivity {
 
                 boolean deleteFile = false;
                 boolean resizeImage = false;
-                boolean importContent = false;
+                boolean importContent = true; //let's import it!
 
                 handleSendDelete(uri, defaultType, deleteFile, resizeImage, importContent);
             }
@@ -795,7 +790,6 @@ public class ConversationDetailActivity extends BaseActivity {
             if (session != null) {
 
                 String offerId = UUID.randomUUID().toString();
-
                 return session.offerData(offerId, uri.toString(), mimeType );
             }
 
