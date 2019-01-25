@@ -135,22 +135,6 @@ public class ConversationDetailActivity extends BaseActivity {
         }
     };
 
-    /**
-    private BroadcastReceiver receiver = new BroadcastReceiver() {
-        public void onReceive(final Context context, final Intent intent) {
-            //check if the broadcast is our desired one
-            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
-//here define your method to be executed when screen is going to sleep
-                mConvoView.setSelected(false);
-            }
-            else if (intent.getAction().equals(Intent.ACTION_SCREEN_ON)) {
-//here define your method to be executed when screen is going to sleep
-                mConvoView.setSelected(true);
-            }
-
-        }};
-        **/
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

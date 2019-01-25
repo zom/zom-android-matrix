@@ -20,6 +20,7 @@ package info.guardianproject.keanu.core.service.adapters;
 import android.os.IBinder;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.ArrayList;
@@ -80,16 +81,11 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
     public IChatSession createChatSession(String contactAddress, boolean isNewSession, IChatSessionListener listener) {
 
-        ContactListManagerAdapter listManager = (ContactListManagerAdapter) mConnection
-                .getContactListManager();
+        ChatGroup chatGroup = groupManager.getChatGroup(new BaseAddress(contactAddress));
+        if (chatGroup == null)
+            chatGroup = new ChatGroup(new BaseAddress(contactAddress),"",groupManager);
 
-        Contact contact = listManager.getContactByAddress(contactAddress);
-
-        if (contact == null)
-            contact = new Contact (new BaseAddress(contactAddress));
-
-        ChatSession session = getChatSessionManager().createChatSession(contact, isNewSession);
-
+        ChatSession session = getChatSessionManager().createChatSession(chatGroup, isNewSession);
 
         if (session != null) {
             ChatSessionAdapter csa = getChatSessionAdapter(session, isNewSession);
@@ -114,18 +110,23 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
             boolean isDirect = invitees != null && invitees.length == 1;
             if (isDirect)
-                subject = invitees[0];
+               subject = invitees[0]; //user address as the subject for a direct room
+            else if (TextUtils.isEmpty(subject))
+            {
+
+            }
 
             groupMan.createChatGroupAsync(subject, isDirect, new IChatSessionListener() {
                 @Override
-                public void onChatSessionCreated(IChatSession session) throws RemoteException {
+                public void onChatSessionCreated(final IChatSession session) throws RemoteException {
+
+                    if (listener != null)
+                        listener.onChatSessionCreated(session);
 
                     if (invitees != null)
                         for (String invitee : invitees)
                             session.inviteContact(invitee);
 
-                    if (listener != null)
-                        listener.onChatSessionCreated(session);
                 }
 
                 @Override

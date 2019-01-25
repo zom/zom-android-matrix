@@ -31,12 +31,16 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import org.apache.commons.codec.DecoderException;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -67,11 +71,14 @@ import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.service.IDataListener;
 import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.service.StatusBarNotifier;
+import info.guardianproject.keanu.core.util.DatabaseUtils;
 import info.guardianproject.keanu.core.util.SystemServices;
 import info.guardianproject.keanu.core.util.UploadProgressListener;
 
 import static cz.msebera.android.httpclient.conn.ssl.SSLConnectionSocketFactory.TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanu.core.KeanuConstants.SMALL_AVATAR_HEIGHT;
+import static info.guardianproject.keanu.core.KeanuConstants.SMALL_AVATAR_WIDTH;
 import static info.guardianproject.keanu.core.provider.Imps.ChatsColumns.LAST_UNREAD_MESSAGE;
 
 public class ChatSessionAdapter extends IChatSession.Stub {
@@ -120,6 +127,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     private boolean mUseEncryption = false;
     private String mNickname = null;
 
+    private ChatGroup mGroup = null;
+
     public ChatSessionAdapter(ChatSession chatSession, ChatGroup group, ImConnectionAdapter connection, boolean isNewSession) {
 
         mChatSession = chatSession;
@@ -152,19 +161,18 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     public void presenceChanged (int newPresence)
     {
 
-        if (mChatSession.getParticipant() instanceof Contact) {
-            ((Contact) mChatSession.getParticipant()).getPresence().setStatus(newPresence);
+      //  ((Contact) mChatSession.getParticipant()).getPresence().setStatus(newPresence);
 
-            if (lastPresence != newPresence && newPresence == Presence.AVAILABLE)
-                sendPostponedMessages();
+        if (lastPresence != newPresence && newPresence == Presence.AVAILABLE)
+            sendPostponedMessages();
 
-            lastPresence = newPresence;
-        }
+        lastPresence = newPresence;
 
     }
 
     private void init(ChatGroup group, boolean isNewSession) {
-        
+
+        mGroup = group;
         mIsGroupChat = true;
         mNickname = group.getName();
 
@@ -239,15 +247,12 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     public String[] getParticipants() {
         if (mIsGroupChat) {
             Contact self = mConnection.getLoginUser();
-            ChatGroup group = (ChatGroup) mChatSession.getParticipant();
-            List<Contact> members = group.getMembers();
+            List<Contact> members = mGroup.getMembers();
             if (members.size() > 0) {
-                String[] result = new String[members.size() - 1];
+                String[] result = new String[members.size()];
                 int index = 0;
                 for (Contact c : members) {
-                    if (!c.equals(self)) {
-                        result[index++] = c.getAddress().getAddress();
-                    }
+                    result[index++] = c.getAddress().getAddress();
                 }
                 return result;
             }
@@ -360,7 +365,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 if (msg.getDateTime() != null)
                     sendTime = msg.getDateTime().getTime();
 
-                updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, newPacketId);
+                updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, newPacketId);
 
                 msg.setID(newPacketId);
             }
@@ -372,9 +377,10 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 if (msg.getDateTime() != null)
                     sendTime = msg.getDateTime().getTime();
 
-                updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, null);
+                updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, null);
             }
         });
+
 
 
     }
@@ -2059,4 +2065,21 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         Contact contact = new Contact(new BaseAddress(contactString), contactString, Imps.Contacts.TYPE_NORMAL);
         getGroupManager().grantAdminAsync((ChatGroup) mChatSession.getParticipant(), contact);
     }
+
+    private int getMemberCount () {
+        String[] projection = {Imps.GroupMembers.USERNAME, Imps.GroupMembers.NICKNAME, Imps.GroupMembers.ROLE, Imps.GroupMembers.AFFILIATION};
+        Uri memberUri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, getId());
+
+        Cursor c = mContentResolver.query(memberUri, projection, null, null, null);
+        if (c != null) {
+
+            int memberCount = c.getCount();
+            c.close();
+
+            return memberCount;
+        }
+
+        return -1;
+    }
+
 }

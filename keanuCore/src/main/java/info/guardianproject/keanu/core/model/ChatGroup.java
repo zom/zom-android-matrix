@@ -134,7 +134,7 @@ public class ChatGroup extends ImEntity {
      *
      * @param newContact the {@link Contact} who has joined into the group.
      */
-    public synchronized void notifyMemberJoined(String groupAddress, Contact newContact) {
+    public void notifyMemberJoined(String groupAddress, Contact newContact) {
 
         // Clear the DB on first join
         if (mMembers.size() == 0) {
@@ -159,8 +159,13 @@ public class ChatGroup extends ImEntity {
         }
     }
 
-    public synchronized void notifyMemberRoleUpdate(Contact newContact, String role, String affiliation) {
+    public void notifyMemberRoleUpdate(Contact newContact, String role, String affiliation) {
         Contact contact = mMembers.get(newContact.getAddress().getBareAddress());
+        if (contact == null) {
+            mMembers.put(newContact.getAddress().getBareAddress(), newContact);
+            contact = newContact;
+        }
+
         if (contact != null) {
             Pair<String, String> oldValue = mMemberRolesAndAffiliations.get(contact);
             mMemberRolesAndAffiliations.put(contact, new Pair<String, String>((role == null) ? oldValue.first : role, (affiliation == null) ? oldValue.second : affiliation));

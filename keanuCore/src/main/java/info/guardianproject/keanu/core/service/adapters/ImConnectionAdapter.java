@@ -27,6 +27,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -483,14 +484,8 @@ public class ImConnectionAdapter extends IImConnection.Stub {
                     saveSessionCookie(cr);
                 }
 
-                /**
-                if (mAutoLoadContacts)
-                {
-                    mContactListManager.loadContactLists();
-                }**/
-
                 try {
-                    Collection<ChatSessionAdapter> adapters = mChatSessionManager.mActiveChatSessionAdapters.values();
+                    ArrayList<ChatSessionAdapter> adapters = new ArrayList<ChatSessionAdapter>(mChatSessionManager.mActiveChatSessionAdapters.values());
 
                     synchronized (adapters) {
                         for (ChatSessionAdapter session : adapters) {
