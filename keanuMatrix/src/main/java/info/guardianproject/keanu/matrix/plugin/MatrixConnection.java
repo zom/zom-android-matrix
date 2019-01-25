@@ -657,7 +657,18 @@ public class MatrixConnection extends ImConnection {
         return group;
     }
 
-    protected void updateGroupMembers (Room room, ChatGroup group)
+    protected void updateGroup (Room room)
+    {
+        if (room.isInvited() || room.isMember()) {
+            ChatGroup group = mChatGroupManager.getChatGroup(new MatrixAddress(room.getRoomId()), room.getRoomDisplayName(mContext));
+            updateGroupMembers(room, group);
+            ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
+            if (csa != null)
+                csa.presenceChanged(Presence.AVAILABLE);
+        }
+    }
+
+    protected void updateGroupMembers (final Room room, final ChatGroup group)
     {
         final PowerLevels powerLevels = room.getState().getPowerLevels();
 
@@ -665,23 +676,44 @@ public class MatrixConnection extends ImConnection {
             @Override
             public void onNetworkError(Exception e) {
                 debug ("Network error syncing active members",e);
+
+                mResponseHandler.postDelayed(new Runnable () {
+
+                    public void run (){
+                        updateGroupMembers(room, group);
+                    }
+                },3000);
             }
 
             @Override
             public void onMatrixError(MatrixError matrixError) {
                 debug ("Matrix error syncing active members",matrixError);
+
+                mResponseHandler.postDelayed(new Runnable () {
+
+                    public void run (){
+                        updateGroupMembers(room, group);
+                    }
+                },3000);
             }
 
             @Override
             public void onUnexpectedError(Exception e) {
 
                 debug("Error syncing active members",e);
+
+                mResponseHandler.postDelayed(new Runnable () {
+
+                    public void run (){
+                        updateGroupMembers(room, group);
+                    }
+                },3000);
             }
 
             @Override
             public void onSuccess(final List<RoomMember> roomMembers) {
 
-                mExecutor.execute(new Runnable (){
+                mResponseHandler.post(new Runnable (){
                     public void run ()
                     {
                         group.beginMemberUpdates();
@@ -856,7 +888,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mStore.getRoom(roomState.roomId);
             if (room.isInvited())
             {
-                onNewRoom(roomState.roomId);
+                handleRoomInvite(room, event.sender);
             }
 
             if (!TextUtils.isEmpty(event.type)) {
@@ -979,32 +1011,8 @@ public class MatrixConnection extends ImConnection {
             debug ("onNewRoom: " + s);
 
             final Room room = mStore.getRoom(s);
+            handleRoomInvite (room, null);
 
-            if (room.isInvited())
-            {
-                MatrixAddress addr = new MatrixAddress(s);
-
-                Invitation invite = new Invitation(s,addr,addr,room.getRoomDisplayName(mContext));
-
-                mChatGroupManager.notifyGroupInvitation(invite);
-
-                ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(new MatrixAddress(room.getRoomId()),room.getRoomDisplayName(mContext));
-                participant.setJoined(false);
-                ChatSession session = mChatSessionManager.createChatSession(participant, true);
-                ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
-                csa.setLastMessage(mContext.getString(R.string.room_invited));
-
-            }
-            else if (room.isMember() && room.getNumberOfMembers() > 1)
-            {
-                ChatGroup group = addRoomContact(room);
-                ChatSession session = mChatSessionManager.getSession(room.getRoomId());
-
-                if (session == null) {
-                    ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(new MatrixAddress(room.getRoomId()),room.getRoomDisplayName(mContext));
-                    session = mChatSessionManager.createChatSession(participant, true);
-                }
-            }
 
         }
 
@@ -1020,13 +1028,17 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onRoomFlush(String s) {
             debug ("onRoomFlush: " + s);
-
+            Room room = mDataHandler.getRoom(s);
+            if (room != null)
+                updateGroup(room);
         }
 
         @Override
         public void onRoomInternalUpdate(String s) {
             debug ("onRoomInternalUpdate: " + s);
-
+            Room room = mDataHandler.getRoom(s);
+            if (room != null)
+                updateGroup(room);
         }
 
         @Override
@@ -1043,7 +1055,9 @@ public class MatrixConnection extends ImConnection {
 
         @Override
         public void onRoomKick(String s) {
-
+            Room room = mDataHandler.getRoom(s);
+            if (room != null)
+                updateGroup(room);
         }
 
         @Override
@@ -1117,7 +1131,9 @@ public class MatrixConnection extends ImConnection {
 
         @Override
         public void onGroupProfileUpdate(String s) {
-
+            Room room = mDataHandler.getRoom(s);
+            if (room != null)
+                updateGroup(room);
         }
 
         @Override
@@ -1130,11 +1146,16 @@ public class MatrixConnection extends ImConnection {
         public void onGroupUsersListUpdate(String s) {
             debug ("onGroupUsersListUpdate: " + s);
             loadStateAsync();
+            Room room = mDataHandler.getRoom(s);
+            if (room != null)
+                updateGroup(room);
         }
 
         @Override
         public void onGroupInvitedUsersListUpdate(String s) {
-
+            Room room = mDataHandler.getRoom(s);
+            if (room != null)
+                updateGroup(room);
         }
 
 
@@ -1566,5 +1587,39 @@ public class MatrixConnection extends ImConnection {
 
             }
         });
+    }
+
+    private void handleRoomInvite (Room room, String sender)
+    {
+
+        if (room.isInvited())
+        {
+            MatrixAddress addrRoom = new MatrixAddress(room.getRoomId());
+            MatrixAddress addrSender = null;
+
+            if (!TextUtils.isEmpty(sender))
+                addrSender = new MatrixAddress(sender);
+
+            Invitation invite = new Invitation(room.getRoomId(),addrRoom,addrSender,room.getRoomDisplayName(mContext));
+
+            mChatGroupManager.notifyGroupInvitation(invite);
+
+            ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(new MatrixAddress(room.getRoomId()),room.getRoomDisplayName(mContext));
+            participant.setJoined(false);
+            ChatSession session = mChatSessionManager.createChatSession(participant, true);
+            ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
+            csa.setLastMessage(mContext.getString(R.string.room_invited));
+
+        }
+        else if (room.isMember() && room.getNumberOfMembers() > 1)
+        {
+            ChatGroup group = addRoomContact(room);
+            ChatSession session = mChatSessionManager.getSession(room.getRoomId());
+
+            if (session == null) {
+                ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(new MatrixAddress(room.getRoomId()),room.getRoomDisplayName(mContext));
+                session = mChatSessionManager.createChatSession(participant, true);
+            }
+        }
     }
 }

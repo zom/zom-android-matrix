@@ -169,15 +169,14 @@ public class StatusBarNotifier {
         intent.setDataAndType(ContentUris.withAppendedId(Imps.Chats.CONTENT_URI, invitationId),Imps.Chats.CONTENT_ITEM_TYPE);
         intent.addCategory(IMPS_CATEGORY);
 
-        String title = mContext.getString(R.string.notify_groupchat_label);
-        String message = mContext.getString(R.string.invitation_prompt, invitation.getReason());
+        String title = invitation.getReason();
+        String message = mContext.getString(R.string.room_invited);
         notify(invitation.getSender().getAddress(), title, message, message, providerId, accountId, intent, false, R.drawable.ic_people_white_24dp, true);
     }
 
     public void notifyLoggedIn(long providerId, long accountId) {
 
         Intent intent = new Intent(mContext, DummyActivity.class);
-        ;
 
         String title = mContext.getString(R.string.app_name);
         String message = mContext.getString(R.string.presence_available);

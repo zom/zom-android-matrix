@@ -142,7 +142,7 @@ public class AddContactActivity extends BaseActivity {
 
         Intent intent = getIntent();
         String scheme = intent.getScheme();
-        if (TextUtils.equals(scheme, "xmpp"))
+        if (TextUtils.equals(scheme, "keanu"))
         {
             addContactFromUri(intent.getData());
         }
@@ -399,14 +399,15 @@ public class AddContactActivity extends BaseActivity {
         return domain;
     }
 
-    void addContact() {
+    boolean foundOne = false;
 
-     //   Pattern pattern = Pattern.compile(EMAIL_PATTERN);
+    private synchronized void addContact() {
 
-        //Rfc822Token[] recipients = Rfc822Tokenizer.tokenize(mNewAddress.getText());
+        if (foundOne)
+            return;
+
         String[] recipients = mNewAddress.getText().toString().split(",");
 
-        boolean foundOne = false;
         String addAddress = null;
 
         for (String address : recipients) {
@@ -434,29 +435,7 @@ public class AddContactActivity extends BaseActivity {
 
         finish();
 
-        /*
-        else
-        {
 
-            String inviteAddress = mNewAddress.getText().toString();
-            String domain = mApp.getDefaultUsername().split("@")[1];
-
-            inviteAddress += "@" + domain;
-
-            if (pattern.matcher(inviteAddress).matches())
-            {
-
-                new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(inviteAddress, null, null);
-                Intent intent = new Intent();
-                intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME,inviteAddress);
-                intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER, mApp.getDefaultProviderId());
-                intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT, mApp.getDefaultAccountId());
-
-                setResult(RESULT_OK, intent);
-                finish();
-            }
-
-        }*/
 
 
     }
@@ -672,21 +651,9 @@ public class AddContactActivity extends BaseActivity {
      */
     private void addContactFromUri(Uri uri) {
         Log.i(TAG, "addContactFromUri: " + uri + "  scheme: " + uri.getScheme());
-        Map<String, String> parsedUri = XmppUriHelper.parse(uri);
-        if (!parsedUri.containsKey(XmppUriHelper.KEY_ADDRESS)) {
-            Toast.makeText(this, "error parsing address: " + uri, Toast.LENGTH_LONG).show();
-            return;
-        }
-        String address = parsedUri.get(XmppUriHelper.KEY_ADDRESS);
-        mNewAddress.setText(address);
-      //  this.mInviteButton.setBackgroundColor(R.drawable.btn_green);
 
-        //store this for future use... ideally the user comes up as verified the first time!
-        String fingerprint = parsedUri.get(XmppUriHelper.KEY_OTR_FINGERPRINT);
-        if (!TextUtils.isEmpty(fingerprint)) {
-            Log.i(TAG, "fingerprint: " + fingerprint);
-          //  OtrAndroidKeyManagerImpl.getInstance(this).verifyUser(address, fingerprint);
-        }
+        mNewAddress.setText(uri.getQueryParameter("id"));
+
     }
 
     @Override

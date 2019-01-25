@@ -1283,6 +1283,7 @@ public class ConversationView {
 
         }
 
+
     }
 
 
@@ -1669,45 +1670,6 @@ public class ConversationView {
 
     }
 
-    /**
-    public void verifyScannedFingerprint (String scannedFingerprint)
-    {
-        try
-        {
-            IOtrChatSession otrChatSession = mCurrentChatSession.getDefaultOtrChatSession();
-
-            if (scannedFingerprint != null && scannedFingerprint.equalsIgnoreCase(otrChatSession.getRemoteFingerprint())) {
-                verifyRemoteFingerprint();
-            }
-        }
-        catch (RemoteException e)
-        {
-            LogCleaner.error(ImApp.LOG_TAG, "unable to perform manual key verification", e);
-        }
-    }*/
-
-    public void showVerifyDialog() {
-
-        Intent intent = new Intent(mContext, ContactDisplayActivity.class);
-        intent.putExtra("nickname", mRemoteNickname);
-        intent.putExtra("address", mRemoteAddress);
-        intent.putExtra("provider", mProviderId);
-        intent.putExtra("account", mAccountId);
-        intent.putExtra("contactId", mLastChatId);
-
-        /**
-        if (mCurrentChatSession != null) {
-            try {
-                IOtrChatSession otrChatSession = mCurrentChatSession.getDefaultOtrChatSession();
-                if (otrChatSession != null)
-                    intent.putExtra("fingerprint", otrChatSession.getRemoteFingerprint());
-            } catch (RemoteException re) {
-            }
-        }**/
-
-        mContext.startActivity(intent);
-
-    }
 
     public void showGroupInfo () {
 
@@ -1936,8 +1898,6 @@ public class ConversationView {
     }
 
     void sendMessageAsync(final String msg) {
-
-        //new SendMessageAsyncTask().execute(msg);
 
         new AsyncTask<String, Void, Boolean>()
         {

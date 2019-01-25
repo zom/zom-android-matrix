@@ -91,13 +91,13 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         else
             result.setName(subject);
 
-        notifyJoinedGroup(result);
+        //notifyJoinedGroup(result);
 
         return result;
     }
 
     @Override
-    public void createChatGroupAsync(final String subject, boolean isDirect, IChatSessionListener listener) throws Exception {
+    public synchronized void createChatGroupAsync(final String subject, final boolean isDirect, final IChatSessionListener listener) throws Exception {
 
         if (isDirect)
         {
@@ -107,27 +107,41 @@ public class MatrixChatGroupManager extends ChatGroupManager {
             {
                 //found an existing room!
 
-                Room room = mDataHandler.getRoom(rooms.get(0));
-                room.join(new BasicApiCallback("join room"));
-                room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
+                final Room room = mDataHandler.getRoom(rooms.get(0));
+                room.join(new BasicApiCallback("join room")
+                          {
+                              @Override
+                              public void onSuccess(Object o) {
+                                  super.onSuccess(o);
 
-                ChatGroup chatGroup = mConn.addRoomContact(room);
-                ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
-                IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
-                try {
-                    iSession.useEncryption(room.isEncrypted());
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
+                                  if (!room.isEncrypted())
+                                    room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
 
-                if (listener != null) {
+                                  ChatGroup chatGroup = mConn.addRoomContact(room);
 
-                    try {
-                        listener.onChatSessionCreated(iSession);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                }
+                                  ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
+                                  IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
+                                  try {
+                                      iSession.useEncryption(room.isEncrypted());
+                                  } catch (RemoteException e) {
+                                      e.printStackTrace();
+                                  }
+
+                                  if (listener != null) {
+
+                                      try {
+                                          listener.onChatSessionCreated(iSession);
+                                      } catch (RemoteException e) {
+                                          e.printStackTrace();
+                                      }
+                                  }
+
+                                  mConn.addRoomContact(room);
+
+                              }
+                          }
+                );
+
 
                 return;
             }
@@ -173,31 +187,49 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                 public void onSuccess(String roomId) {
                     Room room = mDataHandler.getRoom(roomId);
 
-                    room.join(new BasicApiCallback("join room"));
-                    room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
+                    room.join(new BasicApiCallback("join room")
+                              {
+                                  @Override
+                                  public void onSuccess(Object o) {
+                                      super.onSuccess(o);
 
-                    ChatGroup chatGroup = mConn.addRoomContact(room);
-                    ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
-                    IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(roomId);
-                    try {
-                        iSession.useEncryption(true);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
+                                      if (!room.isEncrypted())
+                                          room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
 
-                    if (listener != null) {
+                                      ChatGroup chatGroup = mConn.addRoomContact(room);
 
-                        try {
-                            listener.onChatSessionCreated(iSession);
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                                      ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
+                                      IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
+                                      try {
+                                          iSession.useEncryption(room.isEncrypted());
+                                      } catch (RemoteException e) {
+                                          e.printStackTrace();
+                                      }
+
+                                      if (listener != null) {
+
+                                          try {
+                                              listener.onChatSessionCreated(iSession);
+                                          } catch (RemoteException e) {
+                                              e.printStackTrace();
+                                          }
+                                      }
+
+                                      mConn.updateGroupMembers(room, chatGroup);
+
+
+                                  }
+                              }
+                    );
+
                 }
             });
         }
         else {
-            mSession.createRoom(null, subject, null, new ApiCallback<String>() {
+
+
+
+            mSession.createRoom(subject, null, null, new ApiCallback<String>() {
                 @Override
                 public void onNetworkError(Exception e) {
                     mConn.debug("createChatGroupAsync:onNetworkError: " + e);
@@ -238,29 +270,45 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                 public void onSuccess(String roomId) {
                     Room room = mDataHandler.getRoom(roomId);
 
-                    if (subject != null)
+                    if (!TextUtils.isEmpty(subject))
                         room.updateName(subject, new BasicApiCallback("RoomUpdate"));
 
-                    room.join(new BasicApiCallback("join room"));
-                    room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
+                    room.join(new BasicApiCallback("join room")
+                              {
+                                  @Override
+                                  public void onSuccess(Object o) {
+                                      super.onSuccess(o);
 
-                    ChatGroup chatGroup = mConn.addRoomContact(room);
-                    ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
-                    IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(roomId);
-                    try {
-                        iSession.useEncryption(true);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
+                                      if (!room.isEncrypted())
+                                          room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
 
-                    if (listener != null) {
+                                      ChatGroup chatGroup = mConn.addRoomContact(room);
 
-                        try {
-                            listener.onChatSessionCreated(iSession);
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
-                    }
+                                      ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
+                                      IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
+                                      try {
+                                          iSession.useEncryption(room.isEncrypted());
+                                      } catch (RemoteException e) {
+                                          e.printStackTrace();
+                                      }
+
+                                      if (listener != null) {
+
+                                          try {
+                                              listener.onChatSessionCreated(iSession);
+                                          } catch (RemoteException e) {
+                                              e.printStackTrace();
+                                          }
+                                      }
+
+                                      mConn.updateGroupMembers(room, chatGroup);
+
+
+                                  }
+                              }
+                    );
+
+
                 }
             });
         }

@@ -51,6 +51,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -843,39 +844,19 @@ public class MainActivity extends BaseActivity {
 
     }
 
-
-
     public void startChat (long providerId, long accountId, String username, final boolean openChat)
     {
 
         if (!checkConnection())
             return;
 
-        //startCrypto is not actually used anymore, as we move to OMEMO
-        StringBuffer sbChatRoomName = new StringBuffer();
-
         ArrayList<String> invitees = new ArrayList<>();
         invitees.add(username);
 
         IImConnection conn = RemoteImService.getConnection(providerId, accountId);
 
-        if (conn != null) {
-            try {
-                Contact contact = conn.getContactListManager().getContactByAddress(username);
-
-                if (contact != null) {
-                    sbChatRoomName.append(contact.getName());
-                } else {
-                    sbChatRoomName.append(username);
-                }
-
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
-
-
-            startGroupChat(sbChatRoomName.toString(), invitees, conn);
-        }
+        if (conn != null)
+            startGroupChat(null, invitees, conn);
     }
 
     public void startGroupChat ()
@@ -883,54 +864,6 @@ public class MainActivity extends BaseActivity {
         IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
         startGroupChat(null, null, conn);
     }
-
-    /**
-    public void showGroupChatDialog ()
-    {
-
-        // This example shows how to add a custom layout to an AlertDialog
-        LayoutInflater factory = LayoutInflater.from(this);
-
-        final View dialogGroup = factory.inflate(R.layout.alert_dialog_group_chat, null);
-        //TextView tvServer = (TextView) dialogGroup.findViewById(R.id.chat_server);
-        // tvServer.setText(ImApp.DEFAULT_GROUPCHAT_SERVER);// need to make this a list
-
-       // final Spinner listAccounts = (Spinner) dialogGroup.findViewById(R.id.choose_list);
-       // setupAccountSpinner(listAccounts);
-
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle(R.string.create_group)
-                .setView(dialogGroup)
-                .setPositiveButton(R.string.connect, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int whichButton) {
-
-
-                        TextView tv = (TextView) dialogGroup.findViewById(R.id.chat_room);
-                        String chatRoomName = tv.getText().toString();
-
-
-                        IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
-                        startGroupChat(chatRoomName, null, conn);
-
-
-                        dialog.dismiss();
-
-                    }
-                })
-                .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int whichButton) {
-
-
-                        dialog.dismiss();
-                    }
-                })
-                .create();
-        dialog.show();
-
-
-    }**/
 
     private IImConnection mLastConnGroup = null;
     private long mRequestedChatId = -1;
@@ -940,6 +873,11 @@ public class MainActivity extends BaseActivity {
         mLastConnGroup = conn;
 
         try {
+
+            if (TextUtils.isEmpty(roomSubject))
+            {
+                roomSubject = getString(R.string.new_group_title);
+            }
 
             IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
 
@@ -956,7 +894,7 @@ public class MainActivity extends BaseActivity {
                 }
 
                 @Override
-                public void onChatSessionCreated(IChatSession session) throws RemoteException {
+                public void onChatSessionCreated(final IChatSession session) throws RemoteException {
                     session.useEncryption(true);
                     session.setLastMessage(" ");
                     Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);

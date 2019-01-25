@@ -218,7 +218,7 @@
     <string name="subscription_notify_text">New friend invitation from <xliff:g id="user">%s</xliff:g></string>
     <string name="file_notify_text">New <xliff:g id="filename">%1$s</xliff:g> received</string>
     <string name="notify_groupchat_label">Group chat invitation</string>
-    <string name="group_chat_invite_notify_text">New group chat invitation from <xliff:g id="user">%s</xliff:g></string>
+    <string name="group_chat_invite_notify_text">New chat invitation from <xliff:g id="user">%s</xliff:g></string>
     <string name="new_messages_notify">New message(s) from</string>
     <string name="starting_the_chatsecure_service_">Starting the service…</string>
     <string name="app_unlocked">App is running</string>
@@ -618,4 +618,8 @@
     <string name="login_info">You can use an existing account on any server you would like.</string>
     <string name="is_inviting_you">is inviting you to connect:</string>
 
+    <string name="status_no_internet">No Internet</string>
+    <string name="action_view_devices">View Devices and Keys</string>
+
+    <string name="new_group_title">New Group</string>
 </resources>

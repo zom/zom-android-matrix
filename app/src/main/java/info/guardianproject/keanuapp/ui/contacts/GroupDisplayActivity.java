@@ -373,6 +373,9 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 if (mSession != null) {
                     mSession.registerChatListener(mChatListener);
                     mChatListenerRegistered = true;
+
+                    updateMembers();
+
                     List<Contact> admins = mSession.getGroupChatAdmins();
                     List<Contact> owners = mSession.getGroupChatOwners();
                     if (admins != null) {
@@ -391,7 +394,6 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                             }
                         }
                     }
-                    updateMembers();
 
                     // Update recycler view adapter (if set) to enable session dependent stuff, like notifications
                     if (mRecyclerView != null) {
@@ -460,80 +462,73 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     }
 
     private synchronized void updateMembers() {
-        if (mThreadUpdate != null) {
-            mThreadUpdate.interrupt();
-            mThreadUpdate = null;
-        }
-        mThreadUpdate = new Thread(new Runnable() {
-            @Override
-            public void run() {
 
-                final HashMap<String, GroupMemberDisplay> members = new HashMap<>();
 
-                String[] projection = {Imps.GroupMembers.USERNAME, Imps.GroupMembers.NICKNAME, Imps.GroupMembers.ROLE, Imps.GroupMembers.AFFILIATION};
-                Uri memberUri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, mLastChatId);
-                ContentResolver cr = getContentResolver();
-                Cursor c = cr.query(memberUri, projection, null, null, null);
-                if (c != null) {
-                    int colUsername = c.getColumnIndex(Imps.GroupMembers.USERNAME);
-                    int colNickname = c.getColumnIndex(Imps.GroupMembers.NICKNAME);
-                    int colRole = c.getColumnIndex(Imps.GroupMembers.ROLE);
-                    int colAffiliation = c.getColumnIndex(Imps.GroupMembers.AFFILIATION);
+            final HashMap<String, GroupMemberDisplay> members = new HashMap<>();
 
-                    while (c.moveToNext()) {
-                        GroupMemberDisplay member = new GroupMemberDisplay();
-                        member.username = c.getString(colUsername);
-                        member.nickname = c.getString(colNickname);
-                        member.role = c.getString(colRole);
-                        member.affiliation = c.getString(colAffiliation);
-                        try {
-                            member.avatar = DatabaseUtils.getAvatarFromAddress(cr, member.username, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
-                        } catch (DecoderException e) {
-                            e.printStackTrace();
-                        }
+            String[] projection = {Imps.GroupMembers.USERNAME, Imps.GroupMembers.NICKNAME, Imps.GroupMembers.ROLE, Imps.GroupMembers.AFFILIATION};
+            Uri memberUri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, mLastChatId);
+            ContentResolver cr = getContentResolver();
+            Cursor c = cr.query(memberUri, projection, null, null, null);
+            if (c != null) {
+                int colUsername = c.getColumnIndex(Imps.GroupMembers.USERNAME);
+                int colNickname = c.getColumnIndex(Imps.GroupMembers.NICKNAME);
+                int colRole = c.getColumnIndex(Imps.GroupMembers.ROLE);
+                int colAffiliation = c.getColumnIndex(Imps.GroupMembers.AFFILIATION);
 
-                        if (mLocalAddress.contentEquals(member.username)) {
-                            mYou = member;
-                        }
-
-                        members.put(member.username, member);
+                while (c.moveToNext()) {
+                    GroupMemberDisplay member = new GroupMemberDisplay();
+                    member.username = c.getString(colUsername);
+                    member.nickname = c.getString(colNickname);
+                    member.role = c.getString(colRole);
+                    member.affiliation = c.getString(colAffiliation);
+                    try {
+                        member.avatar = DatabaseUtils.getAvatarFromAddress(cr, member.username, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
+                    } catch (DecoderException e) {
+                        e.printStackTrace();
                     }
-                    c.close();
-                }
-                if (!Thread.currentThread().isInterrupted()) {
 
-                    final ArrayList<GroupMemberDisplay> listMembers = new ArrayList<>(members.values());
-                    // Sort members by name, but keep owners at the top
-                    Collections.sort(listMembers, new Comparator<GroupMemberDisplay>() {
-                        @Override
-                        public int compare(GroupMemberDisplay member1, GroupMemberDisplay member2) {
-                            if (member1.affiliation == null || member2.affiliation == null)
-                                return 1;
-                            boolean member1isImportant = (member1.affiliation.contentEquals("owner") || member1.affiliation.contentEquals("admin"));
-                            boolean member2isImportant = (member2.affiliation.contentEquals("owner") || member2.affiliation.contentEquals("admin"));
-                            if (member1isImportant != member2isImportant) {
-                                if (member1isImportant) {
-                                    return -1;
-                                } else {
-                                    return 1;
-                                }
-                            }
-                            return member1.nickname.compareTo(member2.nickname);
-                        }
-                    });
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mMembers = listMembers;
+                    if (mLocalAddress.contentEquals(member.username)) {
+                        mYou = member;
+                    }
 
-                            if (mRecyclerView != null && mRecyclerView.getAdapter() != null)
-                                mRecyclerView.getAdapter().notifyDataSetChanged();
-                        }
-                    });
+                    members.put(member.username, member);
                 }
+                c.close();
             }
-        });
-        mThreadUpdate.start();
+
+            final ArrayList<GroupMemberDisplay> listMembers = new ArrayList<>(members.values());
+            // Sort members by name, but keep owners at the top
+            Collections.sort(listMembers, new Comparator<GroupMemberDisplay>() {
+                @Override
+                public int compare(GroupMemberDisplay member1, GroupMemberDisplay member2) {
+                    if (member1.affiliation == null || member2.affiliation == null)
+                        return 1;
+                    boolean member1isImportant = (member1.affiliation.contentEquals("owner") || member1.affiliation.contentEquals("admin"));
+                    boolean member2isImportant = (member2.affiliation.contentEquals("owner") || member2.affiliation.contentEquals("admin"));
+                    if (member1isImportant != member2isImportant) {
+                        if (member1isImportant) {
+                            return -1;
+                        } else {
+                            return 1;
+                        }
+                    }
+                    return member1.nickname.compareTo(member2.nickname);
+                }
+            });
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mMembers = listMembers;
+
+                    if (mRecyclerView != null && mRecyclerView.getAdapter() != null)
+                        mRecyclerView.getAdapter().notifyDataSetChanged();
+                }
+            });
+
+
+
     }
 
     public void inviteContacts (ArrayList<String> invitees)
@@ -844,6 +839,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 .setMessage(getString(R.string.confirm_leave_group))
                 .setPositiveButton(getString(R.string.action_leave), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
                         leaveGroup();
                     }
                 })
@@ -892,6 +888,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             IChatSession session = manager.getChatSession(mAddress);
 
             if (session == null)
+
                 session = manager.createChatSession(mAddress, true, new IChatSessionListener() {
                     @Override
                     public void onChatSessionCreated(IChatSession session) throws RemoteException {
