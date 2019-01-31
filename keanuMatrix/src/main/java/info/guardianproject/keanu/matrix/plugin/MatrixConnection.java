@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Pair;
 import android.widget.ImageView;
 
 import com.facebook.stetho.common.ArrayListAccumulator;
@@ -69,9 +70,12 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -191,6 +195,8 @@ public class MatrixConnection extends ImConnection {
 
         initMatrix();
 
+        initGroupLoader();
+        initAvatarLoader();
     }
 
     @Override
@@ -650,9 +656,11 @@ public class MatrixConnection extends ImConnection {
 
        String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(room.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
 
-        if (!TextUtils.isEmpty(downloadUrl))
-            downloadAvatar(room.getRoomId(),downloadUrl);
-
+        if (!TextUtils.isEmpty(downloadUrl)) {
+            if (!hasAvatar(room.getRoomId(), downloadUrl)) {
+                downloadAvatar(room.getRoomId(), downloadUrl);
+            }
+        }
 
         return group;
     }
@@ -668,7 +676,13 @@ public class MatrixConnection extends ImConnection {
         }
     }
 
-    protected void updateGroupMembers (final Room room, final ChatGroup group)
+    protected void updateGroupMembers (final Room room, final ChatGroup group) {
+
+        if (!lbqGroups.contains(group))
+            lbqGroups.add(group);
+    }
+
+    protected void updateGroupMembersAsync (final Room room, final ChatGroup group)
     {
         final PowerLevels powerLevels = room.getState().getPowerLevels();
 
@@ -750,8 +764,11 @@ public class MatrixConnection extends ImConnection {
 
                             String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(member.getUserId(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
 
-                            if (!TextUtils.isEmpty(downloadUrl))
-                                downloadAvatar(member.getUserId(),downloadUrl);
+                            if (!TextUtils.isEmpty(downloadUrl)) {
+                                if (!hasAvatar(member.getUserId(), downloadUrl)) {
+                                    downloadAvatar(member.getUserId(), downloadUrl);
+                                }
+                            }
 
                         }
 
@@ -773,7 +790,9 @@ public class MatrixConnection extends ImConnection {
         ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
         if (csa != null) {
             boolean isEncrypted = mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId());
-            csa.updateEncryptionState(isEncrypted);
+
+            if (!csa.getUseEncryption() == isEncrypted)
+                csa.updateEncryptionState(isEncrypted);
         }
     }
 
@@ -1038,7 +1057,7 @@ public class MatrixConnection extends ImConnection {
             debug ("onRoomInternalUpdate: " + s);
             Room room = mDataHandler.getRoom(s);
             if (room != null)
-                updateGroup(room);
+               updateGroup(room);
         }
 
         @Override
@@ -1056,8 +1075,8 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onRoomKick(String s) {
             Room room = mDataHandler.getRoom(s);
-            if (room != null)
-                updateGroup(room);
+           // if (room != null)
+            //    updateGroup(room);
         }
 
         @Override
@@ -1163,7 +1182,6 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onAccountDataUpdated() {
             debug ("onAccountDataUpdated!");
-
         }
 
 
@@ -1199,12 +1217,11 @@ public class MatrixConnection extends ImConnection {
                 mContactListManager.notifyContactsPresenceUpdated(contacts);
             }
 
-            if (!hasAvatar(user.user_id))
-            {
-                String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
-
-                if (!TextUtils.isEmpty(downloadUrl))
-                    downloadAvatar(user.user_id,downloadUrl);
+            String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+            if (!TextUtils.isEmpty(downloadUrl)) {
+                if (!hasAvatar(user.user_id, downloadUrl)) {
+                    downloadAvatar(user.user_id, downloadUrl);
+                }
             }
         }
     }
@@ -1512,6 +1529,11 @@ public class MatrixConnection extends ImConnection {
 
     private void downloadAvatar (final String address, final String url)
     {
+        lbqAvatars.add(new Pair<String,String>(address,url));
+    }
+
+    private void downloadAvatarAsync (final String address, final String url)
+    {
         mExecutor.execute(new Runnable ()
         {
             public void run ()
@@ -1536,9 +1558,9 @@ public class MatrixConnection extends ImConnection {
 
     }
 
-    private boolean hasAvatar (String address)
+    private boolean hasAvatar (String address, String downloadUrl)
     {
-        return DatabaseUtils.hasAvatarContact(mContext.getContentResolver(),Imps.Avatars.CONTENT_URI,address);
+        return DatabaseUtils.doesAvatarHashExist(mContext.getContentResolver(),Imps.Avatars.CONTENT_URI,address,downloadUrl);
     }
 
     private void setAvatar(String address, byte[] avatarBytesCompressed, String avatarHash) {
@@ -1633,4 +1655,53 @@ public class MatrixConnection extends ImConnection {
             }
         }
     }
+
+    LinkedBlockingQueue<ChatGroup> lbqGroups = new LinkedBlockingQueue<>();
+    Timer mTimerGroupLoader;
+
+    private void initGroupLoader () {
+        mTimerGroupLoader = new Timer();
+
+        mTimerGroupLoader.schedule(new TimerTask() {
+
+            public void run() {
+
+                int maxLoad = 3;
+                int i = 0;
+
+                while (lbqGroups.peek() != null && i++ < maxLoad) {
+                    ChatGroup group = lbqGroups.poll();
+                    Room room = mDataHandler.getRoom(group.getAddress().getAddress());
+                    mExecutor.execute(new Runnable () {
+                            public void run () { updateGroupMembersAsync(room,group);}});
+                }
+
+            }
+
+        }, 5000, 5000);
+    }
+
+    LinkedBlockingQueue<Pair<String,String>> lbqAvatars = new LinkedBlockingQueue<>();
+    Timer mTimerAvatarLoader;
+
+    private void initAvatarLoader () {
+        mTimerAvatarLoader = new Timer();
+
+        mTimerAvatarLoader.schedule(new TimerTask() {
+
+            public void run() {
+
+                int maxLoad = 3;
+                int i = 0;
+
+                while (lbqAvatars.peek() != null && i++ < maxLoad) {
+                    Pair<String,String> pair = lbqAvatars.poll();
+                    downloadAvatarAsync(pair.first, pair.second);
+                }
+
+            }
+
+        }, 5000, 5000);
+    }
+
 }

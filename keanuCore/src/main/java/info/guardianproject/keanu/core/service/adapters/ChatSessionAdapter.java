@@ -1854,7 +1854,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     public boolean useEncryption (boolean useEncryption)
     {
-
+        updateEncryptionState(useEncryption);
         mChatSession.setUseEncryption(useEncryption);
         return getUseEncryption();
     }
