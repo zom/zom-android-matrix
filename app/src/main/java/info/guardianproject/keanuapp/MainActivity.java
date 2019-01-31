@@ -886,6 +886,9 @@ public class MainActivity extends BaseActivity {
             if (invitees != null)
                 aInvitees = invitees.toArray(new String[invitees.size()]);
 
+            mSbStatus = Snackbar.make(mViewPager, R.string.connecting_to_group_chat_, Snackbar.LENGTH_INDEFINITE);
+            mSbStatus.show();
+
             manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, new IChatSessionListener() {
 
                 @Override
@@ -895,7 +898,9 @@ public class MainActivity extends BaseActivity {
 
                 @Override
                 public void onChatSessionCreated(final IChatSession session) throws RemoteException {
-                    session.useEncryption(true);
+
+                    mSbStatus.dismiss();
+
                     session.setLastMessage(" ");
                     Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
                     intent.putExtra("id", session.getId());
@@ -908,6 +913,10 @@ public class MainActivity extends BaseActivity {
                 @Override
                 public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
 
+                    mSbStatus.dismiss();
+
+                    mSbStatus = Snackbar.make(mViewPager, error.getDescription(), Snackbar.LENGTH_LONG);
+                    mSbStatus.show();
                 }
             });
 

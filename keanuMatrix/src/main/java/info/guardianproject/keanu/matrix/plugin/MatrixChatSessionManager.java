@@ -87,7 +87,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                 room = mDataHandler.getRoom(session.getParticipant().getAddress().getAddress());
                // mConn.addRoomContact(room);
 
-            } else if (participant instanceof Contact) {
+            } /**else if (participant instanceof Contact) {
 
                 User user = mDataHandler.getUser(participant.getAddress().getAddress());
                 if (user != null) {
@@ -98,7 +98,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                 }
                 else
                     return null;
-            }
+            }**/
 
             if (room != null) {
 
@@ -129,6 +129,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
             }
         }
 
+        /**
         if (session.useEncryption())
         {
             boolean isEncrypted = mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId());
@@ -137,7 +138,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                 if (!room.isEncrypted())
                     room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("enableEncryptionWithAlgorithm"));
             }
-        }
+        }**/
 
         return room;
     }
@@ -387,6 +388,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
         return null;
     }
 
+    /**
     private void createOneToOneRoom (final String contactId)
     {
 
@@ -422,7 +424,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                 mConn.addRoomContact(room);
             }
         });
-    }
+    }**/
 
     public void enableEncryption (ChatSession session, boolean enableEncryption)
     {

@@ -11,7 +11,9 @@ import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
 import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
+import org.matrix.androidsdk.rest.model.CreateRoomParams;
 import org.matrix.androidsdk.rest.model.MatrixError;
+import org.matrix.androidsdk.rest.model.RoomDirectoryVisibility;
 import org.matrix.androidsdk.rest.model.RoomMember;
 import org.w3c.dom.Text;
 
@@ -114,18 +116,10 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                               public void onSuccess(Object o) {
                                   super.onSuccess(o);
 
-                                  if (!room.isEncrypted())
-                                    room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
-
                                   ChatGroup chatGroup = mConn.addRoomContact(room);
 
                                   ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
                                   IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
-                                  try {
-                                      iSession.useEncryption(room.isEncrypted());
-                                  } catch (RemoteException e) {
-                                      e.printStackTrace();
-                                  }
 
                                   if (listener != null) {
 
@@ -193,8 +187,8 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                                   public void onSuccess(Object o) {
                                       super.onSuccess(o);
 
-                                      if (!room.isEncrypted())
-                                          room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
+                                      setRoomDefaults(room);
+
 
                                       ChatGroup chatGroup = mConn.addRoomContact(room);
 
@@ -226,8 +220,6 @@ public class MatrixChatGroupManager extends ChatGroupManager {
             });
         }
         else {
-
-
 
             mSession.createRoom(subject, null, null, new ApiCallback<String>() {
                 @Override
@@ -279,8 +271,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                                   public void onSuccess(Object o) {
                                       super.onSuccess(o);
 
-                                      if (!room.isEncrypted())
-                                          room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
+                                      setRoomDefaults(room);
 
                                       ChatGroup chatGroup = mConn.addRoomContact(room);
 
@@ -312,6 +303,20 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                 }
             });
         }
+
+    }
+
+    private void setRoomDefaults (Room room)
+    {
+
+
+        if (!room.isEncrypted())
+            room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
+
+        room.setIsURLPreviewAllowedByUser(false, new BasicApiCallback("setIsURLPreviewAllowedByUser:false"));
+        room.updateDirectoryVisibility(RoomDirectoryVisibility.DIRECTORY_VISIBILITY_PRIVATE,new BasicApiCallback("updateDirectoryVisibility:private"));
+        room.updateHistoryVisibility("joined",new BasicApiCallback("updateHistoryVisibility:joined"));
+        room.updateGuestAccess("forbidden", new BasicApiCallback("updateGuestAccess:forbidden"));
 
     }
 

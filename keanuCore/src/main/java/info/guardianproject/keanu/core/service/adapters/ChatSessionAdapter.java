@@ -1854,13 +1854,17 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     public boolean useEncryption (boolean useEncryption)
     {
+        updateEncryptionState(useEncryption);
+        mChatSession.setUseEncryption(useEncryption);
+        return getUseEncryption();
+    }
+
+    public void updateEncryptionState (boolean useEncryption)
+    {
         mUseEncryption = useEncryption;
         ContentValues values = new ContentValues();
         values.put(Imps.Chats.USE_ENCRYPTION,useEncryption ? 1 : 0);
         int rowsUpdate = mContentResolver.update(mChatURI,values,null,null);
-
-        mChatSession.setUseEncryption(useEncryption);
-        return getUseEncryption();
     }
 
     public boolean getUseEncryption ()
