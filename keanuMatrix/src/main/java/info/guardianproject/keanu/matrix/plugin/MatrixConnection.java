@@ -773,7 +773,7 @@ public class MatrixConnection extends ImConnection {
         ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
         if (csa != null) {
             boolean isEncrypted = mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId());
-            csa.useEncryption(isEncrypted);
+            csa.updateEncryptionState(isEncrypted);
         }
     }
 
@@ -1118,7 +1118,8 @@ public class MatrixConnection extends ImConnection {
                 {
                     debug ("onNewGroupInvitation: " + s);
                     Room room = mStore.getRoom(s);
-                    addRoomContact(room);
+                    if (room != null)
+                        addRoomContact(room);
                 }
             });
 
@@ -1238,11 +1239,21 @@ public class MatrixConnection extends ImConnection {
     {
         if (!TextUtils.isEmpty(event.getSender())) {
 
-            String messageBody = event.getContent().getAsJsonObject().get("body").getAsString();
+            debug("MESSAGE: room=" + event.roomId + " from=" + event.getSender() + " event=" + event.toString());
+
+            String messageBody = null;
+
+            if (event.getContent().getAsJsonObject().has("body"))
+                messageBody = event.getContent().getAsJsonObject().get("body").getAsString();
+
+            if (TextUtils.isEmpty(messageBody)) {
+                debug("WARN: MESSAGE HAS NO BODY: " + event.toString());
+                return;
+            }
+
             String messageType = event.getContent().getAsJsonObject().get("msgtype").getAsString();
             String messageMimeType = null;
 
-            debug("MESSAGE: room=" + event.roomId + " from=" + event.getSender() + " message=" + messageBody);
 
             Room room = mStore.getRoom(event.roomId);
 

@@ -895,7 +895,6 @@ public class MainActivity extends BaseActivity {
 
                 @Override
                 public void onChatSessionCreated(final IChatSession session) throws RemoteException {
-                    session.useEncryption(true);
                     session.setLastMessage(" ");
                     Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
                     intent.putExtra("id", session.getId());
