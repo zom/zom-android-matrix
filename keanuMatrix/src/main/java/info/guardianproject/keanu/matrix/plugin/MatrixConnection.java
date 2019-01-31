@@ -57,6 +57,8 @@ import org.matrix.androidsdk.rest.model.login.LoginFlow;
 import org.matrix.androidsdk.rest.model.login.RegistrationFlowResponse;
 import org.matrix.androidsdk.rest.model.login.RegistrationParams;
 import org.matrix.androidsdk.rest.model.message.FileMessage;
+import org.matrix.androidsdk.rest.model.message.StickerJsonMessage;
+import org.matrix.androidsdk.rest.model.message.StickerMessage;
 import org.matrix.androidsdk.rest.model.search.SearchUsersResponse;
 import org.matrix.androidsdk.util.JsonUtils;
 
@@ -64,6 +66,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -680,109 +683,142 @@ public class MatrixConnection extends ImConnection {
 
         if (!lbqGroups.contains(group))
             lbqGroups.add(group);
+
+
     }
 
     protected void updateGroupMembersAsync (final Room room, final ChatGroup group)
     {
-        final PowerLevels powerLevels = room.getState().getPowerLevels();
 
-        mDataHandler.getMembersAsync(room.getRoomId(), new ApiCallback<List<RoomMember>>() {
-            @Override
-            public void onNetworkError(Exception e) {
-                debug ("Network error syncing active members",e);
-
-                mResponseHandler.postDelayed(new Runnable () {
-
-                    public void run (){
-                        updateGroupMembers(room, group);
-                    }
-                },3000);
-            }
-
-            @Override
-            public void onMatrixError(MatrixError matrixError) {
-                debug ("Matrix error syncing active members",matrixError);
-
-                mResponseHandler.postDelayed(new Runnable () {
-
-                    public void run (){
-                        updateGroupMembers(room, group);
-                    }
-                },3000);
-            }
-
-            @Override
-            public void onUnexpectedError(Exception e) {
-
-                debug("Error syncing active members",e);
-
-                mResponseHandler.postDelayed(new Runnable () {
-
-                    public void run (){
-                        updateGroupMembers(room, group);
-                    }
-                },3000);
-            }
-
-            @Override
-            public void onSuccess(final List<RoomMember> roomMembers) {
-
-                mResponseHandler.post(new Runnable (){
-                    public void run ()
-                    {
-                        group.beginMemberUpdates();
-
-                        for (RoomMember member : roomMembers)
-                        {
-                            debug ( "RoomMember: " + room.getRoomId() + ": " + member.getName() + " (" + member.getUserId() + ")");
-
-                            Contact contact = mContactListManager.getContact(member.getUserId());
-
-                            if (contact == null) {
-                                if (member.getName() != null)
-                                    contact = new Contact(new MatrixAddress(member.getUserId()), member.getName(), Imps.Contacts.TYPE_NORMAL);
-                                else
-                                    contact = new Contact(new MatrixAddress(member.getUserId()));
-                            }
-
-                            if (roomMembers.size() == 2)
-                            {
-                                if (!member.getUserId().equals(mDataHandler.getUserId()))
-                                {
-                                    mContactListManager.saveContact(contact);
-                                }
-                            }
-
-                            group.notifyMemberJoined(member.getUserId(), contact);
-
-                            if (powerLevels != null) {
-                                if (powerLevels.getUserPowerLevel(member.getUserId()) > powerLevels.invite)
-                                    group.notifyMemberRoleUpdate(contact, "moderator", "owner");
-                                else
-                                    group.notifyMemberRoleUpdate(contact, "member", "member");
-                            }
-
-                            String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(member.getUserId(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
-
-                            if (!TextUtils.isEmpty(downloadUrl)) {
-                                if (!hasAvatar(member.getUserId(), downloadUrl)) {
-                                    downloadAvatar(member.getUserId(), downloadUrl);
-                                }
-                            }
-
-                        }
-
-                        group.endMemberUpdates();
-
-                    }
-                });
+        if (room.getNumberOfMembers() < 20)
+        {
+            room.getDisplayableMembersAsync(new ApiCallback<List<RoomMember>>() {
+                @Override
+                public void onNetworkError(Exception e) {
+                    debug("Network error syncing active members", e);
 
 
-            }
-        });
+                }
+
+                @Override
+                public void onMatrixError(MatrixError matrixError) {
+                    debug("Matrix error syncing active members", matrixError);
+
+
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+
+                    debug("Error syncing active members", e);
+
+
+                }
+
+                @Override
+                public void onSuccess(final List<RoomMember> roomMembers) {
+
+                    mResponseHandler.post(new GroupMemberLoader(room, group, roomMembers));
+
+                }
+            });
+        }
+        else {
+            room.getActiveMembersAsync(new ApiCallback<List<RoomMember>>() {
+                @Override
+                public void onNetworkError(Exception e) {
+                    debug("Network error syncing active members", e);
+
+
+                }
+
+                @Override
+                public void onMatrixError(MatrixError matrixError) {
+                    debug("Matrix error syncing active members", matrixError);
+
+
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+
+                    debug("Error syncing active members", e);
+
+
+                }
+
+                @Override
+                public void onSuccess(final List<RoomMember> roomMembers) {
+
+                    mResponseHandler.post(new GroupMemberLoader(room, group, roomMembers));
+
+                }
+            });
+        }
 
 
     }
+
+    class GroupMemberLoader implements Runnable {
+
+        Room room;
+        ChatGroup group;
+        List<RoomMember> members;
+
+        public GroupMemberLoader (Room room, ChatGroup group, List<RoomMember> members)
+        {
+            this.room = room;
+            this.group = group;
+            this.members = members;
+        }
+
+        public void run() {
+
+            final PowerLevels powerLevels = room.getState().getPowerLevels();
+
+            group.beginMemberUpdates();
+
+            for (RoomMember member : members) {
+                debug("RoomMember: " + room.getRoomId() + ": " + member.getName() + " (" + member.getUserId() + ")");
+
+                Contact contact = mContactListManager.getContact(member.getUserId());
+
+                if (contact == null) {
+                    if (member.getName() != null)
+                        contact = new Contact(new MatrixAddress(member.getUserId()), member.getName(), Imps.Contacts.TYPE_NORMAL);
+                    else
+                        contact = new Contact(new MatrixAddress(member.getUserId()));
+                }
+
+                if (members.size() == 2) {
+                    if (!member.getUserId().equals(mDataHandler.getUserId())) {
+                        mContactListManager.saveContact(contact);
+                    }
+                }
+
+                group.notifyMemberJoined(member.getUserId(), contact);
+
+                if (powerLevels != null) {
+                    if (powerLevels.getUserPowerLevel(member.getUserId()) > powerLevels.invite)
+                        group.notifyMemberRoleUpdate(contact, "moderator", "owner");
+                    else
+                        group.notifyMemberRoleUpdate(contact, "member", "member");
+                }
+
+                String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(member.getUserId(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+
+                if (!TextUtils.isEmpty(downloadUrl)) {
+                    if (!hasAvatar(member.getUserId(), downloadUrl)) {
+                        downloadAvatar(member.getUserId(), downloadUrl);
+                    }
+                }
+
+            }
+
+            group.endMemberUpdates();
+
+        }
+    };
 
     protected void checkRoomEncryption (Room room)
     {
@@ -889,6 +925,24 @@ public class MatrixConnection extends ImConnection {
                         handleTyping(event);
                     }
                 });
+            }
+            else if (event.getType().equals(Event.EVENT_TYPE_FORWARDED_ROOM_KEY))
+            {
+                debug ("EVENT_TYPE_FORWARDED_ROOM_KEY: from=" + event.getSender() + ": " + event.getContent());
+
+            }
+            else if (event.getType().equals(Event.EVENT_TYPE_STICKER))
+            {
+                debug ("STICKER: from=" + event.getSender() + ": " + event.getContent());
+                mExecutor.execute(new Runnable ()
+                {
+                    public void run ()
+                    {
+                        handleIncomingSticker(event);
+                    }
+                });
+
+
             }
 
 
@@ -1252,6 +1306,109 @@ public class MatrixConnection extends ImConnection {
 
     }
 
+    private void handleIncomingSticker (Event event)
+    {
+        /**
+         *
+         * {
+         *   "age" : null,
+         *   "content": {
+         *     "body": "A hastily-rendered stick figure stands with arms in the air beneath three blue-and-white juggling balls apparently in motion. We cannot tell whether the figure is juggling competently or has simply thrown all three balls into the air and is awaiting the inevitable. The figure's mouth is formed into an enigmatic 'o'.",
+         *     "info": {"h":200,"mimetype":"image/png","size":30170,"thumbnail_info":{"h":200,"mimetype":"image/png","size":30170,"w":88},"thumbnail_url":"mxc://matrix.org/mQEotjwsEKeZivqIfZjxNfgC","w":88},
+         *     "url": "mxc://matrix.org/mQEotjwsEKeZivqIfZjxNfgC",
+         *   },
+         *   "eventId": "$154896906639558KPSVT:matrix.org",
+         *   "originServerTs": 1548969066195,
+         *   "roomId": "!LprBecrICHRvlyHpsO:matrix.org",
+         *   "type": "m.sticker",
+         *   "userId": "null",
+         *   "sender": "@n8fr8:matrix.org",
+         * }
+         *
+         *  Sent state : SENT
+         */
+        if (!TextUtils.isEmpty(event.getSender())) {
+
+            debug("MESSAGE: room=" + event.roomId + " from=" + event.getSender() + " event=" + event.toString());
+
+            String stickerAlt = null;
+            String stickerUrl = null;
+            String stickerType = "image/png";
+            String timeStamp = null;
+
+            if (event.getContent().getAsJsonObject().has("body"))
+                stickerAlt = event.getContent().getAsJsonObject().get("body").getAsString();
+
+            if (event.getContent().getAsJsonObject().has("url"))
+                stickerUrl = event.getContent().getAsJsonObject().get("url").getAsString();
+
+
+            if (!TextUtils.isEmpty(stickerUrl)) {
+
+                Room room = mStore.getRoom(event.roomId);
+
+                if (room != null && room.isMember()) {
+
+                    MatrixAddress addrSender = new MatrixAddress(event.sender);
+                    Uri uriSticker = Uri.parse(stickerUrl);
+
+                    String localFolder = addrSender.getAddress();
+                    String localFileName = new Date().getTime() + '.' + uriSticker.getPath();
+                    String downloadableUrl = mSession.getContentManager().getDownloadableUrl(stickerUrl, false);
+
+                    if (uriSticker.getScheme().equals("mxc")) {
+                        try {
+                            MatrixDownloader dl = new MatrixDownloader();
+                            info.guardianproject.iocipher.File fileDownload = dl.openSecureStorageFile(localFolder, localFileName);
+                            OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
+                            boolean downloaded = dl.get(downloadableUrl, storageStream);
+                            stickerAlt = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
+
+                        } catch (Exception e) {
+                            debug("Error downloading file: " + downloadableUrl, e);
+                        }
+                    }
+
+                    if (!TextUtils.isEmpty(stickerAlt)) {
+                        ChatSession session = mChatSessionManager.getSession(event.roomId);
+
+                        if (session == null) {
+                            ImEntity participant = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId), null);
+                            session = mChatSessionManager.createChatSession(participant, false);
+                        }
+
+                        Message message = new Message(stickerAlt);
+                        message.setID(event.eventId);
+                        message.setFrom(addrSender);
+                        message.setDateTime(new Date(event.originServerTs));//use "age"?
+                        message.setContentType(stickerType);
+
+                        if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
+                            message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
+                        } else
+                            message.setType(Imps.MessageType.INCOMING);
+
+                        session.onReceiveMessage(message, true);
+
+                        IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
+                        if (csa != null) {
+                            try {
+                                csa.setContactTyping(new Contact(addrSender), false);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
+                    }
+                }
+            }
+
+
+        }
+
+    }
+
     private void handleIncomingMessage (Event event)
     {
         if (!TextUtils.isEmpty(event.getSender())) {
@@ -1326,7 +1483,7 @@ public class MatrixConnection extends ImConnection {
                 Message message = new Message(messageBody);
                 message.setID(event.eventId);
                 message.setFrom(addrSender);
-                message.setDateTime(new Date());//use "age"?
+                message.setDateTime(new Date(event.getOriginServerTs()));//use "age"?
                 message.setContentType(messageMimeType);
 
                 if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
@@ -1672,6 +1829,7 @@ public class MatrixConnection extends ImConnection {
                 while (lbqGroups.peek() != null && i++ < maxLoad) {
                     ChatGroup group = lbqGroups.poll();
                     Room room = mDataHandler.getRoom(group.getAddress().getAddress());
+
                     mExecutor.execute(new Runnable () {
                             public void run () { updateGroupMembersAsync(room,group);}});
                 }
