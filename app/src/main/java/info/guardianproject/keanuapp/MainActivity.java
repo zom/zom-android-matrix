@@ -915,7 +915,11 @@ public class MainActivity extends BaseActivity {
 
                     mSbStatus.dismiss();
 
-                    mSbStatus = Snackbar.make(mViewPager, error.getDescription(), Snackbar.LENGTH_LONG);
+                    String errorMessage = getString(R.string.error);
+                    if (error != null)
+                        errorMessage = error.getDescription();
+
+                    mSbStatus = Snackbar.make(mViewPager, errorMessage, Snackbar.LENGTH_LONG);
                     mSbStatus.show();
                 }
             });

@@ -84,6 +84,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import info.guardianproject.iocipher.FileInputStream;
+import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.ChatSession;
@@ -149,6 +150,7 @@ public class MatrixConnection extends ImConnection {
 
     private Handler mResponseHandler = new Handler();
     private ThreadPoolExecutor mExecutor = null;
+    private ThreadPoolExecutor mExecutorGroups = null;
 
     public MatrixConnection (Context context)
     {
@@ -159,6 +161,9 @@ public class MatrixConnection extends ImConnection {
         mChatSessionManager = new MatrixChatSessionManager(context, this);
 
         mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
+                new LinkedBlockingQueue<Runnable>());
+
+        mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
                 new LinkedBlockingQueue<Runnable>());
 
     }
@@ -337,7 +342,7 @@ public class MatrixConnection extends ImConnection {
             password = Imps.Account.getPassword(mContext.getContentResolver(), mAccountId);
 
         final boolean enableEncryption = true;
-        final String initialToken = "";
+        final String initialToken = Preferences.getValue(mUser.getAddress().getUser() + ".sync");
 
         mLoginRestClient.loginWithUser(username, password, mDeviceName, mDeviceId, new SimpleApiCallback<Credentials>()
         {
@@ -625,10 +630,13 @@ public class MatrixConnection extends ImConnection {
 
                 for (Room room : rooms)
                 {
+                    updateGroup(room);
+
+                    /**
                     if (room.isMember() && room.getNumberOfMembers() > 1) {
                         ChatGroup group = addRoomContact(room);
                         mChatSessionManager.createChatSession(group, true);
-                    }
+                    }**/
 
                 }
 
@@ -692,7 +700,7 @@ public class MatrixConnection extends ImConnection {
 
         if (room.getNumberOfMembers() < 20)
         {
-            room.getDisplayableMembersAsync(new ApiCallback<List<RoomMember>>() {
+            room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
                 @Override
                 public void onNetworkError(Exception e) {
                     debug("Network error syncing active members", e);
@@ -724,6 +732,7 @@ public class MatrixConnection extends ImConnection {
             });
         }
         else {
+            /**
             room.getActiveMembersAsync(new ApiCallback<List<RoomMember>>() {
                 @Override
                 public void onNetworkError(Exception e) {
@@ -753,7 +762,7 @@ public class MatrixConnection extends ImConnection {
                     mResponseHandler.post(new GroupMemberLoader(room, group, roomMembers));
 
                 }
-            });
+            });**/
         }
 
 
@@ -945,6 +954,7 @@ public class MatrixConnection extends ImConnection {
 
             }
 
+            Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
 
         }
 
@@ -1341,7 +1351,11 @@ public class MatrixConnection extends ImConnection {
 
             if (event.getContent().getAsJsonObject().has("url"))
                 stickerUrl = event.getContent().getAsJsonObject().get("url").getAsString();
+            else  if (event.getContent().getAsJsonObject().has("sticker_pack")) {
+                stickerUrl = "asset://stickers/" + event.getContent().getAsJsonObject().get("sticker_pack").getAsString()
+                        + "/" + event.getContent().getAsJsonObject().get("sticker_name").getAsString() + ".png";
 
+            }
 
             if (!TextUtils.isEmpty(stickerUrl)) {
 
@@ -1367,6 +1381,10 @@ public class MatrixConnection extends ImConnection {
                         } catch (Exception e) {
                             debug("Error downloading file: " + downloadableUrl, e);
                         }
+                    }
+                    else if (uriSticker.getScheme().equals("asset"))
+                    {
+                        //what do we do?
                     }
 
                     if (!TextUtils.isEmpty(stickerAlt)) {
@@ -1691,7 +1709,7 @@ public class MatrixConnection extends ImConnection {
 
     private void downloadAvatarAsync (final String address, final String url)
     {
-        mExecutor.execute(new Runnable ()
+        mExecutorGroups.execute(new Runnable ()
         {
             public void run ()
             {
@@ -1781,20 +1799,22 @@ public class MatrixConnection extends ImConnection {
 
     private void handleRoomInvite (Room room, String sender)
     {
+        MatrixAddress addrRoom = new MatrixAddress(room.getRoomId());
+        MatrixAddress addrSender = null;
+
+        if (!TextUtils.isEmpty(sender))
+            addrSender = new MatrixAddress(sender);
+
+        String roomName = room.getRoomDisplayName(mContext);
 
         if (room.isInvited())
         {
-            MatrixAddress addrRoom = new MatrixAddress(room.getRoomId());
-            MatrixAddress addrSender = null;
 
-            if (!TextUtils.isEmpty(sender))
-                addrSender = new MatrixAddress(sender);
 
-            Invitation invite = new Invitation(room.getRoomId(),addrRoom,addrSender,room.getRoomDisplayName(mContext));
-
+            Invitation invite = new Invitation(room.getRoomId(),addrRoom,addrSender,roomName);
             mChatGroupManager.notifyGroupInvitation(invite);
 
-            ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(new MatrixAddress(room.getRoomId()),room.getRoomDisplayName(mContext));
+            ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(addrRoom,roomName);
             participant.setJoined(false);
             ChatSession session = mChatSessionManager.createChatSession(participant, true);
             ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
@@ -1807,7 +1827,7 @@ public class MatrixConnection extends ImConnection {
             ChatSession session = mChatSessionManager.getSession(room.getRoomId());
 
             if (session == null) {
-                ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(new MatrixAddress(room.getRoomId()),room.getRoomDisplayName(mContext));
+                ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(addrRoom,roomName);
                 session = mChatSessionManager.createChatSession(participant, true);
             }
         }
@@ -1823,20 +1843,17 @@ public class MatrixConnection extends ImConnection {
 
             public void run() {
 
-                int maxLoad = 3;
-                int i = 0;
-
-                while (lbqGroups.peek() != null && i++ < maxLoad) {
+                while (lbqGroups.peek() != null) {
                     ChatGroup group = lbqGroups.poll();
                     Room room = mDataHandler.getRoom(group.getAddress().getAddress());
 
-                    mExecutor.execute(new Runnable () {
+                    mExecutorGroups.execute(new Runnable () {
                             public void run () { updateGroupMembersAsync(room,group);}});
                 }
 
             }
 
-        }, 5000, 5000);
+        }, 0, 10000);
     }
 
     LinkedBlockingQueue<Pair<String,String>> lbqAvatars = new LinkedBlockingQueue<>();
@@ -1849,7 +1866,7 @@ public class MatrixConnection extends ImConnection {
 
             public void run() {
 
-                int maxLoad = 3;
+                int maxLoad = 5;
                 int i = 0;
 
                 while (lbqAvatars.peek() != null && i++ < maxLoad) {
@@ -1859,7 +1876,7 @@ public class MatrixConnection extends ImConnection {
 
             }
 
-        }, 5000, 5000);
+        }, 0, 10000);
     }
 
 }
