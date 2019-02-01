@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -366,7 +367,30 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
     }
 
-    public IChatSession updateSession() {
+    public void updateSession() {
+
+        new AsyncTask<Void, Void, Void> ()
+        {
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                updateSessionAsync();
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                // Update recycler view adapter (if set) to enable session dependent stuff, like notifications
+                if (mRecyclerView != null) {
+                    mRecyclerView.getAdapter().notifyDataSetChanged();
+                }
+            }
+        }.execute();
+    }
+
+    private IChatSession updateSessionAsync() {
         try {
             if (mSession == null) {
                 mSession = mConn.getChatSessionManager().getChatSession(mAddress);
@@ -395,10 +419,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                         }
                     }
 
-                    // Update recycler view adapter (if set) to enable session dependent stuff, like notifications
-                    if (mRecyclerView != null) {
-                        mRecyclerView.getAdapter().notifyDataSetChanged();
-                    }
+
                 }
             }
         }

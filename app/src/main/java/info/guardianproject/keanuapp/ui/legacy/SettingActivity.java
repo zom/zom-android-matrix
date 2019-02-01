@@ -52,7 +52,6 @@ public class SettingActivity extends PreferenceActivity {
 
     private PackageManager pm;
     private String currentLanguage;
-    ListPreference mOtrMode;
     ListPreference mPanicTriggerApp;
     Preference mPanicConfig;
     ListPreference mLanguage;
@@ -67,7 +66,6 @@ public class SettingActivity extends PreferenceActivity {
     Preference mNotificationRingtone;
 
     private void setInitialValues() {
-        mOtrMode.setValue(Preferences.getOtrMode());
 
         mDeleteUnsecuredMedia.setChecked(Preferences.getDeleteInsecureMedia());
         mEnableNotification.setChecked(Preferences.isNotificationEnabled());
@@ -101,10 +99,6 @@ public class SettingActivity extends PreferenceActivity {
         addPreferencesFromResource(R.xml.preferences);
         pm = getPackageManager();
 
-        mOtrMode = (ListPreference) findPreference("pref_security_otr_mode");
-    //    mOtrMode.setEntries(Preferences.getOtrModeNames());
-        mOtrMode.setEntryValues(Preferences.getOtrModeValues());
-        mOtrMode.setDefaultValue(Preferences.DEFAULT_OTR_MODE);
 
         mAllowScreenshot = (CheckBoxPreference)findPreference("prefBlockScreenshots");
 

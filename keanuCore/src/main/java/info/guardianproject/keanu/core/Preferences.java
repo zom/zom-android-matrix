@@ -234,20 +234,6 @@ public class Preferences {
         preferences.edit().putString(NOTIFICATION_RINGTONE_URI, uri.toString()).apply();
     }
 
-    public static String getOtrMode() {
-        return preferences.getString(OTR_MODE, DEFAULT_OTR_MODE);
-    }
-
-    public static void setOtrMode(String otrMode) {
-        preferences.edit().putString(OTR_MODE, otrMode).commit();
-    }
-
-    /**
-     * Has the same order as {@link #getOtrModeNames()}
-     */
-    public static String[] getOtrModeValues() {
-        return OTR_MODE_VALUES;
-    }
 
     public static boolean doBlockScreenshots () { return preferences.getBoolean(BLOCK_SCREENSHOTS,true);}
 
@@ -262,4 +248,11 @@ public class Preferences {
     public static boolean useProofMode () { return preferences.getBoolean(USE_PROOF_MODE, false);}
 
     public static void setUseProofMode (boolean useProofMode) { preferences.edit().putBoolean(USE_PROOF_MODE,useProofMode).apply(); }
+
+    public static void setValue (String key, String value) { preferences.edit().putString(key, value);}
+
+    public static String getValue (String key) {return preferences.getString(key, null);}
+
+
+
 }

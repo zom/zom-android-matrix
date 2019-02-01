@@ -760,6 +760,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             }
             c.close();
         }
+
+        mChatSession.setSubscribed(true);
     }
 
     String getNickName(String username) {

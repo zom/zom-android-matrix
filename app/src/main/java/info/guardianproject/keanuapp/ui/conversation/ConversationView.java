@@ -141,6 +141,7 @@ import static android.content.Context.CLIPBOARD_SERVICE;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_WIDTH;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanu.core.provider.Imps.ContactsColumns.SUBSCRIPTION_STATUS_NONE;
 
 public class ConversationView {
     // This projection and index are set for the query of active chats
@@ -218,7 +219,7 @@ public class ConversationView {
     RoundedAvatarDrawable mRemoteAvatar = null;
     Drawable mRemoteHeader = null;
     int mSubscriptionType = Imps.Contacts.SUBSCRIPTION_TYPE_NONE;
-    int mSubscriptionStatus = Imps.Contacts.SUBSCRIPTION_STATUS_NONE;
+    int mSubscriptionStatus = SUBSCRIPTION_STATUS_NONE;
 
     long mProviderId = -1;
     long mAccountId = -1;
@@ -1361,14 +1362,14 @@ public class ConversationView {
 
 
     private void setGroupSeen() {
-        if (isGroupChat()) {
-            if (getChatSession() != null) {
-                try {
-                    getChatSession().markAsSeen();
-                } catch (RemoteException e) {
-                }
+        if (getChatSession() != null) {
+            try {
+                getChatSession().markAsSeen();
+            } catch (RemoteException e) {
             }
         }
+
+        mSubscriptionStatus = SUBSCRIPTION_STATUS_NONE;
     }
 
 
