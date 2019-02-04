@@ -661,6 +661,16 @@ public class MatrixConnection extends ImConnection {
         MatrixAddress mAddr = new MatrixAddress(room.getRoomId());
 
         final ChatGroup group = mChatGroupManager.getChatGroup(mAddr, subject);
+
+        ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
+        if (csa != null) {
+            try {
+                csa.setGroupChatSubject(subject);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
         updateGroupMembers (room, group);
 
         checkRoomEncryption(room);
@@ -1809,12 +1819,10 @@ public class MatrixConnection extends ImConnection {
 
         if (room.isInvited())
         {
-
-
             Invitation invite = new Invitation(room.getRoomId(),addrRoom,addrSender,roomName);
             mChatGroupManager.notifyGroupInvitation(invite);
 
-            ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(addrRoom,roomName);
+            ChatGroup participant = mChatGroupManager.getChatGroup(addrRoom,roomName);
             participant.setJoined(false);
             ChatSession session = mChatSessionManager.createChatSession(participant, true);
             ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());

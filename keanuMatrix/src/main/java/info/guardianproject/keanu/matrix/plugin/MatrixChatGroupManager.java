@@ -429,9 +429,6 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     public void acceptInvitationAsync(Invitation invitation) {
 
         Room room = mDataHandler.getRoom(invitation.getGroupAddress().getAddress());
-        ChatGroup group = getChatGroup(room.getRoomId());
-        group.setJoined(true);
-        notifyJoinedGroup(group);
 
         if (room != null && room.isInvited())
             room.join(new ApiCallback<Void>() {
@@ -456,7 +453,10 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                 @Override
                 public void onSuccess(Void aVoid) {
                     mConn.debug("acceptInvitationAsync.join.onSuccess");
-
+                    ChatGroup group = getChatGroup(room.getRoomId());
+                    group.setJoined(true);
+                    group.setName(room.getRoomDisplayName(mContext));
+                    notifyJoinedGroup(group);
                 }
             });
 
@@ -483,7 +483,8 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
         if (room != null)
         {
-            room.updateName(subject,new BasicApiCallback("setGroupSubject"));
+            if (!subject.equals(room.getRoomDisplayName(mContext)))
+                room.updateName(subject,new BasicApiCallback("setGroupSubject"));
         }
     }
 

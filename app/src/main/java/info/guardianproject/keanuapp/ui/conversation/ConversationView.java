@@ -328,17 +328,26 @@ public class ConversationView {
         if (mConn == null)
             return;
 
-        try {
-            IChatSessionManager manager = mConn.getChatSessionManager();
-            IChatSession session = manager.getChatSession(mRemoteAddress);
+        getChatSession(new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                try
+                {
+                    for (String invitee : invitees)
+                        mCurrentChatSession.inviteContact(invitee);
 
-            for (String invitee : invitees)
-                session.inviteContact(invitee);
-        }
-        catch (Exception e)
-        {
-            Log.e(LOG_TAG,"error inviting contacts to group",e);
-        }
+                }
+                catch (RemoteException re)
+                {
+                    Log.e(getClass().getName(),"error inviting contact",re);
+                }
+
+                return null;
+            }
+        });
+
+
+
 
     }
 
@@ -370,50 +379,6 @@ public class ConversationView {
 
 
     }
-
-    /**
-    public void setOTRState(boolean otrEnabled) {
-        
-        try {
-
-            if (mCurrentChatSession == null)
-                mCurrentChatSession = getChatSession();
-
-            if (mCurrentChatSession != null)
-            {
-                IOtrChatSession otrChatSession = mCurrentChatSession.getDefaultOtrChatSession();
-
-                if (otrChatSession != null)
-                {
-                    if (otrEnabled && (otrChatSession.getChatStatus() != SessionStatus.ENCRYPTED.ordinal())) {
-
-                        otrChatSession.startChatEncryption();
-                        mIsStartingOtr = true;
-
-                    }
-                   // else if ((!otrEnabled) && otrChatSession.getChatStatus() == SessionStatus.ENCRYPTED.ordinal())
-                    else
-                    {
-                        otrChatSession.stopChatEncryption();
-
-                    }
-
-
-                }
-            }
-
-
-            updateWarningView();
-
-        }
-        catch (RemoteException e) {
-            Log.d(ImApp.LOG_TAG, "error getting remote activity", e);
-        }
-
-
-    }**/
-
-
 
     private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -667,9 +632,8 @@ public class ConversationView {
 
     private Runnable mUpdateChatCallback = new Runnable() {
         public void run() {
-           // if (mCursor != null && mCursor.requery() && mCursor.moveToFirst()) {
                 updateChat();
-           // }
+
         }
     };
 
@@ -1255,11 +1219,6 @@ public class ConversationView {
 
         updateWarningView();
 
-        mActivity.findViewById(R.id.btnAttachPicture).setEnabled(true);
-        mActivity.findViewById(R.id.btnTakePicture).setEnabled(true);
-        mActivity.findViewById(R.id.btnAttachAudio).setEnabled(true);
-        mMicButton.setEnabled(true);
-
     }
 
     int mContactType = -1;
@@ -1304,25 +1263,60 @@ public class ConversationView {
                 btnJoinAccept.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        setGroupSeen();
-                        joinGroupView.setVisibility(View.GONE);
+
+
+                        getChatSession(new AsyncTask() {
+                            @Override
+                            protected Object doInBackground(Object[] objects) {
+
+                                if (mCurrentChatSession != null) {
+                                    setGroupSeen();
+
+                                }
+
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Object o) {
+                                super.onPostExecute(o);
+
+                                joinGroupView.setVisibility(View.GONE);
+                            }
+                        });
                     }
                 });
                 btnJoinDecline.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        try {
-                            if (mCurrentChatSession != null) {
-                                mCurrentChatSession.leave();
+
+                        getChatSession(new AsyncTask() {
+                            @Override
+                            protected Object doInBackground(Object[] objects) {
+
+                                if (mCurrentChatSession != null) {
+                                    try {
+                                        mCurrentChatSession.leave();
+
+                                    }
+                                    catch (RemoteException re){}
+                                }
+
+                                return null;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Object o) {
+                                super.onPostExecute(o);
 
                                 //clear the stack and go back to the main activity
                                 Intent intent = new Intent(v.getContext(), MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 v.getContext().startActivity(intent);
                             }
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
-                        }
+                        });
+
+
                     }
                 });
             } else {
@@ -1431,17 +1425,16 @@ public class ConversationView {
         if (c == null)
             return false;
 
-        if (!c.moveToFirst()) {
-            if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
-                log("Failed to query chat: " + chatId);
-            }
-            mLastChatId = -1;
-
-            c.close();
-
+        if (c.getColumnCount() < 8)
             return false;
 
-        } else {
+            try {
+                c.moveToFirst();
+            }
+            catch (IllegalStateException ise)
+            {
+                return false;
+            }
 
             updateSessionInfo(c);
 
@@ -1469,6 +1462,8 @@ public class ConversationView {
 
             c.close();
 
+            mHandler.post(mUpdateChatCallback);
+
             initSession ();
 
             if (isGroupChat()) {
@@ -1479,7 +1474,6 @@ public class ConversationView {
             }
 
             return true;
-        }
 
 
     }
@@ -1488,15 +1482,10 @@ public class ConversationView {
 
     private synchronized void initSession ()
     {
-        mHandler.post(mUpdateChatCallback);
-
+        updateChat();
         mCurrentChatSession = getChatSession();
-
         if (mCurrentChatSession == null)
             createChatSession();
-
-        mHandler.post(mUpdateChatCallback);
-
     }
 
 
@@ -1761,21 +1750,33 @@ public class ConversationView {
     }
 
     public IChatSession getChatSession() {
+        return getChatSession(null);
+    }
+
+    public IChatSession getChatSession(AsyncTask task) {
 
         try {
 
-            if (mConn != null)
+            if (mCurrentChatSession != null) {
+                if (task != null)
+                    task.execute();
+                return mCurrentChatSession;
+            }
+            else if (mConn != null)
             {
                 IChatSessionManager sessionMgr = mConn.getChatSessionManager();
                 if (sessionMgr != null) {
 
                         IChatSession session = sessionMgr.getChatSession(mRemoteAddress);
 
-                        if (session == null)
+                        if (session == null) {
                             sessionMgr.createChatSession(mRemoteAddress, false, new IChatSessionListener() {
                                 @Override
                                 public void onChatSessionCreated(IChatSession session) throws RemoteException {
+                                    mCurrentChatSession = session;
 
+                                    if (task != null)
+                                        task.execute();
                                 }
 
                                 @Override
@@ -1788,7 +1789,13 @@ public class ConversationView {
                                     return null;
                                 }
                             });
-                        
+                        }
+                        else
+                        {
+                            if (task != null)
+                                task.execute();
+                        }
+
                         return session;
 
                 }
@@ -2070,7 +2077,7 @@ public class ConversationView {
             boolean isSessionEncrypted = false;
 
             try {
-                isSessionEncrypted = true;//mCurrentChatSession.isEncrypted() ||  mLastSessionStatus == SessionStatus.ENCRYPTED;
+                isSessionEncrypted = mCurrentChatSession.isEncrypted();
             }
             catch (Exception re){}
 
