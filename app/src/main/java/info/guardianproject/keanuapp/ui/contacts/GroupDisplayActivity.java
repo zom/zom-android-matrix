@@ -245,7 +245,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                         h.checkNotifications.setEnabled(false);
                     }
 
-                    if (Preferences.doGroupEncryption()) {
+                    if (Preferences.doGroupEncryption() &&  canInviteOthers(mYou)) {
                         if (mSession != null) {
                             h.checkGroupEncryption.setChecked(isGroupEncryptionEnabled());
                             h.checkGroupEncryption.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
