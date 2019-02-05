@@ -119,6 +119,8 @@ public class ChatSession {
         return message.getType();
     }
 
+
+
     /**
      * Called by ChatSessionManager when received a message of the ChatSession.
      * All the listeners registered in this session will be notified.
