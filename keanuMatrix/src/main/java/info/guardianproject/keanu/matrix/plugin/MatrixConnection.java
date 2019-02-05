@@ -1447,6 +1447,7 @@ public class MatrixConnection extends ImConnection {
 
     private void handleIncomingMessage (Event event)
     {
+
         if (!TextUtils.isEmpty(event.getSender())) {
 
             debug("MESSAGE: room=" + event.roomId + " from=" + event.getSender() + " event=" + event.toString());
@@ -1519,11 +1520,10 @@ public class MatrixConnection extends ImConnection {
 
                     }
 
-
                     Message message = new Message(messageBody);
                     message.setID(event.eventId);
                     message.setFrom(addrSender);
-                    message.setDateTime(new Date(event.getOriginServerTs()));//use "age"?
+                    message.setDateTime(new Date(event.getOriginServerTs()));
                     message.setContentType(messageMimeType);
 
                     if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
@@ -1531,7 +1531,7 @@ public class MatrixConnection extends ImConnection {
                     } else
                         message.setType(Imps.MessageType.INCOMING);
 
-                    session.onReceiveMessage(message, true);
+                    session.onReceiveMessage(message, (!addrSender.mAddress.equals(mUser.getAddress().getAddress())));
 
                     csa.setContactTyping(new Contact(addrSender), false);
 
