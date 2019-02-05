@@ -12,8 +12,8 @@ android {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 123
-        versionName "0.0.1-beta-2"
+        versionCode 124
+        versionName "0.0.1-beta-4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
