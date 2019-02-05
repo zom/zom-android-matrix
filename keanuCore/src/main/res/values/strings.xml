@@ -622,4 +622,6 @@
     <string name="action_view_devices">View Devices and Keys</string>
 
     <string name="new_group_title">New Group</string>
+
+    <string name="default_group_title">Empty room</string>
 </resources>
