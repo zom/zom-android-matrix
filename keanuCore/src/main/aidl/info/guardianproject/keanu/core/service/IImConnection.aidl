@@ -77,9 +77,12 @@ interface IImConnection {
     
     void setProxy(String type, String host, int port);
 
+    void sendMessageRead (in String to, in String messageId);
+
     void sendTypingStatus (in String to, boolean isTyping);
 
     List getFingerprints (String address);
+
     void setDeviceVerified (String address, String device, boolean verified);
 
     void broadcastMigrationIdentity (String address);
