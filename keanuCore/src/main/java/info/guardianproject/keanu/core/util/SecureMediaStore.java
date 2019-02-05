@@ -233,7 +233,7 @@ public class SecureMediaStore {
 
         try {
             vfs.mount(dbFilePath, key);
-           // list("/");
+            //list("/");
         }
         catch (Exception e)
         {
