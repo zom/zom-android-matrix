@@ -19,6 +19,21 @@ android {
 
     }
 
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/ASL2.0'
+        exclude 'META-INF/proguard'
+        exclude 'META-INF/proguard/androidx-annotations.pro'
+        exclude 'META-INF/androidx.exifinterface_exifinterface.version'
+    }
+
     dexOptions {
         javaMaxHeapSize "2g"
         preDexLibraries true
@@ -89,15 +104,16 @@ dependencies {
     implementation 'com.github.javiersantos:AppUpdater:2.6.4'
     implementation 'com.github.QuadFlask:colorpicker:0.0.10'
 
-    //adding this nearby library for now
-    implementation 'com.google.android.gms:play-services-nearby:16.0.0'
 
     //built in camera now!
     //https://github.com/siralam/CameraViewPlus
-    implementation 'com.asksira.android:cameraviewplus:0.9.5'
+    //implementation 'com.asksira.android:cameraviewplus:0.9.5'
+
+    //https://github.com/natario1/CameraView
+    implementation 'com.otaliastudios:cameraview:2.0.0-beta02'
 
     implementation 'commons-codec:commons-codec:1.9'
-    implementation 'commons-io:commons-io:2.4'
+    implementation 'commons-io:commons-io:2.5'
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.8.2'
@@ -124,5 +140,10 @@ dependencies {
 
     //support for in app video playback
     implementation 'com.google.android.exoplayer:exoplayer:2.6.0'
-    implementation 'org.nanohttpd:nanohttpd:2.2.0'
+
+    def lifecycle_version = "2.0.0"
+    implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
+    implementation "androidx.exifinterface:exifinterface:1.0.0"
+
+
 }

@@ -734,28 +734,21 @@ public class ConversationDetailActivity extends BaseActivity {
             {
                 ShareRequest request = new ShareRequest();
 
-                //if (Preferences.useProofMode()) {
                 request.deleteFile = false;
                 request.resizeImage = false;
                 request.importContent = false;
                 request.media = resultIntent.getData();
-                // }
-                /**
-                 else
-                 {
-                 request.deleteFile = false;
-                 request.resizeImage = true;
-                 request.importContent = true;
-                 request.media = mLastPhoto;
-                 }**/
+                request.mimeType = resultIntent.getType();
 
-                request.mimeType = "image/jpeg";
-
-                try {
-                    mConvoView.setMediaDraft(request);
+                if (request.mimeType.equals("image/jpeg")) {
+                    try {
+                        mConvoView.setMediaDraft(request);
+                    } catch (Exception e) {
+                        Log.w(LOG_TAG, "error setting media draft", e);
+                    }
                 }
-                catch (Exception e){
-                    Log.w(LOG_TAG,"error setting media draft",e);
+                else {
+                    sendShareRequest(request);
                 }
 
             }

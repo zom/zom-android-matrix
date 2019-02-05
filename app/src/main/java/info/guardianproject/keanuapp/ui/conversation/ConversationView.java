@@ -1078,6 +1078,18 @@ public class ConversationView {
 
     }
 
+    private void sendMessageRead (String msgId) {
+
+
+        try {
+            if (mConn != null)
+                mConn.sendMessageRead(mRemoteAddress, msgId);
+        } catch (Exception ie) {
+            Log.e(LOG_TAG, "error sending typing status", ie);
+        }
+
+
+    }
     /**
     PopupMenu mPopupWords = null;
     SearchWordTask taskSearch = null;
@@ -2697,6 +2709,7 @@ public class ConversationView {
                 messageView.bindPresenceMessage(viewHolder, nickname, messageType, date, isGroupChat(), false);
             }
 
+            sendMessageRead(packetId);
 
 
         }

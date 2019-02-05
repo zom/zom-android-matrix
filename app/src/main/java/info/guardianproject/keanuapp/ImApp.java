@@ -47,6 +47,7 @@ import android.util.Log;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -235,6 +236,11 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
                     .penaltyLog()
                     .build());
         }
+
+        showFileSizes(getFilesDir());
+
+        showFileSizes(getCacheDir());
+
     }
 
     public boolean isThemeDark ()
@@ -1014,5 +1020,22 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
     }
 
+    private void showFileSizes (File fileDir)
+    {
+        File list[] = fileDir.listFiles();
+
+        for (File file : list)
+        {
+            if (file.isDirectory()) {
+
+                Log.d("KeanuFiles",file.getAbsolutePath() + "/");
+                showFileSizes(file);
+            }
+            else
+            {
+                Log.d("KeanuFiles",file.getAbsolutePath() + " (" + file.length()/1000000 + ")");
+            }
+        }
+    }
 
 }
