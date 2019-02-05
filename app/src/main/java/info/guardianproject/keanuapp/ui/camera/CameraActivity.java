@@ -98,6 +98,8 @@ public class CameraActivity extends AppCompatActivity {
 
         mCameraView = findViewById(R.id.camera_view);
         mCameraView.addCameraListener(new CameraListener() {
+
+
             @Override
             public void onPictureTaken(PictureResult result) {
                 super.onPictureTaken(result);
