@@ -132,7 +132,6 @@ import info.guardianproject.keanuapp.ui.stickers.StickerManager;
 import info.guardianproject.keanuapp.ui.stickers.StickerPagerAdapter;
 import info.guardianproject.keanuapp.ui.stickers.StickerSelectListener;
 import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
-import info.guardianproject.keanuapp.ui.widgets.GiphyAPI;
 import info.guardianproject.keanuapp.ui.widgets.ImageViewActivity;
 import info.guardianproject.keanuapp.ui.widgets.MessageViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.ShareRequest;
@@ -1963,49 +1962,7 @@ public class ConversationView {
         return false;
     }
 
-    private static GiphyAPI.Monitor mMonitor = null;
 
-    private synchronized boolean doGiphy (String search)
-    {
-        mMonitor = new GiphyAPI.Monitor() {
-
-            public void onSearchComplete(GiphyAPI.SearchResult result) {
-
-                if (result.data != null && result.data.length > 0) {
-
-                    final GiphyAPI.GifImage gifResult = result.data[0].images.original;
-
-                    new Thread() {
-                        public void run() {
-
-                            mActivity.handleSendDelete(getChatSession(), Uri.parse(gifResult.url), "image/gif", false, false, true);
-                        }
-                    }.start();
-
-
-                }
-                else
-                {
-                    Toast.makeText(mActivity,"No giphy stickers available for your search",Toast.LENGTH_SHORT).show();
-                }
-
-                GiphyAPI.get().removeMonitor(mMonitor);
-                mMonitor = null;
-
-            }
-        };
-
-        GiphyAPI.get().addMonitor(mMonitor);
-
-
-        try {
-            GiphyAPI.get().search(URLEncoder.encode(search.substring(7).trim(), "UTF-8"));
-
-        }
-        catch (Exception e){}
-
-        return true;
-    }
 
     void registerChatListener() {
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
