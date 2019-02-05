@@ -24,6 +24,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
@@ -37,8 +38,10 @@ import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.util.Languages;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
+import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.ui.PanicSetupActivity;
@@ -188,6 +191,20 @@ public class SettingActivity extends PreferenceActivity {
 
         });
 
+        findPreference("pref_clear_data").setOnPreferenceClickListener(new OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                try {
+                    SecureMediaStore.deleteLargerThan(5000000);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+                return true;
+            }
+        });
 
 
         mHeartbeatInterval = (EditTextPreference) findPreference("pref_heartbeat_interval");

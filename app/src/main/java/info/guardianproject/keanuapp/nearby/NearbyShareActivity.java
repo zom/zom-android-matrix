@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,10 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-import com.google.android.gms.nearby.connection.ConnectionInfo;
-import com.google.android.gms.nearby.connection.Payload;
-import com.google.android.gms.nearby.connection.Strategy;
 
 import org.apache.commons.io.IOUtils;
 
@@ -44,7 +41,7 @@ import info.guardianproject.keanuapp.ui.contacts.ContactListItem;
 import info.guardianproject.keanuapp.ui.contacts.ContactViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.GlideUtils;
 
-public class NearbyShareActivity extends ConnectionsActivity {
+public class NearbyShareActivity extends AppCompatActivity {
 
     /**
      * This service id lets us find other nearby devices that are interested in the same thing. Our
@@ -57,7 +54,7 @@ public class NearbyShareActivity extends ConnectionsActivity {
      * The connection strategy we'll use for Nearby Connections. In this case, we've decided on
      * P2P_STAR, which is a combination of Bluetooth Classic and WiFi Hotspots.
      */
-    private static final Strategy STRATEGY = Strategy.P2P_STAR;
+   // private static final Strategy STRATEGY = Strategy.P2P_STAR;
 
     private String mName = null;
     private File mFile = null;
@@ -71,7 +68,7 @@ public class NearbyShareActivity extends ConnectionsActivity {
 
     private ImApp mApp;
 
-    private HashMap<String,Endpoint> mUserEndpoint = new HashMap<>();
+    private HashMap<String,String> mUserEndpoint = new HashMap<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -111,6 +108,7 @@ public class NearbyShareActivity extends ConnectionsActivity {
 
     private void confirmContact (Contact contact)
     {
+        /**
         Endpoint endpoint = mUserEndpoint.get(contact.getAddress().getBareAddress());
         if (endpoint != null) {
             connectToEndpoint(endpoint);
@@ -119,7 +117,7 @@ public class NearbyShareActivity extends ConnectionsActivity {
         else
         {
             contactList.remove(contact);
-        }
+        }**/
 
         refreshList();
     }
@@ -157,13 +155,14 @@ public class NearbyShareActivity extends ConnectionsActivity {
 
     private void sendFile (File file, String endpointId) throws FileNotFoundException {
 
-        Payload payload = Payload.fromStream(new FileInputStream(file));
-        send(payload,endpointId);
+        //Payload payload = Payload.fromStream(new FileInputStream(file));
+        //send(payload,endpointId);
 
 
     }
 
     /** {@see ConnectionsActivity#onReceive(Endpoint, Payload)} */
+    /**
     @Override
     protected void onReceive(Endpoint endpoint, Payload payload) {
         if (payload.getType() == Payload.Type.STREAM) {
@@ -208,7 +207,7 @@ public class NearbyShareActivity extends ConnectionsActivity {
             }
 
         }
-    }
+    }**/
 
     @Override
     public void onBackPressed() {
@@ -219,6 +218,7 @@ public class NearbyShareActivity extends ConnectionsActivity {
         super.onBackPressed();
     }
 
+    /**
     @Override
     protected void onEndpointDiscovered(Endpoint endpoint) {
         // We found an advertiser!
@@ -230,6 +230,7 @@ public class NearbyShareActivity extends ConnectionsActivity {
 
 
     }
+
 
     @Override
     protected void onConnectionInitiated(Endpoint endpoint, ConnectionInfo connectionInfo) {
@@ -271,6 +272,7 @@ public class NearbyShareActivity extends ConnectionsActivity {
 
         removeContact(endpoint.getName());
     }
+    **/
 
     /**
      * The state has changed. I wonder what we'll be doing now.
@@ -279,11 +281,11 @@ public class NearbyShareActivity extends ConnectionsActivity {
      */
     private void setState(State state) {
         if (mState == state) {
-            logW("State set to " + state + " but already in that state");
+         //   logW("State set to " + state + " but already in that state");
             return;
         }
 
-        logD("State set to " + state);
+      //  logD("State set to " + state);
         State oldState = mState;
         mState = state;
         onStateChanged(oldState, state);
@@ -302,6 +304,7 @@ public class NearbyShareActivity extends ConnectionsActivity {
      */
     private void onStateChanged(State oldState, State newState) {
 
+        /**
         // Update Nearby Connections to the new state.
         switch (newState) {
             case SEARCHING:
@@ -319,7 +322,7 @@ public class NearbyShareActivity extends ConnectionsActivity {
             default:
                 // no-op
                 break;
-        }
+        }**/
 
         // Update the UI.
         switch (oldState) {
@@ -349,20 +352,19 @@ public class NearbyShareActivity extends ConnectionsActivity {
         }
     }
 
-    @Override
     protected String getName() {
         return mName;
     }
 
-    @Override
     protected String getServiceId() {
         return SERVICE_ID;
     }
 
+    /**
     @Override
     protected Strategy getStrategy() {
         return STRATEGY;
-    }
+    }**/
 
     /** States that the UI goes through. */
     public enum State {

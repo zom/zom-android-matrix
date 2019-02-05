@@ -267,6 +267,8 @@ public abstract class ImConnection {
 
     public abstract void sendTypingStatus (String to, boolean isTyping);
 
+    public abstract void sendMessageRead (String to, String msgId);
+
     public abstract List getFingerprints (String address);
 
     public abstract void setDeviceVerified (String address, String device, boolean verified);

@@ -543,6 +543,14 @@ public class MatrixConnection extends ImConnection {
     }
 
     @Override
+    public void sendMessageRead (String roomId, String msgId)
+    {
+        Event event = mStore.getEvent(msgId, roomId);
+        Room room = mStore.getRoom(roomId);
+        room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
+    }
+
+    @Override
     public void sendTypingStatus(String to, boolean isTyping) {
 
         mDataHandler.getRoom(to).sendTypingNotification(isTyping, 3000, new ApiCallback<Void>() {
@@ -630,13 +638,13 @@ public class MatrixConnection extends ImConnection {
 
                 for (Room room : rooms)
                 {
-                    updateGroup(room);
+                    //get fresh room from data handler?
+                    updateGroup(mDataHandler.getRoom(room.getRoomId()));
 
-                    /**
                     if (room.isMember() && room.getNumberOfMembers() > 1) {
                         ChatGroup group = addRoomContact(room);
                         mChatSessionManager.createChatSession(group, true);
-                    }**/
+                    }
 
                 }
 
@@ -663,7 +671,7 @@ public class MatrixConnection extends ImConnection {
         final ChatGroup group = mChatGroupManager.getChatGroup(mAddr, subject);
 
         ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
-        if (csa != null) {
+        if (csa != null && (!subject.equals(mContext.getString(R.string.default_group_title)))) {
             try {
                 csa.setGroupChatSubject(subject);
             } catch (RemoteException e) {
@@ -1427,7 +1435,7 @@ public class MatrixConnection extends ImConnection {
                             }
                         }
 
-                        room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
+
                     }
                 }
             }
@@ -1439,6 +1447,7 @@ public class MatrixConnection extends ImConnection {
 
     private void handleIncomingMessage (Event event)
     {
+
         if (!TextUtils.isEmpty(event.getSender())) {
 
             debug("MESSAGE: room=" + event.roomId + " from=" + event.getSender() + " event=" + event.toString());
@@ -1461,46 +1470,6 @@ public class MatrixConnection extends ImConnection {
 
             if (room != null && room.isMember()) {
 
-                MatrixAddress addrSender = new MatrixAddress(event.sender);
-
-                if (messageType.equals("m.image")
-                        || messageType.equals("m.file")
-                        || messageType.equals("m.video")
-                        || messageType.equals("m.audio")) {
-                    FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
-
-                    String mediaUrl = fileMessage.getUrl();
-                    messageMimeType = fileMessage.getMimeType();
-
-                    String localFolder = addrSender.getAddress();
-                    String localFileName = new Date().getTime() + '.' + messageBody;
-                    EncryptedFileInfo encryptedFileInfo = fileMessage.file;
-
-                    String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, null != encryptedFileInfo);
-
-                    try {
-                        MatrixDownloader dl = new MatrixDownloader();
-                        info.guardianproject.iocipher.File fileDownload = dl.openSecureStorageFile(localFolder, localFileName);
-                        OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
-                        boolean downloaded = dl.get(downloadableUrl, storageStream);
-
-                        if (encryptedFileInfo != null) {
-                            InputStream decryptedIs = MXEncryptedAttachments.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo);
-                            info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileName);
-                            SecureMediaStore.copyToVfs(decryptedIs, fileDownloadDecrypted.getAbsolutePath());
-                            fileDownload.delete();
-                            fileDownload = fileDownloadDecrypted;
-                        }
-
-                        messageBody = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
-
-                    } catch (Exception e) {
-                        debug("Error downloading file: " + downloadableUrl, e);
-                    }
-
-
-                }
-
                 ChatSession session = mChatSessionManager.getSession(event.roomId);
 
                 if (session == null) {
@@ -1508,29 +1477,65 @@ public class MatrixConnection extends ImConnection {
                     session = mChatSessionManager.createChatSession(participant, false);
                 }
 
-                Message message = new Message(messageBody);
-                message.setID(event.eventId);
-                message.setFrom(addrSender);
-                message.setDateTime(new Date(event.getOriginServerTs()));//use "age"?
-                message.setContentType(messageMimeType);
+                ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(event.roomId);
 
-                if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
-                    message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
-                } else
-                    message.setType(Imps.MessageType.INCOMING);
+                if (!csa.doesMessageExist(event.eventId)) {
+                    MatrixAddress addrSender = new MatrixAddress(event.sender);
 
-                session.onReceiveMessage(message, true);
+                    if (messageType.equals("m.image")
+                            || messageType.equals("m.file")
+                            || messageType.equals("m.video")
+                            || messageType.equals("m.audio")) {
+                        FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
 
-                IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
-                if (csa != null) {
-                    try {
-                        csa.setContactTyping(new Contact(addrSender), false);
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
+                        String mediaUrl = fileMessage.getUrl();
+                        messageMimeType = fileMessage.getMimeType();
+
+                        String localFolder = addrSender.getAddress();
+                        String localFileName = new Date().getTime() + '.' + messageBody;
+                        EncryptedFileInfo encryptedFileInfo = fileMessage.file;
+
+                        String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, null != encryptedFileInfo);
+
+                        try {
+                            MatrixDownloader dl = new MatrixDownloader();
+                            info.guardianproject.iocipher.File fileDownload = dl.openSecureStorageFile(localFolder, localFileName);
+                            OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
+                            boolean downloaded = dl.get(downloadableUrl, storageStream);
+
+                            if (encryptedFileInfo != null) {
+                                InputStream decryptedIs = MXEncryptedAttachments.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo);
+                                info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileName);
+                                SecureMediaStore.copyToVfs(decryptedIs, fileDownloadDecrypted.getAbsolutePath());
+                                fileDownload.delete();
+                                fileDownload = fileDownloadDecrypted;
+                            }
+
+                            messageBody = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
+
+                        } catch (Exception e) {
+                            debug("Error downloading file: " + downloadableUrl, e);
+                        }
+
+
                     }
-                }
 
-                room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
+                    Message message = new Message(messageBody);
+                    message.setID(event.eventId);
+                    message.setFrom(addrSender);
+                    message.setDateTime(new Date(event.getOriginServerTs()));
+                    message.setContentType(messageMimeType);
+
+                    if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
+                        message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
+                    } else
+                        message.setType(Imps.MessageType.INCOMING);
+
+                    session.onReceiveMessage(message, (!addrSender.mAddress.equals(mUser.getAddress().getAddress())));
+
+                    csa.setContactTyping(new Contact(addrSender), false);
+
+                }
             }
         }
 

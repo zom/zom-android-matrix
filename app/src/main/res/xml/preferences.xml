@@ -176,6 +176,10 @@
         android:summary="@string/pref_enable_proof_mode_summary"
         android:defaultValue="false"
         />
-
+    <Preference
+        android:layout="?android:attr/preferenceLayoutChild"
+        android:key="pref_clear_data"
+        android:title="@string/pref_clear_data"
+        />
 
 </PreferenceScreen>

@@ -33,6 +33,7 @@ import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -573,10 +574,28 @@ public class ConversationDetailActivity extends BaseActivity {
 
     public void handleSendDelete(Uri contentUri, String defaultType, boolean delete, boolean resizeImage, boolean importContent) {
 
-        handleSendDelete(mConvoView.getChatSession(),contentUri,defaultType,delete,resizeImage,importContent);
+        final Snackbar sb = Snackbar.make(mConvoView.getHistoryView(), R.string.upgrade_progress_action, Snackbar.LENGTH_INDEFINITE);
+        sb.show();
+
+        new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+
+                handleSendDeleteAsync(mConvoView.getChatSession(),contentUri,defaultType,delete,resizeImage,importContent);
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Object o) {
+                super.onPostExecute(o);
+
+                sb.dismiss();
+            }
+        }.execute();
     }
 
-    public void handleSendDelete(IChatSession session, Uri contentUri, String defaultType, boolean delete, boolean resizeImage, boolean importContent) {
+    public void handleSendDeleteAsync(IChatSession session, Uri contentUri, String defaultType, boolean delete, boolean resizeImage, boolean importContent) {
         try {
 
             // import
@@ -663,6 +682,7 @@ public class ConversationDetailActivity extends BaseActivity {
                 mConvoView.inviteContacts(invitees);
 
             }
+
             if (requestCode == REQUEST_SEND_IMAGE) {
 
 
@@ -714,28 +734,21 @@ public class ConversationDetailActivity extends BaseActivity {
             {
                 ShareRequest request = new ShareRequest();
 
-                //if (Preferences.useProofMode()) {
-                    request.deleteFile = false;
-                    request.resizeImage = false;
-                    request.importContent = false;
-                    request.media = resultIntent.getData();
-               // }
-                /**
-                else
-                {
-                    request.deleteFile = false;
-                    request.resizeImage = true;
-                    request.importContent = true;
-                    request.media = mLastPhoto;
-                }**/
+                request.deleteFile = false;
+                request.resizeImage = false;
+                request.importContent = false;
+                request.media = resultIntent.getData();
+                request.mimeType = resultIntent.getType();
 
-                request.mimeType = "image/jpeg";
-
-                try {
-                    mConvoView.setMediaDraft(request);
+                if (request.mimeType.equals("image/jpeg")) {
+                    try {
+                        mConvoView.setMediaDraft(request);
+                    } catch (Exception e) {
+                        Log.w(LOG_TAG, "error setting media draft", e);
+                    }
                 }
-                catch (Exception e){
-                    Log.w(LOG_TAG,"error setting media draft",e);
+                else {
+                    sendShareRequest(request);
                 }
 
             }

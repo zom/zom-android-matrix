@@ -1,5 +1,6 @@
 package info.guardianproject.keanuapp.ui.camera;
 
+import android.arch.lifecycle.LifecycleOwner;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
@@ -12,10 +13,21 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
 import android.view.View;
+import android.widget.ImageView;
 
-import com.google.android.cameraview.CameraView;
-import com.google.android.cameraview.CameraViewImpl;
+import com.otaliastudios.cameraview.BitmapCallback;
+import com.otaliastudios.cameraview.CameraListener;
+import com.otaliastudios.cameraview.CameraOptions;
+import com.otaliastudios.cameraview.CameraView;
+import com.otaliastudios.cameraview.Flash;
+import com.otaliastudios.cameraview.Mode;
+import com.otaliastudios.cameraview.PictureResult;
+import com.otaliastudios.cameraview.SizeSelector;
+import com.otaliastudios.cameraview.VideoResult;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,6 +38,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.Nullable;
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.keanu.core.Preferences;
@@ -50,6 +63,9 @@ public class CameraActivity extends AppCompatActivity {
     public static final int ORIENTATION_PORTRAIT_REVERSE = 2;
     public static final int ORIENTATION_LANDSCAPE_REVERSE = 3;
 
+    File fileVideoTmp;
+    boolean isRecordingVideo = false;
+
     private Handler mHandler = new Handler ()
     {
         @Override
@@ -62,7 +78,8 @@ public class CameraActivity extends AppCompatActivity {
             }
             else if (msg.what == 2)
             {
-                mCameraView.stop();
+                mCameraView.close();
+                finish();
             }
         }
     };
@@ -80,25 +97,98 @@ public class CameraActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mCameraView = findViewById(R.id.camera_view);
+        mCameraView.addCameraListener(new CameraListener() {
+
+
+            @Override
+            public void onPictureTaken(PictureResult result) {
+                super.onPictureTaken(result);
+
+
+                result.toBitmap(bitmap -> {
+                    storeBitmap(bitmap);
+                    if (mOneAndDone)
+                        mHandler.sendEmptyMessage(2);
+                });
+
+
+                mHandler.sendEmptyMessage(1);
+
+            }
+
+            @Override
+            public void onVideoTaken(VideoResult result) {
+                super.onVideoTaken(result);
+
+                storeVideo(result.getFile());
+
+            }
+
+            @Override
+            public void onCameraClosed() {
+                super.onCameraClosed();
+
+            }
+        });
+
 
         findViewById(R.id.btnCamera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCameraView.takePicture();
+
+                if (!mCameraView.isTakingVideo())
+                {
+                    mCameraView.setMode(Mode.PICTURE);
+                    mCameraView.takePictureSnapshot();
+                }
+
+
+
             }
+
+
+        });
+
+        findViewById(R.id.btnCameraVideo).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public synchronized void onClick(View view) {
+
+                if (isRecordingVideo)
+                {
+                    ((ImageView)findViewById(R.id.btnCameraVideo)).setImageResource(R.drawable.ic_video_rec);
+
+                    mCameraView.stopVideo();
+                    isRecordingVideo = false;
+                }
+                else {
+                    isRecordingVideo = true;
+                    mCameraView.setMode(Mode.VIDEO);
+                    mCameraView.setVideoMaxDuration(10000);
+                    mCameraView.setVideoMaxSize(50000000);
+                    ((ImageView)findViewById(R.id.btnCameraVideo)).setImageResource(R.drawable.ic_video_stop);
+
+                    fileVideoTmp = new File(getFilesDir(), "tmp.mp4");
+                    mCameraView.takeVideo(fileVideoTmp);
+                }
+
+
+
+            }
+
+
         });
 
         findViewById(R.id.toggle_camera).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCameraView.switchCamera();
+                mCameraView.toggleFacing();
             }
         });
 
         findViewById(R.id.toggle_flash).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mCameraView.setFlash(CameraView.FLASH_AUTO);
+                mCameraView.setFlash(Flash.AUTO);
             }
         });
 
@@ -202,37 +292,66 @@ public class CameraActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        mCameraView.start();
-        mCameraView.setOnPictureTakenListener(new CameraViewImpl.OnPictureTakenListener() {
-            @Override
-            public void onPictureTaken(final Bitmap bitmap, final int rotationDegrees) {
-
-                mExec.execute(new Runnable()
-                {
-                    public void run ()
-                    {
-
-                        if (mOneAndDone)
-                            mHandler.sendEmptyMessage(2);
-
-                        storeBitmap(rotate(bitmap,rotationDegrees));
-
-                    }
-                });
-
-                mHandler.sendEmptyMessage(1);
-            }
-        });
+        mCameraView.open();
 
     }
 
     @Override
     protected void onPause() {
 
-        if (mCameraView.isCameraOpened())
-            mCameraView.stop();
+        if (mCameraView.isOpened())
+            mCameraView.close();
 
         super.onPause();
+    }
+
+    private void storeVideo (java.io.File fileVideo)
+    {
+        // import
+        String sessionId = "self";
+        String offerId = UUID.randomUUID().toString();
+
+        try {
+
+            final Uri vfsUri = SecureMediaStore.createContentPath(sessionId,"cam" + new Date().getTime() + ".mp4");
+
+            OutputStream out = new info.guardianproject.iocipher.FileOutputStream(new File(vfsUri.getPath()));
+
+            IOUtils.copyLarge(new java.io.FileInputStream(fileVideo),out);
+
+            fileVideo.delete();
+            System.gc();
+
+            String mimeType = "video/mp4";
+
+            //adds in an empty message, so it can exist in the gallery and be forwarded
+            Imps.insertMessageInDb(
+                    getContentResolver(), false, new Date().getTime(), true, null, vfsUri.toString(),
+                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED_VERIFIED,
+                    0, offerId, mimeType);
+
+            if (mOneAndDone) {
+                Intent data = new Intent();
+                data.setDataAndType(vfsUri,mimeType);
+                setResult(RESULT_OK, data);
+                finish();
+            }
+
+            if (Preferences.useProofMode()) {
+
+                try {
+                    ProofMode.generateProof(CameraActivity.this, vfsUri);
+                } catch (FileNotFoundException e) {
+                    Log.e(LOG_TAG,"error generating proof for photo",e);
+                }
+            }
+
+
+        }
+        catch (IOException ioe)
+        {
+            Log.e(LOG_TAG,"error importing photo",ioe);
+        }
     }
 
     private void storeBitmap (Bitmap bitmap)
@@ -262,7 +381,7 @@ public class CameraActivity extends AppCompatActivity {
 
             if (mOneAndDone) {
                 Intent data = new Intent();
-                data.setData(vfsUri);
+                data.setDataAndType(vfsUri,mimeType);
                 setResult(RESULT_OK, data);
                 finish();
             }

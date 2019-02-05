@@ -21,9 +21,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.nearby.Nearby;
-import com.google.android.gms.nearby.messages.Message;
-import com.google.android.gms.nearby.messages.MessageListener;
 
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.Presence;
@@ -45,8 +42,8 @@ import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 public class NearbyAddContactActivity extends AppCompatActivity {
 
-    private MessageListener mMessageListener;
-    private Message mMessage;
+  //  private MessageListener mMessageListener;
+ //   private Message mMessage;
     private static ImApp mApp;
     private static RecyclerView mList;
     private static HashMap<String,Contact> contactList = new HashMap<>();
@@ -116,6 +113,7 @@ public class NearbyAddContactActivity extends AppCompatActivity {
 
     private void initNearby (String nearbyMessage) {
 
+        /**
         mMessageListener = new MessageListener() {
             @Override
             public void onFound(Message message) {
@@ -134,7 +132,7 @@ public class NearbyAddContactActivity extends AppCompatActivity {
             }
         };
 
-        mMessage = new Message(nearbyMessage.getBytes());
+        mMessage = new Message(nearbyMessage.getBytes());**/
     }
 
     private void addContact (OnboardingManager.DecodedInviteLink diLink)
@@ -173,14 +171,14 @@ public class NearbyAddContactActivity extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        Nearby.getMessagesClient(this).publish(mMessage);
-        Nearby.getMessagesClient(this).subscribe(mMessageListener);
+    //    Nearby.getMessagesClient(this).publish(mMessage);
+     //   Nearby.getMessagesClient(this).subscribe(mMessageListener);
     }
 
     @Override
     public void onStop() {
-        Nearby.getMessagesClient(this).unpublish(mMessage);
-        Nearby.getMessagesClient(this).unsubscribe(mMessageListener);
+      //  Nearby.getMessagesClient(this).unpublish(mMessage);
+      //  Nearby.getMessagesClient(this).unsubscribe(mMessageListener);
 
         super.onStop();
     }

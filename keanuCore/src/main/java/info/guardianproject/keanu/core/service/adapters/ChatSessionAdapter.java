@@ -1161,6 +1161,11 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         return prefix + Long.toString(id++);
     }
 
+    public boolean doesMessageExist (String msgId)
+    {
+        return Imps.messageExists(mContentResolver,msgId,-1);
+    }
+
     Uri insertMessageInDb(String contact, String body, long time, int type, int errCode, String id, String mimeType) {
         return Imps.insertMessageInDb(mContentResolver, mIsGroupChat, mContactId, false, contact, body, time, type, errCode, id, mimeType);
     }

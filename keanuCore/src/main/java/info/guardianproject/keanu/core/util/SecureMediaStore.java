@@ -49,18 +49,29 @@ public class SecureMediaStore {
 
     public static void list(String parent) {
         File file = new File(parent);
-        String[] list = file.list();
+        File[] list = file.listFiles();
 
-        Log.d(TAG, "Dir=" + file.isDirectory() + ";" + file.getAbsolutePath() + ";last=" + new Date(file.lastModified()));
+        Log.d(TAG, "Dir=" + file.isDirectory() + ";" + file.getAbsolutePath() + ";files=" + list.length);
 
-        for (int i = 0 ; i < list.length ; i++) {
-            File fileChild = new File(parent,list[i]);
+        for (File fileChild : list)
+        {
             if (fileChild.isDirectory()) {
                 list(fileChild.getAbsolutePath());
             } else {
-                Log.d(TAG, "Dir=" + fileChild.isDirectory() + ";" + fileChild.getAbsolutePath()+ ";last=" + new Date(fileChild.lastModified()));
+                Log.d(TAG,  fileChild.getAbsolutePath()+ " (" + fileChild.length()/1000 + "KB)");
             }
         }
+    }
+
+    public static void deleteLargerThan( long fileLengthFilter ) throws IOException {
+        String dirName = "/";
+        File file = new File(dirName);
+        // if the session doesnt have any ul/dl files - bail
+        if (!file.exists()) {
+            return;
+        }
+        // delete recursive
+        deleteBySize( file, fileLengthFilter );
     }
 
     public static void deleteSession( String sessionId ) throws IOException {
@@ -72,6 +83,25 @@ public class SecureMediaStore {
         }
         // delete recursive
         delete( dirName );
+    }
+
+    private static void deleteBySize(File parent, long sizeFilter) throws IOException {
+        // if a file or an empty directory - delete it
+
+        if (parent.length() > sizeFilter) {
+            //    Log.e(TAG, "delete:" + parent );
+            if (!parent.delete()) {
+                throw new IOException("Error deleting " + parent);
+            }
+            return;
+        }
+
+        // directory - recurse
+        File[] list = parent.listFiles();
+        for (File fileToDelete : list) {
+            deleteBySize( fileToDelete, sizeFilter );
+        }
+
     }
 
     private static void delete(String parentName) throws IOException {
@@ -203,7 +233,7 @@ public class SecureMediaStore {
 
         try {
             vfs.mount(dbFilePath, key);
-       //     list("/");
+            //list("/");
         }
         catch (Exception e)
         {

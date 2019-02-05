@@ -599,6 +599,13 @@ public class ImConnectionAdapter extends IImConnection.Stub {
             mConnection.changeNickname(nickname);
     }
 
+    @Override
+    public void sendMessageRead (String roomId, String msgId)
+    {
+        if (mConnection != null)
+            mConnection.sendMessageRead(roomId, msgId);
+    }
+
     public void sendTypingStatus (String to, boolean isTyping)
     {
         if (mConnection != null)

@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+        <!--
     <com.google.android.cameraview.CameraView
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
@@ -23,7 +24,26 @@
         app:useHighResPicture="false"
         app:facing="back"
         app:flash="off"/>
-
+        -->
+        <!-- Camera -->
+        <com.otaliastudios.cameraview.CameraView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/camera_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:keepScreenOn="true"
+            app:cameraExperimental="true"
+            app:cameraPlaySounds="true"
+            app:cameraGrid="off"
+            app:cameraFlash="off"
+            app:cameraAudio="on"
+            app:cameraGestureTap="focusWithMarker"
+            app:cameraGestureLongTap="none"
+            app:cameraGesturePinch="zoom"
+            app:cameraGestureScrollHorizontal="exposureCorrection"
+            app:cameraGestureScrollVertical="none"
+            app:cameraMode="picture" />
 
         <LinearLayout
             android:id="@+id/btn_holder"
@@ -40,6 +60,14 @@
                 android:layout_weight="1"
                 android:padding="6dp"
                 android:src="@drawable/ic_camera_front"/>
+
+            <ImageView
+                android:id="@+id/btnCameraVideo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:padding="6dp"
+                android:src="@drawable/ic_video_rec"/>
 
             <ImageView
                 android:id="@+id/btnCamera"
