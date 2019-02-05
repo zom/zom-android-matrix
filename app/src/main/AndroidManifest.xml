@@ -361,7 +361,6 @@
         <activity
             android:name=".ui.camera.CameraActivity"
             android:label=""
-            android:screenOrientation="portrait"
             android:exported="false"
             />
 
