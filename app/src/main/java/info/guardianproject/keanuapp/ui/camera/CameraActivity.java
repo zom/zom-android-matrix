@@ -163,14 +163,16 @@ public class CameraActivity extends AppCompatActivity {
                 else {
                     isRecordingVideo = true;
                     mCameraView.setMode(Mode.VIDEO);
-                    mCameraView.setVideoMaxDuration(10000);
+                    mCameraView.setVideoMaxDuration(30000);
                     mCameraView.setVideoMaxSize(50000000);
+                    mCameraView.setVideoBitRate(800);
+                    mCameraView.setAudioBitRate(64);
+
                     ((ImageView)findViewById(R.id.btnCameraVideo)).setImageResource(R.drawable.ic_video_stop);
 
                     fileVideoTmp = new File(getFilesDir(), "tmp.mp4");
                     mCameraView.takeVideo(fileVideoTmp);
                 }
-
 
 
             }
