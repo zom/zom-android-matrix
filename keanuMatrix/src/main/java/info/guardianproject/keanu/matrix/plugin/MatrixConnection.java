@@ -630,13 +630,13 @@ public class MatrixConnection extends ImConnection {
 
                 for (Room room : rooms)
                 {
-                    updateGroup(room);
+                    //get fresh room from data handler?
+                    updateGroup(mDataHandler.getRoom(room.getRoomId()));
 
-                    /**
                     if (room.isMember() && room.getNumberOfMembers() > 1) {
                         ChatGroup group = addRoomContact(room);
                         mChatSessionManager.createChatSession(group, true);
-                    }**/
+                    }
 
                 }
 
@@ -663,7 +663,7 @@ public class MatrixConnection extends ImConnection {
         final ChatGroup group = mChatGroupManager.getChatGroup(mAddr, subject);
 
         ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
-        if (csa != null) {
+        if (csa != null && (!subject.equals(mContext.getString(R.string.default_group_title)))) {
             try {
                 csa.setGroupChatSubject(subject);
             } catch (RemoteException e) {

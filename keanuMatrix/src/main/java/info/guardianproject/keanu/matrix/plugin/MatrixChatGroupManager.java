@@ -81,7 +81,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         {
             if (TextUtils.isEmpty(subject))
             {
-                Room room = mDataHandler.getRoom(addr.getBareAddress());
+                Room room = mDataHandler.getRoom(addr.getAddress());
                 if (room != null)
                     subject = room.getRoomDisplayName(mContext);
                 else
@@ -90,10 +90,6 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
             result = new ChatGroup(addr,subject,this);
         }
-        else
-            result.setName(subject);
-
-        //notifyJoinedGroup(result);
 
         return result;
     }
