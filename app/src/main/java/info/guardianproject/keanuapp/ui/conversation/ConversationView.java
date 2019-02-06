@@ -823,6 +823,7 @@ public class ConversationView {
 
             @Override
             public void onClick(View v) {
+                mViewAttach.setVisibility(View.INVISIBLE);
                 mActivity.startFilePicker("*/*");
             }
 

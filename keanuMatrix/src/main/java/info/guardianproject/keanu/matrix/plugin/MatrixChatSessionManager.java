@@ -253,7 +253,15 @@ public class MatrixChatSessionManager extends ChatSessionManager {
         ClipData.Item clipItemData = new ClipData.Item(uriMedia);
 
         RoomMediaMessage msg = new RoomMediaMessage(clipItemData, mimeType);
-        msg.setMessageType("m.file");
+
+        if (mimeType.startsWith("image"))
+            msg.setMessageType("m.image");
+        else if (mimeType.startsWith("audio"))
+            msg.setMessageType("m.audio");
+        else if (mimeType.startsWith("video"))
+            msg.setMessageType("m.video");
+        else
+            msg.setMessageType("m.file");
 
         KeanuRoomMediaMessagesSender sender = new KeanuRoomMediaMessagesSender(mContext,mDataHandler,room);
         sender.send(msg, new RoomMediaMessage.EventCreationListener() {

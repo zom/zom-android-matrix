@@ -503,27 +503,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             public void run ()
             {
 
-                String sendFileName = fileName;
-
                 final Message msgMedia = storeMediaMessage(mediaPath, mimeType, fileName);
-
-                if (!sendFileName.contains("."))
-                {
-                    String fileExt = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType);
-
-                    if (!TextUtils.isEmpty(fileExt))
-                        sendFileName += "." + fileExt;
-                    else if (mimeType.equals("audio/mp4"))
-                    {
-                        sendFileName += ".m4a";
-                    }
-                    else if (mimeType.equals("audio/mp4"))
-                    {
-                        sendFileName += ".m4a";
-                    }
-
-
-                }
 
 
                 UploadProgressListener listener = new UploadProgressListener() {

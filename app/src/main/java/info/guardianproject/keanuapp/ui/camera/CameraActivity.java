@@ -3,6 +3,7 @@ package info.guardianproject.keanuapp.ui.camera;
 import android.arch.lifecycle.LifecycleOwner;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,11 +19,15 @@ import android.widget.ImageView;
 import com.otaliastudios.cameraview.BitmapCallback;
 import com.otaliastudios.cameraview.CameraListener;
 import com.otaliastudios.cameraview.CameraOptions;
+import com.otaliastudios.cameraview.CameraUtils;
 import com.otaliastudios.cameraview.CameraView;
 import com.otaliastudios.cameraview.Flash;
+import com.otaliastudios.cameraview.Frame;
+import com.otaliastudios.cameraview.FrameProcessor;
 import com.otaliastudios.cameraview.Mode;
 import com.otaliastudios.cameraview.PictureResult;
 import com.otaliastudios.cameraview.SizeSelector;
+import com.otaliastudios.cameraview.VideoCodec;
 import com.otaliastudios.cameraview.VideoResult;
 
 import org.apache.commons.io.IOUtils;
@@ -38,6 +43,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileOutputStream;
@@ -65,6 +71,7 @@ public class CameraActivity extends AppCompatActivity {
 
     File fileVideoTmp;
     boolean isRecordingVideo = false;
+    Bitmap thumbnail = null;
 
     private Handler mHandler = new Handler ()
     {
@@ -97,6 +104,8 @@ public class CameraActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mCameraView = findViewById(R.id.camera_view);
+
+
         mCameraView.addCameraListener(new CameraListener() {
 
 
@@ -104,15 +113,25 @@ public class CameraActivity extends AppCompatActivity {
             public void onPictureTaken(PictureResult result) {
                 super.onPictureTaken(result);
 
+                if (isRecordingVideo) {
 
-                result.toBitmap(bitmap -> {
-                    storeBitmap(bitmap);
-                    if (mOneAndDone)
-                        mHandler.sendEmptyMessage(2);
-                });
+                    result.toBitmap(new BitmapCallback() {
+                        @Override
+                        public void onBitmapReady(@Nullable Bitmap bitmap) {
+                            thumbnail = bitmap;
+                        }
+                    });
+                }
+                else {
+                    result.toBitmap(bitmap -> {
+                        storeBitmap(bitmap);
+                        if (mOneAndDone)
+                            mHandler.sendEmptyMessage(2);
+                    });
 
 
-                mHandler.sendEmptyMessage(1);
+                    mHandler.sendEmptyMessage(1);
+                }
 
             }
 
@@ -162,11 +181,16 @@ public class CameraActivity extends AppCompatActivity {
                 }
                 else {
                     isRecordingVideo = true;
+
+                    mCameraView.setPlaySounds(false);
+                    mCameraView.takePictureSnapshot();
+
                     mCameraView.setMode(Mode.VIDEO);
                     mCameraView.setVideoMaxDuration(30000);
                     mCameraView.setVideoMaxSize(50000000);
                     mCameraView.setVideoBitRate(800);
-                    mCameraView.setAudioBitRate(64);
+                    mCameraView.setAudioBitRate(128);
+                    mCameraView.setVideoCodec(VideoCodec.H_264);
 
                     ((ImageView)findViewById(R.id.btnCameraVideo)).setImageResource(R.drawable.ic_video_stop);
 
@@ -323,6 +347,11 @@ public class CameraActivity extends AppCompatActivity {
 
             fileVideo.delete();
             System.gc();
+
+            if (thumbnail != null)
+                thumbnail.compress(Bitmap.CompressFormat.JPEG,
+                        80,new info.guardianproject.iocipher.FileOutputStream(new File(vfsUri.getPath()+".thumb.jpg")));
+
 
             String mimeType = "video/mp4";
 

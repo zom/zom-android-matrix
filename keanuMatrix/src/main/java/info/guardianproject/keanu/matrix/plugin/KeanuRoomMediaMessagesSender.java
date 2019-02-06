@@ -20,6 +20,10 @@ package info.guardianproject.keanu.matrix.plugin;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.ExifInterface;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.HandlerThread;
@@ -29,6 +33,11 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.util.Pair;
 
+import org.jcodec.api.FrameGrab;
+import org.jcodec.api.JCodecException;
+import org.jcodec.common.AndroidUtil;
+import org.jcodec.common.io.SeekableByteChannel;
+import org.jcodec.common.model.Picture;
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.R;
 import org.matrix.androidsdk.crypto.MXEncryptedAttachments;
@@ -45,6 +54,8 @@ import org.matrix.androidsdk.rest.model.message.ImageMessage;
 import org.matrix.androidsdk.rest.model.message.MediaMessage;
 import org.matrix.androidsdk.rest.model.message.Message;
 import org.matrix.androidsdk.rest.model.message.RelatesTo;
+import org.matrix.androidsdk.rest.model.message.ThumbnailInfo;
+import org.matrix.androidsdk.rest.model.message.VideoInfo;
 import org.matrix.androidsdk.rest.model.message.VideoMessage;
 import org.matrix.androidsdk.util.ImageUtils;
 import org.matrix.androidsdk.util.JsonUtils;
@@ -54,11 +65,18 @@ import org.matrix.androidsdk.util.ResourceUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import info.guardianproject.iocipher.IOCipherFileChannel;
+import info.guardianproject.iocipher.RandomAccessFile;
+import info.guardianproject.keanu.core.util.IOCipherFileChannelWrapper;
 
 /**
  * Room helper to send media messages in the right order.
@@ -699,17 +717,68 @@ class KeanuRoomMediaMessagesSender {
      * @return the video thumbnail
      */
     public String getVideoThumbnailUrl(final String videoUrl) {
-        String thumbUrl = null;
+        String thumbUrl = videoUrl + ".thumb.jpg";
+        /**
         try {
             Uri uri = Uri.parse(videoUrl);
-            Bitmap thumb = ThumbnailUtils.createVideoThumbnail(uri.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
+            //Bitmap thumb = createVideoThumbnail(uri, MediaStore.Images.Thumbnails.MINI_KIND);
+            Bitmap thumb = new BitmapDrawable(mContext.getDrawable(android.R.d))
             thumbUrl = mDataHandler.getMediaCache().saveBitmap(thumb, null);
         } catch (Exception e) {
             Log.e(LOG_TAG, "## getVideoThumbnailUrl() failed with " + e.getMessage(), e);
-        }
+        }**/
 
         return thumbUrl;
     }
+
+
+    /**
+     * Create a video thumbnail for a video. May return null if the video is
+     * corrupt or the format is not supported.
+     *
+     * @param uriMedia the path of video file
+     * @param kind could be MINI_KIND or MICRO_KIND
+     */
+    /**
+    public static Bitmap createVideoThumbnail(Uri uriMedia, int kind) {
+        Bitmap bitmap = null;
+
+        if (uriMedia.getScheme().equals("vfs")) {
+            int frameNumber = 42;
+            Picture picture = null;
+            try {
+                IOCipherFileChannel fc = new info.guardianproject.iocipher.FileInputStream(uriMedia.getPath()).getChannel();
+                picture = FrameGrab.getFrameFromChannel(new IOCipherFileChannelWrapper(fc), frameNumber);
+
+                //for Android (jcodec-android)
+                bitmap = AndroidUtil.toBitmap(picture);
+
+            } catch (JCodecException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            bitmap = ThumbnailUtils.createVideoThumbnail(uriMedia.getPath(),kind);
+        }
+
+        if (bitmap == null) return null;
+
+        // Scale down the bitmap if it's too large.
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+        int max = Math.max(width, height);
+        if (max > 512) {
+            float scale = 512f / max;
+            int w = Math.round(scale * width);
+            int h = Math.round(scale * height);
+            bitmap = Bitmap.createScaledBitmap(bitmap, w, h, true);
+        }
+
+        return bitmap;
+    }**/
 
     /**
      * Build an video message from a RoomMediaMessage.
@@ -722,10 +791,6 @@ class KeanuRoomMediaMessagesSender {
             String mediaUrl = getMediaUrl(roomMediaMessage);
             String thumbnailUrl = getVideoThumbnailUrl(mediaUrl);
 
-            if (null == thumbnailUrl) {
-                return buildFileMessage(roomMediaMessage);
-            }
-
             VideoMessage videoMessage = new VideoMessage();
             videoMessage.url = mediaUrl;
             videoMessage.body = roomMediaMessage.getFileName(mContext);
@@ -734,7 +799,8 @@ class KeanuRoomMediaMessagesSender {
 
             Uri videoUri = Uri.parse(mediaUrl);
             Uri thumbnailUri = (null != thumbnailUrl) ? Uri.parse(thumbnailUrl) : null;
-            Room.fillVideoInfo(mContext, videoMessage, videoUri, roomMediaMessage.getMimeType(mContext), thumbnailUri, "image/jpeg");
+
+            fillVideoInfo(mContext, videoMessage, videoUri, roomMediaMessage.getMimeType(mContext), thumbnailUri, "image/jpeg");
 
             if (null == videoMessage.body) {
                 videoMessage.body = videoUri.getLastPathSegment();
@@ -746,6 +812,70 @@ class KeanuRoomMediaMessagesSender {
         }
 
         return null;
+    }
+
+    public static void fillVideoInfo(Context context, VideoMessage videoMessage, Uri fileUri, String videoMimeType, Uri thumbnailUri, String thumbMimeType) {
+        try {
+
+            VideoInfo videoInfo = new VideoInfo();
+
+            /**
+            File file = new File(fileUri.getPath());
+
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            Bitmap bmp = retriever.getFrameAtTime();
+            videoInfo.h = bmp.getHeight();
+            videoInfo.w = bmp.getWidth();
+             **/
+
+            videoInfo.mimetype = videoMimeType;
+            videoInfo.duration = 10L;
+
+            /**
+            try {
+                MediaPlayer mp = MediaPlayer.create(context, fileUri);
+                if (null != mp) {
+                    videoInfo.duration = (long)mp.getDuration();
+                    mp.release();
+                }
+            } catch (Exception var15) {
+                Log.e(LOG_TAG, "fillVideoInfo : MediaPlayer.create failed" + var15.getMessage(), var15);
+            }**/
+
+            videoInfo.size = new info.guardianproject.iocipher.File(fileUri.getPath()).length();
+            if (null != thumbnailUri) {
+                videoInfo.thumbnail_url = thumbnailUri.toString();
+                ThumbnailInfo thumbInfo = new ThumbnailInfo();
+                info.guardianproject.iocipher.File thumbnailFile = new info.guardianproject.iocipher.File(thumbnailUri.getPath());
+
+                /**
+                ExifInterface exifMedia = new ExifInterface(new info.guardianproject.iocipher.FileInputStream(thumbnailFile));
+                String sWidth = exifMedia.getAttribute("ImageWidth");
+                String sHeight = exifMedia.getAttribute("ImageLength");
+                if (null != sWidth) {
+                    thumbInfo.w = Integer.parseInt(sWidth);
+                }
+
+                if (null != sHeight) {
+                    thumbInfo.h = Integer.parseInt(sHeight);
+                }**/
+                thumbInfo.w = 1080;
+                thumbInfo.h = 720;
+
+
+                videoInfo.h = thumbInfo.h;
+                videoInfo.w = thumbInfo.w;
+                thumbInfo.size = thumbnailFile.length();
+                thumbInfo.mimetype = thumbMimeType;
+                videoInfo.thumbnail_info = thumbInfo;
+            }
+
+            videoMessage.info = videoInfo;
+
+        } catch (Exception var16) {
+            Log.e(LOG_TAG, "fillVideoInfo : failed" + var16.getMessage(), var16);
+        }
+
     }
 
     /**
@@ -1002,4 +1132,6 @@ class KeanuRoomMediaMessagesSender {
 
         return true;
     }
+
+
 }

@@ -35,7 +35,7 @@ android {
     }
 
     dexOptions {
-        javaMaxHeapSize "2g"
+        javaMaxHeapSize "3g"
         preDexLibraries true
     }
 
@@ -101,15 +101,11 @@ dependencies {
     implementation 'com.github.javiersantos:AppUpdater:2.6.4'
     implementation 'com.github.QuadFlask:colorpicker:0.0.10'
 
-
     //built in camera now!
-    //https://github.com/siralam/CameraViewPlus
-    //implementation 'com.asksira.android:cameraviewplus:0.9.5'
-
     //https://github.com/natario1/CameraView
     implementation 'com.otaliastudios:cameraview:2.0.0-beta02'
 
-    implementation 'commons-codec:commons-codec:1.9'
+    implementation 'commons-codec:commons-codec:1.10'
     implementation 'commons-io:commons-io:2.5'
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
@@ -137,6 +133,7 @@ dependencies {
 
     //support for in app video playback
     implementation 'com.google.android.exoplayer:exoplayer:2.6.0'
+    implementation 'org.jcodec:jcodec:0.2.3'
 
     def lifecycle_version = "2.0.0"
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"

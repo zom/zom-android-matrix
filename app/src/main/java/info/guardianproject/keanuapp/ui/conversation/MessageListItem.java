@@ -17,6 +17,7 @@
 
 package info.guardianproject.keanuapp.ui.conversation;
 
+import info.guardianproject.iocipher.File;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.ui.RoundedAvatarDrawable;
@@ -455,9 +456,9 @@ public class MessageListItem extends FrameLayout {
             holder.mAvatar.setVisibility(View.VISIBLE);
             holder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
             holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
-            //setVideoThumbnail( getContext().getContentResolver(), id, holder, mediaUri );
-            //holder.mMediaThumbnail.setBackgroundResource(android.R.color.transparent);
-            holder.mMediaThumbnail.setImageResource(R.drawable.video256); // generic file icon
+            setVideoThumbnail( getContext().getContentResolver(), id, holder, mediaUri );
+            holder.mMediaThumbnail.setBackgroundResource(android.R.color.transparent);
+
             holder.mTextViewForMessages.setText(mediaUri.getLastPathSegment() + " (" + mimeType + ")");
             holder.mTextViewForMessages.setVisibility(View.VISIBLE);
         }
@@ -764,7 +765,13 @@ public class MessageListItem extends FrameLayout {
         aHolder.mMediaUri = mediaUri;
         // if a content uri - already scanned
 
-        GlideUtils.loadVideoFromUri(context, mediaUri, aHolder.mMediaThumbnail);
+        File fileThumb = new File(mediaUri.getPath()+".thumb.jpg");
+        if (fileThumb.exists()) {
+            //GlideUtils.loadVideoFromUri(context, mediaUri, aHolder.mMediaThumbnail);
+            GlideUtils.loadImageFromUri(context, Uri.parse("vfs://"+fileThumb.getAbsolutePath()), aHolder.mMediaThumbnail);
+        }
+        else
+            aHolder.mMediaThumbnail.setImageResource(R.drawable.video256); // generic file icon
 
     }
     /**
