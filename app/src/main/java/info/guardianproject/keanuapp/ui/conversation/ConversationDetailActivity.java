@@ -29,9 +29,12 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaRecorder;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -70,6 +73,7 @@ import java.util.UUID;
 
 import info.guardianproject.keanu.core.BuildConfig;
 import info.guardianproject.keanu.core.Preferences;
+import info.guardianproject.keanu.core.model.SystemService;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.model.Presence;
 import info.guardianproject.keanu.core.provider.Imps;
@@ -620,6 +624,50 @@ public class ConversationDetailActivity extends BaseActivity {
                 }
                 else
                     sendUri = SecureMediaStore.importContent(sessionId,info.name, info.stream);
+
+                if (info.type.startsWith("video"))
+                {
+
+                   String videoPath = new SystemServices().getUriRealPath(this, contentUri);
+                   if (!TextUtils.isEmpty(videoPath)) {
+                       Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.MINI_KIND);
+
+                       if (bitmap != null){
+                           String thumbPath = sendUri.getPath() + ".thumb.jpg";
+                           info.guardianproject.iocipher.File fileThumb = new info.guardianproject.iocipher.File(thumbPath);
+                           bitmap.compress(Bitmap.CompressFormat.JPEG,100,new info.guardianproject.iocipher.FileOutputStream(fileThumb));
+                       }
+                   }
+                   else
+                   {
+
+                       long videoId = -1;
+                       String lastPath = contentUri.getLastPathSegment();
+                       try {
+                           videoId = Long.parseLong(lastPath);
+                       }
+                       catch (Exception e)
+                       {
+                           String[] parts = lastPath.split(":");
+                           if (parts.length > 1)
+                               videoId = Long.parseLong(parts[1]);
+                       }
+
+                       if (videoId != -1)
+                       {
+                           Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(
+                                   getContentResolver(), videoId,
+                                   MediaStore.Images.Thumbnails.MINI_KIND,
+                                   (BitmapFactory.Options) null);
+
+                           if (bitmap != null) {
+                               String thumbPath = sendUri.getPath() + ".thumb.jpg";
+                               info.guardianproject.iocipher.File fileThumb = new info.guardianproject.iocipher.File(thumbPath);
+                               bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new info.guardianproject.iocipher.FileOutputStream(fileThumb));
+                           }
+                       }
+                   }
+                }
             }
             else
             {

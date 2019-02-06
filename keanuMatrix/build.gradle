@@ -63,6 +63,11 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+
+    //for thumbnail extraction for videos!
+    implementation 'org.jcodec:jcodec-android:0.2.3'
+
 }
 
 apply plugin: 'maven'
