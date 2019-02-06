@@ -13,7 +13,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 124
-        versionName "0.0.1-beta-4"
+        versionName "0.0.1-beta-5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
