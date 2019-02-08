@@ -26,6 +26,7 @@ import com.otaliastudios.cameraview.Frame;
 import com.otaliastudios.cameraview.FrameProcessor;
 import com.otaliastudios.cameraview.Mode;
 import com.otaliastudios.cameraview.PictureResult;
+import com.otaliastudios.cameraview.Size;
 import com.otaliastudios.cameraview.SizeSelector;
 import com.otaliastudios.cameraview.VideoCodec;
 import com.otaliastudios.cameraview.VideoResult;
@@ -36,7 +37,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -72,6 +75,8 @@ public class CameraActivity extends AppCompatActivity {
     File fileVideoTmp;
     boolean isRecordingVideo = false;
     Bitmap thumbnail = null;
+
+    private final static int MAX_LENGTH_MS = 30 * 1000;
 
     private Handler mHandler = new Handler ()
     {
@@ -121,6 +126,8 @@ public class CameraActivity extends AppCompatActivity {
                             thumbnail = bitmap;
                         }
                     });
+
+                    startVideoRecording ();
                 }
                 else {
                     result.toBitmap(bitmap -> {
@@ -136,10 +143,15 @@ public class CameraActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onVideoTaken(VideoResult result) {
+            public void onVideoTaken(final VideoResult result) {
                 super.onVideoTaken(result);
 
-                storeVideo(result.getFile());
+                mExec.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        storeVideo(result.getFile());
+                    }
+                });
 
             }
 
@@ -181,21 +193,7 @@ public class CameraActivity extends AppCompatActivity {
                 }
                 else {
                     isRecordingVideo = true;
-
-                    mCameraView.setPlaySounds(false);
                     mCameraView.takePictureSnapshot();
-
-                    mCameraView.setMode(Mode.VIDEO);
-                    mCameraView.setVideoMaxDuration(30000);
-                    mCameraView.setVideoMaxSize(50000000);
-                    mCameraView.setVideoBitRate(800);
-                    mCameraView.setAudioBitRate(128);
-                    mCameraView.setVideoCodec(VideoCodec.H_264);
-
-                    ((ImageView)findViewById(R.id.btnCameraVideo)).setImageResource(R.drawable.ic_video_stop);
-
-                    fileVideoTmp = new File(getFilesDir(), "tmp.mp4");
-                    mCameraView.takeVideo(fileVideoTmp);
                 }
 
 
@@ -253,6 +251,34 @@ public class CameraActivity extends AppCompatActivity {
             mOrientationEventListener.disable();
         }
 
+    }
+
+    private void startVideoRecording ()
+    {
+        mCameraView.setMode(Mode.VIDEO);
+        mCameraView.setVideoMaxDuration(MAX_LENGTH_MS);
+        mCameraView.setVideoCodec(VideoCodec.H_264);
+
+        mCameraView.setVideoSize(new SizeSelector() {
+            @NonNull
+            @Override
+            public List<Size> select(@NonNull List<Size> source) {
+                ArrayList<Size> result = new ArrayList<>();
+
+                for (Size size : source)
+                {
+                    if (size.getWidth() < 800)
+                        result.add(size);
+                }
+
+                return result;
+            }
+        });
+
+        ((ImageView)findViewById(R.id.btnCameraVideo)).setImageResource(R.drawable.ic_video_stop);
+
+        fileVideoTmp = new File(getFilesDir(), "tmp.mp4");
+        mCameraView.takeVideo(fileVideoTmp);
     }
 
     @Override

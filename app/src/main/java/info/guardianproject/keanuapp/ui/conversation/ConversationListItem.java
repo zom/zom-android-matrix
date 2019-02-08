@@ -39,6 +39,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 
+import info.guardianproject.iocipher.File;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IImConnection;
@@ -77,7 +78,7 @@ public class ConversationListItem extends FrameLayout {
             Imps.Chats.LAST_UNREAD_MESSAGE,
             Imps.Chats.LAST_READ_DATE,
             Imps.Chats.CHAT_TYPE,
-            Imps.Chats.USE_ENCRYPTION
+            Imps.Chats.USE_ENCRYPTIONf
             //          Imps.Contacts.AVATAR_HASH,
             //        Imps.Contacts.AVATAR_DATA
 
@@ -242,11 +243,24 @@ public class ConversationListItem extends FrameLayout {
                     }
                     else if (messageType.startsWith("video"))
                     {
-                        mLastMediaUri = null;
-                        holder.mMediaThumb.setVisibility(View.VISIBLE);
-                        holder.mMediaThumb.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-                        holder.mMediaThumb.setImageResource(R.drawable.video256);
-                        holder.mLine2.setText("");
+                        Uri uriMedia = Uri.parse(vPath);
+                        File fileThumb = new info.guardianproject.iocipher.File(uriMedia.getPath() + ".thumb.jpg");
+
+                        if (!fileThumb.exists()) {
+                            mLastMediaUri = null;
+                            holder.mMediaThumb.setVisibility(View.VISIBLE);
+                            holder.mMediaThumb.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                            holder.mMediaThumb.setImageResource(R.drawable.video256);
+                            holder.mLine2.setText("");
+                        }
+                        else {
+                            if (holder.mMediaThumb != null) {
+                                holder.mMediaThumb.setVisibility(View.VISIBLE);
+                                holder.mMediaThumb.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                                setThumbnail(getContext().getContentResolver(), holder, Uri.parse(vPath + ".thumb.jpg"), true);
+                                holder.mLine2.setVisibility(View.GONE);
+                            }
+                        }
                     }
                     else if (messageType.startsWith("application"))
                     {

@@ -516,8 +516,10 @@ public class OnboardingActivity extends BaseActivity {
         mNickname = ((EditText)findViewById(R.id.edtNameAdvanced)).getText().toString();
         String username = mNickname.replaceAll(USERNAME_ONLY_ALPHANUM, "").toLowerCase();
 
-        if (TextUtils.isEmpty(username))
-            username = "matrixuser"+UUID.randomUUID().toString().substring(0,8); //if there are no alphanum then just use "keanuuser"
+        if (TextUtils.isEmpty(username)) {
+            //if there are no alphanum then just use a series of numbers with the app name
+            username = getString(R.string.app_name) + "=" + (int)(Math.random()*1000000f);
+        }
 
         String domain = ((EditText)findViewById(R.id.spinnerDomains)).getText().toString();
 
@@ -547,8 +549,10 @@ public class OnboardingActivity extends BaseActivity {
 
         String username = mNickname.replaceAll(USERNAME_ONLY_ALPHANUM, "").toLowerCase();
 
-        if (TextUtils.isEmpty(username))
-            username = "keanuuser"; //if there are no alphanum then just use "keanuuser"
+        if (TextUtils.isEmpty(username)) {
+            //if there are no alphanum then just use a series of numbers with the app name
+            username = getString(R.string.app_name) + "=" + (int)(Math.random()*1000000f);
+        }
 
         if (mCurrentFindServerTask != null)
             mCurrentFindServerTask.cancel(true);
@@ -606,20 +610,6 @@ public class OnboardingActivity extends BaseActivity {
 
                                         showMainScreen(true);
 
-                                        /**
-                                        showSuccess();
-
-
-                                        mItemSkip.setVisible(true);
-                                        mItemSkip.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                                            @Override
-                                            public boolean onMenuItemClick(MenuItem item) {
-
-
-                                                return false;
-                                            }
-                                        });**/
-
 
                                         SignInHelper signInHelper = new SignInHelper(OnboardingActivity.this, mHandler);
                                         signInHelper.activateAccount(account.providerId, account.accountId);
@@ -637,11 +627,8 @@ public class OnboardingActivity extends BaseActivity {
 
                                     public void run ()
                                     {
-                                        findViewById(R.id.progressImage).setVisibility(View.GONE);
 
-                                        findViewById(R.id.viewProgress).setVisibility(View.GONE);
-                                        findViewById(R.id.viewCreate).setVisibility(View.VISIBLE);
-                                        findViewById(R.id.btnAdvanced).setVisibility(View.VISIBLE);
+                                        showSetupScreen();
 
                                         StringBuffer sb = new StringBuffer();
                                         sb.append(getString(R.string.account_setup_error_server));
