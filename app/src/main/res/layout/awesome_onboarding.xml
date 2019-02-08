@@ -27,6 +27,7 @@
 
                 <include android:id="@+id/flipViewAdvanced" layout="@layout/awesome_onboarding_advanced"/>
                 <include android:id="@+id/flipViewProgress" layout="@layout/awesome_onboarding_progress"/>
+                
                 <include android:id="@+id/flipViewSuccess" layout="@layout/awesome_onboarding_success"/>
 
             <!--    <include android:id="@+id/flipViewInviteFriends" layout="@layout/awesome_onboarding_invite"/>-->
