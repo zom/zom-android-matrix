@@ -25,9 +25,9 @@ allprojects {
         maven {
             url 'https://oss.sonatype.org/content/repositories/snapshots'
         }
-        mavenCentral()
-        maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
         google()
+        maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
+
     }
 }
 
