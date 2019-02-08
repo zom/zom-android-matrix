@@ -281,6 +281,7 @@ public class MatrixConnection extends ImConnection {
         mCredentials.deviceId = mDeviceId;
 
         mConfig.setCredentials(mCredentials);
+        mConfig.forceUsageOfTlsVersions();
 
         mStore = new KeanuMXFileStore(mConfig,enableEncryption, mContext);
 
@@ -627,11 +628,10 @@ public class MatrixConnection extends ImConnection {
 
     private void loadStateAsync ()
     {
-        new AsyncTask<Void, Void, String>()
-        {
-            @Override
-            protected String doInBackground(Void... voids) {
 
+        mExecutorGroups.execute(new Runnable() {
+            @Override
+            public void run() {
                 mContactListManager.loadContactListsAsync();
 
                 Collection<Room> rooms = mStore.getRooms();
@@ -639,18 +639,16 @@ public class MatrixConnection extends ImConnection {
                 for (Room room : rooms)
                 {
                     //get fresh room from data handler?
-                    updateGroup(mDataHandler.getRoom(room.getRoomId()));
-
-                    if (room.isMember() && room.getNumberOfMembers() > 1) {
+                   // updateGroup(mDataHandler.getRoom(room.getRoomId()));
+                    if (room.isMember()) {
                         ChatGroup group = addRoomContact(room);
                         mChatSessionManager.createChatSession(group, true);
                     }
 
                 }
-
-                return null;
             }
-        }.execute();
+        });
+
     }
 
     protected ChatGroup addRoomContact (final Room room)
@@ -1043,7 +1041,6 @@ public class MatrixConnection extends ImConnection {
                 });
             }
 
-            loadStateAsync();
         }
 
         private void downloadKeys (String user, String device)
@@ -1247,7 +1244,7 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onGroupUsersListUpdate(String s) {
             debug ("onGroupUsersListUpdate: " + s);
-            loadStateAsync();
+
             Room room = mDataHandler.getRoom(s);
             if (room != null)
                 updateGroup(room);
