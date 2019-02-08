@@ -14,6 +14,8 @@ import info.guardianproject.keanuapp.R;
 public class MediaViewHolder extends RecyclerView.ViewHolder  {
 
     public ImageView mMediaThumbnail;
+    public ImageView mMediaPlay;
+
     public ViewGroup mContainer;
 
     // save the media uri while the MediaScanner is creating the thumbnail
@@ -24,8 +26,9 @@ public class MediaViewHolder extends RecyclerView.ViewHolder  {
     {
         super(view);
 
-        mMediaThumbnail = (ImageView) view.findViewById(R.id.media_thumbnail);
-        mContainer = (ViewGroup)view.findViewById(R.id.message_container);
+        mMediaThumbnail = view.findViewById(R.id.media_thumbnail);
+        mContainer = view.findViewById(R.id.message_container);
+        mMediaPlay = view.findViewById(R.id.media_thumbnail_play);
 
     }
 }

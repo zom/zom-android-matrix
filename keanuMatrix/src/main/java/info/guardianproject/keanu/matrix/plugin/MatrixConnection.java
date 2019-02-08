@@ -56,9 +56,12 @@ import org.matrix.androidsdk.rest.model.login.Credentials;
 import org.matrix.androidsdk.rest.model.login.LoginFlow;
 import org.matrix.androidsdk.rest.model.login.RegistrationFlowResponse;
 import org.matrix.androidsdk.rest.model.login.RegistrationParams;
+import org.matrix.androidsdk.rest.model.message.AudioMessage;
 import org.matrix.androidsdk.rest.model.message.FileMessage;
+import org.matrix.androidsdk.rest.model.message.ImageMessage;
 import org.matrix.androidsdk.rest.model.message.StickerJsonMessage;
 import org.matrix.androidsdk.rest.model.message.StickerMessage;
+import org.matrix.androidsdk.rest.model.message.VideoMessage;
 import org.matrix.androidsdk.rest.model.search.SearchUsersResponse;
 import org.matrix.androidsdk.util.JsonUtils;
 
@@ -83,6 +86,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.ChatGroup;
@@ -1479,39 +1483,107 @@ public class MatrixConnection extends ImConnection {
                 if (!csa.doesMessageExist(event.eventId)) {
                     MatrixAddress addrSender = new MatrixAddress(event.sender);
 
+                    /**
+                     * {
+                     *   "age" : null,
+                     *   "content": {
+                     *     "body": "SampleVideo_1280x720_1mb.mp4",
+                     *     "info": {"size":1055736,"mimetype":"video/mp4","thumbnail_info":{"w":800,"h":450,"mimetype":"image/jpeg","size":144242},"w":1280,"h":720,"thumbnail_file":{"v":"v2","key":{"alg":"A256CTR","ext":true,"k":"jzdnhAwFnBTUQDuaRm3C11A-QPMH70nMm5smZTameKs","key_ops":["encrypt","decrypt"],"kty":"oct"},"iv":"htNMugSjnGMAAAAAAAAAAA","hashes":{"sha256":"mFG8yy0+AtiADgLVfLbxdgBENoCRbWx+VIsHoDO+qs8"},"url":"mxc://dev.keanu.im/IVTShPNtheLCPNCduSRMCRLn","mimetype":"image/jpeg"}},
+                     *     "msgtype": "m.video",
+                     *     "file": {"v":"v2","key":{"alg":"A256CTR","ext":true,"k":"27avGKl4nieHz--_PpSQVAtmQzdkt0YfoYY4t5-H4fI","key_ops":["encrypt","decrypt"],"kty":"oct"},"iv":"BEI+98qtTwwAAAAAAAAAAA","hashes":{"sha256":"xIdrIW7SRoyFnkJ4hlS1XQINAqzOrI64hq1upL0x48s"},"url":"mxc://dev.keanu.im/svGZZuDKuQBXVWtWPkjMDxmR","mimetype":"video/mp4"},
+                     *   },
+                     *   "eventId": "null",
+                     *   "originServerTs": 0,
+                     *   "roomId": "!zSTBLplOdsGQPLxmVe:dev.keanu.im",
+                     *   "type": "m.room.message",
+                     *   "userId": "null",
+                     *   "sender": "null",
+                     * }
+                     *
+                     *  Sent state : SENT
+                     */
+
                     if (messageType.equals("m.image")
                             || messageType.equals("m.file")
                             || messageType.equals("m.video")
                             || messageType.equals("m.audio")) {
-                        FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
 
-                        String mediaUrl = fileMessage.getUrl();
-                        messageMimeType = fileMessage.getMimeType();
 
+                        String mediaUrl = null;
+                        String thumbUrl = null;
                         String localFolder = addrSender.getAddress();
-                        String localFileName = new Date().getTime() + '.' + messageBody;
-                        EncryptedFileInfo encryptedFileInfo = fileMessage.file;
+                        String localFileName = messageBody;
+                        EncryptedFileInfo encryptedFileInfo = null;
+                        EncryptedFileInfo encryptedThumbInfo = null;
 
-                        String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, null != encryptedFileInfo);
+                        if (messageType.equals("m.file")) {
+                            FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
+                            messageMimeType = fileMessage.getMimeType();
+                            mediaUrl = fileMessage.getUrl();
+                            encryptedFileInfo = fileMessage.file;
+                        }
+                        else if (messageType.equals("m.image"))
+                        {
+                            ImageMessage fileMessage = JsonUtils.toImageMessage(event.getContent());
+                            messageMimeType = fileMessage.getMimeType();
+                            mediaUrl = fileMessage.getUrl();
+                            encryptedFileInfo = fileMessage.file;
+                        }
+                        else if (messageType.equals("m.audio"))
+                        {
+                            AudioMessage fileMessage = JsonUtils.toAudioMessage(event.getContent());
+                            messageMimeType = fileMessage.getMimeType();
+                            mediaUrl = fileMessage.getUrl();
+                            encryptedFileInfo = fileMessage.file;
+                        }
+                        else if (messageType.equals("m.video"))
+                        {
+                            VideoMessage fileMessage = JsonUtils.toVideoMessage(event.getContent());
+                            messageMimeType = fileMessage.getMimeType();
+                            mediaUrl = fileMessage.getUrl();
+                            encryptedFileInfo = fileMessage.file;
+                            thumbUrl = fileMessage.getThumbnailUrl();
+                            encryptedThumbInfo = fileMessage.info.thumbnail_file;
+
+                        }
+
+
+                        MatrixDownloader dl = new MatrixDownloader();
+                        info.guardianproject.iocipher.File fileDownload = null;
 
                         try {
-                            MatrixDownloader dl = new MatrixDownloader();
-                            info.guardianproject.iocipher.File fileDownload = dl.openSecureStorageFile(localFolder, localFileName);
+                            String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, null != encryptedFileInfo);
+                            fileDownload = dl.openSecureStorageFile(localFolder, localFileName + ".encrypted");
                             OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
                             boolean downloaded = dl.get(downloadableUrl, storageStream);
 
-                            if (encryptedFileInfo != null) {
-                                InputStream decryptedIs = MXEncryptedAttachments.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo);
+                            if (downloaded && encryptedFileInfo != null) {
                                 info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileName);
-                                SecureMediaStore.copyToVfs(decryptedIs, fileDownloadDecrypted.getAbsolutePath());
+                                storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadDecrypted);
+                                boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo,storageStream);
                                 fileDownload.delete();
                                 fileDownload = fileDownloadDecrypted;
+                                messageBody = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
                             }
 
-                            messageBody = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
+                            try {
+                                downloadableUrl = mSession.getContentManager().getDownloadableUrl(thumbUrl, null != encryptedThumbInfo);
+                                info.guardianproject.iocipher.File fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileName + ".thumb.encrypted");
+                                storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadThumb);
+                                downloaded = dl.get(downloadableUrl, storageStream);
+
+                                if (downloaded && encryptedThumbInfo != null) {
+                                    storageStream = new info.guardianproject.iocipher.FileOutputStream(new File(fileDownload.getAbsolutePath() + ".thumb.jpg"));
+                                    boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownloadThumb), encryptedThumbInfo,storageStream);
+                                    fileDownloadThumb.delete();
+                                }
+
+                            } catch (Exception e) {
+                                debug("Error downloading file: " + thumbUrl, e);
+                            }
 
                         } catch (Exception e) {
-                            debug("Error downloading file: " + downloadableUrl, e);
+                            debug("Error downloading file: " + mediaUrl, e);
                         }
 
 

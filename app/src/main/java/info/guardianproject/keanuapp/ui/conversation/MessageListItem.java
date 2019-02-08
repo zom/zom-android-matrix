@@ -249,9 +249,9 @@ public class MessageListItem extends FrameLayout {
 
                 } else {
                     mHolder.mTextViewForMessages.setVisibility(View.GONE);
-                    boolean isJpeg = mimeType.contains("jpg")||mimeType.contains("jpeg");
-                    cmdSuccess = showMediaThumbnail(mediaUri.getLastPathSegment(),mimeType, mediaUri, id, mHolder, isJpeg);
                     mHolder.mMediaContainer.setVisibility(View.VISIBLE);
+                    boolean centerCrop = mimeType.contains("jpg")||mimeType.contains("jpeg")||mimeType.contains("video");
+                    cmdSuccess = showMediaThumbnail(mediaUri.getLastPathSegment(),mimeType, mediaUri, id, mHolder, centerCrop);
 
                 }
             }
@@ -430,10 +430,10 @@ public class MessageListItem extends FrameLayout {
             }
         }
 
-        holder.setOnClickListenerMediaThumbnail(mimeType, mediaUri);
 
         holder.mTextViewForMessages.setText("");
         holder.mTextViewForMessages.setVisibility(View.GONE);
+        holder.mMediaPlay.setVisibility(View.GONE);
 
         holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
 
@@ -458,9 +458,10 @@ public class MessageListItem extends FrameLayout {
             holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
             setVideoThumbnail( getContext().getContentResolver(), id, holder, mediaUri );
             holder.mMediaThumbnail.setBackgroundResource(android.R.color.transparent);
+            holder.mMediaPlay.setVisibility(View.VISIBLE);
 
-            holder.mTextViewForMessages.setText(mediaUri.getLastPathSegment() + " (" + mimeType + ")");
-            holder.mTextViewForMessages.setVisibility(View.VISIBLE);
+          //  holder.mTextViewForMessages.setText(mediaUri.getLastPathSegment() + " (" + mimeType + ")");
+           // holder.mTextViewForMessages.setVisibility(View.VISIBLE);
         }
         else if (mimeType.equals("text/csv") && mediaUri.getLastPathSegment().contains("proof.csv"))
         {
@@ -492,6 +493,8 @@ public class MessageListItem extends FrameLayout {
             holder.mTextViewForMessages.setText(displayName);
             holder.mTextViewForMessages.setVisibility(View.VISIBLE);
         }
+        
+        holder.setOnClickListenerMediaThumbnail(mimeType, mediaUri);
 
         holder.mMediaContainer.setVisibility(View.VISIBLE);
         holder.mContainer.setBackgroundResource(android.R.color.transparent);
@@ -770,9 +773,10 @@ public class MessageListItem extends FrameLayout {
             //GlideUtils.loadVideoFromUri(context, mediaUri, aHolder.mMediaThumbnail);
             GlideUtils.loadImageFromUri(context, Uri.parse("vfs://"+fileThumb.getAbsolutePath()), aHolder.mMediaThumbnail);
         }
-        else
+        else {
             aHolder.mMediaThumbnail.setImageResource(R.drawable.video256); // generic file icon
-
+            aHolder.mMediaThumbnail.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        }
     }
     /**
      * @param contentResolver
@@ -856,14 +860,10 @@ public class MessageListItem extends FrameLayout {
             }
             else {
                 mHolder.mTextViewForMessages.setVisibility(View.GONE);
-
                 mHolder.mMediaContainer.setVisibility(View.VISIBLE);
-
-                boolean isJpeg = mimeType.contains("jpg")||mimeType.contains("jpeg");
-
                 String displayName = mediaUri.getLastPathSegment();
-
-                showMediaThumbnail(displayName,mimeType, mediaUri, id, mHolder, isJpeg);
+                boolean centerCrop = mimeType.contains("jpg")||mimeType.contains("jpeg")||mimeType.contains("video");
+                showMediaThumbnail(displayName,mimeType, mediaUri, id, mHolder, centerCrop);
 
             }
 

@@ -69,7 +69,12 @@ public class MessageViewHolder extends MediaViewHolder
 
         }
         else {
-            mMediaThumbnail.setOnClickListener(new View.OnClickListener() {
+
+            View viewForClick = mMediaThumbnail;
+            if (mMediaPlay.getVisibility() == View.VISIBLE)
+                viewForClick = mMediaPlay;
+
+            viewForClick.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (mimeType.startsWith("image")) {
@@ -89,6 +94,7 @@ public class MessageViewHolder extends MediaViewHolder
 
     public void resetOnClickListenerMediaThumbnail() {
         mMediaThumbnail.setOnClickListener( null );
+        mMediaPlay.setOnClickListener( null );
     }
 
     long mTimeDiff = -1;

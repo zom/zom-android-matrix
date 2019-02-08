@@ -518,7 +518,7 @@ public class OnboardingActivity extends BaseActivity {
 
         if (TextUtils.isEmpty(username)) {
             //if there are no alphanum then just use a series of numbers with the app name
-            username = getString(R.string.app_name) + (int)(Math.random()*1000000f);
+            username = getString(R.string.app_name) + "=" + (int)(Math.random()*1000000f);
         }
 
         String domain = ((EditText)findViewById(R.id.spinnerDomains)).getText().toString();
@@ -549,8 +549,10 @@ public class OnboardingActivity extends BaseActivity {
 
         String username = mNickname.replaceAll(USERNAME_ONLY_ALPHANUM, "").toLowerCase();
 
-        if (TextUtils.isEmpty(username))
-            username = "keanuuser"; //if there are no alphanum then just use "keanuuser"
+        if (TextUtils.isEmpty(username)) {
+            //if there are no alphanum then just use a series of numbers with the app name
+            username = getString(R.string.app_name) + "=" + (int)(Math.random()*1000000f);
+        }
 
         if (mCurrentFindServerTask != null)
             mCurrentFindServerTask.cancel(true);
