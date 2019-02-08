@@ -3,6 +3,6 @@
     <string name="default_server">dev.keanu.im</string>
     <!-- General: Names -->
     <string name="ic_launcher_name">Zom2</string>
-    <string name="app_name">Zom2 BETA</string>
+    <string name="app_name">Zom2</string>
     <string name="im_label">Zom2</string>
 </resources>
