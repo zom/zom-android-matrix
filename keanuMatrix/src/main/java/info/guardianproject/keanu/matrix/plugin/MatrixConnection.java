@@ -333,8 +333,6 @@ public class MatrixConnection extends ImConnection {
 
         mLoginRestClient = new LoginRestClient(mConfig);
 
-
-
     }
 
     private void loginAsync (String password)
@@ -402,6 +400,10 @@ public class MatrixConnection extends ImConnection {
 
                                 mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
                                 loadStateAsync();
+
+                                mDataHandler.getMediaCache().clearShareDecryptedMediaCache();
+                                mDataHandler.getMediaCache().clearTmpDecryptedMediaCache();
+
                             }
                         });
                     }
