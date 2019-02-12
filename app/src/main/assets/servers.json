@@ -1,6 +1,23 @@
 {
   "servers": [
     {
+      "name": "Zom Nang",
+      "description": "Zom2 Nang Matrix Server",
+      "website": "https://zom.im",
+      "twitter": "https://twitter.com/zomapp",
+      "privacy_policy": "https://zom.im/privacy",
+      "logo": "image/zom.png",
+      "country_code": "US",
+      "domain": "nang.zom.im",
+      "server": "18.223.165.37",
+      "ip": "337.218.242.222",
+      "port": 443,
+      "requires_otr": true,
+      "captcha": false,
+      "extensions": [],
+      "certificate": ""
+    },
+    {
       "name": "KeanuDev",
       "description": "Keanu team's home while building Keanu",
       "website": "https://keanu.im",
