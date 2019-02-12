@@ -73,7 +73,7 @@ uploadArchives {
                 repository(url: "file://${deployPath.absolutePath}")
                 pom.project {
                         groupId 'info.guardianproject.keanuapp'
-                        artifactId 'keanuCore'
+                        artifactId 'keanucore'
                         version '0.0.1.5'
                 }
         }
