@@ -74,7 +74,7 @@ uploadArchives {
                 pom.project {
                         groupId 'info.guardianproject.keanuapp'
                         artifactId 'keanucore'
-                        version '0.0.1.5'
+                        version '0.0.1.6'
                 }
         }
 }
