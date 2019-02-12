@@ -82,6 +82,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -153,8 +155,10 @@ public class MatrixConnection extends ImConnection {
     private final static String HTTPS_PREPEND = "https://";
 
     private Handler mResponseHandler = new Handler();
-    private ThreadPoolExecutor mExecutor = null;
-    private ThreadPoolExecutor mExecutorGroups = null;
+    //private ThreadPoolExecutor mExecutor = null;
+    //private ThreadPoolExecutor mExecutorGroups = null;
+    private ExecutorService mExecutorGroups = null;
+    private ExecutorService mExecutor = null;
 
     public MatrixConnection (Context context)
     {
@@ -164,11 +168,14 @@ public class MatrixConnection extends ImConnection {
         mChatGroupManager = new MatrixChatGroupManager(context, this);
         mChatSessionManager = new MatrixChatSessionManager(context, this);
 
-        mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>());
+       // mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
+         //       new LinkedBlockingQueue<Runnable>());
 
-        mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
-                new LinkedBlockingQueue<Runnable>());
+        //mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
+          //      new LinkedBlockingQueue<Runnable>());
+
+        mExecutor = Executors.newCachedThreadPool();
+        mExecutorGroups = Executors.newCachedThreadPool();
 
     }
 
@@ -725,7 +732,7 @@ public class MatrixConnection extends ImConnection {
     protected void updateGroupMembersAsync (final Room room, final ChatGroup group)
     {
 
-        if (room.getNumberOfMembers() < 20)
+        if (room.getNumberOfMembers() < 40)
         {
             room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
                 @Override
@@ -753,43 +760,24 @@ public class MatrixConnection extends ImConnection {
                 @Override
                 public void onSuccess(final List<RoomMember> roomMembers) {
 
-                    mResponseHandler.post(new GroupMemberLoader(room, group, roomMembers));
+                    mExecutorGroups.execute(new GroupMemberLoader(room, group, roomMembers));
 
                 }
             });
         }
         else {
-            /**
-            room.getActiveMembersAsync(new ApiCallback<List<RoomMember>>() {
-                @Override
-                public void onNetworkError(Exception e) {
-                    debug("Network error syncing active members", e);
+
+            //just get the typing users!
+            List<String> typers = room.getTypingUsers();
+            ArrayList<RoomMember> members = new ArrayList<>(typers.size());
+            for (String typer : typers)
+            {
+                members.add(room.getMember(typer));
+            }
+
+            mExecutorGroups.execute(new GroupMemberLoader(room, group, members));
 
 
-                }
-
-                @Override
-                public void onMatrixError(MatrixError matrixError) {
-                    debug("Matrix error syncing active members", matrixError);
-
-
-                }
-
-                @Override
-                public void onUnexpectedError(Exception e) {
-
-                    debug("Error syncing active members", e);
-
-
-                }
-
-                @Override
-                public void onSuccess(final List<RoomMember> roomMembers) {
-
-                    mResponseHandler.post(new GroupMemberLoader(room, group, roomMembers));
-
-                }
-            });**/
         }
 
 
@@ -826,6 +814,7 @@ public class MatrixConnection extends ImConnection {
                         contact = new Contact(new MatrixAddress(member.getUserId()));
                 }
 
+                //this is a one-to-one chat (2 people in a room), save the contact as a local one
                 if (members.size() == 2) {
                     if (!member.getUserId().equals(mDataHandler.getUserId())) {
                         mContactListManager.saveContact(contact);
@@ -841,11 +830,13 @@ public class MatrixConnection extends ImConnection {
                         group.notifyMemberRoleUpdate(contact, "member", "member");
                 }
 
-                String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(member.getUserId(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+                if (members.size() < 20) {
+                    String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(member.getUserId(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
 
-                if (!TextUtils.isEmpty(downloadUrl)) {
-                    if (!hasAvatar(member.getUserId(), downloadUrl)) {
-                        downloadAvatar(member.getUserId(), downloadUrl);
+                    if (!TextUtils.isEmpty(downloadUrl)) {
+                        if (!hasAvatar(member.getUserId(), downloadUrl)) {
+                            downloadAvatar(member.getUserId(), downloadUrl);
+                        }
                     }
                 }
 
@@ -861,10 +852,12 @@ public class MatrixConnection extends ImConnection {
 
         ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
         if (csa != null) {
-            boolean isEncrypted = mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId());
+            if (mDataHandler != null && mDataHandler.getCrypto() != null) {
+                boolean isEncrypted = mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId());
 
-            if (!csa.getUseEncryption() == isEncrypted)
-                csa.updateEncryptionState(isEncrypted);
+                if (!csa.getUseEncryption() == isEncrypted)
+                    csa.updateEncryptionState(isEncrypted);
+            }
         }
     }
 
@@ -923,25 +916,13 @@ public class MatrixConnection extends ImConnection {
 
             if (event.getType().equals(Event.EVENT_TYPE_MESSAGE))
             {
-                mExecutor.execute(new Runnable ()
-                {
-                    public void run ()
-                    {
-                        handleIncomingMessage(event);
-                    }
-                });
+                mExecutor.execute(() -> handleIncomingMessage(event));
             }
             else if (event.getType().equals(Event.EVENT_TYPE_PRESENCE))
             {
 
                 debug ("PRESENCE: from=" + event.getSender() + ": " + event.getContent());
-                mExecutor.execute(new Runnable ()
-                {
-                    public void run ()
-                    {
-                        handlePresence(event);
-                    }
-                });
+                mExecutor.execute(() -> handlePresence(event));
 
 
 
@@ -954,13 +935,7 @@ public class MatrixConnection extends ImConnection {
             else if (event.getType().equals(Event.EVENT_TYPE_TYPING))
             {
                 debug ("TYPING: from=" + event.getSender() + ": " + event.getContent());
-                mExecutor.execute(new Runnable ()
-                {
-                    public void run ()
-                    {
-                        handleTyping(event);
-                    }
-                });
+                mExecutor.execute(() -> handleTyping(event));
             }
             else if (event.getType().equals(Event.EVENT_TYPE_FORWARDED_ROOM_KEY))
             {
@@ -970,32 +945,22 @@ public class MatrixConnection extends ImConnection {
             else if (event.getType().equals(Event.EVENT_TYPE_STICKER))
             {
                 debug ("STICKER: from=" + event.getSender() + ": " + event.getContent());
-                mExecutor.execute(new Runnable ()
-                {
-                    public void run ()
-                    {
-                        handleIncomingSticker(event);
-                    }
-                });
+                mExecutor.execute(() -> handleIncomingSticker(event));
 
 
             }
             else if (event.getType().equals(Event.EVENT_TYPE_STATE_ROOM_NAME)) {
-                mExecutor.execute(new Runnable ()
-                {
-                    public void run ()
-                    {
-                        ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(event.roomId);
-                        if (csa != null) {
-                            String newName = event.getContent().getAsJsonObject().get("name").getAsString();
-                            try {
-                                csa.setGroupChatSubject(newName);
-                            } catch (RemoteException e) {
-                                e.printStackTrace();
-                            }
+                mExecutor.execute(() -> {
+                    ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(event.roomId);
+                    if (csa != null) {
+                        String newName = event.getContent().getAsJsonObject().get("name").getAsString();
+                        try {
+                            csa.setGroupChatSubject(newName);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
                         }
-
                     }
+
                 });
             }
 
@@ -1241,7 +1206,7 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onJoinGroup(String s) {
 
-            mResponseHandler.post (new Runnable ()
+            mExecutorGroups.execute(new Runnable ()
             {
                 public void run ()
                 {
@@ -1837,28 +1802,24 @@ public class MatrixConnection extends ImConnection {
 
     private void downloadAvatar (final String address, final String url)
     {
-        lbqAvatars.add(new Pair<String,String>(address,url));
+        lbqAvatars.add(new Pair<>(address, url));
     }
 
     private void downloadAvatarAsync (final String address, final String url)
     {
-        mExecutorGroups.execute(new Runnable ()
-        {
-            public void run ()
-            {
-                boolean hasAvatar = DatabaseUtils.doesAvatarHashExist(mContext.getContentResolver(),Imps.Avatars.CONTENT_URI,address,url);
+        mExecutorGroups.execute(() -> {
+            boolean hasAvatar = DatabaseUtils.doesAvatarHashExist(mContext.getContentResolver(),Imps.Avatars.CONTENT_URI,address,url);
 
-                if (!hasAvatar) {
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    try {
-                        new Downloader().get(url, baos);
+            if (!hasAvatar) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                try {
+                    new Downloader().get(url, baos);
 
-                        if (baos != null && baos.size() > 0)
-                            setAvatar(address, baos.toByteArray(), url);
+                    if (baos != null && baos.size() > 0)
+                        setAvatar(address, baos.toByteArray(), url);
 
-                    } catch (Exception e) {
-                        debug("downloadAvatar error",e);
-                    }
+                } catch (Exception e) {
+                    debug("downloadAvatar error",e);
                 }
             }
         });
