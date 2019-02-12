@@ -980,6 +980,24 @@ public class MatrixConnection extends ImConnection {
 
 
             }
+            else if (event.getType().equals(Event.EVENT_TYPE_STATE_ROOM_NAME)) {
+                mExecutor.execute(new Runnable ()
+                {
+                    public void run ()
+                    {
+                        ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(event.roomId);
+                        if (csa != null) {
+                            String newName = event.getContent().getAsJsonObject().get("name").getAsString();
+                            try {
+                                csa.setGroupChatSubject(newName);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+                });
+            }
 
             Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
 
