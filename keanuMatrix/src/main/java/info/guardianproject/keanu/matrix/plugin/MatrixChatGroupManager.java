@@ -65,30 +65,21 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     @Override
     public ChatGroup getChatGroup (Address addr)
     {
-        return getChatGroup(new MatrixAddress(addr.getAddress()),null);
+        return getChatGroup(new MatrixAddress(addr.getAddress()));
     }
 
     public ChatGroup getChatGroup (String addr)
     {
-        return getChatGroup(new MatrixAddress(addr),null);
+        return getChatGroup(new MatrixAddress(addr));
     }
 
-    public ChatGroup getChatGroup (MatrixAddress addr, String subject)
+    public synchronized ChatGroup getChatGroup (MatrixAddress addr)
     {
         ChatGroup result = super.getChatGroup(addr);
 
         if (result == null)
         {
-            if (TextUtils.isEmpty(subject))
-            {
-                Room room = mDataHandler.getRoom(addr.getAddress());
-                if (room != null)
-                    subject = room.getRoomDisplayName(mContext);
-                else
-                    subject = addr.getUser();
-            }
-
-            result = new ChatGroup(addr,subject,this);
+            result = new ChatGroup(addr,null,this);
         }
 
         return result;

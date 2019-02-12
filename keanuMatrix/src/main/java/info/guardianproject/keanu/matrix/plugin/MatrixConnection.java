@@ -399,7 +399,6 @@ public class MatrixConnection extends ImConnection {
                                 debug("getCrypto().start.onSuccess");
 
                                 mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
-                                loadStateAsync();
 
                                 mDataHandler.getMediaCache().clearShareDecryptedMediaCache();
                                 mDataHandler.getMediaCache().clearTmpDecryptedMediaCache();
@@ -635,24 +634,24 @@ public class MatrixConnection extends ImConnection {
     private void loadStateAsync ()
     {
 
-        mExecutorGroups.execute(new Runnable() {
-            @Override
-            public void run() {
-                mContactListManager.loadContactListsAsync();
+        mExecutorGroups.execute(() -> {
 
-                Collection<Room> rooms = mStore.getRooms();
+            Collection<Room> rooms = mStore.getRooms();
 
-                for (Room room : rooms)
-                {
-                    //get fresh room from data handler?
-                   // updateGroup(mDataHandler.getRoom(room.getRoomId()));
-                    if (room.isMember()) {
-                        ChatGroup group = addRoomContact(room);
-                        mChatSessionManager.createChatSession(group, true);
-                    }
+            for (Room room : rooms)
+            {
+                //get fresh room from data handler?
+                updateGroup(mDataHandler.getRoom(room.getRoomId()));
 
+                if (room.isMember()) {
+                    ChatGroup group = addRoomContact(room);
+                    mChatSessionManager.createChatSession(group, true);
                 }
+
             }
+
+            mContactListManager.loadContactListsAsync();
+
         });
 
     }
@@ -663,16 +662,12 @@ public class MatrixConnection extends ImConnection {
 
         String subject = room.getRoomDisplayName(mContext);
 
-        if (TextUtils.isEmpty(subject)) {
-            subject = room.getTopic();
-
-            if (TextUtils.isEmpty(subject))
-                subject = room.getRoomId();
-        }
-
         MatrixAddress mAddr = new MatrixAddress(room.getRoomId());
 
-        final ChatGroup group = mChatGroupManager.getChatGroup(mAddr, subject);
+        final ChatGroup group = mChatGroupManager.getChatGroup(mAddr);
+
+        if (TextUtils.isEmpty(group.getName()))
+            group.setName(subject);
 
         ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
         if (csa != null && (!subject.equals(mContext.getString(R.string.default_group_title)))) {
@@ -683,7 +678,7 @@ public class MatrixConnection extends ImConnection {
             }
         }
 
-        updateGroupMembers (room, group);
+        updateGroup(room, group);
 
         checkRoomEncryption(room);
 
@@ -700,8 +695,18 @@ public class MatrixConnection extends ImConnection {
 
     protected void updateGroup (Room room)
     {
+        updateGroup(room, null);
+    }
+
+    protected void updateGroup (Room room, ChatGroup group)
+    {
         if (room.isInvited() || room.isMember()) {
-            ChatGroup group = mChatGroupManager.getChatGroup(new MatrixAddress(room.getRoomId()), room.getRoomDisplayName(mContext));
+            if (group == null) {
+                group = mChatGroupManager.getChatGroup(new MatrixAddress(room.getRoomId()));
+                if (TextUtils.isEmpty(group.getName()))
+                    group.setName(room.getRoomDisplayName(mContext));
+            }
+
             updateGroupMembers(room, group);
             ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
             if (csa != null)
@@ -1046,6 +1051,8 @@ public class MatrixConnection extends ImConnection {
                     }
                 });
             }
+
+            loadStateAsync();
 
         }
 
@@ -1412,7 +1419,7 @@ public class MatrixConnection extends ImConnection {
                         ChatSession session = mChatSessionManager.getSession(event.roomId);
 
                         if (session == null) {
-                            ImEntity participant = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId), null);
+                            ImEntity participant = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId));
                             session = mChatSessionManager.createChatSession(participant, false);
                         }
 
@@ -1465,10 +1472,6 @@ public class MatrixConnection extends ImConnection {
                 return;
             }
 
-            String messageType = event.getContent().getAsJsonObject().get("msgtype").getAsString();
-            String messageMimeType = null;
-
-
             Room room = mStore.getRoom(event.roomId);
 
             if (room != null && room.isMember()) {
@@ -1476,7 +1479,7 @@ public class MatrixConnection extends ImConnection {
                 ChatSession session = mChatSessionManager.getSession(event.roomId);
 
                 if (session == null) {
-                    ImEntity participant = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId),null);
+                    ImEntity participant = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId));
                     session = mChatSessionManager.createChatSession(participant, false);
                 }
 
@@ -1485,117 +1488,14 @@ public class MatrixConnection extends ImConnection {
                 if (!csa.doesMessageExist(event.eventId)) {
                     MatrixAddress addrSender = new MatrixAddress(event.sender);
 
-                    /**
-                     * {
-                     *   "age" : null,
-                     *   "content": {
-                     *     "body": "SampleVideo_1280x720_1mb.mp4",
-                     *     "info": {"size":1055736,"mimetype":"video/mp4","thumbnail_info":{"w":800,"h":450,"mimetype":"image/jpeg","size":144242},"w":1280,"h":720,"thumbnail_file":{"v":"v2","key":{"alg":"A256CTR","ext":true,"k":"jzdnhAwFnBTUQDuaRm3C11A-QPMH70nMm5smZTameKs","key_ops":["encrypt","decrypt"],"kty":"oct"},"iv":"htNMugSjnGMAAAAAAAAAAA","hashes":{"sha256":"mFG8yy0+AtiADgLVfLbxdgBENoCRbWx+VIsHoDO+qs8"},"url":"mxc://dev.keanu.im/IVTShPNtheLCPNCduSRMCRLn","mimetype":"image/jpeg"}},
-                     *     "msgtype": "m.video",
-                     *     "file": {"v":"v2","key":{"alg":"A256CTR","ext":true,"k":"27avGKl4nieHz--_PpSQVAtmQzdkt0YfoYY4t5-H4fI","key_ops":["encrypt","decrypt"],"kty":"oct"},"iv":"BEI+98qtTwwAAAAAAAAAAA","hashes":{"sha256":"xIdrIW7SRoyFnkJ4hlS1XQINAqzOrI64hq1upL0x48s"},"url":"mxc://dev.keanu.im/svGZZuDKuQBXVWtWPkjMDxmR","mimetype":"video/mp4"},
-                     *   },
-                     *   "eventId": "null",
-                     *   "originServerTs": 0,
-                     *   "roomId": "!zSTBLplOdsGQPLxmVe:dev.keanu.im",
-                     *   "type": "m.room.message",
-                     *   "userId": "null",
-                     *   "sender": "null",
-                     * }
-                     *
-                     *  Sent state : SENT
-                     */
+                    Message message = downloadMedia (event, messageBody, addrSender);
 
-                    if (messageType.equals("m.image")
-                            || messageType.equals("m.file")
-                            || messageType.equals("m.video")
-                            || messageType.equals("m.audio")) {
-
-
-                        String mediaUrl = null;
-                        String thumbUrl = null;
-                        String localFolder = addrSender.getAddress();
-                        String localFileName = messageBody;
-                        EncryptedFileInfo encryptedFileInfo = null;
-                        EncryptedFileInfo encryptedThumbInfo = null;
-
-                        if (messageType.equals("m.file")) {
-                            FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
-                            messageMimeType = fileMessage.getMimeType();
-                            mediaUrl = fileMessage.getUrl();
-                            encryptedFileInfo = fileMessage.file;
-                        }
-                        else if (messageType.equals("m.image"))
-                        {
-                            ImageMessage fileMessage = JsonUtils.toImageMessage(event.getContent());
-                            messageMimeType = fileMessage.getMimeType();
-                            mediaUrl = fileMessage.getUrl();
-                            encryptedFileInfo = fileMessage.file;
-                        }
-                        else if (messageType.equals("m.audio"))
-                        {
-                            AudioMessage fileMessage = JsonUtils.toAudioMessage(event.getContent());
-                            messageMimeType = fileMessage.getMimeType();
-                            mediaUrl = fileMessage.getUrl();
-                            encryptedFileInfo = fileMessage.file;
-                        }
-                        else if (messageType.equals("m.video"))
-                        {
-                            VideoMessage fileMessage = JsonUtils.toVideoMessage(event.getContent());
-                            messageMimeType = fileMessage.getMimeType();
-                            mediaUrl = fileMessage.getUrl();
-                            encryptedFileInfo = fileMessage.file;
-                            thumbUrl = fileMessage.getThumbnailUrl();
-                            encryptedThumbInfo = fileMessage.info.thumbnail_file;
-
-                        }
-
-
-                        MatrixDownloader dl = new MatrixDownloader();
-                        info.guardianproject.iocipher.File fileDownload = null;
-
-                        try {
-                            String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, null != encryptedFileInfo);
-                            fileDownload = dl.openSecureStorageFile(localFolder, localFileName + ".encrypted");
-                            OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
-                            boolean downloaded = dl.get(downloadableUrl, storageStream);
-
-                            if (downloaded && encryptedFileInfo != null) {
-                                info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileName);
-                                storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadDecrypted);
-                                boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo,storageStream);
-                                fileDownload.delete();
-                                fileDownload = fileDownloadDecrypted;
-                                messageBody = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
-                            }
-
-                            try {
-                                downloadableUrl = mSession.getContentManager().getDownloadableUrl(thumbUrl, null != encryptedThumbInfo);
-                                info.guardianproject.iocipher.File fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileName + ".thumb.encrypted");
-                                storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadThumb);
-                                downloaded = dl.get(downloadableUrl, storageStream);
-
-                                if (downloaded && encryptedThumbInfo != null) {
-                                    storageStream = new info.guardianproject.iocipher.FileOutputStream(new File(fileDownload.getAbsolutePath() + ".thumb.jpg"));
-                                    boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownloadThumb), encryptedThumbInfo,storageStream);
-                                    fileDownloadThumb.delete();
-                                }
-
-                            } catch (Exception e) {
-                                debug("Error downloading file: " + thumbUrl, e);
-                            }
-
-                        } catch (Exception e) {
-                            debug("Error downloading file: " + mediaUrl, e);
-                        }
-
-
+                    if (message == null) {
+                        message = new Message(messageBody);
+                        message.setID(event.eventId);
+                        message.setFrom(addrSender);
+                        message.setDateTime(new Date(event.getOriginServerTs()));
                     }
-
-                    Message message = new Message(messageBody);
-                    message.setID(event.eventId);
-                    message.setFrom(addrSender);
-                    message.setDateTime(new Date(event.getOriginServerTs()));
-                    message.setContentType(messageMimeType);
 
                     if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
                         message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
@@ -1610,6 +1510,135 @@ public class MatrixConnection extends ImConnection {
             }
         }
 
+    }
+
+    private Message downloadMedia (Event event, String localFileName, MatrixAddress addrSender)
+    {
+        String messageType = event.getContent().getAsJsonObject().get("msgtype").getAsString();
+        String messageMimeType = null;
+
+        Message message = null;
+
+        if (messageType.equals("m.image")
+                || messageType.equals("m.file")
+                || messageType.equals("m.video")
+                || messageType.equals("m.audio")) {
+
+            String result = null;
+            String mediaUrl = null;
+            String thumbUrl = null;
+            String localFolder = addrSender.getAddress();
+            EncryptedFileInfo encryptedFileInfo = null;
+            EncryptedFileInfo encryptedThumbInfo = null;
+
+            if (messageType.equals("m.file")) {
+                FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
+                messageMimeType = fileMessage.getMimeType();
+                mediaUrl = fileMessage.getUrl();
+                encryptedFileInfo = fileMessage.file;
+            }
+            else if (messageType.equals("m.image"))
+            {
+                ImageMessage fileMessage = JsonUtils.toImageMessage(event.getContent());
+                messageMimeType = fileMessage.getMimeType();
+                mediaUrl = fileMessage.getUrl();
+                encryptedFileInfo = fileMessage.file;
+            }
+            else if (messageType.equals("m.audio"))
+            {
+                AudioMessage fileMessage = JsonUtils.toAudioMessage(event.getContent());
+                messageMimeType = fileMessage.getMimeType();
+                mediaUrl = fileMessage.getUrl();
+                encryptedFileInfo = fileMessage.file;
+            }
+            else if (messageType.equals("m.video"))
+            {
+                VideoMessage fileMessage = JsonUtils.toVideoMessage(event.getContent());
+                messageMimeType = fileMessage.getMimeType();
+                mediaUrl = fileMessage.getUrl();
+                encryptedFileInfo = fileMessage.file;
+                thumbUrl = fileMessage.getThumbnailUrl();
+                encryptedThumbInfo = fileMessage.info.thumbnail_file;
+
+            }
+
+
+            MatrixDownloader dl = new MatrixDownloader();
+            info.guardianproject.iocipher.File fileDownload = null;
+
+
+            try {
+                boolean isEncrypted = null != encryptedFileInfo;
+
+                String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, isEncrypted);
+
+                if (isEncrypted)
+                    fileDownload = dl.openSecureStorageFile(localFolder, localFileName + ".encrypted");
+                else
+                    fileDownload = dl.openSecureStorageFile(localFolder, localFileName);
+
+                OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
+                boolean downloaded = dl.get(downloadableUrl, storageStream);
+
+                if (downloaded) {
+
+                    if (isEncrypted) {
+                        info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileName);
+                        storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadDecrypted);
+                        boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo, storageStream);
+                        fileDownload.delete();
+                        fileDownload = fileDownloadDecrypted;
+                        result = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
+                    }
+                    else
+                    {
+                        result = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
+                    }
+                }
+
+                try {
+                    downloadableUrl = mSession.getContentManager().getDownloadableUrl(thumbUrl, isEncrypted);
+
+
+                    info.guardianproject.iocipher.File fileDownloadThumb;
+
+                    if (isEncrypted)
+                        fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileName + ".thumb.encrypted");
+                    else
+                        fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileName + ".thumb.jpg");
+
+                    storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadThumb);
+                    downloaded = dl.get(downloadableUrl, storageStream);
+
+                    if (downloaded) {
+
+                        if (isEncrypted) {
+                            storageStream = new info.guardianproject.iocipher.FileOutputStream(new File(fileDownload.getAbsolutePath() + ".thumb.jpg"));
+                            boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownloadThumb), encryptedThumbInfo, storageStream);
+                            fileDownloadThumb.delete();
+                        }
+                    }
+
+                } catch (Exception e) {
+                    debug("Error downloading file: " + thumbUrl, e);
+                }
+
+                if (result != null) {
+                    message = new Message(result);
+                    message.setID(event.eventId);
+                    message.setFrom(addrSender);
+                    message.setDateTime(new Date(event.getOriginServerTs()));
+                    message.setContentType(messageMimeType);
+                }
+
+            } catch (Exception e) {
+                debug("Error downloading file: " + mediaUrl, e);
+            }
+
+
+        }
+
+        return message;
     }
     /**
      * Send a registration request with the given parameters
@@ -1891,27 +1920,29 @@ public class MatrixConnection extends ImConnection {
         if (!TextUtils.isEmpty(sender))
             addrSender = new MatrixAddress(sender);
 
-        String roomName = room.getRoomDisplayName(mContext);
-
         if (room.isInvited())
         {
-            Invitation invite = new Invitation(room.getRoomId(),addrRoom,addrSender,roomName);
+            Invitation invite = new Invitation(room.getRoomId(),addrRoom,addrSender,room.getRoomDisplayName(mContext));
             mChatGroupManager.notifyGroupInvitation(invite);
 
-            ChatGroup participant = mChatGroupManager.getChatGroup(addrRoom,roomName);
+            ChatGroup participant = mChatGroupManager.getChatGroup(addrRoom);
+            if (TextUtils.isEmpty(participant.getName()))
+                participant.setName(room.getRoomDisplayName(mContext));
+
             participant.setJoined(false);
             ChatSession session = mChatSessionManager.createChatSession(participant, true);
             ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
             csa.setLastMessage(mContext.getString(R.string.room_invited));
 
         }
-        else if (room.isMember() && room.getNumberOfMembers() > 1)
+        else if (room.isMember())
         {
-            ChatGroup group = addRoomContact(room);
             ChatSession session = mChatSessionManager.getSession(room.getRoomId());
 
             if (session == null) {
-                ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(addrRoom,roomName);
+                ChatGroup participant =(ChatGroup) mChatGroupManager.getChatGroup(addrRoom);
+                if (TextUtils.isEmpty(participant.getName()))
+                    participant.setName(room.getRoomDisplayName(mContext));
                 session = mChatSessionManager.createChatSession(participant, true);
             }
         }

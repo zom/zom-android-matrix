@@ -78,7 +78,7 @@ uploadArchives {
                 repository(url: "file://${deployPath.absolutePath}")
                 pom.project {
                         groupId 'info.guardianproject.keanuapp'
-                        artifactId 'keanuMatrix'
+                        artifactId 'keanumatrix'
                         version '0.0.1.5'
                 }
         }
