@@ -1181,82 +1181,76 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
             long time = msg.getDateTime().getTime();
 
-            boolean allowWebDownloads = true;
-            ArrayList<String> mediaLinks = checkForLinkedMedia(username, body, allowWebDownloads);
+            String notificationText = body;
 
             boolean wasMessageSeen = false;
-            ArrayList<String> mimeTypes = new ArrayList<>();
-            int attachIdx = 0;
 
-            for (String mediaLink : mediaLinks)
-            {
-               String resultMimeType = downloadMedia (mediaLink, msg.getID() + "-" + attachIdx++, nickname);
-               mimeTypes.add(resultMimeType);
-            }
+            if ((!TextUtils.isEmpty(msg.getContentType()))
+                    && (!msg.getContentType().startsWith("text")) ) {
 
-            if (mimeTypes.size() > 0) {
+                String displayType = "\uD83D\uDDCE";
 
-                //update the notification message
-
-                String displayType = mimeTypes.get(0).split("/")[0];
-                if (displayType.equals("audio"))
+                //update the notificati
+                if (msg.getContentType().contains("audio"))
                 {
-                    displayType += "🔊";
+                    displayType += "🔊\uD83D\uDD0A";
                 }
-                else if (displayType.equals("image"))
+                else if (msg.getContentType().contains("image"))
                 {
                     displayType += "\uD83D\uDCF7";
                 }
+                else if (msg.getContentType().contains("video"))
+                {
+                    displayType += "\u25B6";
+                }
 
-                body = service.getString(R.string.file_notify_text, displayType);
+                notificationText = service.getString(R.string.file_notify_text, displayType);
 
 
             }
-            else {
 
 
+            //if it wasn't a media file or we had an issue downloading, then it is chat
+            Uri messageUri = null;
 
-                //if it wasn't a media file or we had an issue downloading, then it is chat
-                Uri messageUri = null;
+            if (msg.getID() == null)
+                messageUri = insertMessageInDb(nickname, body, time, msg.getType(), msg.getContentType());
+            else
+                messageUri = insertMessageInDb(nickname, body, time, msg.getType(), 0, msg.getID(), msg.getContentType());
 
-                if (msg.getID() == null)
-                    messageUri = insertMessageInDb(nickname, body, time, msg.getType(), msg.getContentType());
-                else
-                    messageUri = insertMessageInDb(nickname, body, time, msg.getType(), 0, msg.getID(), msg.getContentType());
+            setLastMessage(body);
 
-                setLastMessage(body);
+            if (messageUri == null) {
+                Log.e(TAG,"error saving message to the db: " + msg.getID());
+                return false; //couldn't write to database
+            }
 
-                if (messageUri == null) {
-                    Log.e(TAG,"error saving message to the db: " + msg.getID());
-                    return false; //couldn't write to database
-                }
+            int max = 3;
+            int n = 0;
 
-                int max = 3;
-                int n = 0;
-
-                while (n++ < max) {
-                    try {
-                        synchronized (mRemoteListeners) {
-                            int N = mRemoteListeners.beginBroadcast();
-                            for (int i = 0; i < N; i++) {
-                                IChatListener listener = mRemoteListeners.getBroadcastItem(i);
-                                try {
-                                    wasMessageSeen = listener.onIncomingMessage(ChatSessionAdapter.this, msg);
-                                } catch (RemoteException e) {
-                                    // The RemoteCallbackList will take care of removing the
-                                    // dead listeners.
-                                }
+            while (n++ < max) {
+                try {
+                    synchronized (mRemoteListeners) {
+                        int N = mRemoteListeners.beginBroadcast();
+                        for (int i = 0; i < N; i++) {
+                            IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+                            try {
+                                wasMessageSeen = listener.onIncomingMessage(ChatSessionAdapter.this, msg);
+                            } catch (RemoteException e) {
+                                // The RemoteCallbackList will take care of removing the
+                                // dead listeners.
                             }
-                            mRemoteListeners.finishBroadcast();
                         }
-                        break;
-                    } catch (Exception e) {
-                        Log.w(TAG, "error notifying of new messages", e);
-                        try { Thread.sleep(500);}catch(Exception e2){}//wait for broadcast to be over
-
+                        mRemoteListeners.finishBroadcast();
                     }
+                    break;
+                } catch (Exception e) {
+                    Log.w(TAG, "error notifying of new messages", e);
+                    try { Thread.sleep(500);}catch(Exception e2){}//wait for broadcast to be over
+
                 }
             }
+
 
 
             // Due to the move to fragments, we could have listeners for ChatViews that are not visible on the screen.
@@ -1280,13 +1274,13 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         }
 
                         mStatusBarNotifier.notifyGroupChat(mConnection.getProviderId(), mConnection.getAccountId(),
-                                getId(), group.getAddress().getBareAddress(), group.getName(), nickname, body, false);
+                                getId(), group.getAddress().getBareAddress(), group.getName(), nickname, notificationText, false);
                     }
                 } else {
 
                     //reinstated body display here in the notification; perhaps add preferences to turn that off
                     mStatusBarNotifier.notifyChat(mConnection.getProviderId(), mConnection.getAccountId(),
-                            getId(), bareUsername, nickname, body, false);
+                            getId(), bareUsername, nickname, notificationText, false);
 
                 }
             }
