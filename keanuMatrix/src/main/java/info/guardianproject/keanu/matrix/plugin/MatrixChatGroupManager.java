@@ -97,31 +97,33 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                 //found an existing room!
 
                 final Room room = mDataHandler.getRoom(rooms.get(0));
-                room.join(new BasicApiCallback("join room")
-                          {
-                              @Override
-                              public void onSuccess(Object o) {
-                                  super.onSuccess(o);
 
-                                  ChatGroup chatGroup = mConn.addRoomContact(room);
+                if (!room.isMember()) {
+                    room.join(new BasicApiCallback("join room") {
+                                  @Override
+                                  public void onSuccess(Object o) {
+                                      super.onSuccess(o);
 
-                                  ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
-                                  IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
+                                      ChatGroup chatGroup = mConn.addRoomContact(room);
 
-                                  if (listener != null) {
+                                      ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
+                                      IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
 
-                                      try {
-                                          listener.onChatSessionCreated(iSession);
-                                      } catch (RemoteException e) {
-                                          e.printStackTrace();
+                                      if (listener != null) {
+
+                                          try {
+                                              listener.onChatSessionCreated(iSession);
+                                          } catch (RemoteException e) {
+                                              e.printStackTrace();
+                                          }
                                       }
+
+                                      mConn.addRoomContact(room);
+
                                   }
-
-                                  mConn.addRoomContact(room);
-
                               }
-                          }
-                );
+                    );
+                }
 
 
                 return;
@@ -168,40 +170,41 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                 public void onSuccess(String roomId) {
                     Room room = mDataHandler.getRoom(roomId);
 
-                    room.join(new BasicApiCallback("join room")
-                              {
-                                  @Override
-                                  public void onSuccess(Object o) {
-                                      super.onSuccess(o);
+                    if (!room.isMember()) {
+                        room.join(new BasicApiCallback("join room") {
+                                      @Override
+                                      public void onSuccess(Object o) {
+                                          super.onSuccess(o);
 
-                                      setRoomDefaults(room);
+                                          setRoomDefaults(room);
 
 
-                                      ChatGroup chatGroup = mConn.addRoomContact(room);
+                                          ChatGroup chatGroup = mConn.addRoomContact(room);
 
-                                      ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
-                                      IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
-                                      try {
-                                          iSession.useEncryption(room.isEncrypted());
-                                      } catch (RemoteException e) {
-                                          e.printStackTrace();
-                                      }
-
-                                      if (listener != null) {
-
+                                          ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
+                                          IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
                                           try {
-                                              listener.onChatSessionCreated(iSession);
+                                              iSession.useEncryption(room.isEncrypted());
                                           } catch (RemoteException e) {
                                               e.printStackTrace();
                                           }
+
+                                          if (listener != null) {
+
+                                              try {
+                                                  listener.onChatSessionCreated(iSession);
+                                              } catch (RemoteException e) {
+                                                  e.printStackTrace();
+                                              }
+                                          }
+
+                                          mConn.updateGroupMembers(room, chatGroup);
+
+
                                       }
-
-                                      mConn.updateGroupMembers(room, chatGroup);
-
-
                                   }
-                              }
-                    );
+                        );
+                    }
 
                 }
             });
@@ -252,39 +255,40 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                     if (!TextUtils.isEmpty(subject))
                         room.updateName(subject, new BasicApiCallback("RoomUpdate"));
 
-                    room.join(new BasicApiCallback("join room")
-                              {
-                                  @Override
-                                  public void onSuccess(Object o) {
-                                      super.onSuccess(o);
+                    if (!room.isMember()) {
+                        room.join(new BasicApiCallback("join room") {
+                                      @Override
+                                      public void onSuccess(Object o) {
+                                          super.onSuccess(o);
 
-                                      setRoomDefaults(room);
+                                          setRoomDefaults(room);
 
-                                      ChatGroup chatGroup = mConn.addRoomContact(room);
+                                          ChatGroup chatGroup = mConn.addRoomContact(room);
 
-                                      ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
-                                      IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
-                                      try {
-                                          iSession.useEncryption(room.isEncrypted());
-                                      } catch (RemoteException e) {
-                                          e.printStackTrace();
-                                      }
-
-                                      if (listener != null) {
-
+                                          ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
+                                          IChatSession iSession = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
                                           try {
-                                              listener.onChatSessionCreated(iSession);
+                                              iSession.useEncryption(room.isEncrypted());
                                           } catch (RemoteException e) {
                                               e.printStackTrace();
                                           }
+
+                                          if (listener != null) {
+
+                                              try {
+                                                  listener.onChatSessionCreated(iSession);
+                                              } catch (RemoteException e) {
+                                                  e.printStackTrace();
+                                              }
+                                          }
+
+                                          mConn.updateGroupMembers(room, chatGroup);
+
+
                                       }
-
-                                      mConn.updateGroupMembers(room, chatGroup);
-
-
                                   }
-                              }
-                    );
+                        );
+                    }
 
 
                 }
@@ -329,7 +333,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     public void joinChatGroupAsync(Address address, String subject) {
         Room room = mDataHandler.getRoom(address.getAddress());
 
-        if (room != null && room.isInvited())
+        if (room != null && room.isInvited() && (!room.isMember()))
             room.join(new ApiCallback<Void>() {
                 @Override
                 public void onNetworkError(Exception e) {

@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.RemoteException;
 import android.text.TextUtils;
+import android.util.JsonReader;
 import android.util.Log;
 import android.util.Pair;
 import android.widget.ImageView;
@@ -20,8 +21,14 @@ import android.widget.ImageView;
 import com.facebook.stetho.common.ArrayListAccumulator;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
+import org.jcodec.common.StringUtils;
+import org.jcodec.common.io.IOUtils;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.matrix.androidsdk.HomeServerConnectionConfig;
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
@@ -66,8 +73,11 @@ import org.matrix.androidsdk.rest.model.search.SearchUsersResponse;
 import org.matrix.androidsdk.util.JsonUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.security.acl.Group;
 import java.util.ArrayList;
@@ -115,6 +125,7 @@ import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.core.util.UploadProgressListener;
 import info.guardianproject.keanu.matrix.R;
 
+import static com.facebook.stetho.inspector.network.PrettyPrinterDisplayType.JSON;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_WIDTH;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
@@ -159,6 +170,8 @@ public class MatrixConnection extends ImConnection {
     //private ThreadPoolExecutor mExecutorGroups = null;
     private ExecutorService mExecutorGroups = null;
     private ExecutorService mExecutor = null;
+
+    private final static int LARGE_GROUP_SIZE_THRESHOLD = 25;
 
     public MatrixConnection (Context context)
     {
@@ -250,13 +263,8 @@ public class MatrixConnection extends ImConnection {
         mProviderId = providerId;
         mAccountId = accountId;
 
-        new Thread ()
-        {
-            public void run ()
-            {
-                loginAsync (password);
-            }
-        }.start();
+        mExecutor.execute(() -> loginAsync (password));
+
     }
 
     private void initMatrix ()
@@ -354,106 +362,150 @@ public class MatrixConnection extends ImConnection {
         final boolean enableEncryption = true;
         final String initialToken = Preferences.getValue(mUser.getAddress().getUser() + ".sync");
 
-        mLoginRestClient.loginWithUser(username, password, mDeviceName, mDeviceId, new SimpleApiCallback<Credentials>()
+        File fileCredsJson = new File("/" + username + "/creds.json");
+
+        if (fileCredsJson.exists()& fileCredsJson.length() > 0)
         {
+            mCredentials = new Credentials();
+            try {
+                JsonParser parser = new JsonParser();
+                String json = IOUtils.readToString(new FileInputStream(fileCredsJson));
+                JsonObject jCreds = parser.parse(json).getAsJsonObject();
 
-            @Override
-            public void onSuccess(Credentials credentials) {
+                mCredentials = new Credentials();
+                mCredentials.accessToken = jCreds.get("access_token").getAsString();
+                mCredentials.deviceId = jCreds.get("device_id").getAsString();
+                mCredentials.homeServer = jCreds.get("home_server").getAsString();
+                if (jCreds.has("refresh_token"))
+                    if (!jCreds.get("refresh_token").isJsonNull())
+                        mCredentials.refreshToken = jCreds.get("refresh_token").getAsString();
 
-                setState(ImConnection.LOGGING_IN, null);
+                mCredentials.userId = jCreds.get("user_id").getAsString();
 
-                mCredentials = credentials;
-                mCredentials.deviceId = mDeviceId;
-                mConfig.setCredentials(mCredentials);
+            } catch (Exception e) {
+                debug("error reading from cred json",e);
+                fileCredsJson.delete();
+                loginAsync(password);
+                return;
+            }
 
-                mExecutor.execute(new Runnable ()
-                {
-                    public void run ()
-                    {
-                        mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
-                                .withFileEncryption(enableEncryption)
-                                .build();
+            mConfig.setCredentials(mCredentials);
 
-                        mChatGroupManager.setSession(mSession);
-                        mChatSessionManager.setSession(mSession);
+            initSession (enableEncryption, initialToken);
+        }
+        else {
+            mLoginRestClient.loginWithUser(username, password, mDeviceName, mDeviceId, new SimpleApiCallback<Credentials>() {
 
-                        mSession.startEventStream(initialToken);
-                        setState(LOGGED_IN, null);
-                        mSession.setIsOnline(true);
+                @Override
+                public void onSuccess(Credentials credentials) {
 
-                        mSession.enableCrypto(true, new ApiCallback<Void>() {
-                            @Override
-                            public void onNetworkError(Exception e) {
-                                debug("getCrypto().start.onNetworkError",e);
+                    setState(ImConnection.LOGGING_IN, null);
 
-                            }
+                    mCredentials = credentials;
 
-                            @Override
-                            public void onMatrixError(MatrixError matrixError) {
-                                debug("getCrypto().start.onMatrixError",matrixError);
+                    try {
+                        fileCredsJson.getParentFile().mkdirs();
+                        String jCreds =mCredentials.toJson().toString();
+                        info.guardianproject.iocipher.FileWriter writer = new info.guardianproject.iocipher.FileWriter(fileCredsJson);
+                        writer.write(jCreds);
+                        writer.flush();
+                        writer.close();
+                    } catch (IOException e) {
+                        debug("error writing creds to file",e);
+                    } catch (JSONException e) {
+                        debug("error turning creds into json",e);
+                    }
 
-                            }
+                    mCredentials.deviceId = mDeviceId;
+                    mConfig.setCredentials(mCredentials);
 
-                            @Override
-                            public void onUnexpectedError(Exception e) {
-                                debug("getCrypto().start.onUnexpectedError",e);
+                    initSession (enableEncryption, initialToken);
 
-                            }
+                }
 
-                            @Override
-                            public void onSuccess(Void aVoid) {
 
-                                debug("getCrypto().start.onSuccess");
+                @Override
+                public void onNetworkError(Exception e) {
+                    super.onNetworkError(e);
 
-                                mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
+                    debug("loginWithUser: OnNetworkError", e);
 
-                                mDataHandler.getMediaCache().clearShareDecryptedMediaCache();
-                                mDataHandler.getMediaCache().clearTmpDecryptedMediaCache();
+                    setState(ImConnection.SUSPENDED, null);
 
-                            }
-                        });
+                    mResponseHandler.postDelayed(new Runnable() {
+                        public void run() {
+                            loginAsync(null);
+                        }
+                    }, 10000);
+
+                }
+
+                @Override
+                public void onMatrixError(MatrixError e) {
+                    super.onMatrixError(e);
+
+                    debug("loginWithUser: onMatrixError: " + e.mErrorBodyAsString);
+
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+                    super.onUnexpectedError(e);
+
+                    debug("loginWithUser: onUnexpectedError", e);
+
+
+                }
+            });
+        }
+    }
+
+    private void initSession (boolean enableEncryption, String initialToken)
+    {
+        mExecutor.execute(new Runnable() {
+            public void run() {
+                mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
+                        .withFileEncryption(enableEncryption)
+                        .build();
+
+                mChatGroupManager.setSession(mSession);
+                mChatSessionManager.setSession(mSession);
+
+                mSession.startEventStream(initialToken);
+                setState(LOGGED_IN, null);
+                mSession.setIsOnline(true);
+
+                mSession.enableCrypto(true, new ApiCallback<Void>() {
+                    @Override
+                    public void onNetworkError(Exception e) {
+                        debug("getCrypto().start.onNetworkError", e);
+
+                    }
+
+                    @Override
+                    public void onMatrixError(MatrixError matrixError) {
+                        debug("getCrypto().start.onMatrixError", matrixError);
+
+                    }
+
+                    @Override
+                    public void onUnexpectedError(Exception e) {
+                        debug("getCrypto().start.onUnexpectedError", e);
+
+                    }
+
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                        debug("getCrypto().start.onSuccess");
+
+                        mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
+
+                        mDataHandler.getMediaCache().clearShareDecryptedMediaCache();
+                        mDataHandler.getMediaCache().clearTmpDecryptedMediaCache();
+
                     }
                 });
-
-
-
-            }
-
-
-
-            @Override
-            public void onNetworkError(Exception e) {
-                super.onNetworkError(e);
-
-                debug("loginWithUser: OnNetworkError",e);
-
-                setState(ImConnection.SUSPENDED, null);
-
-                mResponseHandler.postDelayed(new Runnable ()
-                {
-                    public void run ()
-                    {
-                        loginAsync(null);
-                    }
-                },10000);
-
-            }
-
-            @Override
-            public void onMatrixError(MatrixError e) {
-                super.onMatrixError(e);
-
-                debug("loginWithUser: onMatrixError: " + e.mErrorBodyAsString);
-
-            }
-
-            @Override
-            public void onUnexpectedError(Exception e) {
-                super.onUnexpectedError(e);
-
-                debug("loginWithUser: onUnexpectedError",e);
-
-
             }
         });
     }
@@ -647,12 +699,8 @@ public class MatrixConnection extends ImConnection {
 
             for (Room room : rooms)
             {
-                //get fresh room from data handler?
-                updateGroup(mDataHandler.getRoom(room.getRoomId()));
-
                 if (room.isMember()) {
                     ChatGroup group = addRoomContact(room);
-                    mChatSessionManager.createChatSession(group, true);
                 }
 
             }
@@ -667,17 +715,27 @@ public class MatrixConnection extends ImConnection {
     {
         debug ("addRoomContact: " + room.getRoomId() + " - " + room.getRoomDisplayName(mContext) + " - " + room.getNumberOfMembers());
 
-        String subject = room.getRoomDisplayName(mContext);
-
         MatrixAddress mAddr = new MatrixAddress(room.getRoomId());
 
         final ChatGroup group = mChatGroupManager.getChatGroup(mAddr);
+        if (group.isLoaded())
+            return group;
+
+        String subject = room.getRoomDisplayName(mContext);
 
         if (TextUtils.isEmpty(group.getName()))
             group.setName(subject);
 
         ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
-        if (csa != null && (!subject.equals(mContext.getString(R.string.default_group_title)))) {
+        if (csa == null) {
+
+            mChatSessionManager.createChatSession(group, true);
+            csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
+
+        }
+
+        if (!subject.equals(mContext.getString(R.string.default_group_title)))
+        {
             try {
                 csa.setGroupChatSubject(subject);
             } catch (RemoteException e) {
@@ -697,6 +755,8 @@ public class MatrixConnection extends ImConnection {
             }
         }
 
+        group.setLoaded();
+
         return group;
     }
 
@@ -714,10 +774,13 @@ public class MatrixConnection extends ImConnection {
                     group.setName(room.getRoomDisplayName(mContext));
             }
 
-            updateGroupMembers(room, group);
             ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
             if (csa != null)
                 csa.presenceChanged(Presence.AVAILABLE);
+
+            if (!group.isLoaded())
+                updateGroupMembers(room, group);
+
         }
     }
 
@@ -731,8 +794,7 @@ public class MatrixConnection extends ImConnection {
 
     protected void updateGroupMembersAsync (final Room room, final ChatGroup group)
     {
-
-        if (room.getNumberOfMembers() < 40)
+        if (!room.getState().isPublic())
         {
             room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
                 @Override
@@ -765,21 +827,6 @@ public class MatrixConnection extends ImConnection {
                 }
             });
         }
-        else {
-
-            //just get the typing users!
-            List<String> typers = room.getTypingUsers();
-            ArrayList<RoomMember> members = new ArrayList<>(typers.size());
-            for (String typer : typers)
-            {
-                members.add(room.getMember(typer));
-            }
-
-            mExecutorGroups.execute(new GroupMemberLoader(room, group, members));
-
-
-        }
-
 
     }
 
@@ -1115,7 +1162,8 @@ public class MatrixConnection extends ImConnection {
             debug ("onJoinRoom: " + s);
 
             Room room = mStore.getRoom(s);
-            addRoomContact(room);
+            if (room != null)
+                addRoomContact(room);
 
         }
 
@@ -1264,6 +1312,7 @@ public class MatrixConnection extends ImConnection {
 
     private void handlePresence (Event event)
     {
+
         User user = mStore.getUser(event.getSender());
 
         //not me!
@@ -1299,6 +1348,7 @@ public class MatrixConnection extends ImConnection {
                 }
             }
         }
+
     }
 
     private void handleTyping (Event event)
@@ -1941,8 +1991,7 @@ public class MatrixConnection extends ImConnection {
                     ChatGroup group = lbqGroups.poll();
                     Room room = mDataHandler.getRoom(group.getAddress().getAddress());
 
-                    mExecutorGroups.execute(new Runnable () {
-                            public void run () { updateGroupMembersAsync(room,group);}});
+                    mExecutorGroups.execute(() -> updateGroupMembersAsync(room,group));
                 }
 
             }
