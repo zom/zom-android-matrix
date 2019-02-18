@@ -1186,16 +1186,17 @@ class KeanuRoomMediaMessagesSender {
                                         uploadMedia(roomMediaMessage);
                                     } else {
                                         if (null != encryptedUri) {
+
                                             // replace the thumbnail and the media contents by the computed one
-                                            mediaCache.saveFileMediaForUrl(contentUri, encryptedUri.toString(), mediaMessage.getMimeType());
+                                            //mediaCache.saveFileMediaForUrl(contentUri, encryptedUri.toString(), mediaMessage.getMimeType());
                                             try {
-                                                new File(Uri.parse(url).getPath()).delete();
+                                                new File(encryptedUri.getPath()).delete();
                                             } catch (Exception e) {
                                                 Log.e(LOG_TAG, "## cannot delete the uncompress media", e);
                                             }
                                         } else {
                                             // replace the thumbnail and the media contents by the computed one
-                                            mediaCache.saveFileMediaForUrl(contentUri, url, mediaMessage.getMimeType());
+                                            //mediaCache.saveFileMediaForUrl(contentUri, url, mediaMessage.getMimeType());
                                         }
                                         mediaMessage.setUrl(encryptionResult, contentUri);
 
