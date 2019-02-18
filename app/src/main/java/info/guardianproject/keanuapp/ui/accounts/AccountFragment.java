@@ -73,7 +73,7 @@ public class AccountFragment extends Fragment {
 
     ImageView mIvAvatar;
     CropImageView mCropImageView;
-    TextView mTvPassword, mTvNickname;
+    TextView mTvPassword, mTvNickname, mTvUsername;
     Handler mHandler = new Handler();
     ImageView ivScan;
     View mView;
@@ -82,7 +82,6 @@ public class AccountFragment extends Fragment {
     long mAccountId;
     String mUserAddress;
     String mNickname;
-    String mUserKey;
 
     IImConnection mConn;
 
@@ -117,77 +116,91 @@ public class AccountFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-
-        ImApp mApp = ((ImApp) getActivity().getApplication());
-        mProviderId = mApp.getDefaultProviderId();
-        mAccountId = mApp.getDefaultAccountId();
-        mUserAddress = mApp.getDefaultUsername();
-        mUserKey = "";//mApp.getDefaultOtrKey();
-        mNickname = Imps.Account.getNickname(getContext().getContentResolver(), mAccountId);
 
         mView = inflater.inflate(R.layout.awesome_fragment_account, container, false);
 
-        if (!TextUtils.isEmpty(mUserAddress)) {
+        mTvNickname = (TextView) mView.findViewById(R.id.tvNickname);
 
-            mConn = RemoteImService.getConnection(mProviderId, mAccountId);
+        mTvUsername = (TextView) mView.findViewById(R.id.edtName);
+        mTvUsername.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText(getActivity().getString(R.string.app_name), mUserAddress);
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(getActivity(), R.string.action_copied, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
 
-            mUserAddress = mUserAddress.trim(); //make sure any whitespace is removed
+        mTvPassword = (TextView) mView.findViewById(R.id.edtPass);
+        mTvPassword.setText(DEFAULT_PASSWORD_TEXT);
 
-            mTvNickname = (TextView) mView.findViewById(R.id.tvNickname);
+        View btnShowPassword = mView.findViewById(R.id.btnShowPass);
+        btnShowPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mTvPassword.getText().toString().equals(DEFAULT_PASSWORD_TEXT))
+                    mTvPassword.setText(getAccountPassword(mProviderId));
+                else
+                    mTvPassword.setText(DEFAULT_PASSWORD_TEXT);
+            }
+        });
 
-            TextView tvUsername = (TextView) mView.findViewById(R.id.edtName);
-            tvUsername.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    ClipboardManager clipboard = (ClipboardManager) getActivity().getSystemService(CLIPBOARD_SERVICE);
-                    ClipData clip = ClipData.newPlainText(getActivity().getString(R.string.app_name), mUserAddress);
-                    clipboard.setPrimaryClip(clip);
-                    Toast.makeText(getActivity(), R.string.action_copied, Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-            });
-            mTvPassword = (TextView) mView.findViewById(R.id.edtPass);
-            mTvPassword.setText(DEFAULT_PASSWORD_TEXT);
+        View btnEditAccountNickname = mView.findViewById(R.id.edit_account_nickname);
+        btnEditAccountNickname.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showChangeNickname();
+            }
+        });
 
-            View btnShowPassword = mView.findViewById(R.id.btnShowPass);
-            btnShowPassword.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (mTvPassword.getText().toString().equals(DEFAULT_PASSWORD_TEXT))
-                        mTvPassword.setText(getAccountPassword(mProviderId));
-                    else
-                        mTvPassword.setText(DEFAULT_PASSWORD_TEXT);
-                }
-            });
-
-            View btnEditAccountNickname = mView.findViewById(R.id.edit_account_nickname);
-            btnEditAccountNickname.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showChangeNickname();
-                }
-            });
-
-            View btnEditAccountPassword = mView.findViewById(R.id.edit_account_password);
-            btnEditAccountPassword.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showChangePassword();
-                }
-            });
+        View btnEditAccountPassword = mView.findViewById(R.id.edit_account_password);
+        btnEditAccountPassword.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showChangePassword();
+            }
+        });
 
 
-            mIvAvatar = (ImageView) mView.findViewById(R.id.imageAvatar);
-            mIvAvatar.setOnClickListener(new View.OnClickListener() {
+        mIvAvatar = (ImageView) mView.findViewById(R.id.imageAvatar);
+        mIvAvatar.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View view) {
+            @Override
+            public void onClick(View view) {
 
-                    startAvatarTaker();
+                startAvatarTaker();
 
-                }
-            });
+            }
+        });
+
+
+        mView.findViewById(R.id.btnViewDevices).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                viewDevicesClicked();
+            }
+        });
+
+        updateInfo();
+
+        return mView;
+    }
+
+    private void updateInfo ()
+    {
+        ImApp mApp = ((ImApp) getActivity().getApplication());
+        mProviderId = mApp.getDefaultProviderId();
+        mAccountId = mApp.getDefaultAccountId();
+        mUserAddress = mApp.getDefaultUsername().trim();
+        mNickname = Imps.Account.getNickname(getContext().getContentResolver(), mAccountId);
+
+        mConn = RemoteImService.getConnection(mProviderId, mAccountId);
+
+        if (mTvUsername != null) {
+            mTvUsername.setText(mUserAddress);
+            mTvNickname.setText(mNickname);
 
             try {
 
@@ -198,22 +211,8 @@ public class AccountFragment extends Fragment {
             } catch (Exception e) {
                 Log.w(LOG_TAG, "error getting avatar", e);
             }
-
-            tvUsername.setText(mUserAddress);
-            mTvNickname.setText(mNickname);
-
-            mView.findViewById(R.id.btnViewDevices).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    viewDevicesClicked();
-                }
-            });
         }
-
-
-        return mView;
     }
-
 
 
     private void showChangeNickname ()
@@ -500,12 +499,31 @@ public class AccountFragment extends Fragment {
             return getCaptureImageOutputUri();
     }
 
+    @Override
+    public void setUserVisibleHint(boolean visible)
+    {
+        super.setUserVisibleHint(visible);
+        if (visible && isResumed())
+        {
+            //Only manually call onResume if fragment is already visible
+            //Otherwise allow natural fragment lifecycle to call onResume
+            updateInfo();
+
+        }
+    }
 
     @Override
-    public void onResume() {
+    public void onResume()
+    {
         super.onResume();
+        if (!getUserVisibleHint())
+        {
+            return;
+        }
 
+        updateInfo ();
     }
+
 
     @Override
     public void onAttach(Activity activity) {

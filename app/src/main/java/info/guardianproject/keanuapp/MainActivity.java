@@ -165,10 +165,6 @@ public class MainActivity extends BaseActivity {
         adapter.addFragment(mConversationList, getString(R.string.title_chats), R.drawable.ic_message_white_36dp);
         adapter.addFragment(mContactList, getString(R.string.contacts), R.drawable.ic_people_white_36dp);
         adapter.addFragment(mMoreFragment, getString(R.string.title_more), R.drawable.ic_more_horiz_white_36dp);
-
-        mAccountFragment = new AccountFragment();
-      //  fragAccount.setArguments();
-
         adapter.addFragment(mAccountFragment, getString(R.string.title_me), R.drawable.ic_face_white_24dp);
 
         mViewPager.setAdapter(adapter);
@@ -196,6 +192,7 @@ public class MainActivity extends BaseActivity {
             public void onTabSelected(TabLayout.Tab tab) {
 
                 mViewPager.setCurrentItem(tab.getPosition());
+
                 setToolbarTitle(tab.getPosition());
                 applyStyleColors ();
             }
@@ -285,6 +282,7 @@ public class MainActivity extends BaseActivity {
                 break;
             case 3:
                 sb.append(getString(R.string.me_title));
+                mAccountFragment.setUserVisibleHint(true);
                 break;
         }
 
