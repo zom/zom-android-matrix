@@ -140,10 +140,10 @@ public class MatrixConnection extends ImConnection {
     private final static String HTTPS_PREPEND = "https://";
 
     private Handler mResponseHandler = new Handler();
-    private ThreadPoolExecutor mExecutor = null;
-    private ThreadPoolExecutor mExecutorGroups = null;
-    //private ExecutorService mExecutorGroups = null;
-    //private ExecutorService mExecutor = null;
+  //  private ThreadPoolExecutor mExecutor = null;
+   // private ThreadPoolExecutor mExecutorGroups = null;
+    private ExecutorService mExecutorGroups = null;
+    private ExecutorService mExecutor = null;
 
     private final static int LARGE_GROUP_SIZE_THRESHOLD = 25;
 
@@ -155,14 +155,14 @@ public class MatrixConnection extends ImConnection {
         mChatGroupManager = new MatrixChatGroupManager(context, this);
         mChatSessionManager = new MatrixChatSessionManager(context, this);
 
-       mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
-               new LinkedBlockingQueue<>());
+       //mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
+         //      new LinkedBlockingQueue<>());
 
-      mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
-              new LinkedBlockingQueue<>());
+     /// mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
+        //      new LinkedBlockingQueue<>());
 
-      //  mExecutor = Executors.newCachedThreadPool();
-      //  mExecutorGroups = Executors.newCachedThreadPool();
+          mExecutor = Executors.newCachedThreadPool();
+          mExecutorGroups = Executors.newCachedThreadPool();
 
     }
 
@@ -754,8 +754,9 @@ public class MatrixConnection extends ImConnection {
             if (csa != null)
                 csa.presenceChanged(Presence.AVAILABLE);
 
-            if (!group.isLoaded())
-                updateGroupMembers(room, group);
+            updateGroupMembers(room, group);
+
+
 
         }
     }

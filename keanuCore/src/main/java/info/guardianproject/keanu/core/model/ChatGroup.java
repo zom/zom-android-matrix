@@ -100,6 +100,11 @@ public class ChatGroup extends ImEntity {
         }
     }
 
+    public boolean hasMemberListener ()
+    {
+        return mMemberListeners.size() > 0;
+    }
+
     public void addMemberListener(GroupMemberListener listener) {
         mMemberListeners.add(listener);
 

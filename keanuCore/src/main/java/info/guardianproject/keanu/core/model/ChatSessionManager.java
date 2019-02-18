@@ -90,14 +90,11 @@ public abstract class ChatSessionManager {
                 ChatSession session = new ChatSession((ChatGroup) participant, this);
                 sessionAdapter = mAdapter.getChatSessionAdapter(session, isNewSession);
 
+                mSessions.put(participant.getAddress().getAddress(), sessionAdapter);
+
                 for (ChatSessionListener listener : mListeners) {
                     listener.onChatSessionCreated(session);
                 }
-
-                mSessions.put(participant.getAddress().getAddress(), sessionAdapter);
-            }
-            else
-            {
 
             }
 

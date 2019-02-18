@@ -150,6 +150,11 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     }
 
+    public ListenerAdapter getListenerAdapter ()
+    {
+        return mListenerAdapter;
+    }
+
     public ChatSession getChatSession ()
     {
         return mChatSession;
