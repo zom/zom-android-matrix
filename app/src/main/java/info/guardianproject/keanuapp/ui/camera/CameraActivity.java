@@ -72,6 +72,9 @@ public class CameraActivity extends AppCompatActivity {
     public static final int ORIENTATION_PORTRAIT_REVERSE = 2;
     public static final int ORIENTATION_LANDSCAPE_REVERSE = 3;
 
+    private final static int VIDEO_KBITRATE = 800;
+    private final static int AUDIO_KBITRATE = 64;
+
     File fileVideoTmp;
     boolean isRecordingVideo = false;
     Bitmap thumbnail = null;
@@ -109,7 +112,6 @@ public class CameraActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mCameraView = findViewById(R.id.camera_view);
-
 
         mCameraView.addCameraListener(new CameraListener() {
 
@@ -259,20 +261,19 @@ public class CameraActivity extends AppCompatActivity {
         mCameraView.setVideoMaxDuration(MAX_LENGTH_MS);
         mCameraView.setVideoCodec(VideoCodec.H_264);
 
-        mCameraView.setVideoSize(new SizeSelector() {
-            @NonNull
-            @Override
-            public List<Size> select(@NonNull List<Size> source) {
-                ArrayList<Size> result = new ArrayList<>();
+        mCameraView.setVideoBitRate(VIDEO_KBITRATE * 1000);
+        mCameraView.setAudioBitRate(AUDIO_KBITRATE * 1000);
 
-                for (Size size : source)
-                {
-                    if (size.getWidth() < 800)
-                        result.add(size);
-                }
+        mCameraView.setVideoSize(source -> {
+            ArrayList<Size> result = new ArrayList<>();
 
-                return result;
+            for (Size size : source)
+            {
+                if (size.getWidth() < 1000)
+                    result.add(size);
             }
+
+            return result;
         });
 
         ((ImageView)findViewById(R.id.btnCameraVideo)).setImageResource(R.drawable.ic_video_stop);
