@@ -670,16 +670,16 @@ public class MatrixConnection extends ImConnection {
     {
 
         mExecutorGroups.execute(() -> {
-            /**
+
             Collection<Room> rooms = mStore.getRooms();
 
             for (Room room : rooms)
             {
                 if (room.isMember()) {
-                    ChatGroup group = addRoomContact(room);
+                    addRoomContact(room);
                 }
 
-            }**/
+            }
 
             mContactListManager.loadContactListsAsync();
 
