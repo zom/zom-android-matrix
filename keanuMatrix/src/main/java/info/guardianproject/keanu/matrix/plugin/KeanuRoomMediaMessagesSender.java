@@ -1164,9 +1164,9 @@ class KeanuRoomMediaMessagesSender {
                                         mediaMessage.setThumbnailUrl(encryptionResult, contentUri);
 
                                         if (null != encryptionResult) {
-                                            mediaCache.saveFileMediaForUrl(contentUri, encryptedUri.toString(), -1, -1, "image/jpeg");
+                                           // mediaCache.saveFileMediaForUrl(contentUri, encryptedUri.toString(), -1, -1, "image/jpeg");
                                             try {
-                                                new File(Uri.parse(url).getPath()).delete();
+                                                new File(encryptedUri.getPath()).delete();
                                             } catch (Exception e) {
                                                 Log.e(LOG_TAG, "## cannot delete the uncompress media", e);
                                             }
