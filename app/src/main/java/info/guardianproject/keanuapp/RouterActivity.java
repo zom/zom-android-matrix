@@ -64,7 +64,7 @@ public class RouterActivity extends AppCompatActivity implements ICacheWordSubsc
     private SimpleAlertHandler mHandler;
     private SignInHelper mSignInHelper;
 
-    private boolean mDoSignIn = true;
+    private boolean mDoSignIn = false;
 
     public static final String ACTION_LOCK_APP = "actionLockApp";
 
@@ -146,7 +146,7 @@ public class RouterActivity extends AppCompatActivity implements ICacheWordSubsc
         }
 
         mSignInHelper = new SignInHelper(this, mHandler);
-        mDoSignIn = intent.getBooleanExtra(EXTRA_DO_SIGNIN, true);
+        mDoSignIn = intent.getBooleanExtra(EXTRA_DO_SIGNIN, false);
 
         AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 

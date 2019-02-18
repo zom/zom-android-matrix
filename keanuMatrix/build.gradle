@@ -18,8 +18,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 1
-        versionName "1.0"
+        versionCode 17
+        versionName "0.0.1.7"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -64,10 +64,10 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-
     //for thumbnail extraction for videos!
-    implementation 'org.jcodec:jcodec-android:0.2.3'
+    implementation 'com.android.support:exifinterface:28.0.0'
 
+    implementation 'commons-io:commons-io:2.5'
 }
 
 apply plugin: 'maven'
@@ -78,8 +78,8 @@ uploadArchives {
                 repository(url: "file://${deployPath.absolutePath}")
                 pom.project {
                         groupId 'info.guardianproject.keanuapp'
-                        artifactId 'keanuMatrix'
-                        version '0.0.1.5'
+                        artifactId 'keanumatrix'
+                        version '0.0.1.7'
                 }
         }
 }
