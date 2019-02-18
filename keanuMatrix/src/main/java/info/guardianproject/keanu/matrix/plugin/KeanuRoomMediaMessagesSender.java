@@ -20,26 +20,15 @@ package info.guardianproject.keanu.matrix.plugin;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.ExifInterface;
-import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.provider.MediaStore;
+import android.support.media.ExifInterface;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Pair;
 
-import org.jcodec.api.FrameGrab;
-import org.jcodec.api.JCodecException;
-import org.jcodec.common.AndroidUtil;
-import org.jcodec.common.io.SeekableByteChannel;
-import org.jcodec.common.model.Picture;
 import org.matrix.androidsdk.MXDataHandler;
-import org.matrix.androidsdk.R;
 import org.matrix.androidsdk.crypto.MXEncryptedAttachments;
 import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.data.RoomMediaMessage;
@@ -49,7 +38,9 @@ import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.model.Event;
 import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.rest.model.message.AudioMessage;
+import org.matrix.androidsdk.rest.model.message.FileInfo;
 import org.matrix.androidsdk.rest.model.message.FileMessage;
+import org.matrix.androidsdk.rest.model.message.ImageInfo;
 import org.matrix.androidsdk.rest.model.message.ImageMessage;
 import org.matrix.androidsdk.rest.model.message.MediaMessage;
 import org.matrix.androidsdk.rest.model.message.Message;
@@ -63,21 +54,16 @@ import org.matrix.androidsdk.util.Log;
 import org.matrix.androidsdk.util.PermalinkUtils;
 import org.matrix.androidsdk.util.ResourceUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import info.guardianproject.iocipher.IOCipherFileChannel;
-import info.guardianproject.iocipher.RandomAccessFile;
-import info.guardianproject.keanu.core.util.IOCipherFileChannelWrapper;
-
+import info.guardianproject.iocipher.File;
+import info.guardianproject.iocipher.FileInputStream;
+import info.guardianproject.iocipher.FileOutputStream;
+import info.guardianproject.keanu.matrix.R;
 /**
  * Room helper to send media messages in the right order.
  */
@@ -646,6 +632,7 @@ class KeanuRoomMediaMessagesSender {
             final MXMediaCache mediaCache = mDataHandler.getMediaCache();
 
             String mediaUrl = getMediaUrl(roomMediaMessage);
+            String thumbnailURL = mediaUrl + ".thumb.jpg";
 
             /**
             // compute the thumbnail
@@ -692,15 +679,16 @@ class KeanuRoomMediaMessagesSender {
             Uri imageUri = Uri.parse(mediaUrl);
 
             if (null == imageMessage.info) {
-                Room.fillImageInfo(mContext, imageMessage, imageUri, mimeType);
+                fillImageInfo(mContext, imageMessage, imageUri, mimeType);
             }
 
-            /**
+
             if ((null != thumbnailURL) && (null != imageMessage.info) && (null == imageMessage.info.thumbnailInfo)) {
                 Uri thumbUri = Uri.parse(thumbnailURL);
-                Room.fillThumbnailInfo(mContext, imageMessage, thumbUri, "image/jpeg");
-                imageMessage.info.thumbnailUrl = thumbnailURL;
-            }**/
+                ImageInfo info = fillThumbnailInfo(mContext, imageMessage, thumbUri, "image/jpeg");
+                if (info != null)
+                    imageMessage.info.thumbnailUrl = thumbnailURL;
+            }
 
             return imageMessage;
         } catch (Exception e) {
@@ -708,6 +696,100 @@ class KeanuRoomMediaMessagesSender {
         }
 
         return null;
+    }
+
+    public static ImageInfo fillImageInfo(Context context, ImageMessage imageMessage, Uri imageUri, String mimeType) {
+        imageMessage.info = getImageInfo(context, imageMessage.info, imageUri, mimeType);
+        return imageMessage.info;
+    }
+
+    public static ImageInfo fillThumbnailInfo(Context context, ImageMessage imageMessage, Uri thumbUri, String mimeType) {
+        ImageInfo imageInfo = getImageInfo(context, (ImageInfo)null, thumbUri, mimeType);
+        if (null != imageInfo) {
+            if (null == imageMessage.info) {
+                imageMessage.info = new ImageInfo();
+            }
+
+            imageMessage.info.thumbnailInfo = new ThumbnailInfo();
+            imageMessage.info.thumbnailInfo.w = imageInfo.w;
+            imageMessage.info.thumbnailInfo.h = imageInfo.h;
+            imageMessage.info.thumbnailInfo.size = imageInfo.size;
+            imageMessage.info.thumbnailInfo.mimetype = imageInfo.mimetype;
+        }
+        return imageInfo;
+
+    }
+
+    public static ImageInfo getImageInfo(Context context, ImageInfo anImageInfo, Uri imageUri, String mimeType) {
+        ImageInfo imageInfo = null == anImageInfo ? new ImageInfo() : anImageInfo;
+
+        try {
+
+            ExifInterface exifMedia = null;
+
+            String filename = imageUri.getPath();
+            java.io.File file = new java.io.File(filename);
+            if (file.exists())
+                exifMedia = new ExifInterface(filename);
+            else
+            {
+                info.guardianproject.iocipher.File fileEncrypted = new info.guardianproject.iocipher.File(filename);
+                if (fileEncrypted.exists())
+                {
+                    InputStream is = new info.guardianproject.iocipher.FileInputStream(fileEncrypted);
+                    exifMedia = new ExifInterface(is);
+
+                }
+                else
+                    return null;
+            }
+
+
+
+            String sWidth = exifMedia.getAttribute("ImageWidth");
+            String sHeight = exifMedia.getAttribute("ImageLength");
+            imageInfo.orientation = ImageUtils.getOrientationForBitmap(context, imageUri);
+            int width = 0;
+            int height = 0;
+            if (null != sWidth && null != sHeight) {
+                if (imageInfo.orientation != 5 && imageInfo.orientation != 6 && imageInfo.orientation != 7 && imageInfo.orientation != 8) {
+                    width = Integer.parseInt(sWidth);
+                    height = Integer.parseInt(sHeight);
+                } else {
+                    height = Integer.parseInt(sWidth);
+                    width = Integer.parseInt(sHeight);
+                }
+            }
+
+            if (0 == width || 0 == height) {
+                try {
+                    BitmapFactory.Options opts = new BitmapFactory.Options();
+                    opts.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(imageUri.getPath(), opts);
+                    if (opts.outHeight > 0 && opts.outWidth > 0) {
+                        width = opts.outWidth;
+                        height = opts.outHeight;
+                    }
+                } catch (Exception var13) {
+                    Log.e(LOG_TAG, "fillImageInfo : failed" + var13.getMessage(), var13);
+                } catch (OutOfMemoryError var14) {
+                    Log.e(LOG_TAG, "fillImageInfo : oom", var14);
+                }
+            }
+
+            if (0 != width || 0 != height) {
+                imageInfo.w = width;
+                imageInfo.h = height;
+            }
+
+            imageInfo.mimetype = mimeType;
+            imageInfo.size = file.length();
+        } catch (Exception var15) {
+            Log.e(LOG_TAG, "fillImageInfo : failed" + var15.getMessage(), var15);
+            imageInfo = null;
+        }
+
+        return imageInfo;
     }
 
     /**
@@ -846,22 +928,23 @@ class KeanuRoomMediaMessagesSender {
             if (null != thumbnailUri) {
                 videoInfo.thumbnail_url = thumbnailUri.toString();
                 ThumbnailInfo thumbInfo = new ThumbnailInfo();
-                info.guardianproject.iocipher.File thumbnailFile = new info.guardianproject.iocipher.File(thumbnailUri.getPath());
 
-                /**
-                ExifInterface exifMedia = new ExifInterface(new info.guardianproject.iocipher.FileInputStream(thumbnailFile));
-                String sWidth = exifMedia.getAttribute("ImageWidth");
-                String sHeight = exifMedia.getAttribute("ImageLength");
-                if (null != sWidth) {
-                    thumbInfo.w = Integer.parseInt(sWidth);
-                }
-
-                if (null != sHeight) {
-                    thumbInfo.h = Integer.parseInt(sHeight);
-                }**/
                 thumbInfo.w = 1080;
                 thumbInfo.h = 720;
 
+                info.guardianproject.iocipher.File thumbnailFile = new info.guardianproject.iocipher.File(thumbnailUri.getPath());
+                if (thumbnailFile.exists()) {
+                    ExifInterface exifMedia = new ExifInterface(new info.guardianproject.iocipher.FileInputStream(thumbnailFile));
+                    String sWidth = exifMedia.getAttribute("ImageWidth");
+                    String sHeight = exifMedia.getAttribute("ImageLength");
+                    if (null != sWidth) {
+                        thumbInfo.w = Integer.parseInt(sWidth);
+                    }
+
+                    if (null != sHeight) {
+                        thumbInfo.h = Integer.parseInt(sHeight);
+                    }
+                }
 
                 videoInfo.h = thumbInfo.h;
                 videoInfo.w = thumbInfo.w;
@@ -903,7 +986,7 @@ class KeanuRoomMediaMessagesSender {
                 fileMessage.body = Uri.parse(mediaUrl).getLastPathSegment();
 
             Uri uri = Uri.parse(mediaUrl);
-            Room.fillFileInfo(mContext, fileMessage, uri, mimeType);
+            fillFileInfo(mContext, fileMessage, uri, mimeType);
 
             if (null == fileMessage.body) {
                 fileMessage.body = uri.getLastPathSegment();
@@ -915,6 +998,20 @@ class KeanuRoomMediaMessagesSender {
         }
 
         return null;
+    }
+
+    public static void fillFileInfo(Context context, FileMessage fileMessage, Uri fileUri, String mimeType) {
+        try {
+            FileInfo fileInfo = new FileInfo();
+            String filename = fileUri.getPath();
+            File file = new File(filename);
+            fileInfo.mimetype = mimeType;
+            fileInfo.size = file.length();
+            fileMessage.info = fileInfo;
+        } catch (Exception var7) {
+            Log.e(LOG_TAG, "fillFileInfo : failed" + var7.getMessage(), var7);
+        }
+
     }
 
     //==============================================================================================================
@@ -949,185 +1046,183 @@ class KeanuRoomMediaMessagesSender {
             return false;
         }
 
-        mEncodingHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                final MXMediaCache mediaCache = mDataHandler.getMediaCache();
+        mEncodingHandler.post(() -> {
+            final MXMediaCache mediaCache = mDataHandler.getMediaCache();
 
-                Uri uri = Uri.parse(url);
-                String mimeType = fMimeType;
-                final MXEncryptedAttachments.EncryptionResult encryptionResult;
-                final Uri encryptedUri;
-                InputStream stream;
+            Uri uri = Uri.parse(url);
+            String mimeType = fMimeType;
+            final MXEncryptedAttachments.EncryptionResult encryptionResult;
+            final Uri encryptedUri;
+            InputStream stream;
 
-                String filename = null;
+            String filename = null;
 
-                try {
-                    stream = null;
-                    if (uri.getScheme() == null || uri.getScheme().equals("file"))
-                        stream = new FileInputStream(new File(uri.getPath()));
-                    else if (uri.getScheme().equals("vfs"))
-                        stream = new info.guardianproject.iocipher.FileInputStream(new info.guardianproject.iocipher.File(uri.getPath()));
+            try {
+                stream = null;
+                if (uri.getScheme() == null || uri.getScheme().equals("file"))
+                    stream = new java.io.FileInputStream(new File(uri.getPath()));
+                else if (uri.getScheme().equals("vfs"))
+                    stream = new FileInputStream(new File(uri.getPath()));
 
-                    if (mRoom.isEncrypted() && mDataHandler.isCryptoEnabled() && (null != stream)) {
-                        encryptionResult = MXEncryptedAttachments.encryptAttachment(stream, mimeType);
-                        stream.close();
+                if (mRoom.isEncrypted() && mDataHandler.isCryptoEnabled() && (null != stream)) {
+                    File fileEncrypted = new File(uri.getPath() + ".encrypted");
+                    FileOutputStream fos = new FileOutputStream(fileEncrypted);
+                    encryptionResult = KeanuMXEncryptedAttachments.encryptAttachment(stream, mimeType,fos);
+                    stream.close();
 
-                        if (null != encryptionResult) {
-                            mimeType = "application/octet-stream";
-                            encryptedUri = Uri.parse(mediaCache.saveMedia(encryptionResult.mEncryptedStream, null, fMimeType));
-                            File file = new File(encryptedUri.getPath());
-                            stream = new FileInputStream(file);
-                        } else {
-                            skip();
+                    if (null != encryptionResult) {
+                        mimeType = "application/octet-stream";
+                        encryptedUri = Uri.parse("vfs://" + fileEncrypted.getAbsolutePath());
+                        stream = new FileInputStream(fileEncrypted);
+                    } else {
+                        skip();
 
+                        mUiHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                mDataHandler.updateEventState(roomMediaMessage.getEvent(), Event.SentState.UNDELIVERED);
+                                mRoom.storeOutgoingEvent(roomMediaMessage.getEvent());
+                                mDataHandler.getStore().commit();
+
+                               // roomMediaMessage.onEncryptionFailed();
+                            }
+                        });
+
+                        return;
+                    }
+                } else {
+                    // Only pass filename string to server in non-encrypted rooms to prevent leaking filename
+                    filename = mediaMessage.isThumbnailLocalContent() ? ("thumb" + message.body) : message.body;
+                    encryptionResult = null;
+                    encryptedUri = null;
+                }
+            } catch (Exception e) {
+                skip();
+                return;
+            }
+
+            mDataHandler.updateEventState(roomMediaMessage.getEvent(), Event.SentState.SENDING);
+
+            mediaCache.uploadContent(stream, filename, mimeType, url,
+                    new MXMediaUploadListener() {
+                        @Override
+                        public void onUploadStart(final String uploadId) {
+                            mUiHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (null != roomMediaMessage.getMediaUploadListener()) {
+                                        roomMediaMessage.getMediaUploadListener().onUploadStart(uploadId);
+                                    }
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onUploadCancel(final String uploadId) {
                             mUiHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
                                     mDataHandler.updateEventState(roomMediaMessage.getEvent(), Event.SentState.UNDELIVERED);
-                                    mRoom.storeOutgoingEvent(roomMediaMessage.getEvent());
-                                    mDataHandler.getStore().commit();
 
-                                   // roomMediaMessage.onEncryptionFailed();
+                                    if (null != roomMediaMessage.getMediaUploadListener()) {
+                                        roomMediaMessage.getMediaUploadListener().onUploadCancel(uploadId);
+                                        roomMediaMessage.setMediaUploadListener(null);
+                                        roomMediaMessage.setEventSendingCallback(null);
+                                    }
+
+                                    skip();
                                 }
                             });
-
-                            return;
                         }
-                    } else {
-                        // Only pass filename string to server in non-encrypted rooms to prevent leaking filename
-                        filename = mediaMessage.isThumbnailLocalContent() ? ("thumb" + message.body) : message.body;
-                        encryptionResult = null;
-                        encryptedUri = null;
-                    }
-                } catch (Exception e) {
-                    skip();
-                    return;
-                }
 
-                mDataHandler.updateEventState(roomMediaMessage.getEvent(), Event.SentState.SENDING);
+                        @Override
+                        public void onUploadError(final String uploadId, final int serverResponseCode, final String serverErrorMessage) {
+                            mUiHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mDataHandler.updateEventState(roomMediaMessage.getEvent(), Event.SentState.UNDELIVERED);
 
-                mediaCache.uploadContent(stream, filename, mimeType, url,
-                        new MXMediaUploadListener() {
-                            @Override
-                            public void onUploadStart(final String uploadId) {
-                                mUiHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        if (null != roomMediaMessage.getMediaUploadListener()) {
-                                            roomMediaMessage.getMediaUploadListener().onUploadStart(uploadId);
-                                        }
+                                    if (null != roomMediaMessage.getMediaUploadListener()) {
+                                        roomMediaMessage.getMediaUploadListener().onUploadError(uploadId, serverResponseCode, serverErrorMessage);
+                                        roomMediaMessage.setMediaUploadListener(null);
+                                        roomMediaMessage.setEventSendingCallback(null);
                                     }
-                                });
-                            }
 
-                            @Override
-                            public void onUploadCancel(final String uploadId) {
-                                mUiHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mDataHandler.updateEventState(roomMediaMessage.getEvent(), Event.SentState.UNDELIVERED);
+                                    skip();
+                                }
+                            });
+                        }
 
-                                        if (null != roomMediaMessage.getMediaUploadListener()) {
-                                            roomMediaMessage.getMediaUploadListener().onUploadCancel(uploadId);
-                                            roomMediaMessage.setMediaUploadListener(null);
-                                            roomMediaMessage.setEventSendingCallback(null);
-                                        }
+                        @Override
+                        public void onUploadComplete(final String uploadId, final String contentUri) {
+                            mUiHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    boolean isThumbnailUpload = mediaMessage.isThumbnailLocalContent();
 
-                                        skip();
-                                    }
-                                });
-                            }
+                                    if (isThumbnailUpload) {
+                                        mediaMessage.setThumbnailUrl(encryptionResult, contentUri);
 
-                            @Override
-                            public void onUploadError(final String uploadId, final int serverResponseCode, final String serverErrorMessage) {
-                                mUiHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        mDataHandler.updateEventState(roomMediaMessage.getEvent(), Event.SentState.UNDELIVERED);
-
-                                        if (null != roomMediaMessage.getMediaUploadListener()) {
-                                            roomMediaMessage.getMediaUploadListener().onUploadError(uploadId, serverResponseCode, serverErrorMessage);
-                                            roomMediaMessage.setMediaUploadListener(null);
-                                            roomMediaMessage.setEventSendingCallback(null);
-                                        }
-
-                                        skip();
-                                    }
-                                });
-                            }
-
-                            @Override
-                            public void onUploadComplete(final String uploadId, final String contentUri) {
-                                mUiHandler.post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        boolean isThumbnailUpload = mediaMessage.isThumbnailLocalContent();
-
-                                        if (isThumbnailUpload) {
-                                            mediaMessage.setThumbnailUrl(encryptionResult, contentUri);
-
-                                            if (null != encryptionResult) {
-                                                mediaCache.saveFileMediaForUrl(contentUri, encryptedUri.toString(), -1, -1, "image/jpeg");
-                                                try {
-                                                    new File(Uri.parse(url).getPath()).delete();
-                                                } catch (Exception e) {
-                                                    Log.e(LOG_TAG, "## cannot delete the uncompress media", e);
-                                                }
-                                            } else {
-                                                Pair<Integer, Integer> thumbnailSize = roomMediaMessage.getThumbnailSize();
-                                                mediaCache.saveFileMediaForUrl(contentUri, url, thumbnailSize.first, thumbnailSize.second, "image/jpeg");
+                                        if (null != encryptionResult) {
+                                            mediaCache.saveFileMediaForUrl(contentUri, encryptedUri.toString(), -1, -1, "image/jpeg");
+                                            try {
+                                                new File(Uri.parse(url).getPath()).delete();
+                                            } catch (Exception e) {
+                                                Log.e(LOG_TAG, "## cannot delete the uncompress media", e);
                                             }
-
-                                            // update the event content with the new message info
-                                            event.updateContent(JsonUtils.toJson(message));
-
-                                            // force to save the room events list
-                                            // https://github.com/vector-im/riot-android/issues/1390
-                                            mDataHandler.getStore().flushRoomEvents(mRoom.getRoomId());
-
-                                            // upload the media
-                                            uploadMedia(roomMediaMessage);
                                         } else {
-                                            if (null != encryptedUri) {
-                                                // replace the thumbnail and the media contents by the computed one
-                                                mediaCache.saveFileMediaForUrl(contentUri, encryptedUri.toString(), mediaMessage.getMimeType());
-                                                try {
-                                                    new File(Uri.parse(url).getPath()).delete();
-                                                } catch (Exception e) {
-                                                    Log.e(LOG_TAG, "## cannot delete the uncompress media", e);
-                                                }
-                                            } else {
-                                                // replace the thumbnail and the media contents by the computed one
-                                                mediaCache.saveFileMediaForUrl(contentUri, url, mediaMessage.getMimeType());
-                                            }
-                                            mediaMessage.setUrl(encryptionResult, contentUri);
-
-                                            // update the event content with the new message info
-                                            event.updateContent(JsonUtils.toJson(message));
-
-                                            // force to save the room events list
-                                            // https://github.com/vector-im/riot-android/issues/1390
-                                            mDataHandler.getStore().flushRoomEvents(mRoom.getRoomId());
-
-                                            Log.d(LOG_TAG, "Uploaded to " + contentUri);
-
-                                            // send
-                                            sendEvent(event);
+                                            Pair<Integer, Integer> thumbnailSize = roomMediaMessage.getThumbnailSize();
+                                            mediaCache.saveFileMediaForUrl(contentUri, url, thumbnailSize.first, thumbnailSize.second, "image/jpeg");
                                         }
 
-                                        if (null != roomMediaMessage.getMediaUploadListener()) {
-                                            roomMediaMessage.getMediaUploadListener().onUploadComplete(uploadId, contentUri);
+                                        // update the event content with the new message info
+                                        event.updateContent(JsonUtils.toJson(message));
 
-                                            if (!isThumbnailUpload) {
-                                                roomMediaMessage.setMediaUploadListener(null);
+                                        // force to save the room events list
+                                        // https://github.com/vector-im/riot-android/issues/1390
+                                        mDataHandler.getStore().flushRoomEvents(mRoom.getRoomId());
+
+                                        // upload the media
+                                        uploadMedia(roomMediaMessage);
+                                    } else {
+                                        if (null != encryptedUri) {
+                                            // replace the thumbnail and the media contents by the computed one
+                                            mediaCache.saveFileMediaForUrl(contentUri, encryptedUri.toString(), mediaMessage.getMimeType());
+                                            try {
+                                                new File(Uri.parse(url).getPath()).delete();
+                                            } catch (Exception e) {
+                                                Log.e(LOG_TAG, "## cannot delete the uncompress media", e);
                                             }
+                                        } else {
+                                            // replace the thumbnail and the media contents by the computed one
+                                            mediaCache.saveFileMediaForUrl(contentUri, url, mediaMessage.getMimeType());
+                                        }
+                                        mediaMessage.setUrl(encryptionResult, contentUri);
+
+                                        // update the event content with the new message info
+                                        event.updateContent(JsonUtils.toJson(message));
+
+                                        // force to save the room events list
+                                        // https://github.com/vector-im/riot-android/issues/1390
+                                        mDataHandler.getStore().flushRoomEvents(mRoom.getRoomId());
+
+                                        Log.d(LOG_TAG, "Uploaded to " + contentUri);
+
+                                        // send
+                                        sendEvent(event);
+                                    }
+
+                                    if (null != roomMediaMessage.getMediaUploadListener()) {
+                                        roomMediaMessage.getMediaUploadListener().onUploadComplete(uploadId, contentUri);
+
+                                        if (!isThumbnailUpload) {
+                                            roomMediaMessage.setMediaUploadListener(null);
                                         }
                                     }
-                                });
-                            }
-                        });
-            }
+                                }
+                            });
+                        }
+                    });
         });
 
         return true;

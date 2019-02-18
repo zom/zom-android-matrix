@@ -585,6 +585,7 @@ public class SystemServices {
                     ret = cursor.getString(imageColumnIndex);
 
             }
+            cursor.close();
         }
 
         return ret;

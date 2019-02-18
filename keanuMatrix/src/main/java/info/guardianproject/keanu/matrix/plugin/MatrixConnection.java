@@ -1,52 +1,37 @@
 package info.guardianproject.keanu.matrix.plugin;
 
-import android.content.ClipData;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.TrafficStats;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
+import android.os.Process;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.util.JsonReader;
 import android.util.Log;
 import android.util.Pair;
-import android.widget.ImageView;
 
-import com.facebook.stetho.common.ArrayListAccumulator;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.jcodec.common.StringUtils;
-import org.jcodec.common.io.IOUtils;
-import org.json.JSONArray;
+import org.apache.commons.io.IOUtils;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.matrix.androidsdk.HomeServerConnectionConfig;
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
 import org.matrix.androidsdk.crypto.IncomingRoomKeyRequest;
 import org.matrix.androidsdk.crypto.IncomingRoomKeyRequestCancellation;
 import org.matrix.androidsdk.crypto.MXCrypto;
-import org.matrix.androidsdk.crypto.MXCryptoError;
-import org.matrix.androidsdk.crypto.MXEncryptedAttachments;
 import org.matrix.androidsdk.crypto.data.MXDeviceInfo;
 import org.matrix.androidsdk.crypto.data.MXUsersDevicesMap;
 import org.matrix.androidsdk.data.MyUser;
 import org.matrix.androidsdk.data.Room;
-import org.matrix.androidsdk.data.RoomMediaMessage;
 import org.matrix.androidsdk.data.RoomState;
 import org.matrix.androidsdk.data.store.IMXStoreListener;
-import org.matrix.androidsdk.db.MXMediaCache;
 import org.matrix.androidsdk.listeners.IMXEventListener;
-import org.matrix.androidsdk.listeners.IMXMediaUploadListener;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.callback.SimpleApiCallback;
 import org.matrix.androidsdk.rest.client.LoginRestClient;
@@ -66,27 +51,20 @@ import org.matrix.androidsdk.rest.model.login.RegistrationParams;
 import org.matrix.androidsdk.rest.model.message.AudioMessage;
 import org.matrix.androidsdk.rest.model.message.FileMessage;
 import org.matrix.androidsdk.rest.model.message.ImageMessage;
-import org.matrix.androidsdk.rest.model.message.StickerJsonMessage;
-import org.matrix.androidsdk.rest.model.message.StickerMessage;
 import org.matrix.androidsdk.rest.model.message.VideoMessage;
 import org.matrix.androidsdk.rest.model.search.SearchUsersResponse;
 import org.matrix.androidsdk.util.JsonUtils;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -100,11 +78,11 @@ import java.util.concurrent.TimeUnit;
 
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileInputStream;
+import info.guardianproject.iocipher.FileReader;
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.ChatSession;
-import info.guardianproject.keanu.core.model.ChatSessionListener;
 import info.guardianproject.keanu.core.model.ChatSessionManager;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ContactListManager;
@@ -122,14 +100,10 @@ import info.guardianproject.keanu.core.service.adapters.ChatSessionAdapter;
 import info.guardianproject.keanu.core.util.DatabaseUtils;
 import info.guardianproject.keanu.core.util.Downloader;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
-import info.guardianproject.keanu.core.util.UploadProgressListener;
 import info.guardianproject.keanu.matrix.R;
 
-import static com.facebook.stetho.inspector.network.PrettyPrinterDisplayType.JSON;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
-import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_WIDTH;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
-import static info.guardianproject.keanu.core.service.RemoteImService.debug;
 
 public class MatrixConnection extends ImConnection {
 
@@ -166,10 +140,10 @@ public class MatrixConnection extends ImConnection {
     private final static String HTTPS_PREPEND = "https://";
 
     private Handler mResponseHandler = new Handler();
-    //private ThreadPoolExecutor mExecutor = null;
-    //private ThreadPoolExecutor mExecutorGroups = null;
-    private ExecutorService mExecutorGroups = null;
-    private ExecutorService mExecutor = null;
+    private ThreadPoolExecutor mExecutor = null;
+    private ThreadPoolExecutor mExecutorGroups = null;
+    //private ExecutorService mExecutorGroups = null;
+    //private ExecutorService mExecutor = null;
 
     private final static int LARGE_GROUP_SIZE_THRESHOLD = 25;
 
@@ -181,14 +155,14 @@ public class MatrixConnection extends ImConnection {
         mChatGroupManager = new MatrixChatGroupManager(context, this);
         mChatSessionManager = new MatrixChatSessionManager(context, this);
 
-       // mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
-         //       new LinkedBlockingQueue<Runnable>());
+       mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
+               new LinkedBlockingQueue<>());
 
-        //mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
-          //      new LinkedBlockingQueue<Runnable>());
+      mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
+              new LinkedBlockingQueue<>());
 
-        mExecutor = Executors.newCachedThreadPool();
-        mExecutorGroups = Executors.newCachedThreadPool();
+      //  mExecutor = Executors.newCachedThreadPool();
+      //  mExecutorGroups = Executors.newCachedThreadPool();
 
     }
 
@@ -352,6 +326,7 @@ public class MatrixConnection extends ImConnection {
 
     private void loginAsync (String password)
     {
+        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
         String username = mUser.getAddress().getUser();
         setState(ImConnection.LOGGING_IN, null);
@@ -369,7 +344,8 @@ public class MatrixConnection extends ImConnection {
             mCredentials = new Credentials();
             try {
                 JsonParser parser = new JsonParser();
-                String json = IOUtils.readToString(new FileInputStream(fileCredsJson));
+
+                String json = IOUtils.toString(new FileInputStream(fileCredsJson));
                 JsonObject jCreds = parser.parse(json).getAsJsonObject();
 
                 mCredentials = new Credentials();
@@ -694,7 +670,7 @@ public class MatrixConnection extends ImConnection {
     {
 
         mExecutorGroups.execute(() -> {
-
+            /**
             Collection<Room> rooms = mStore.getRooms();
 
             for (Room room : rooms)
@@ -703,7 +679,7 @@ public class MatrixConnection extends ImConnection {
                     ChatGroup group = addRoomContact(room);
                 }
 
-            }
+            }**/
 
             mContactListManager.loadContactListsAsync();
 
@@ -794,6 +770,8 @@ public class MatrixConnection extends ImConnection {
 
     protected void updateGroupMembersAsync (final Room room, final ChatGroup group)
     {
+        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST);
+
         if (!room.getState().isPublic())
         {
             room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
@@ -1591,7 +1569,9 @@ public class MatrixConnection extends ImConnection {
                 mediaUrl = fileMessage.getUrl();
                 encryptedFileInfo = fileMessage.file;
                 thumbUrl = fileMessage.getThumbnailUrl();
-                encryptedThumbInfo = fileMessage.info.thumbnail_file;
+
+                if (fileMessage.info != null)
+                    encryptedThumbInfo = fileMessage.info.thumbnail_file;
 
             }
 

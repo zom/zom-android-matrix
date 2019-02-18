@@ -62,7 +62,9 @@ import android.widget.TextView;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
@@ -387,7 +389,6 @@ public class ConversationDetailActivity extends BaseActivity {
 
     void startImagePicker() {
         startActivityForResult(getPickImageChooserIntent(), REQUEST_SEND_IMAGE);
-
     }
 
     /**
@@ -403,7 +404,11 @@ public class ConversationDetailActivity extends BaseActivity {
 
         // collect all gallery intents
         Intent galleryIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        galleryIntent.setType("image/*");
+        galleryIntent.setType("*/*");
+
+        String[] mimetypes = {"image/*", "video/*"};
+        galleryIntent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
+
         List<ResolveInfo> listGallery = packageManager.queryIntentActivities(galleryIntent, 0);
         for (ResolveInfo res : listGallery) {
             Intent intent = new Intent(galleryIntent);
@@ -690,6 +695,11 @@ public class ConversationDetailActivity extends BaseActivity {
                     throw new IOException("Error deleting " + contentUri);
                 }
             }
+
+            if (info.stream != null)
+                info.stream.close();
+
+
         } catch (Exception e) {
             //  Toast.makeText(this, "Error sending file", Toast.LENGTH_LONG).show(); // TODO i18n
             Log.e(LOG_TAG, "error sending file", e);
@@ -743,19 +753,44 @@ public class ConversationDetailActivity extends BaseActivity {
                     return ;
                 }
 
+
                 ShareRequest request = new ShareRequest();
                 request.deleteFile = false;
                 request.resizeImage = true;
                 request.importContent = true;
                 request.media = uri;
-                request.mimeType = "image/jpeg";
+                request.mimeType = resultIntent.getType();
 
-                try {
-                    mConvoView.setMediaDraft(request);
+                if (TextUtils.isEmpty(request.mimeType)) {
+                    // import
+                    SystemServices.FileInfo info = null;
+                    try {
+                        info = SystemServices.getFileInfoFromURI(this, request.media);
+                        request.mimeType = info.type;
+                        info.stream.close();
+                    } catch (Exception e) {
+
+                    }
+
                 }
-                catch (Exception e){
-                    Log.w(LOG_TAG,"error setting media draft",e);
+
+                if (request.mimeType.startsWith("image"))
+                {
+                    try {
+                        mConvoView.setMediaDraft(request);
+                    }
+                    catch (Exception e){
+                        Log.w(LOG_TAG,"error setting media draft",e);
+                    }
                 }
+                else {
+                    boolean deleteFile = false;
+                    boolean resizeImage = false;
+                    boolean importContent = true; //let's import it!
+
+                    handleSendDelete(uri, request.mimeType, deleteFile, resizeImage, importContent);
+                }
+
 
             }
             else if (requestCode == REQUEST_SEND_FILE || requestCode == REQUEST_SEND_AUDIO) {
