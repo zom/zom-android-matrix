@@ -334,7 +334,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
       //  }
     }
 
-    public void sendMessage(String text, boolean isResend, boolean isEphemeral) {
+    public void sendMessage(String text, boolean isResend, boolean isEphemeral, boolean setLastMessage) {
 
         if (mConnection.getState() != ImConnection.LOGGED_IN) {
             // connection has been suspended, save the message without send it
@@ -355,7 +355,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
             if (!isEphemeral) {
                 insertMessageInDb(null, text, sendTime, msg.getType(), 0, msg.getID(), null);
-                setLastMessage(text);
+
+                if (setLastMessage)
+                    setLastMessage(text);
             }
             else
             {
@@ -702,7 +704,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         }
                     }
                     else {
-                        sendMessage(body, false, false);
+                        sendMessage(body, false, false, false);
                     }
                 }
             }
