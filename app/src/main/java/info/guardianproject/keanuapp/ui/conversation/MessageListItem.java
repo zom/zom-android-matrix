@@ -179,12 +179,10 @@ public class MessageListItem extends FrameLayout {
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
-        /**
         if (mHolder.mAudioWife != null)
         {
-            mHolder.mAudioWife.release();
-
-        }**/
+            mHolder.mAudioWife.pause();
+        }
 
     }
 
@@ -528,6 +526,7 @@ public class MessageListItem extends FrameLayout {
 
         if (holder.mAudioWife != null)
         {
+            holder.mAudioWife.pause();
             holder.mAudioWife.release();
         }
 
