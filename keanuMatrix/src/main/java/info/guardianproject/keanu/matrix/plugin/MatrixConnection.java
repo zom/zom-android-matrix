@@ -155,14 +155,8 @@ public class MatrixConnection extends ImConnection {
         mChatGroupManager = new MatrixChatGroupManager(context, this);
         mChatSessionManager = new MatrixChatSessionManager(context, this);
 
-       //mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
-         //      new LinkedBlockingQueue<>());
-
-     /// mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS,
-        //      new LinkedBlockingQueue<>());
-
-          mExecutor = Executors.newCachedThreadPool();
-          mExecutorGroups = Executors.newCachedThreadPool();
+        mExecutor = Executors.newCachedThreadPool();
+        mExecutorGroups = Executors.newCachedThreadPool();
 
     }
 
@@ -694,8 +688,6 @@ public class MatrixConnection extends ImConnection {
         MatrixAddress mAddr = new MatrixAddress(room.getRoomId());
 
         final ChatGroup group = mChatGroupManager.getChatGroup(mAddr);
-        if (group.isLoaded())
-            return group;
 
         String subject = room.getRoomDisplayName(mContext);
 
@@ -773,39 +765,36 @@ public class MatrixConnection extends ImConnection {
     {
         android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST);
 
-        if (!room.getState().isPublic())
-        {
-            room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
-                @Override
-                public void onNetworkError(Exception e) {
-                    debug("Network error syncing active members", e);
+        room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
+            @Override
+            public void onNetworkError(Exception e) {
+                debug("Network error syncing active members", e);
 
 
-                }
+            }
 
-                @Override
-                public void onMatrixError(MatrixError matrixError) {
-                    debug("Matrix error syncing active members", matrixError);
-
-
-                }
-
-                @Override
-                public void onUnexpectedError(Exception e) {
-
-                    debug("Error syncing active members", e);
+            @Override
+            public void onMatrixError(MatrixError matrixError) {
+                debug("Matrix error syncing active members", matrixError);
 
 
-                }
+            }
 
-                @Override
-                public void onSuccess(final List<RoomMember> roomMembers) {
+            @Override
+            public void onUnexpectedError(Exception e) {
 
-                    mExecutorGroups.execute(new GroupMemberLoader(room, group, roomMembers));
+                debug("Error syncing active members", e);
 
-                }
-            });
-        }
+
+            }
+
+            @Override
+            public void onSuccess(final List<RoomMember> roomMembers) {
+
+                mExecutorGroups.execute(new GroupMemberLoader(room, group, roomMembers));
+
+            }
+        });
 
     }
 
@@ -976,7 +965,7 @@ public class MatrixConnection extends ImConnection {
 
             }
             else if (event.getType().equals(Event.EVENT_TYPE_STATE_ROOM_NAME)) {
-                mExecutor.execute(() -> {
+                mExecutorGroups.execute(() -> {
                     ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(event.roomId);
                     if (csa != null) {
                         String newName = event.getContent().getAsJsonObject().get("name").getAsString();
@@ -987,6 +976,18 @@ public class MatrixConnection extends ImConnection {
                         }
                     }
 
+                });
+            }
+            else if (event.getType().equals(Event.EVENT_TYPE_STATE_ROOM_AVATAR)) {
+                mExecutorGroups.execute(() -> {
+                    Room room = mStore.getRoom(event.roomId);
+                    String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(room.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+
+                    if (!TextUtils.isEmpty(downloadUrl)) {
+                        if (!hasAvatar(room.getRoomId(), downloadUrl)) {
+                            downloadAvatar(room.getRoomId(), downloadUrl);
+                        }
+                    }
                 });
             }
 
@@ -1131,7 +1132,7 @@ public class MatrixConnection extends ImConnection {
             debug ("onNewRoom: " + s);
 
             final Room room = mStore.getRoom(s);
-            handleRoomInvite (room, null);
+            handleRoomInvite (room, s);
 
 
         }
