@@ -164,9 +164,8 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
                                     @Override
                                     public void onChatSessionCreated(IChatSession session) throws RemoteException {
 
-                                        session.sendMessage(migrateMessage, false);
-
-
+                                        session.sendMessage(migrateMessage, false, false);
+                                        
                                         //archive existing contact
                                         clManager.archiveContact(contact, session.isGroupChatSession() ? Imps.Contacts.TYPE_NORMAL : Imps.Contacts.TYPE_GROUP, true);
                                     }

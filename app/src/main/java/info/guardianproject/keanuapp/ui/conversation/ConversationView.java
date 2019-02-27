@@ -1958,7 +1958,7 @@ public class ConversationView {
             createChatSession();
         else {
             try {
-                session.sendMessage(msg, isResend);
+                session.sendMessage(msg, isResend, false);
                 return true;
                 //requeryCursor();
             } catch (RemoteException e) {
