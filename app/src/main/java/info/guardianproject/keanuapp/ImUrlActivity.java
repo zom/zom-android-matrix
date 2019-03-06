@@ -403,7 +403,7 @@ public class ImUrlActivity extends Activity {
         Uri data = intent.getData();
         mHost = data.getHost();
 
-        if (data.getScheme().equals("https") && mHost.equals("zom.im"))
+        if (data.getScheme().equals("https"))
         {
             //special zom.im invite link: https://zom.im/invite/<base64 encoded username?k=otrFingerprint
 
@@ -428,71 +428,12 @@ public class ImUrlActivity extends Activity {
             }
 
         }
-        else if (data.getScheme().equals("immu")) {
-            mFromAddress = data.getUserInfo();
-
-            //remove username non-letters
-            mFromAddress = mFromAddress.replaceAll(USERNAME_ONLY_ALPHANUM, "").toLowerCase(Locale.ENGLISH);
-
-            String chatRoom = null;
-
-            if (data.getPathSegments().size() > 0)
-            {
-                chatRoom = data.getPathSegments().get(0);
-
-                //replace chat room name non-letters with underscores
-                chatRoom = chatRoom.replaceAll("[\\d[^\\w]]+", "_");
-
-                mToAddress = chatRoom + '@' + mHost;
-
-                mProviderName = findMatchingProvider(mHost);
-
-                return true;
-            }
-
-            return false;
-
-        }
         else if (data.getScheme().equals("otr-in-band")) {
             this.openOtrInBand(data, intent.getType());
 
             return true;
         }
-        else if (data.getScheme().equals("xmpp")) {
-            mToAddress = data.getSchemeSpecificPart();
 
-            try {
-                //parse each string and if they are for a new user then add the user
-                String[] parts =  mToAddress.split("\\?subscribe&otr-fingerprint=");
-
-                ImApp app = (ImApp)getApplication();
-                app.initAccountInfo();
-
-                String username =parts[0];
-                String fingerprint = null;
-                String nickname = null;
-
-                if (parts.length > 1)
-                    fingerprint = parts[1];
-                if (parts.length > 2)
-                    nickname = parts[2];
-
-                new AddContactAsyncTask(app.getDefaultProviderId(), app.getDefaultAccountId()).executeOnExecutor(ImApp.sThreadPoolExecutor,username, fingerprint);
-
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("newcontact",username);
-                setResult(RESULT_OK,resultIntent);
-
-                //if they are for a group chat, then add the group
-                return false; //the work is done so we will finish!
-            }
-            catch (Exception e)
-            {
-                Log.w(LOG_TAG, "error parsing QR invite link", e);
-            }
-
-
-        }
 
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
             log("resolveIntent: host=" + mHost);
