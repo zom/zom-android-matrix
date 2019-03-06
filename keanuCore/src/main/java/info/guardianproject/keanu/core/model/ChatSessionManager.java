@@ -96,7 +96,10 @@ public abstract class ChatSessionManager {
                     listener.onChatSessionCreated(session);
                 }
 
+                sessionAdapter.getChatSession().updateParticipant(participant);
+
             }
+
 
         }
         else

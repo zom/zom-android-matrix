@@ -1381,14 +1381,17 @@ public class ConversationView {
 
 
     private void setGroupSeen() {
-        if (getChatSession() != null) {
-            try {
-                getChatSession().markAsSeen();
-            } catch (RemoteException e) {
-            }
-        }
 
-        mSubscriptionStatus = SUBSCRIPTION_STATUS_NONE;
+        try {
+            if (mCurrentChatSession != null)
+                mCurrentChatSession.markAsSeen();
+
+            mSubscriptionStatus = SUBSCRIPTION_STATUS_NONE;
+        }
+        catch (RemoteException re)
+        {
+            Log.e(getClass().getName(),"error setting subscription / markAsSeen()",re);
+        }
     }
 
 

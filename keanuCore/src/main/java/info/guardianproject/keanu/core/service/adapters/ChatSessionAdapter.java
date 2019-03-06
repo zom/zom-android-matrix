@@ -357,7 +357,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 insertMessageInDb(null, text, sendTime, msg.getType(), 0, msg.getID(), null);
 
                 if (setLastMessage)
-                    setLastMessage(text);
+                    setLastMessage(text, sendTime);
             }
             else
             {
@@ -414,7 +414,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         long sendTime = System.currentTimeMillis();
 
         insertMessageInDb(null, msgBody, sendTime, msg.getType(), 0, msg.getID(), mimeType);
-        setLastMessage(msgBody);
+        setLastMessage(msgBody,sendTime);
 
         return msg;
     }
@@ -741,6 +741,11 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     }
 
     public void markAsSeen() {
+
+
+        mChatSession.setSubscribed(true);
+        ((ChatGroup)mChatSession.getParticipant()).setJoined(true);
+
         Uri uriContact = ContentUris.withAppendedId(Imps.Contacts.CONTENT_URI, mContactId);
         Cursor c = mContentResolver.query(uriContact, new String[]{Imps.Contacts.TYPE}, null, null, null);
         if (c != null) {
@@ -749,14 +754,18 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(Imps.Contacts.TYPE, type & (~Imps.Contacts.TYPE_FLAG_UNSEEN));
                 contentValues.put(Imps.Contacts.SUBSCRIPTION_STATUS,Imps.Contacts.SUBSCRIPTION_STATUS_NONE);
-                mContentResolver.update(uriContact, contentValues, null, null);
+                int rowsUpdated = mContentResolver.update(uriContact, contentValues, null, null);
+
+                if (rowsUpdated == 0)
+                {
+                    rowsUpdated = mContentResolver.update(uriContact, contentValues, null, null);
+                }
 
                 mChatSessionManager.getChatGroupManager().acceptInvitationAsync(getAddress());
             }
             c.close();
         }
 
-        mChatSession.setSubscribed(true);
     }
 
     String getNickName(String username) {
@@ -813,7 +822,12 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     public void setLastMessage (String message)
     {
-        setLastMessageForUri(message);
+        setLastMessageForUri(message, System.currentTimeMillis());
+    }
+
+    public void setLastMessage (String message, long lastMessageTime)
+    {
+        setLastMessageForUri(message, lastMessageTime);
     }
 
     private boolean hasLastMessage ()
@@ -830,11 +844,11 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     }
 
-    private Uri setLastMessageForUri(String message) {
+    private Uri setLastMessageForUri(String message, long lastMessageTime) {
 
         ContentValues values = new ContentValues(4);
 
-        values.put(Imps.Chats.LAST_MESSAGE_DATE, System.currentTimeMillis());
+        values.put(Imps.Chats.LAST_MESSAGE_DATE, lastMessageTime);
         values.put(LAST_UNREAD_MESSAGE, message);
          values.put(Imps.Chats.GROUP_CHAT, mIsGroupChat);
          values.put(Imps.Chats.USE_ENCRYPTION,mUseEncryption);
@@ -1233,7 +1247,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             else
                 messageUri = insertMessageInDb(nickname, body, time, msg.getType(), 0, msg.getID(), msg.getContentType());
 
-            setLastMessage(body);
+            setLastMessage(body, time);
 
             if (messageUri == null) {
                 Log.e(TAG,"error saving message to the db: " + msg.getID());

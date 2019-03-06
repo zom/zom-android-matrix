@@ -285,6 +285,7 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
         }
 
         public void onJoinedGroup(ChatGroup group) {
+            group.setJoined(true);
             getChatSessionManager().createChatSession(group,false);
         }
 

@@ -366,7 +366,7 @@ public class ConversationListFragment extends Fragment {
 
         public ConversationListRecyclerViewAdapter(Context context, Cursor cursor) {
             super(context,cursor);
-            context.getTheme().resolveAttribute(R.attr.selectableItemBackground, mTypedValue, true);
+            context.getTheme().resolveAttribute(R.attr.chatBackground, mTypedValue, true);
             mBackground = mTypedValue.resourceId;
             mContext = context;
 
