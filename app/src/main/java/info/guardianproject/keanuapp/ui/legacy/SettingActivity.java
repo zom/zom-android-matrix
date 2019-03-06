@@ -59,23 +59,23 @@ public class SettingActivity extends PreferenceActivity {
     Preference mPanicConfig;
     ListPreference mLanguage;
 
-    CheckBoxPreference mDeleteUnsecuredMedia;
+ //   CheckBoxPreference mDeleteUnsecuredMedia;
     CheckBoxPreference mEnableNotification;
     CheckBoxPreference mNotificationVibrate;
     CheckBoxPreference mNotificationSound;
     CheckBoxPreference mAllowScreenshot;
-    EditTextPreference mHeartbeatInterval;
+ //   EditTextPreference mHeartbeatInterval;
 
     Preference mNotificationRingtone;
 
     private void setInitialValues() {
 
-        mDeleteUnsecuredMedia.setChecked(Preferences.getDeleteInsecureMedia());
+   //     mDeleteUnsecuredMedia.setChecked(Preferences.getDeleteInsecureMedia());
         mEnableNotification.setChecked(Preferences.isNotificationEnabled());
         mNotificationVibrate.setChecked(Preferences.getNotificationVibrate());
         mNotificationSound.setChecked(Preferences.getNotificationSound());
 
-        mHeartbeatInterval.setText(String.valueOf(Preferences.getHeartbeatInterval()));
+     //   mHeartbeatInterval.setText(String.valueOf(Preferences.getHeartbeatInterval()));
 
         ArrayList<CharSequence> entries = new ArrayList<CharSequence>();
         ArrayList<CharSequence> entryValues = new ArrayList<CharSequence>();
@@ -109,7 +109,7 @@ public class SettingActivity extends PreferenceActivity {
         mPanicConfig = (Preference) findPreference("pref_panic_config");
         mLanguage = (ListPreference) findPreference("pref_language");
 
-        mDeleteUnsecuredMedia = (CheckBoxPreference) findPreference("pref_delete_unsecured_media");
+   //     mDeleteUnsecuredMedia = (CheckBoxPreference) findPreference("pref_delete_unsecured_media");
         mEnableNotification = (CheckBoxPreference) findPreference("pref_enable_notification");
         mNotificationVibrate = (CheckBoxPreference) findPreference("pref_notification_vibrate");
         mNotificationSound = (CheckBoxPreference) findPreference("pref_notification_sound");
@@ -191,6 +191,7 @@ public class SettingActivity extends PreferenceActivity {
 
         });
 
+        /**
         findPreference("pref_clear_data").setOnPreferenceClickListener(new OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
@@ -204,10 +205,10 @@ public class SettingActivity extends PreferenceActivity {
 
                 return true;
             }
-        });
+        });**/
 
 
-        mHeartbeatInterval = (EditTextPreference) findPreference("pref_heartbeat_interval");
+      //  mHeartbeatInterval = (EditTextPreference) findPreference("pref_heartbeat_interval");
 
 
     }
