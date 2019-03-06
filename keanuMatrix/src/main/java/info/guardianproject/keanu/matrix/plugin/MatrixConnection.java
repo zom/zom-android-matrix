@@ -140,12 +140,8 @@ public class MatrixConnection extends ImConnection {
     private final static String HTTPS_PREPEND = "https://";
 
     private Handler mResponseHandler = new Handler();
-  //  private ThreadPoolExecutor mExecutor = null;
-   // private ThreadPoolExecutor mExecutorGroups = null;
-    private ExecutorService mExecutorGroups = null;
-    private ExecutorService mExecutor = null;
-
-    private final static int LARGE_GROUP_SIZE_THRESHOLD = 25;
+    private ThreadPoolExecutor mExecutor = null;
+    private ThreadPoolExecutor mExecutorGroups = null;
 
     public MatrixConnection (Context context)
     {
@@ -155,8 +151,8 @@ public class MatrixConnection extends ImConnection {
         mChatGroupManager = new MatrixChatGroupManager(context, this);
         mChatSessionManager = new MatrixChatSessionManager(context, this);
 
-        mExecutor = Executors.newCachedThreadPool();
-        mExecutorGroups = Executors.newCachedThreadPool();
+        mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
 
     }
 
@@ -1923,7 +1919,7 @@ public class MatrixConnection extends ImConnection {
         });
     }
 
-    private void handleRoomInvite (Room room, String sender)
+    private synchronized void handleRoomInvite (Room room, String sender)
     {
         MatrixAddress addrRoom = new MatrixAddress(room.getRoomId());
         MatrixAddress addrSender = null;
