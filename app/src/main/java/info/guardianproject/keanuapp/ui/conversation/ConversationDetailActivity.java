@@ -388,7 +388,38 @@ public class ConversationDetailActivity extends BaseActivity {
     }
 
     void startImagePicker() {
-        startActivityForResult(getPickImageChooserIntent(), REQUEST_SEND_IMAGE);
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        if (permissionCheck ==PackageManager.PERMISSION_DENIED)
+        {
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_EXTERNAL_STORAGE)) {
+
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+                Snackbar.make(mConvoView.getHistoryView(), R.string.grant_perms, Snackbar.LENGTH_LONG).show();
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        MY_PERMISSIONS_REQUEST_FILE);
+
+            }
+        }
+        else {
+
+
+            startActivityForResult(getPickImageChooserIntent(), REQUEST_SEND_IMAGE);
+
+        }
+
     }
 
     /**
@@ -633,9 +664,10 @@ public class ConversationDetailActivity extends BaseActivity {
                 if (info.type.startsWith("video"))
                 {
 
+                   Bitmap bitmap = null;
                    String videoPath = new SystemServices().getUriRealPath(this, contentUri);
                    if (!TextUtils.isEmpty(videoPath)) {
-                       Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.MINI_KIND);
+                       bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.MINI_KIND);
 
                        if (bitmap != null){
                            String thumbPath = sendUri.getPath() + ".thumb.jpg";
@@ -643,7 +675,8 @@ public class ConversationDetailActivity extends BaseActivity {
                            bitmap.compress(Bitmap.CompressFormat.JPEG,100,new info.guardianproject.iocipher.FileOutputStream(fileThumb));
                        }
                    }
-                   else
+
+                   if (bitmap == null)
                    {
 
                        long videoId = -1;
@@ -660,7 +693,7 @@ public class ConversationDetailActivity extends BaseActivity {
 
                        if (videoId != -1)
                        {
-                           Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(
+                           bitmap = MediaStore.Video.Thumbnails.getThumbnail(
                                    getContentResolver(), videoId,
                                    MediaStore.Images.Thumbnails.MINI_KIND,
                                    (BitmapFactory.Options) null);
