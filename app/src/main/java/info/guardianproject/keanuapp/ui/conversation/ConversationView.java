@@ -1251,40 +1251,45 @@ public class ConversationView {
 
             mSubscriptionStatus = c.getInt(SUBSCRIPTION_STATUS_COLUMN);
 
-            showJoinGroupUI();
+            if (!hasJoined())
+                showJoinGroupUI();
 
         }
 
 
     }
 
+    private boolean hasJoined ()
+    {
+        return mSubscriptionStatus == Imps.Contacts.SUBSCRIPTION_STATUS_NONE;
+    }
 
     private void showJoinGroupUI ()
     {
         final View joinGroupView = mActivity.findViewById(R.id.join_group_view);
 
-            if (mSubscriptionStatus == Imps.Contacts.SUBSCRIPTION_STATUS_SUBSCRIBE_PENDING) {
-                joinGroupView.setVisibility(View.VISIBLE);
+        joinGroupView.setVisibility(View.VISIBLE);
 
-                final View btnJoinAccept = joinGroupView.findViewById(R.id.btnJoinAccept);
-                final View btnJoinDecline = joinGroupView.findViewById(R.id.btnJoinDecline);
-                final TextView title = joinGroupView.findViewById(R.id.room_join_title);
+        final View btnJoinAccept = joinGroupView.findViewById(R.id.btnJoinAccept);
+        final View btnJoinDecline = joinGroupView.findViewById(R.id.btnJoinDecline);
+        final TextView title = joinGroupView.findViewById(R.id.room_join_title);
 
-                title.setText(title.getContext().getString(R.string.room_invited, mRemoteNickname));
+        title.setText(title.getContext().getString(R.string.room_invited, mRemoteNickname));
 
-                btnJoinAccept.setOnClickListener(new View.OnClickListener() {
+        btnJoinAccept.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                getChatSession(new AsyncTask() {
                     @Override
-                    public void onClick(View v) {
-
+                    protected Object doInBackground(Object[] objects) {
 
                         getChatSession(new AsyncTask() {
                             @Override
                             protected Object doInBackground(Object[] objects) {
 
-                                if (mCurrentChatSession != null) {
-                                    setGroupSeen();
-
-                                }
+                                if (mCurrentChatSession != null)
+                                        setGroupSeen();
 
                                 return null;
                             }
@@ -1293,47 +1298,55 @@ public class ConversationView {
                             protected void onPostExecute(Object o) {
                                 super.onPostExecute(o);
 
-                                joinGroupView.setVisibility(View.GONE);
                             }
                         });
+
+
+                        return null;
                     }
-                });
-                btnJoinDecline.setOnClickListener(new View.OnClickListener() {
+
                     @Override
-                    public void onClick(View v) {
+                    protected void onPostExecute(Object o) {
+                        super.onPostExecute(o);
 
-                        getChatSession(new AsyncTask() {
-                            @Override
-                            protected Object doInBackground(Object[] objects) {
-
-                                if (mCurrentChatSession != null) {
-                                    try {
-                                        mCurrentChatSession.leave();
-
-                                    }
-                                    catch (RemoteException re){}
-                                }
-
-                                return null;
-                            }
-
-                            @Override
-                            protected void onPostExecute(Object o) {
-                                super.onPostExecute(o);
-
-                                //clear the stack and go back to the main activity
-                                Intent intent = new Intent(v.getContext(), MainActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                v.getContext().startActivity(intent);
-                            }
-                        });
-
-
+                        joinGroupView.setVisibility(View.GONE);
                     }
                 });
-            } else {
-                joinGroupView.setVisibility(View.GONE);
             }
+        });
+        btnJoinDecline.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                getChatSession(new AsyncTask() {
+                    @Override
+                    protected Object doInBackground(Object[] objects) {
+
+                        if (mCurrentChatSession != null) {
+                            try {
+                                mCurrentChatSession.leave();
+
+                            }
+                            catch (RemoteException re){}
+                        }
+
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Object o) {
+                        super.onPostExecute(o);
+
+                        //clear the stack and go back to the main activity
+                        Intent intent = new Intent(v.getContext(), MainActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        v.getContext().startActivity(intent);
+                    }
+                });
+
+
+            }
+        });
 
 
     }
@@ -2034,6 +2047,7 @@ public class ConversationView {
             isConnected = false;
         }
 
+        /**
         if (this.isGroupChat())
         {
 
@@ -2064,8 +2078,7 @@ public class ConversationView {
 
             }
 
-
-        }
+        }**/
 
 
     }
