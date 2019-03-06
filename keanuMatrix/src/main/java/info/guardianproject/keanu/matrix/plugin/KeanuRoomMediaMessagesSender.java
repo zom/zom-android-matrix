@@ -1036,10 +1036,10 @@ class KeanuRoomMediaMessagesSender {
         final String url;
         final String fMimeType;
 
-        if (mediaMessage.isThumbnailLocalContent()) {
+        if (isThumbnailLocalContent(mediaMessage)) {
             url = mediaMessage.getThumbnailUrl();
             fMimeType = "image/jpeg";
-        } else if (mediaMessage.isLocalContent()||mediaMessage.getUrl().startsWith("vfs:")) {
+        } else if (isLocalContent(mediaMessage)) {
             url = mediaMessage.getUrl();
             fMimeType = mediaMessage.getMimeType();
         } else {
@@ -1158,7 +1158,7 @@ class KeanuRoomMediaMessagesSender {
                             mUiHandler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    boolean isThumbnailUpload = mediaMessage.isThumbnailLocalContent();
+                                    boolean isThumbnailUpload = isThumbnailLocalContent(mediaMessage);
 
                                     if (isThumbnailUpload) {
                                         mediaMessage.setThumbnailUrl(encryptionResult, contentUri);
@@ -1229,5 +1229,15 @@ class KeanuRoomMediaMessagesSender {
         return true;
     }
 
+
+    public boolean isThumbnailLocalContent(MediaMessage message) {
+        String thumbUrl = message.getThumbnailUrl();
+        return null != thumbUrl && (thumbUrl.startsWith("file://")||thumbUrl.startsWith("vfs:"));
+    }
+
+    public boolean isLocalContent(MediaMessage message) {
+        String url = message.getUrl();
+        return null != url && (url.startsWith("file://")||url.startsWith("vfs:"));
+    }
 
 }
