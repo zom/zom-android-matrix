@@ -96,16 +96,19 @@
             <Button
                 android:id="@+id/btnAddFriend"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
+                android:layout_height="wrap_content"
                 android:layout_below="@id/input_contact_label"
                 android:layout_centerHorizontal="true"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="14dp"
+                android:layout_gravity="center_horizontal|center_vertical"
+                android:layout_marginTop="28dp"
                 android:background="@drawable/rounded_rect_primary"
                 android:paddingEnd="30dp"
                 android:paddingLeft="30dp"
                 android:paddingRight="30dp"
                 android:paddingStart="30dp"
+                android:paddingTop="9dp"
+                android:paddingBottom="9dp"
+
                 android:text="@string/action_add_buddy"
                 android:textAllCaps="false"
                 android:textColor="@android:color/white"
@@ -114,7 +117,7 @@
             <View
                 android:id="@+id/spacer"
                 android:layout_width="match_parent"
-                android:layout_height="26dp"
+                android:layout_height="48dp"
                 android:layout_alignBottom="@id/image"
                 android:background="@android:color/white" />
 
@@ -123,7 +126,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/input_contact_label"
-                android:layout_marginTop="34dp"
+                android:layout_marginTop="68dp"
                 android:adjustViewBounds="true"
                 android:maxHeight="150dp"
                 android:paddingEnd="12dp"
