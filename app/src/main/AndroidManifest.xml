@@ -131,8 +131,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="matrix.org"
-                    android:pathPrefix="/i/"
+                    android:host="matrix.to"
+                    android:pathPrefix="/#/"
                     android:scheme="https" />
             </intent-filter>
 
