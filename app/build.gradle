@@ -12,8 +12,8 @@ android {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 2005
-        versionName "2.0.0-BETA-5"
+        versionCode 20025
+        versionName "2.0.0-RC-1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -59,8 +59,8 @@ android {
 
          altbrand {
              dimension "release"
-	     //applicationId "im.zom.matrix"
-	     applicationId "im.zom.messenger"
+	         applicationId "im.zom.matrix"
+	     //applicationId "im.zom.messenger"
          }
 
      }
