@@ -56,6 +56,7 @@ public class VideoViewActivity extends AppCompatActivity {
     private String accessToken = null;
 
     private SimpleExoPlayerView mPlayerView = null;
+    private SimpleExoPlayer mExoPlayer;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -97,13 +98,13 @@ public class VideoViewActivity extends AppCompatActivity {
                 new DefaultTrackSelector(videoTrackSelectionFactory);
 
         // 2. Create the player
-        SimpleExoPlayer exoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+        mExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
 
         ////Set media controller
         mPlayerView.setUseController(true);//set to true or false to see controllers
         mPlayerView.requestFocus();
         // Bind the player to the view.
-        mPlayerView.setPlayer(exoPlayer);
+        mPlayerView.setPlayer(mExoPlayer);
 
         DataSpec dataSpec = new DataSpec(mMediaUri);
         final InputStreamDataSource inputStreamDataSource = new InputStreamDataSource(this, dataSpec);
@@ -123,8 +124,16 @@ public class VideoViewActivity extends AppCompatActivity {
         MediaSource audioSource = new ExtractorMediaSource(inputStreamDataSource.getUri(),
                 factory, new DefaultExtractorsFactory(), null, null);
 
-        exoPlayer.prepare(audioSource);
-        exoPlayer.setPlayWhenReady(true); //run file/link when ready to play.
+        mExoPlayer.prepare(audioSource);
+        mExoPlayer.setPlayWhenReady(true); //run file/link when ready to play.
+
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        mExoPlayer.stop();
 
     }
 

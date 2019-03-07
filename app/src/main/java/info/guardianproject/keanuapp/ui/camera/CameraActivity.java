@@ -79,7 +79,8 @@ public class CameraActivity extends AppCompatActivity {
     boolean isRecordingVideo = false;
     Bitmap thumbnail = null;
 
-    private final static int MAX_LENGTH_MS = 30 * 1000;
+   // private final static int MAX_LENGTH_MS = 60 * 2 * 1000;
+    private final static int MAX_FILE_SIZE = 100 * 1024 * 1024;
 
     private Handler mHandler = new Handler ()
     {
@@ -258,7 +259,10 @@ public class CameraActivity extends AppCompatActivity {
     private void startVideoRecording ()
     {
         mCameraView.setMode(Mode.VIDEO);
-        mCameraView.setVideoMaxDuration(MAX_LENGTH_MS);
+
+        //mCameraView.setVideoMaxDuration(MAX_LENGTH_MS);
+        mCameraView.setVideoMaxSize(MAX_FILE_SIZE);
+
         mCameraView.setVideoCodec(VideoCodec.H_264);
 
         mCameraView.setVideoBitRate(VIDEO_KBITRATE * 1000);

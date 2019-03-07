@@ -66,6 +66,8 @@ import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
 import com.github.javiersantos.appupdater.enums.UpdateFrom;
 
+import org.w3c.dom.Text;
+
 import info.guardianproject.iocipher.VirtualFileSystem;
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.Contact;
@@ -557,20 +559,23 @@ public class MainActivity extends BaseActivity {
                     try {
 
                         String address = null;
+                        Uri uriScan = Uri.parse(resultScan);
 
-                        if (resultScan.startsWith("keanu:"))
+                        if (!TextUtils.isEmpty(uriScan.getQueryParameter("id")))
                         {
-                            List<String> lAddr = Uri.parse(resultScan).getQueryParameters("id");
+                            List<String> lAddr = uriScan.getQueryParameters("id");
 
                             if (lAddr != null && lAddr.size() > 0)
-                            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(lAddr.get(0), null);
+                                new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(lAddr.get(0), null);
 
                         }
                         else {
                             //parse each string and if they are for a new user then add the user
                             OnboardingManager.DecodedInviteLink diLink = OnboardingManager.decodeInviteLink(resultScan);
 
-                            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(diLink.username,diLink.fingerprint,diLink.nickname);
+                            if (diLink != null && TextUtils.isEmpty(diLink.username))
+                                new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(diLink.username, diLink.fingerprint, diLink.nickname);
+
                         }
 
                         if (address != null)

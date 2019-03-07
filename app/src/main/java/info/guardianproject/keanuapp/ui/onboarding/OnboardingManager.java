@@ -134,35 +134,12 @@ public class OnboardingManager {
         Uri inviteLink = Uri.parse(link);
         String[] code = inviteLink.toString().split("#");
 
-        if (code.length == 1
-                && inviteLink.getScheme() != null
-                && inviteLink.getScheme().toLowerCase().equals(DEFAULT_SCHEME)) {
-
-            diLink = new DecodedInviteLink();
-
-            String parseLink = link.substring(DEFAULT_SCHEME.length());
-
-            int idx = -1;
-
-            if ((idx = parseLink.indexOf("?"))!=-1)
-                parseLink = parseLink.substring(0,idx);
-
-            diLink.username = parseLink;
-            diLink.isMigration = false;
-
-            if ((idx = link.indexOf("otr-fingerprint"))!=-1)
-                diLink.fingerprint = link.substring(idx+16);
-
-            diLink.nickname = null;
-
-        }
-        else if (code[0].contains("/i/")){
+        if (code[0].contains("/i/")){
 
             //this is an invite link
             try {
                 String out = new String(Base64.decode(code[1], Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING));
 
-//                String[] parts = out.split("\\?otr=");
                 String[] partsTemp = out.split("\\?");
 
                 if (partsTemp == null)
@@ -206,6 +183,21 @@ public class OnboardingManager {
             catch (IllegalArgumentException iae)
             {
              Log.e(LOG_TAG,"bad link decode",iae);
+            }
+        }
+        else if (link.contains("/#/")){
+
+            //this is an invite link
+            try {
+                String matrixContact = link.substring(link.lastIndexOf("/")+1);
+
+                diLink = new DecodedInviteLink();
+                diLink.username = matrixContact;
+
+            }
+            catch (IllegalArgumentException iae)
+            {
+                Log.e(LOG_TAG,"bad link decode",iae);
             }
         }
 
