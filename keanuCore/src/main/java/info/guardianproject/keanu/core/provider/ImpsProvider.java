@@ -92,8 +92,9 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
     private static final String TABLE_CSP_DEVICES = "csp_device";
     private static final String TABLE_CSP_TOKENS = "csp_tokens";
 
-    private static final String ENCRYPTED_DATABASE_NAME = "impsenc.db";
-    private static final String UNENCRYPTED_DATABASE_NAME = "imps.db";
+    private static final String LEGACY_ENCRYPTED_DATABASE_NAME = "impsenc.db";
+    private static final String LEGACY_UNENCRYPTED_DATABASE_NAME = "imps.db";
+    private static final String DATABASE_NAME = "keanu.db";
 
     private static final int DATABASE_VERSION = 113;
 
@@ -344,14 +345,10 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
         private SQLiteDatabase dbRead;
         private SQLiteDatabase dbWrite;
 
-        boolean mInMemoryDB = false;
-        String mKey = null;
+        String mKey;
 
-        boolean doCleanup = false;
-        
-        DatabaseHelper(Context context, byte[] key, boolean inMemoryDb) throws Exception {
+        DatabaseHelper(Context context, byte[] key) throws Exception {
             super(context, mDatabaseName, null, mDatabaseVersion);
-            mInMemoryDB = inMemoryDb;
             mKey = SQLCipherOpenHelper.encodeRawKeyToStr(key);
         }
 
@@ -597,6 +594,7 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                     db.endTransaction();
                 }
 
+                /**
                 if (mInMemoryDB) { //this should actually be if mInMemoryDB = true, then update the table
 
                         try {
@@ -612,7 +610,7 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                             db.endTransaction();
                         }
 
-                }
+                }**/
 
 
             case 104:
@@ -953,19 +951,7 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                 log("##### createTransientTables");
 
 
-            // Create transient tables
-            String cpDbName;
-
-            if (mInMemoryDB)
-            {
-                db.execSQL("ATTACH DATABASE ':memory:' AS " + mTransientDbName + ";");
-                cpDbName = mTransientDbName + ".";
-            }
-            else
-            {
-               cpDbName = "";
-            }
-
+            String cpDbName = "";
             // in-memory message table
             createInMemoryMessageTables(db, cpDbName);
 
@@ -1360,16 +1346,11 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
         mCacheword.detach();
     }
 
-    private void setDatabaseName(boolean isEncrypted) {
-        mDatabaseName = isEncrypted ? ENCRYPTED_DATABASE_NAME : UNENCRYPTED_DATABASE_NAME;
-        mTransientDbName = "transient_" + mDatabaseName.replace(".", "_");
-    }
-
     private synchronized DatabaseHelper initDBHelper(byte[] pkey, boolean noCreate) throws Exception {
         synchronized (mDbHelperLock) {
             if (mDbHelper == null) {
                 if (pkey != null) {
-                    setDatabaseName(pkey != null);
+                    mDatabaseName = DATABASE_NAME;
                     Context ctx = getContext();
                     String path = ctx.getDatabasePath(mDatabaseName).getPath();
                     if (noCreate && !new File(path).exists()) {
@@ -1377,9 +1358,15 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                         return null;
                     }
 
-                    boolean inMemoryDb = false;
+                    File fileLegacyDb = new File(LEGACY_ENCRYPTED_DATABASE_NAME);
+                    if (fileLegacyDb.exists())
+                        fileLegacyDb.delete();
 
-                    mDbHelper = new DatabaseHelper(ctx, pkey, inMemoryDb);
+                    fileLegacyDb = new File(LEGACY_UNENCRYPTED_DATABASE_NAME);
+                    if (fileLegacyDb.exists())
+                        fileLegacyDb.delete();
+
+                    mDbHelper = new DatabaseHelper(ctx, pkey);
                     LogCleaner.debug(LOG_TAG, "Opened DB with key");
                     mDbHelperLock.notify();
 

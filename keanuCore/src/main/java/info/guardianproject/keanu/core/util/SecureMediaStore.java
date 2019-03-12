@@ -38,7 +38,8 @@ public class SecureMediaStore {
 
     public static final String TAG = SecureMediaStore.class.getName();
     private static String dbFilePath;
-    private static final String BLOB_NAME = "media.db";
+    private static final String BLOB_NAME = "keanumedia.db";
+    private static final String LEGACY_BLOB_NAME = "media.db";
 
     public static final int DEFAULT_IMAGE_WIDTH = 1080;
 
@@ -240,6 +241,16 @@ public class SecureMediaStore {
             Log.w(TAG, "VFS " + vfs.getContainerPath() + " issues with mounting: " + e.getMessage());
         }
 
+        deleteLegacy (context);
+
+    }
+
+    public static void deleteLegacy (Context context)
+    {
+        File fileLegacy = new File(getLegacyDbFilePath(context));
+        if (fileLegacy.exists())
+            fileLegacy.delete();
+
     }
 
     public static boolean isMounted ()
@@ -252,6 +263,10 @@ public class SecureMediaStore {
      */
     public static String getInternalDbFilePath(Context c) {
         return c.getFilesDir() + "/" + BLOB_NAME;
+    }
+
+    public static String getLegacyDbFilePath(Context c) {
+        return c.getFilesDir() + "/" + LEGACY_BLOB_NAME;
     }
 
     /**
