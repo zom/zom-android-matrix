@@ -237,8 +237,6 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
                     .build());
         }
 
-       // showFileSizes(getFilesDir());
-
 
     }
 

@@ -262,6 +262,7 @@ public class SecureMediaStore {
      * get the internal storage path for the chat media file storage file.
      */
     public static String getInternalDbFilePath(Context c) {
+
         return c.getFilesDir() + "/" + BLOB_NAME;
     }
 

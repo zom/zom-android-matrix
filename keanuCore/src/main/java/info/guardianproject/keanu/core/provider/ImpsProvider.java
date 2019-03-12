@@ -1358,11 +1358,11 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                         return null;
                     }
 
-                    File fileLegacyDb = new File(LEGACY_ENCRYPTED_DATABASE_NAME);
+                    File fileLegacyDb = new File(ctx.getDatabasePath(mDatabaseName).getPath());
                     if (fileLegacyDb.exists())
                         fileLegacyDb.delete();
 
-                    fileLegacyDb = new File(LEGACY_UNENCRYPTED_DATABASE_NAME);
+                    fileLegacyDb = new File(ctx.getDatabasePath(mDatabaseName).getPath());
                     if (fileLegacyDb.exists())
                         fileLegacyDb.delete();
 
