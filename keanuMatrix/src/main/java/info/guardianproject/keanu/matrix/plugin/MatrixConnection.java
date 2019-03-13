@@ -35,6 +35,7 @@ import org.matrix.androidsdk.listeners.IMXEventListener;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.callback.SimpleApiCallback;
 import org.matrix.androidsdk.rest.client.LoginRestClient;
+import org.matrix.androidsdk.rest.client.AccountDataRestClient;
 import org.matrix.androidsdk.rest.model.Event;
 import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.rest.model.PowerLevels;
@@ -227,7 +228,40 @@ public class MatrixConnection extends ImConnection {
         mProviderId = providerId;
         mAccountId = accountId;
 
-        mExecutor.execute(() -> loginAsync (password));
+        mExecutor.execute(() -> loginAsync (password, new LoginListener() {
+
+            @Override
+            public void onLoginSuccess() {
+
+            }
+
+            @Override
+            public void onLoginFailed(String message) {
+
+            }
+        }));
+
+    }
+
+    public void loginAsync(long accountId, final String password, long providerId, LoginListener listener) {
+
+        setState(LOGGING_IN, null);
+
+        mProviderId = providerId;
+        mAccountId = accountId;
+
+        mExecutor.execute(() -> loginAsync (password, listener));
+
+    }
+
+    public void checkAccount(long accountId, final String password, long providerId, LoginListener listener) {
+
+        setState(LOGGING_IN, null);
+
+        mProviderId = providerId;
+        mAccountId = accountId;
+
+        mExecutor.execute(() -> checkAccount (password, listener));
 
     }
 
@@ -312,9 +346,73 @@ public class MatrixConnection extends ImConnection {
 
         mLoginRestClient = new LoginRestClient(mConfig);
 
+
     }
 
-    private void loginAsync (String password)
+    private void checkAccount (String password, LoginListener listener)
+    {
+        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+
+        String username = mUser.getAddress().getUser();
+        setState(ImConnection.LOGGING_IN, null);
+
+        if (password == null)
+            password = Imps.Account.getPassword(mContext.getContentResolver(), mAccountId);
+
+        mLoginRestClient.loginWithUser(username, password, mDeviceName, mDeviceId, new SimpleApiCallback<Credentials>() {
+
+            @Override
+            public void onSuccess(Credentials credentials) {
+
+                if (listener != null)
+                    listener.onLoginSuccess();
+
+                mLoginRestClient.logout(new SimpleApiCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                    }
+                });
+            }
+
+
+            @Override
+            public void onNetworkError(Exception e) {
+                super.onNetworkError(e);
+
+                debug("loginWithUser: OnNetworkError", e);
+
+                if (listener != null)
+                    listener.onLoginFailed(e.getMessage());
+
+            }
+
+            @Override
+            public void onMatrixError(MatrixError e) {
+                super.onMatrixError(e);
+
+                if (listener != null)
+                    listener.onLoginFailed(e.getMessage());
+
+                debug("loginWithUser: onMatrixError: " + e.mErrorBodyAsString);
+
+            }
+
+            @Override
+            public void onUnexpectedError(Exception e) {
+                super.onUnexpectedError(e);
+
+                debug("loginWithUser: onUnexpectedError", e);
+                if (listener != null)
+                    listener.onLoginFailed(e.getMessage());
+
+
+            }
+        });
+
+    }
+
+    private void loginAsync (String password, LoginListener listener)
     {
         android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
@@ -351,7 +449,7 @@ public class MatrixConnection extends ImConnection {
             } catch (Exception e) {
                 debug("error reading from cred json",e);
                 fileCredsJson.delete();
-                loginAsync(password);
+                loginAsync(password, listener);
                 return;
             }
 
@@ -366,6 +464,9 @@ public class MatrixConnection extends ImConnection {
                 public void onSuccess(Credentials credentials) {
 
                     setState(ImConnection.LOGGING_IN, null);
+
+                    if (listener != null)
+                        listener.onLoginSuccess();
 
                     mCredentials = credentials;
 
@@ -398,9 +499,12 @@ public class MatrixConnection extends ImConnection {
 
                     setState(ImConnection.SUSPENDED, null);
 
+                    if (listener != null)
+                        listener.onLoginFailed(e.getMessage());
+
                     mResponseHandler.postDelayed(new Runnable() {
                         public void run() {
-                            loginAsync(null);
+                            loginAsync(null, listener);
                         }
                     }, 10000);
 
@@ -409,6 +513,9 @@ public class MatrixConnection extends ImConnection {
                 @Override
                 public void onMatrixError(MatrixError e) {
                     super.onMatrixError(e);
+
+                    if (listener != null)
+                        listener.onLoginFailed(e.getMessage());
 
                     debug("loginWithUser: onMatrixError: " + e.mErrorBodyAsString);
 
@@ -419,6 +526,8 @@ public class MatrixConnection extends ImConnection {
                     super.onUnexpectedError(e);
 
                     debug("loginWithUser: onUnexpectedError", e);
+                    if (listener != null)
+                        listener.onLoginFailed(e.getMessage());
 
 
                 }
@@ -1733,6 +1842,13 @@ public class MatrixConnection extends ImConnection {
         void onRegistrationFailed(String message);
 
         void onResourceLimitExceeded(MatrixError e);
+    }
+
+    public interface LoginListener {
+        void onLoginSuccess();
+
+        void onLoginFailed(String message);
+
     }
 
     /**
