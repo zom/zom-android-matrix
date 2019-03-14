@@ -191,6 +191,10 @@ public class AccountFragment extends Fragment {
     private void updateInfo ()
     {
         ImApp mApp = ((ImApp) getActivity().getApplication());
+
+        if (mApp.getDefaultUsername() == null)
+            return;
+
         mProviderId = mApp.getDefaultProviderId();
         mAccountId = mApp.getDefaultAccountId();
         mUserAddress = mApp.getDefaultUsername().trim();
