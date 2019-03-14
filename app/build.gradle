@@ -59,8 +59,8 @@ android {
          altbrand {
              dimension "release"
 	         //applicationId "im.zom.matrix"
-	       //applicationId "im.zom.messenger"
-             applicationId 'org.awesomeapp.messenger.debug'
+	         applicationId "im.zom.messenger"
+             //applicationId 'org.awesomeapp.messenger.debug'
          }
 
      }
@@ -92,7 +92,6 @@ dependencies {
     // use the matrix SDK as external lib
     implementation(name: 'matrix-sdk', ext: 'aar')
     implementation(name: 'olm-sdk', ext: 'aar')
-
 
     /*********** KeanuApp components **********/
     implementation(name: 'keanucore-0.0.1.16', ext: 'aar')
