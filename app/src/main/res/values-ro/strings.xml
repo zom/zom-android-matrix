@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <!--General: Permissions-->
+  <string name="ro_perm_label">citeste mesaje</string>
+  <string name="ro_perm_desc">Permite aplicatiilor sa citeasca date de la furnizorul de MI</string>
+  <string name="wo_perm_label">scrie mesaje</string>
+  <string name="perm_label">porneste serviciul de mesagerie</string>
+  <!--General: Actions-->
+  <string name="confirm">Confirma</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Anuleaza</string>
+  <string name="yes">OK</string>
+  <string name="no">Anuleaza</string>
+  <string name="connect">Conecteaza-te</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Alege Parola</string>
+  <string name="lock_screen_confirm_passphrase">Confirma Parola</string>
+  <string name="lock_screen_passphrase_hint">Parola</string>
+  <string name="lock_screen_passphrase_not_set_enter">Optional, poti alege o parola principala pentru Zom, ca sa previi accesul la contacte si mesaje fara o parola:</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Confirma Parola Noua</string>
+  <string name="lock_screen_passphrases_not_matching">Parolele nu coincid, mai incearca o data</string>
+  <string name="lock_screen_skip">Sari peste &gt;&gt;</string>
+  <!--Views: Setup-->
+  <string name="add_account">Adauga cont <xliff:g id="account">%1$s</xliff:g></string>
+  <string name="menu_about">Despre</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <!--Views: Settings: Account-->
+  <!--Views: Contact list-->
+  <!--Views: Chat: Single-->
+  <!--Views: Chat: Group-->
+  <!--Security: OTR-->
+  <!--Security: OTR: Keyring-->
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="otr_qa_cancel">Anuleaza</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <!--Actions: Settings: General: User Interface-->
+  <!--Actions: Settings: General: Other Tuning-->
+  <!--Actions: Settings: General: Notifications-->
+  <!--Actions: Settings: General: Developer-->
+  <!--Alerts: Dialogs-->
+  <!--Alerts: Notifications-->
+  <!--Alerts: Exceptions-->
+  <!--added 2011/09/01-->
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <!--Other: Provider-->
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <!--Other: Smileys-->
+  <!--[Do not localize!]-->
+</resources>

@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">चॅटसिक्यॉर</string>
+  <string name="app_name">चॅटसिक्यॉर</string>
+  <string name="im_label">चॅटसिक्यॉर</string>
+  <!--General: Permissions-->
+  <!--General: Actions-->
+  <string name="confirm">नक्की करा</string>
+  <string name="ok">ठीक आहे</string>
+  <string name="cancel">रद्द करा</string>
+  <string name="yes">ठीक आहे</string>
+  <string name="no">रद्द करा</string>
+  <!--Views-->
+  <string name="lock_screen_passphrase_hint">परवलीचा शब्द</string>
+  <!--Views: Setup-->
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <!--Views: Settings: Account-->
+  <!--Views: Contact list-->
+  <string name="search_label">संपर्क</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online"><xliff:g id="user">%1$s</xliff:g> ऑनलाइन आहेत</string>
+  <string name="contact_away"><xliff:g id="user">%1$s</xliff:g> बाहेर गेले आहेत</string>
+  <string name="contact_busy"><xliff:g id="user">%1$s</xliff:g> व्यस्त आहेत</string>
+  <string name="contact_offline"><xliff:g id="user">%1$s</xliff:g> ऑफलाइन आहेत</string>
+  <string name="contact_joined"><xliff:g id="user">%1$s</xliff:g> आले आहेत</string>
+  <string name="contact_left"><xliff:g id="user">%1$s</xliff:g> सोडून गेले</string>
+  <string name="menu_end_conversation">गप्पा थांबवा</string>
+  <!--Views: Chat: Group-->
+  <string name="accept_invitation">स्वीकार करा</string>
+  <string name="decline_invitation">नकार द्या</string>
+  <string name="connecting_to_group_chat_">सामूहिक गप्पांशी जोडत आहोत…</string>
+  <!--Security: OTR-->
+  <!--Security: OTR: Keyring-->
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="otr_qa_cancel">रद्द करा</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <!--Actions: Settings: General: User Interface-->
+  <!--Actions: Settings: General: Other Tuning-->
+  <!--Actions: Settings: General: Notifications-->
+  <!--Actions: Settings: General: Developer-->
+  <!--Alerts: Dialogs-->
+  <!--Alerts: Notifications-->
+  <!--Alerts: Exceptions-->
+  <!--added 2011/09/01-->
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <!--Other: Provider-->
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <!--Other: Smileys-->
+  <!--[Do not localize!]-->
+  <string name="title_me">मी</string>
+</resources>

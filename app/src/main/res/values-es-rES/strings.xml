@@ -1,0 +1,299 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Zom</string>
+  <string name="app_name">Zom</string>
+  <string name="im_label">Zom</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">leer mensajes instantáneos</string>
+  <string name="ro_perm_desc">Permite a las aplicaciones leer datos desde el proveedor de contenido de mensajería instantánea.    </string>
+  <string name="wo_perm_label">escribir mensajes </string>
+  <string name="wo_perm_desc">Permite a las aplicaciones escribir datos en el proveedor de contenido de mensajería instantánea.</string>
+  <string name="perm_label">iniciar servicio de MI</string>
+  <string name="perm_desc">Permitir que las aplicaciones inicien el servicio de MI mediante la ejecución de un intento.</string>
+  <!--General: Actions-->
+  <string name="confirm">Confirmar</string>
+  <string name="ok">Aceptar</string>
+  <string name="cancel">Cancelar</string>
+  <string name="yes">Aceptar</string>
+  <string name="no">Cancelar</string>
+  <string name="connect">Conectarse</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Establecer contraseña</string>
+  <string name="lock_screen_confirm_passphrase">Confirmar contraseña</string>
+  <string name="lock_screen_passphrase_hint">Contraseña</string>
+  <string name="lock_screen_passphrase_not_set_enter">Opcionalmente puede establecer una contraseña maestra para Zom, para evitar el acceso a sus contactos y mensajes sin una contraseña.</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Confirmar nueva contraseña</string>
+  <string name="lock_screen_passphrases_not_matching">La contraseña no coincide, por favor inténtelo de nuevo</string>
+  <string name="lock_screen_skip">Omitir &gt;&gt;</string>
+  <!--Views: Setup-->
+  <string name="add_account">Añadir cuenta <xliff:g id="ACCOUNT">%1$s</xliff:g></string>
+  <string name="menu_about">Acerca de</string>
+  <string name="signed_out_prompt_with_error">Se ha cerrado su sesión de <xliff:g id="account">%1$s</xliff:g> a causa de <xliff:g id="reason">%2$s</xliff:g></string>
+  <string name="pass_err_length">Su contraseña no es lo suficientemente larga</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Iniciar sesión</string>
+  <string name="account_setup_example_email_address">usuario@dominio.com</string>
+  <string name="account_setup_new_username">nuevo usuario</string>
+  <string name="account_setup_password">contraseña</string>
+  <string name="account_setup_password_confirm">confirmar contraseña</string>
+  <string name="btn_create_new_account">Registrar cuenta</string>
+  <string name="account_setup_pers_now_title">Iniciar sesión ahora</string>
+  <string name="select_domain_new_account">Dominio del servicio de chat</string>
+  <string name="registering_new_account_">Registrando nueva cuenta…</string>
+  <string name="signing_in_wait">Iniciando sesión</string>
+  <string name="signing_out_wait">Cerrar sesión\u2026</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">Hacer búsqueda SRV</string>
+  <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">Realizar una búsqueda SRV para encontrar el servidor XMPP a partir del nombre de dominio</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Permitir que el usuario y la contraseña sean enviados en texto plano cuando no se utiliza cifrado</string>
+  <string name="allow_plain_text_auth">Texto plano</string>
+  <string name="require_tls_ssl_connection">Requiere conexión TLS</string>
+  <string name="transport_encryption">Capa de transporte</string>
+  <string name="how_encrypted_chats_are_started">De qué manera comienzan las conversaciones cifradas</string>
+  <string name="the_server_to_connect_to_if_needed">El servidor al que conectarse, si es necesario</string>
+  <string name="connect_server">Servidor</string>
+  <string name="tcp_port_for_xmpp_server">Puerto TCP del servidor XMPP</string>
+  <string name="server_port">Puerto de servidor</string>
+  <string name="xmpp_resource">Recurso XMPP</string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">distinguir esta conexión de otros clientes que también han iniciado sesión</string>
+  <string name="xmpp_resource_prio_title">Prioridad del recurso</string>
+  <string name="xmpp_resource_prio_summary">Los mensajes a clientes con recursos múltiples activos serán enviados al recurso con la prioridad más alta</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">Conversaciones</string>
+  <string name="empty_account_message">No tiene
+cuentas configuradas.\n\n¡Pulse aquí para añadir una!</string>
+  <string name="menu_remove_contact">Borrar contacto</string>
+  <string name="menu_contact_nickname">Alias (nickname) de contacto</string>
+  <string name="menu_view_blocked">Bloqueados</string>
+  <string name="nickname">Apodo</string>
+  <string name="confirm_delete_contact">El contacto "<xliff:g id="USER">%1$s</xliff:g>" se eliminará.</string>
+  <string name="confirm_block_contact">El contacto "<xliff:g id="USER">%1$s</xliff:g>" se bloqueará.</string>
+  <string name="add_contact_success">Contacto "<xliff:g id="USER">%1$s</xliff:g>" añadido.</string>
+  <string name="delete_contact_success">Contacto "<xliff:g id="USER">%1$s</xliff:g>" eliminado.</string>
+  <string name="block_contact_success">Contacto "<xliff:g id="USER">%1$s</xliff:g>" bloqueado.</string>
+  <string name="unblock_contact_success">Contacto "<xliff:g id="USER">%1$s</xliff:g>" desbloqueado</string>
+  <string name="menu_verify">Verificar contacto</string>
+  <string name="empty_conversation_group">No hay conversaciones abiertas\n\n¡Pulse para iniciar conversación!</string>
+  <string name="search_label">Contacto</string>
+  <string name="search_hint">escriba el nombre del contacto para comenzar una conversación</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online"><xliff:g id="USER">%1$s</xliff:g> está conectado</string>
+  <string name="contact_away"><xliff:g id="USER">%1$s</xliff:g> está ausente</string>
+  <string name="contact_busy"><xliff:g id="USER">%1$s</xliff:g> está ocupado</string>
+  <string name="contact_offline"><xliff:g id="USER">%1$s</xliff:g> está desconectado</string>
+  <string name="contact_joined"><xliff:g id="USER">%1$s</xliff:g> se ha unido a la conversación</string>
+  <string name="contact_left"><xliff:g id="USER">%1$s</xliff:g> se ha desconectado</string>
+  <string name="file_transfer">Transferencia de fichero</string>
+  <string name="accept_transfer_">¿Aceptar transferencia?</string>
+  <string name="wants_to_send_you_the_file">quiere enviarle el fichero</string>
+  <string name="no_connection_for_sending">¡No hay conexiones disponibles para enviar su compartido!</string>
+  <string name="compose_hint">Enviar un mensaje</string>
+  <string name="compose_hint_secure">Enviar mensaje seguro</string>
+  <string name="menu_end_conversation">Finalizar conversación</string>
+  <string name="select_link_title">Seleccionar enlace</string>
+  <string name="delete">Borrar</string>
+  <string name="export_media">¿Exportar fichero de audiovisual?</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt"><xliff:g id="USER">%1$s</xliff:g> le ha invitado a unirse a un chat en grupo.</string>
+  <string name="accept_invitation">Aceptar</string>
+  <string name="decline_invitation">Rechazar</string>
+  <string name="connecting_to_group_chat_">Conectando a grupo de chat…</string>
+  <string name="empty_contact_list">No se encontraron contactos.\n\nPulse para invitar.</string>
+  <string name="subscription_prompt">¿Añadir contacto?</string>
+  <string name="approve_subscription">Sí</string>
+  <string name="decline_subscription">No</string>
+  <string name="approve_subscription_error">No se pudo aprobar la suscripción de <xliff:g id="USER">%1$s</xliff:g>. Inténtelo de nuevo más tarde.</string>
+  <string name="decline_subscription_error">No se pudo rechazar la suscripción de <xliff:g id="USER">%1$s</xliff:g>. Inténtelo de nuevo más tarde.</string>
+  <!--Security: OTR-->
+  <string name="otr_session_status_finished">Su contacto ha detenido el chat cifrado.</string>
+  <!--Security: OTR: Keyring-->
+  <string name="detected_Otr_keystore_import">Detectamos un almacén de claves OTR para importar. ¿Te gustaría escanear la contraseña QR ahora?</string>
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Autenticación</string>
+  <string name="smp_question_summary">Introduzca una pregunta para enviar a su contacto junto a la respuesta que espera recibir para verificar que se trata de la persona que dice ser.</string>
+  <string name="smp_question_hint">la pregunta que formular </string>
+  <string name="qmp_answer_hint">la respuesta que se espera</string>
+  <string name="remote_verified_us">Su contacto le ha autenticado. Ahora valide a su contacto mediante una pregunta.</string>
+  <string name="otr_qa_title">Preguntas y respuestas de verificación del cifrado OTR</string>
+  <string name="chat_encryption_title">Cifrado de chat</string>
+  <string name="otr_qa_send">Enviar</string>
+  <string name="otr_qa_cancel">Cancelar</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">Seguridad y privacidad</string>
+  <string name="encryption_and_anonymity_title">Cifrado y Anonimato</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="pref_linkify_on_tor_title">URLs pulsables sobre Tor</string>
+  <string name="pref_linkify_on_tor_summary">Para cuentas que utilizan Tor, hace que las URLs en el texto de los chats sean enlaces pulsables (¡ADVERTENCIA, posible filtración de detalles privados!)</string>
+  <string name="menu_locale">Idioma</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Idiomas</string>
+  <string name="use_system_default">Usar la configuración por defecto del sistema</string>
+  <string name="button_yes_accept_all">Sí, aceptar todo</string>
+  <string name="pref_delete_unsecured_media_title">Borrar audiovisuales no asegurados</string>
+  <string name="pref_delete_unsecured_media_summary">Después de compartir una foto o fichero, borrarlo automáticamente del almacenamiento no asegurado original depués de importarlo</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">Otros ajustes</string>
+  <string name="start_on_boot_summary">Iniciar sesión automáticamente </string>
+  <string name="hide_offline_contacts">Ocultar desconectados</string>
+  <string name="foreground_service_title">Prioridad primer plano</string>
+  <string name="foreground_service_summary">Disminuye la probabilidad de que Android reinicie la conexión. Esto añadirá una entrada en el área de notificación</string>
+  <string name="heartbeat_interval_title">Intervalo de latidos</string>
+  <string name="heartbeat_interval_summary">Utilizar un valor más alto (en minutos) para ahorrar batería. Esto puede provocar que su proveedor cierre la conexión por inactividad</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Configuración de notificaciones</string>
+  <string name="notification_enabled_title">Notificaciones de MI</string>
+  <string name="notification_enabled_summary">Notificar cuando se recibe un mensaje  instantáneo en la barra de estado </string>
+  <string name="notification_vibrate_title">Vibrar</string>
+  <string name="notification_vibrate_summary">Vibrar al recibir un mensaje </string>
+  <string name="notification_sound_title">Sonido</string>
+  <string name="notification_sound_summary">Reproducir un tono al recibir mensaje instantáneo</string>
+  <string name="notification_ringtone_title">Seleccionar timbre de llamada personalizado</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">Habilitar registros (\'logs\') de depuración</string>
+  <string name="pref_debug_summary">Datos de registro (\'log\') de salida de la aplicación a la salida estándar / logcat para depuración</string>
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message">Para que la aplicación abra sesión, se necesita conectividad de datos de red (incluyendo datos en segundo plano).</string>
+  <string name="prompt_create_new_account_">¿Crear nueva cuenta?</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">¿Crear una nueva cuenta de chat con el nombre de usuario \'%1$s\'?</string>
+  <!--Alerts: Notifications-->
+  <string name="subscription_notify_text">Nueva invitación a incluir como amigo de <xliff:g id="user">%s</xliff:g></string>
+  <string name="file_notify_text">Nuevo fichero <xliff:g id="filename">%1$s</xliff:g> de <xliff:g id="user">%2$s</xliff:g></string>
+  <string name="notify_groupchat_label">Invitación a conversación en grupo</string>
+  <string name="group_chat_invite_notify_text">Nueva invitación para conversación en grupo de <xliff:g id="user">%s</xliff:g></string>
+  <string name="new_messages_notify">Nuevo mensaje de:</string>
+  <string name="app_unlocked">Activado y desclausurado</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">Atención</string>
+  <string name="error_prefix">Error:</string>
+  <string name="general_error">Código de error <xliff:g id="CODE">%1$d</xliff:g></string>
+  <string name="login_service_failed">No se pudo abrir sesión en el servicio <xliff:g id="SERVICE">%1$s</xliff:g>. Inténtelo de nuevo más tarde.\n(Detalle: <xliff:g id="DESCRIPTION">%2$s</xliff:g>)</string>
+  <string name="add_list_failed">La lista no se ha añadido.</string>
+  <string name="block_contact_failed">No se ha podido bloquear el contacto.</string>
+  <string name="unblock_contact_failed">No se ha podido desbloquear el contacto.</string>
+  <string name="load_contact_list_failed">No se ha podido cargar la lista de contactos.</string>
+  <string name="cant_connect_to_server">No se puede establecer conexión con el servidor. Comprueba la conexión.</string>
+  <string name="contact_already_exist"><xliff:g id="USER">%1$s</xliff:g> ya figura en su lista de contactos.</string>
+  <string name="contact_blocked">El contacto "<xliff:g id="USER">%1$s</xliff:g>" ha sido bloqueado.</string>
+  <string name="contact_not_loaded">Por favor, espera mientras se carga la lista de contactos.</string>
+  <string name="network_error">Se ha producido un error de red.</string>
+  <string name="wifi_not_connected_error">Se necesita una conexión WiFi.</string>
+  <string name="service_not_support">El servidor no admite esta función.</string>
+  <string name="invalid_password">La contraseña introducida no es válida.</string>
+  <string name="internal_server_error">Se ha producido un error en el servidor.</string>
+  <string name="not_implemented">El servidor no admite esta función.</string>
+  <string name="service_unavaiable">El servidor no está disponible en este momento.</string>
+  <string name="timeout">Se ha agotado el tiempo de espera del servidor.</string>
+  <string name="version_not_supported">El servidor no admite la versión actual.</string>
+  <string name="message_queue_full">La cola de mensajes está llena.</string>
+  <string name="domain_not_supported">El servidor no admite el reenvío al dominio.</string>
+  <string name="unknown_user">El nombre de usuario introducido no se reconoce.</string>
+  <string name="recipient_blocked_the_user">El usuario le ha bloqueado.</string>
+  <string name="session_expired">La sesión ha expirado. Inicie sesión de nuevo.</string>
+  <string name="forced_logout">ha iniciado sesión desde otro cliente.</string>
+  <string name="already_logged_in">ha iniciado sesión desde otro cliente.</string>
+  <string name="msisdn_error">No se puede leer el número de teléfono de la tarjeta SIM. Póngase en contacto con su operador para obtener ayuda.</string>
+  <string name="not_signed_in">No ha iniciado sesión.</string>
+  <string name="account_setup_error_server">Zom encontró un error mientras se conectaba al servidor de chat - por favor revise su configuración y pruebe de nuevo.</string>
+  <string name="error_suspended_connection">Zom ha perdido la conexión a la red</string>
+  <string name="unable_to_create_or_join_group_chat">Imposible de crear o unirse al chat de grupo</string>
+  <string name="unsupported_incoming_data">¡Datos entrantes no soportados, no se pudo compartir!</string>
+  <string name="there_is_no_viewer_available_for_this_file_format">No hay ningún visor disponible para este formato de fichero</string>
+  <string name="otr_keysync_warning_message">Por favor copie el archivo \'otr_keystore.ofcaes\' desde el escritorio de la herramienta OtrFileConverter al directorio raíz de su dispositivo de almacenamiento</string>
+  <string name="msg_sent_failed">No se ha podido enviar el mensaje.</string>
+  <string name="disconnected_warning">Está desconectado. Los mensajes se reenviarán al volver a conectarse.</string>
+  <string name="error_account_password_mismatch">Sus contraseñas no coinciden</string>
+  <string name="error_account_settings_priority">La prioridad debe ser un número en el rango [0 … 127]</string>
+  <string name="error_account_settings_port">El número de puerto debe ser un número</string>
+  <string name="error_welcome_database">Error importante: No se pudo desbloquear o cargar la base de datos de la aplicación. Por favor reinstale la aplicación o borre los datos.</string>
+  <string name="account_settings_title">Configuración de la cuenta</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Grupos</string>
+  <string name="buddies">Amigos</string>
+  <string name="contacts">Contactos</string>
+  <string name="mtm_accept_cert">¿Aceptar certificado del servidor?</string>
+  <string name="loading">cargando…</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Ajustes</string>
+  <string name="menu_sign_out">Cerrar sesión</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">Conectado</string>
+  <string name="presence_busy">Ocupado</string>
+  <string name="presence_away">Ausente</string>
+  <string name="presence_idle">Inactivo</string>
+  <string name="presence_offline">Desconectado</string>
+  <string name="presence_invisible">Aparecer desconectado</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Feliz</item>
+    <item>Triste</item>
+    <item>Parpadeo</item>
+    <item>Lengua fuera</item>
+    <item>Sorprendido</item>
+    <item>Besos</item>
+    <item>Gritar</item>
+    <item>Fresco</item>
+    <item>Dinero boca</item>
+    <item>Los pies en la boca</item>
+    <item>Avergonzado</item>
+    <item>Angel</item>
+    <item>Indeciso</item>
+    <item>Llorar</item>
+    <item>Los labios están sellados</item>
+    <item>Riendo</item>
+    <item>Confundido</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Feliz</item>
+    <item>Triste</item>
+    <item>Parpadeo</item>
+    <item>Lengua fuera</item>
+    <item>Sorprendido</item>
+    <item>Besos</item>
+    <item>Gritar</item>
+    <item>Fresco</item>
+    <item>Dinero boca</item>
+    <item>Los pies en la boca</item>
+    <item>Avergonzado</item>
+    <item>Angel</item>
+    <item>Indeciso</item>
+    <item>Llorar</item>
+    <item>Los labios están sellados</item>
+    <item>Riendo</item>
+    <item>Confundido</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="this_is_a_group_chat">Esto es un grupo de chat</string>
+  <string name="unable_to_securely_share_this_file">No se pudo compartir este fichero de forma segura</string>
+  <string name="swipe_hint">&lt; haga un gesto de barrido a la izquierda y la derecha para más opciones &gt;</string>
+  <string name="title_me">Yo</string>
+</resources>

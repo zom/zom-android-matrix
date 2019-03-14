@@ -1,0 +1,210 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <!--General: Permissions-->
+  <string name="ro_perm_label">စာတိုများ ဖတ်ရန်</string>
+  <string name="ro_perm_desc">
+        Allows applications to read data from the IM content provider.
+    </string>
+  <string name="wo_perm_label">စာတိုများ ရေးရန်</string>
+  <string name="wo_perm_desc">
+        Allows applications to write data to the IM content provider.
+    </string>
+  <string name="perm_label">IM ဝန်ဆောင်မှုစတင်</string>
+  <string name="perm_desc">အက်ပလီကေးရှင်းများကို intent သုံး၍  IM ဆားဗစ် စရန် ခွင့်ပြုပါ။</string>
+  <!--General: Actions-->
+  <string name="confirm">အတည်ပြုချက်</string>
+  <string name="ok">အိုကေ</string>
+  <string name="cancel">ပယ်ဖျက်</string>
+  <string name="yes">အိုကေ</string>
+  <string name="no">ပယ်ဖျက်</string>
+  <!--Views-->
+  <!--Views: Setup-->
+  <string name="menu_about">အကြောင်း</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">ဝင်ရောက်</string>
+  <string name="account_setup_example_email_address">user@domain.com</string>
+  <string name="account_setup_password">စကားဝှက်</string>
+  <string name="account_setup_pers_now_title">ယခု ဝင်ရန်</string>
+  <string name="_via_orbot">Orbot (Tor)</string>
+  <string name="signing_in_wait">ဝင်နေတယ် \u2026</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">SRV ရှာဖွေမှု ပြုလုပ်ပါ</string>
+  <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">ဒိုမိန်းနာမည်မှ XMPP ဆာဗာကို ရှာရန် DNS SRV ကို သုံးပါ</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">ဝှက်ထားခြင်းမရှိသော ပေးပို့မှုတွင် ယူဇာအမည်နှင့် စကားဝှက်ကို ရိုးရိုးစာသားအနေဖြင့် ပေးပို့ခြင်း ခွင့်ပြုပါ</string>
+  <string name="allow_plain_text_auth">Plain Text စိစစ်စစ်ဆေးမှု ခွင့်ပြုပါ</string>
+  <string name="transport_encryption">Transport Encryption</string>
+  <string name="how_encrypted_chats_are_started">ဝှက်ထားသည့် စကားဝိုင်းများ စတင်ပုံ</string>
+  <string name="the_server_to_connect_to_if_needed">လိုအပ်လျှင် ချိတ်ဆက်ရမည့် ဆာဗာ</string>
+  <string name="connect_server">ဆာဗာသို့ ချိတ်ဆက်ခြင်း</string>
+  <string name="tcp_port_for_xmpp_server">XMPP ဆာဗာအတွက် TCP Port</string>
+  <string name="server_port">ဆာဗာ Port</string>
+  <string name="xmpp_resource">XMPP Resource</string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">ဤကော်နက်ရှင်ကို အခြားဝင်ထားသော ကလိုင်းယင့်များထံမှ ခွဲခြားရန်</string>
+  <string name="xmpp_resource_prio_title">XMPP Resource Priority</string>
+  <string name="xmpp_resource_prio_summary">Messages to clients with multiple active resources will be sent to the resource with the highest priority</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">စကားဝိုင်းများ</string>
+  <string name="menu_remove_contact">အဆက်အသွယ်ပယ်ဖျက်</string>
+  <string name="menu_view_blocked">ပိတ်ထားသော</string>
+  <string name="empty_conversation_group">စကားစမြည်ပြောထားသည်များမရှိ</string>
+  <string name="search_label">အဆက်အသွယ်</string>
+  <string name="search_hint">စကားပြောဆိုမည့် အဆက်အသွယ်၏ အမည်ရိုက်ရန်</string>
+  <!--Views: Chat: Single-->
+  <string name="menu_end_conversation">စကားဝိုင်းဆုံး</string>
+  <string name="select_link_title">လင့်ရွေးပါ</string>
+  <!--Views: Chat: Group-->
+  <string name="accept_invitation">လက်ခံ</string>
+  <string name="decline_invitation">ငြင်းဆို</string>
+  <!--Security: OTR-->
+  <!--Security: OTR: Keyring-->
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">စိစစ်စစ်ဆေးခြင်း</string>
+  <string name="smp_question_summary">အသင့်အဆက်အသွယ်ကို အတည်ပြုစစ်ဆေးရန် မေးရမည့် မေးခွန်းနှင့် သူတို့ ဖြေရမည့် အဖြေကို ရိုက်ပါ။</string>
+  <string name="smp_question_hint">မေးရမည့် မေးခွန်း</string>
+  <string name="qmp_answer_hint">မျှော်လင့်ထားသော အဖြေ</string>
+  <string name="remote_verified_us">အသင့် အဆက်အသွယကို အောင်မြင်စွာ စစ်ဆေးပြီးပါပြီ။ ယခု ၎င်းကို အတည်ပြုရန် မေးခွန်းမေးပါ။</string>
+  <string name="otr_qa_send">ပို့</string>
+  <string name="otr_qa_cancel">ပယ်ဖျက်</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">Security and Privacy</string>
+  <string name="encryption_and_anonymity_title">Encryption and Anonymity</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">ဘာသာစကား</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">ဘာသာစကားများ</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">အခြား</string>
+  <string name="start_on_boot_summary">နဂိုဝင်သုံးဖူးသည့် အကောင့်များသို့ အလိုအလျှောက် ဝင်ရန်</string>
+  <string name="hide_offline_contacts">လိုင်းပေါ်တွင်မရှိသောအဆက်သွယ်များအားဖျောက်</string>
+  <string name="foreground_service_title">Use foreground priority</string>
+  <string name="foreground_service_summary">အန်းဒရိုက်မှ ဒီကော်နက်ရှင်ဆားဗစ်ကို ပြန်စနိုင်ခြင်းကို လျော့ချပါ။ အချက်ပြဧရိယာတွင် အချက်ပြမှု ပေါ်နေပါလိမ့်မည်။</string>
+  <string name="heartbeat_interval_title">နှလုံးခုန်နူန်း</string>
+  <string name="heartbeat_interval_summary">ဘက်ထရီစား သက်သာစေရန် မိနစ်များများ သုံးပါ။ </string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">အကြောင်းကြားချက်ဆင်တင်</string>
+  <string name="notification_enabled_title">IM အကြာင်းကြားချက်များ</string>
+  <string name="notification_enabled_summary">စာသစ်ရောက်လျှင် အခြေအနေပြဘားတွင်း အကြောင်းကြားပါ။</string>
+  <string name="notification_vibrate_title">တုန်ခါ</string>
+  <string name="notification_vibrate_summary">စာရောက်လာလျှင် တုန်ပေးပါ</string>
+  <string name="notification_sound_title">အသံ</string>
+  <string name="notification_sound_summary">စာရောက်လာလျှင် ringtone ဖွင့်ပါ</string>
+  <!--Actions: Settings: General: Developer-->
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message">
+ အက်ပလီကေးရှင်မှ ဝင်သုံးရန် ကွန်ရက်ဒေတာ ချိတ်ဆက်မှု (နောက်ကွယ် ဒေတာများ အပါအဝင်) ကို လိုအပ်ပါတယ်။ 
+</string>
+  <!--Alerts: Notifications-->
+  <string name="notify_groupchat_label">အုပ်စုလိုက် စကားဝိုင်း တောင်းဆိုခြင်း</string>
+  <string name="new_messages_notify">စာအသစ်၊ ပို့သူမှာ </string>
+  <!--Alerts: Exceptions-->
+  <string name="error">အာရုံစိုက်ရန်</string>
+  <string name="add_list_failed">စာရင်းအားမပေါင်းထည့်လိုက်ပါ</string>
+  <string name="block_contact_failed">အဆက်အသွယ်ကို ပိတ်ဆို့ထားခြင်း မရှိပါ။</string>
+  <string name="unblock_contact_failed">အဆက်အသွယ်ကို ပိတ်ဆို့မှုဖွင့်ထားခြင်း မရှိပါ။</string>
+  <string name="load_contact_list_failed">အဆက်အသွယ်စာရင်း တင်ယူထားခြင်း မရှိပါ။</string>
+  <string name="cant_connect_to_server">ဆာဗာသို့ ချိတ်ဆက်၍ မရပါ။ ကျေးဇူးပြုပြီး ကောနက်ရှင်  စစ်ကြည့်ပါ။</string>
+  <string name="contact_not_loaded">အဆက်အသွယ်စာရင်းအားဆွဲတင်နေစဉ်　ကျေးဇူးပြု၍　ခေတ္တစောင့်ပါ</string>
+  <string name="network_error">ကွန်ယက်အမှားပေါ်ပေါက်</string>
+  <string name="wifi_not_connected_error">ဤကော်နက်ရှင်အတွက် ဝိုင်ဖိုင် လိုပါတယ်။</string>
+  <string name="service_not_support">ဆာဗာက ဤဖန်ရှင်အား ထောက်ပံနိုင်ခြင်း မရှိပါ</string>
+  <string name="invalid_password">သင်ရိုက်ထည့်သောစကားဝှက်အားလက်မခံနိင်</string>
+  <string name="internal_server_error">ဆာဗာမှ　အမှားနှင့်ကြံုတွေ့</string>
+  <string name="not_implemented">ဆာဗာက ဤဖန်ရှင်အား ထောက်ပံနိုင်ခြင်း မရှိပါ</string>
+  <string name="service_unavaiable">လက်ရှိတွင်ဆာဗာအားမရရှိနိုင်</string>
+  <string name="timeout">ဆာဗာမှ အကြောင်းမပြန်ပါ</string>
+  <string name="version_not_supported">လက်ရှိမူကွဲအားဆာဗာမှထောက်ပံ့ခြင်းမပြု</string>
+  <string name="message_queue_full">စာသားအတန်း ပြည့်နေပြီ</string>
+  <string name="domain_not_supported">ဆာဗာက ဒိုမိန်းသို့ ဆင့်ကမ်းပို့ခြင်း ခွင့်မပြုပါ</string>
+  <string name="unknown_user">ရိုက်လိုက်သည့် အကောင့်အမည်ကို မသိရှိပါ</string>
+  <string name="recipient_blocked_the_user">အသင့်ကို တစ်ဖက်ယူဇာမှ ပိတ်ထားပါတယ်။</string>
+  <string name="session_expired">ဆက်ရှင်သက်တမ်းကုန်ဆံုး၊ ကျေးဇူးပြု၍နောက်တစ်ကြိမ်ဝင်ရောက်ပါ</string>
+  <string name="forced_logout">အခြားကလိုင်းယင့်မှ ဝင်ထားခြင်း ဖြစ်သည်။</string>
+  <string name="already_logged_in">အခြားကလိုင်းယင့်မှ ဝင်ထားခြင်း ဖြစ်သည်။</string>
+  <string name="msisdn_error">ဆင်းမ်ကတ်မှ အသင့်ဖုန်းနံပါတ် ဖတ်၍ မရပါ။ အကူအညီအတွက် အော်ပရေတာကို ဆက်သွယ်ပါရန်။</string>
+  <string name="not_signed_in">သင်သည်　လက်ရှိတွင်　မဝင်ရသေးပါ</string>
+  <string name="msg_sent_failed">ဤအကြောင်းကြားချက်အားမပို့နိုင်</string>
+  <string name="account_settings_title">အကောင့်ဆက်တင်</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">အဖွဲ့များ</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">ဆက်တင်</string>
+  <string name="menu_sign_out">ထွက်ခွာ</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">လိုင်းပေါ်တွင်ရှိ</string>
+  <string name="presence_busy">အလုပ်ရှုပ်နေ</string>
+  <string name="presence_away">အဝေးတွင်</string>
+  <string name="presence_idle">အားနေ</string>
+  <string name="presence_offline">လိုင်းပေါ်တွင်မရှိ</string>
+  <string name="presence_invisible">အောဖ့်လိုင်းဟု ပြပါ</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>ပျော်နေ</item>
+    <item>ဝမ်းနည်း</item>
+    <item>မျက်စိမှိတ်</item>
+    <item>လျှာထုတ်</item>
+    <item>အံဩ</item>
+    <item>နမ်း</item>
+    <item>အော်</item>
+    <item>အေးဆေး</item>
+    <item>ငွေပါးစပ်</item>
+    <item>ပါးစပ်ထဲမှာ ခြေထောက်</item>
+    <item>စိတ်အနှောင့်အယှက်ဖြစ်နေ</item>
+    <item>အိန်ဂျယ်</item>
+    <item>မဆုံးဖြတ်ရသေး</item>
+    <item>ငိုနေ</item>
+    <item>နှုတ်ခမ်း စိထားတယ်</item>
+    <item>ရယ်နေ</item>
+    <item>စိတ်ရှုပ်နေ</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>ပျော်နေ</item>
+    <item>ဝမ်းနည်း</item>
+    <item>မျက်စိမှိတ်</item>
+    <item>လျှာထုတ်</item>
+    <item>အံဩ</item>
+    <item>နမ်း</item>
+    <item>အော်</item>
+    <item>အေးဆေး</item>
+    <item>ငွေပါးစပ်</item>
+    <item>ပါးစပ်ထဲမှာ ခြေထောက်</item>
+    <item>စိတ်အနှောင့်အယှက်ဖြစ်နေ</item>
+    <item>အိန်ဂျယ်</item>
+    <item>မဆုံးဖြတ်ရသေး</item>
+    <item>ငိုနေ</item>
+    <item>နှုတ်ခမ်း စိထားတယ်</item>
+    <item>ရယ်နေ</item>
+    <item>စိတ်ရှုပ်နေ</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:0</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="title_me">ကျွန်ုပ်</string>
+</resources>

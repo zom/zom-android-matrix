@@ -1,0 +1,270 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Zom</string>
+  <string name="app_name">Zom</string>
+  <string name="im_label">Zom</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">διάβασε τα άμεσα μηνύματα</string>
+  <string name="ro_perm_desc">
+Επιτρέπει στις εφαρμογές να διαβάζουν δεδομένα απο τον πάροχο IM.</string>
+  <string name="wo_perm_label">γράψε άμεσα μηνύματα</string>
+  <string name="wo_perm_desc">
+Επιτρέπει στις εφαρμογές να γράφουν δεδομένα στον πάροχο IM</string>
+  <string name="perm_label">Έναρξη υπηρεσίας ανταλλαγής άμεσων μηνυμάτων (IM)</string>
+  <string name="perm_desc">Επιτρέπει στις εφαρμογές να εκκινούν την υπηρεσία ανταλλαγής άμεσων μηνυμάτων (IM) μέσω του intent.</string>
+  <!--General: Actions-->
+  <string name="confirm">Επιβεβαίωση</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Ακύρωση</string>
+  <string name="yes">OK</string>
+  <string name="no">Ακύρωση</string>
+  <string name="connect">Σύνδεση</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Ρύθμιση Κωδικού</string>
+  <string name="lock_screen_confirm_passphrase">Επικύρωση Κωδικού</string>
+  <string name="lock_screen_passphrase_hint">Κωδικός</string>
+  <string name="lock_screen_passphrase_not_set_enter">Νέος Κωδικός</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Επιβεβαίωση Νέου Κωδικού</string>
+  <string name="lock_screen_passphrases_not_matching">Ο κωδικός δεν ταιριάζει, δοκιμάστε ξανά</string>
+  <string name="lock_screen_skip">Βαριέμαι (μη χρήση κωδικού)</string>
+  <!--Views: Setup-->
+  <string name="add_account">Προσθήκη λογαριασμού <xliff:g id="ACCOUNT">%1$s</xliff:g></string>
+  <string name="menu_about">Σχετικά με</string>
+  <string name="pass_err_length">Ο κωδικός ασφαλείας δεν είναι αρκετά μεγάλος</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Σύνδεση</string>
+  <string name="account_setup_example_email_address">χρήστης@σελίδα.com</string>
+  <string name="account_setup_new_username">νέο όνομα χρήστη</string>
+  <string name="account_setup_password">κωδικός</string>
+  <string name="account_setup_password_confirm">επιβεβαιώστε τον κωδικό</string>
+  <string name="btn_create_new_account">Εγγραφή λογαριασμού</string>
+  <string name="account_setup_pers_now_title">Σύνδεση Τώρα</string>
+  <string name="select_domain_new_account">Επιλογή domain</string>
+  <string name="registering_new_account_">Καταχώριση νέου λογαριασμού…</string>
+  <string name="signing_in_wait">Σύνδεση…</string>
+  <string name="signing_out_wait">Γίνεται απεγγραφή\u2026</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">Αναζήτηση SRV</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Επέτρεψε την αποστολή του ονόματος και κωδικού χρήστη ως απλό κείμενο όταν χρησιμοποιείτε μη κρυπτογραφημένη μεταφορά.</string>
+  <string name="allow_plain_text_auth">Επέτρεψε αυθεντικοποίηση με σκέτο κείμενο</string>
+  <string name="require_tls_ssl_connection">Απαίτηση Σύνδεσης TLS</string>
+  <string name="transport_encryption">Κρυπτογράφηση μεταφοράς</string>
+  <string name="how_encrypted_chats_are_started">πώς ξεκινούν οι κρυπτογραφημένες συζητήσεις</string>
+  <string name="the_server_to_connect_to_if_needed">Ο server στον οποίον συνδέεστε, αν χρειαστεί</string>
+  <string name="connect_server">Σύνδεση σε Server</string>
+  <string name="tcp_port_for_xmpp_server">Πόρτα TCP για τον XMPP Server</string>
+  <string name="server_port">Πόρτα διακομιστή</string>
+  <string name="xmpp_resource">XMPP Resource</string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">για διάκριση αυτής της σύνδεσης απο άλλους λογαριασμούς που είναι συνδεδεμένοι</string>
+  <string name="xmpp_resource_prio_title">Προτεραιότητα πόρων XMPP</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">Συζητήσεις</string>
+  <string name="empty_account_message">Δεν έχετε ρυθμισμένους
+λογαριασμούς
+
+Πατήστε εδώ για να προσθέσετε έναν!</string>
+  <string name="menu_remove_contact">Διαγραφή επαφής</string>
+  <string name="menu_contact_nickname">Ψευδώνυμο επαφής</string>
+  <string name="menu_view_blocked">Αποκλεισμένος/η</string>
+  <string name="confirm_delete_contact">Η επαφή "<xliff:g id="USER">%1$s</xliff:g>" θα διαγραφεί.</string>
+  <string name="confirm_block_contact">Θα γίνει αποκλεισμός της επαφής "<xliff:g id="USER">%1$s</xliff:g>".</string>
+  <string name="add_contact_success">Έγινε προσθήκη της επαφής "<xliff:g id="USER">%1$s</xliff:g>".</string>
+  <string name="delete_contact_success">Η επαφή "<xliff:g id="USER">%1$s</xliff:g>" διαγράφηκε.</string>
+  <string name="block_contact_success">Έγινε αποκλεισμός της επαφής "<xliff:g id="USER">%1$s</xliff:g>".</string>
+  <string name="unblock_contact_success">Κατάργηση αποκλεισμού της επαφής "<xliff:g id="USER">%1$s</xliff:g>".</string>
+  <string name="menu_verify">Επαλήθευση κλειδιού</string>
+  <string name="empty_conversation_group">Δεν υπάρχουν συνομιλίες</string>
+  <string name="search_label">Επαφή</string>
+  <string name="search_hint">εισάγετε το όνομα μιας επαφής για συνομιλία</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online">Ο χρήστης <xliff:g id="USER">%1$s</xliff:g> συνδέθηκε</string>
+  <string name="contact_away">Ο χρήστης <xliff:g id="USER">%1$s</xliff:g> βρίσκεται μακριά από τον υπολογιστή του</string>
+  <string name="contact_busy">Ο χρήστης <xliff:g id="USER">%1$s</xliff:g> είναι απασχολημένος/η</string>
+  <string name="contact_offline">Ο χρήστης <xliff:g id="USER">%1$s</xliff:g> βρίσκεται εκτός σύνδεσης</string>
+  <string name="contact_joined">Ο χρήστης <xliff:g id="USER">%1$s</xliff:g> συνδέθηκε</string>
+  <string name="contact_left">Ο χρήστης <xliff:g id="USER">%1$s</xliff:g> αποχώρησε</string>
+  <string name="file_transfer">Αποστολή Αρχείου</string>
+  <string name="accept_transfer_">Αποδοχή μεταφοράς;</string>
+  <string name="wants_to_send_you_the_file">θέλει να σας στείλει το αρχείο </string>
+  <string name="compose_hint">Στείλτε ένα μήνυμα</string>
+  <string name="compose_hint_secure">Αποστολή ασφαλούς μηνύματος</string>
+  <string name="menu_end_conversation">Τερματισμός συζήτησης</string>
+  <string name="select_link_title">Επιλογή συνδέσμου</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt">Ο χρήστης <xliff:g id="USER">%1$s</xliff:g> σας προσκάλεσε να συμμετέχετε σε ομαδική συζήτηση.</string>
+  <string name="accept_invitation">Αποδοχή</string>
+  <string name="decline_invitation">Απόρριψη</string>
+  <string name="connecting_to_group_chat_">Σύνδεση στο ομαδικό chat…</string>
+  <string name="empty_contact_list">Δεν βρέθηκαν επαφές.
+
+Πατήστε για να προσθέσετε κάποιες.</string>
+  <string name="approve_subscription_error">Δεν ήταν δυνατή η έγκριση συνδρομής από τον χρήστη <xliff:g id="USER">%1$s</xliff:g>. Δοκιμάστε ξανά αργότερα.</string>
+  <string name="decline_subscription_error">Δεν ήταν δυνατή η απόρριψη συνδρομής από τον χρήστη <xliff:g id="USER">%1$s</xliff:g>. Δοκιμάστε ξανά αργότερα.</string>
+  <!--Security: OTR-->
+  <string name="otr_session_status_finished">Η επαφή σας έχει σταματήσει την κρυπτογραφημένη συνομιλία.</string>
+  <!--Security: OTR: Keyring-->
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Αυθεντικοποίηση</string>
+  <string name="smp_question_summary">Εισάγετε μια ερώτηση για αποστολή στην επαφή σας, και την απάντηση που περιμένετε να εισάγουν, για να πιστοποιήσετε οτι είναι αυτοί που ισχυρίζονται οτι είναι</string>
+  <string name="smp_question_hint">ερώτηση ασφαλείας</string>
+  <string name="qmp_answer_hint">αναμενώμενη απάντηση</string>
+  <string name="otr_qa_send">Αποστολή</string>
+  <string name="otr_qa_cancel">Ακύρωση</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">Ασφάλεια και Ιδιωτικότητα </string>
+  <string name="encryption_and_anonymity_title">Κρυπτογραφία και ανωνυμία</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">Γλώσσα</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Γλώσσες</string>
+  <string name="button_yes_accept_all">Ναι, αποδοχή όλων</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">Άλλη Ρύθμιση</string>
+  <string name="start_on_boot_summary">Πάντα εκκίνηση και αυτόματη σύνδεση στους προηγούμενα συνδεδεμένους λογαριασμούς</string>
+  <string name="hide_offline_contacts">Απόκρυψη επαφών εκτός σύνδεσης</string>
+  <string name="foreground_service_title">Χρήση υψηλότερης προτεραιότητας προσκήνιου</string>
+  <string name="foreground_service_summary">Μείωση της πιθανότητας του Android να επανεκκινήσει το service με τις συνδέσεις. Αυτό θα προσθέσει και μια ειδοποίηση στην περιοχή ειδοποιήσεων.</string>
+  <string name="heartbeat_interval_title">Διάστημα μεταξύ χτύπων</string>
+  <string name="heartbeat_interval_summary">Χρησιμοποιήστε μεγαλύτερη τιμή (σε λεπτά) για εξοικονόμιση μπαταρίας. Μια υψηλότερη τιμή μπορεί να προκαλέσει τον πάροχο να κλείσει την σύνδεση λόγω αδράνειας της.</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Ρυθμίσεις ειδοποιήσεων</string>
+  <string name="notification_enabled_title">Ειδοποιήσεις άμεσων μηνυμάτων (IM)</string>
+  <string name="notification_enabled_summary">Να εμφανίζεται ειδοποίηση στη γραμμή κατάστασης όταν γίνεται λήψη άμεσου μηνύματος (IM)</string>
+  <string name="notification_vibrate_title">Δόνηση</string>
+  <string name="notification_vibrate_summary">Δόνηση κατά τη λήψη άμεσων μηνυμάτων (IM)</string>
+  <string name="notification_sound_title">Ήχος</string>
+  <string name="notification_sound_summary">Αναπαραγωγή ήχου κλήσης κατά τη λήψη άμεσου μηνύματος (IM)</string>
+  <string name="notification_ringtone_title">Χρήση ήχου κλήσης του Zom</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">Ενεργοποίηση Debug Logs</string>
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message"><xliff:g id="PROVIDER">%1$s</xliff:g> χρειάζεται ενεργοποιημένα τα δεδομένα παρασκηνίου.</string>
+  <string name="prompt_create_new_account_">Δημιουργία νέο λογαριασμού;</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">Δημιουργία ένος νέου chat λογαριασμού για τον χρήστη \'%1$s\';</string>
+  <!--Alerts: Notifications-->
+  <string name="notify_groupchat_label">Πρόσκληση σε ομαδική συζήτηση</string>
+  <string name="new_messages_notify">Νέα μηνύματα από</string>
+  <string name="app_unlocked">Ενεργοποιημένο και ξεκλείδωτο</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">Προσοχή</string>
+  <string name="general_error">Κωδικός σφάλματος <xliff:g id="CODE">%1$d</xliff:g></string>
+  <string name="login_service_failed">Δεν είναι δυνατή η σύνδεση στην υπηρεσία <xliff:g id="SERVICE">%1$s</xliff:g>. Δοκιμάστε ξανά αργότερα."\n"(Λεπτομέρειες: <xliff:g id="DESCRIPTION">%2$s</xliff:g>)</string>
+  <string name="add_list_failed">Δεν έγινε προσθήκη της λίστας.</string>
+  <string name="block_contact_failed">Δεν έγινε αποκλεισμός της επαφής.</string>
+  <string name="unblock_contact_failed">Δεν έγινε κατάργηση αποκλεισμού της επαφής.</string>
+  <string name="load_contact_list_failed">Δεν έγινε φόρτωση της λίστας επαφών.</string>
+  <string name="cant_connect_to_server">Δεν είναι δυνατή η σύνδεση με τον διακομιστή. Ελέγξτε τη σύνδεσή σας.</string>
+  <string name="contact_already_exist">Ο χρήστης <xliff:g id="USER">%1$s</xliff:g> υπάρχει ήδη στη λίστα επαφών σας.</string>
+  <string name="contact_blocked">Έγινε αποκλεισμός της επαφής "<xliff:g id="USER">%1$s</xliff:g>".</string>
+  <string name="contact_not_loaded">Περιμένετε μέχρι να φορτώσει η λίστα επαφών σας.</string>
+  <string name="network_error">Προέκυψε σφάλμα δικτύου.</string>
+  <string name="wifi_not_connected_error">Απαιτείται WiFi για αυτήν την συνεδρία</string>
+  <string name="service_not_support">Ο διακομιστής δεν υποστηρίζει αυτήν τη δυνατότητα.</string>
+  <string name="invalid_password">Ο κωδικός πρόσβασης που εισάγατε δεν είναι έγκυρος.</string>
+  <string name="internal_server_error">Παρουσιάστηκε σφάλμα στον διακομιστή.</string>
+  <string name="not_implemented">Ο διακομιστής δεν υποστηρίζει αυτήν τη δυνατότητα.</string>
+  <string name="service_unavaiable">Ο διακομιστής δεν είναι διαθέσιμος αυτήν τη στιγμή.</string>
+  <string name="timeout">Η περίοδος σύνδεσης με τον διακομιστή έληξε.</string>
+  <string name="version_not_supported">Ο διακομιστής δεν υποστηρίζει την τρέχουσα έκδοση.</string>
+  <string name="message_queue_full">Η ουρά μηνυμάτων είναι πλήρης.</string>
+  <string name="domain_not_supported">Ο διακομιστής δεν υποστηρίζει την προώθηση προς τον τομέα διαδικτύου.</string>
+  <string name="unknown_user">Το όνομα χρήστη που εισάγατε δεν αναγνωρίζεται.</string>
+  <string name="recipient_blocked_the_user">Λυπούμαστε, αλλά έχετε αποκλειστεί από τον χρήστη.</string>
+  <string name="session_expired">Η περίοδος σύνδεσης έληξε, συνδεθείτε ξανά.</string>
+  <string name="forced_logout">συνδεθήκατε από άλλο πρόγραμμα-πελάτη.</string>
+  <string name="already_logged_in">έχετε ήδη συνδεθεί από άλλο πρόγραμμα-πελάτη.</string>
+  <string name="msisdn_error">Λυπούμαστε, δεν είναι δυνατή η ανάγνωση του αριθμού τηλεφώνου από την κάρτα SIM. Επικοινωνήστε με την εταιρεία κινητής τηλεφωνίας για βοήθεια.</string>
+  <string name="not_signed_in">Δεν είστε συνδεδεμένοι αυτήν τη στιγμή.</string>
+  <string name="account_setup_error_server">To Zom αντιμετώπισε ένα σφάλμα κατά την σύνδεση - ξαναελέγξτε την σύνδεση σας στο δίκτυο και δοκιμάστε ξανά.</string>
+  <string name="error_suspended_connection">Το Zom έχασε μια σύνδεση στο δίκτυο</string>
+  <string name="unable_to_create_or_join_group_chat">Αδυναμία δημιουργίας η σύνδεσης σε ομάδα συζήτησης</string>
+  <string name="msg_sent_failed">Δεν ήταν δυνατή η αποστολή αυτού του μηνύματος.</string>
+  <string name="disconnected_warning">Το μήνυμα θα σταλεί ξανά όταν επανασυνδεθείτε</string>
+  <string name="account_settings_title">Ρυθμίσεις λογαριασμού</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Ομάδες</string>
+  <string name="buddies">Φίλοι</string>
+  <string name="contacts">Επαφές</string>
+  <string name="mtm_accept_cert">Έγκριση Πιστοποιητικού Server;</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Ρυθμίσεις</string>
+  <string name="menu_sign_out">Αποσύνδεση</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">Συνδεδεμένος</string>
+  <string name="presence_busy">Απασχολημένος/η</string>
+  <string name="presence_away">Μακριά από τον υπολογιστή</string>
+  <string name="presence_idle">Αδρανής</string>
+  <string name="presence_offline">Εκτός σύνδεσης</string>
+  <string name="presence_invisible">Να εμφανίζομαι εκτός σύνδεσης</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Είμαι χαρούμενος</item>
+    <item>Είμαι λυπημένος</item>
+    <item>Κλείνω το μάτι</item>
+    <item>Κοροϊδεύω</item>
+    <item>Είμαι έκπληκτος</item>
+    <item>Φιλάω</item>
+    <item>Φωνάζω</item>
+    <item>Cool</item>
+    <item>Κάνω τα λόγια μου πράξη</item>
+    <item>Είπα χαζομάρα</item>
+    <item>Ντρέπομαι</item>
+    <item>Αγγελούδι</item>
+    <item>Δεν έχω αποφασίσει</item>
+    <item>Κλαίω</item>
+    <item>Δεν αποκαλύπτω τίποτα</item>
+    <item>Γελάω</item>
+    <item>Είμαι μπερδεμένος</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Είμαι χαρούμενος</item>
+    <item>Είμαι λυπημένος</item>
+    <item>Κλείνω το μάτι</item>
+    <item>Κοροϊδεύω</item>
+    <item>Είμαι έκπληκτος</item>
+    <item>Φιλάω</item>
+    <item>Φωνάζω</item>
+    <item>Cool</item>
+    <item>Κάνω τα λόγια μου πράξη</item>
+    <item>Είπα χαζομάρα</item>
+    <item>Ντρέπομαι</item>
+    <item>Αγγελούδι</item>
+    <item>Δεν έχω αποφασίσει</item>
+    <item>Κλαίω</item>
+    <item>Δεν αποκαλύπτω τίποτα</item>
+    <item>Γελάω</item>
+    <item>Είμαι μπερδεμένος</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="title_me">Εγώ</string>
+</resources>

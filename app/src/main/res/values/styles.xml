@@ -77,14 +77,14 @@
     <style name="AppTheme" parent="@style/Theme.AppCompat.Light" >
 
     <!-- colorPrimary is used for the default action bar background -->
-    <item name="colorPrimary">@color/app_primary</item>
+    <item name="colorPrimary">@color/zom_primary</item>
 
     <!-- colorPrimaryDark is used for the status bar -->
-    <item name="colorPrimaryDark">@color/app_primary_dark</item>
+    <item name="colorPrimaryDark">#BF204B</item>
 
     <!-- colorAccent is used as the default value for colorControlActivated,
          which is used to tint widgets -->
-    <item name="colorAccent">@color/app_accent</item>
+    <item name="colorAccent">#FF2b63</item>
 
     <!-- You can also set colorControlNormal, colorControlActivated
          colorControlHighlight, and colorSwitchThumbNormal. -->
@@ -132,7 +132,7 @@
 
 
     <style name="LStyled.ActionMode" parent="@style/Widget.AppCompat.ActionMode">
-        <item name="background">@color/app_primary</item>
+        <item name="background">@color/zom_primary</item>
     </style>
 
     <!--Action bar-->

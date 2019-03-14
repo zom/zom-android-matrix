@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">चैटसिक्योर </string>
+  <string name="app_name">चैटसिक्योर </string>
+  <string name="im_label">चैटसिक्योर </string>
+  <!--General: Permissions-->
+  <!--General: Actions-->
+  <string name="ok">ठीक </string>
+  <string name="cancel">रद्द करें </string>
+  <string name="yes">ठीक</string>
+  <string name="no">रद्द करें </string>
+  <!--Views-->
+  <string name="lock_screen_passphrase_hint">कूटशब्द </string>
+  <!--Views: Setup-->
+  <string name="add_account"><xliff:g id="account">%1$s</xliff:g> खाता जोड़ें </string>
+  <string name="menu_about">परिचय </string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="account_setup_new_username">नया उपयोक्तानाम </string>
+  <string name="account_setup_password">कूटशब्द </string>
+  <string name="account_setup_password_confirm">कूटशब्द सम्प्रेष्ट करें </string>
+  <string name="_via_orbot">ऑरबोट (टोर)</string>
+  <!--Views: Settings: Account-->
+  <!--Views: Contact list-->
+  <string name="menu_remove_contact">संपर्क मिठाएँ </string>
+  <string name="search_label">संपर्क </string>
+  <!--Views: Chat: Single-->
+  <!--Views: Chat: Group-->
+  <!--Security: OTR-->
+  <!--Security: OTR: Keyring-->
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="otr_qa_send">भेजें </string>
+  <string name="otr_qa_cancel">रद्द करें</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">भाषा </string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">भाषा </string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_sound_title">आवाज़ </string>
+  <!--Actions: Settings: General: Developer-->
+  <!--Alerts: Dialogs-->
+  <string name="prompt_create_new_account_">नया खाता बनाएँ ?</string>
+  <!--Alerts: Notifications-->
+  <!--Alerts: Exceptions-->
+  <string name="error">ध्यान </string>
+  <string name="error_prefix">त्रुटि:</string>
+  <string name="general_error">त्रुटि कोड  <xliff:g id="code">%1$d</xliff:g></string>
+  <string name="msg_sent_failed">संदेश नहीं भेजा गया </string>
+  <string name="account_settings_title">खाता विन्यास </string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">समूह </string>
+  <string name="buddies">दोस्तों </string>
+  <string name="contacts">संपर्क </string>
+  <string name="loading">लोड कर रहा है… </string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">विकल्प </string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_busy">व्यस्त </string>
+  <string name="presence_offline">ऑफलाइन</string>
+  <string name="presence_invisible">ऑफलाइन प्रकट करें </string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>ख़ुशी </item>
+    <item>Sad</item>
+    <item>Winking</item>
+    <item>Tongue sticking out</item>
+    <item>Surprised</item>
+    <item>Kissing</item>
+    <item>Yelling</item>
+    <item>Cool</item>
+    <item>Money mouth</item>
+    <item>Foot in mouth</item>
+    <item>Embarrassed</item>
+    <item>Angel</item>
+    <item>Undecided</item>
+    <item>Crying</item>
+    <item>Lips are sealed</item>
+    <item>हँसी</item>
+    <item>Confused</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>ख़ुशी </item>
+    <item>Sad</item>
+    <item>Winking</item>
+    <item>Tongue sticking out</item>
+    <item>Surprised</item>
+    <item>Kissing</item>
+    <item>Yelling</item>
+    <item>Cool</item>
+    <item>Money mouth</item>
+    <item>Foot in mouth</item>
+    <item>Embarrassed</item>
+    <item>Angel</item>
+    <item>Undecided</item>
+    <item>Crying</item>
+    <item>Lips are sealed</item>
+    <item>हँसी</item>
+    <item>Confused</item>
+  </string-array>
+</resources>

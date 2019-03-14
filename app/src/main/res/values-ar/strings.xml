@@ -1,0 +1,298 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">شات سيكيور Zom</string>
+  <string name="app_name">شات سيكيور </string>
+  <string name="im_label">شات سيكيور Zom</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">قراءة الرسائل الفورية</string>
+  <string name="ro_perm_desc">يسمح للتطبيقات بقراءة البيانات من مزود محتوى الرسائل الفورية.</string>
+  <string name="wo_perm_label">كتابة رسائل فورية</string>
+  <string name="wo_perm_desc">يسمح للتطبيقات بكتابة البيانات إلى مزود محتوى الرسائل الفورية.</string>
+  <string name="perm_label">بدء تشغيل خدمة المراسلة الفورية</string>
+  <string name="perm_desc">يسمح للتطبيقات ببدء تشغيل خدمة المحادثة عن طريق الIntent.</string>
+  <!--General: Actions-->
+  <string name="confirm">تأكيد</string>
+  <string name="ok">موافق</string>
+  <string name="cancel">إلغاء</string>
+  <string name="yes">موافق</string>
+  <string name="no">إلغاء</string>
+  <string name="connect">اتصال</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">ضبط كلمة السر</string>
+  <string name="lock_screen_confirm_passphrase">تأكيد كلمة السر</string>
+  <string name="lock_screen_passphrase_hint">كلمة السر</string>
+  <string name="lock_screen_passphrase_not_set_enter">يمكنك ضبط كلمة سر أساسية لمنع الولوج إلى أصدقائك ورسائلك دون كلمة سر:</string>
+  <string name="lock_screen_passphrase_not_set_confirm">تأكيد كلمة السر الجديدة</string>
+  <string name="lock_screen_passphrases_not_matching">العبارات السرية المدخلة لم تتطابق. حاول مرة أخرى.</string>
+  <string name="lock_screen_skip">التخطي &gt;&gt;</string>
+  <!--Views: Setup-->
+  <string name="add_account">أضف حساب (<xliff:g id="account">%1$s</xliff:g>)</string>
+  <string name="menu_about">حول التطبيق</string>
+  <string name="signed_out_prompt_with_error">لقد تم إخراجك من<xliff:g id="account">%1$s</xliff:g> بسبب <xliff:g id="reason">%2$s</xliff:g></string>
+  <string name="pass_err_length">عبارتك السرية ليست طويلة بما يكفي.</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">تسجيل الدخول</string>
+  <string name="account_setup_example_email_address">الاسم@العنوان</string>
+  <string name="account_setup_new_username">اسم مستخدم جديد</string>
+  <string name="account_setup_password">كلمة السر</string>
+  <string name="account_setup_password_confirm">تأكيد كلمة السر</string>
+  <string name="btn_create_new_account">تسجيل حساب</string>
+  <string name="account_setup_pers_now_title">تسجيل الدخول الآن</string>
+  <string name="select_domain_new_account">اختر اسم نطاق الدردشة</string>
+  <string name="registering_new_account_">جاري تسجيل حساب جديد…</string>
+  <string name="signing_in_wait">يتم تسجيل الدخول الآن…</string>
+  <string name="signing_out_wait">يتم تسجيل الخروج الآن…</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">تفقد سجل SRV</string>
+  <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">استخدم نظام الأسماء للبحث عن خادم أكس أم بي بي من اسم النطاق</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">اسمح بإرسال إسم المستخدم و كلمة السر دون حماية عند استخدام الاتصال غير المشفر</string>
+  <string name="allow_plain_text_auth">اسمح بالتحقق من الهوية دون تشفير</string>
+  <string name="require_tls_ssl_connection">إلزام استخدام TLS</string>
+  <string name="transport_encryption">تشفير الاتصال</string>
+  <string name="how_encrypted_chats_are_started">كيف يتم ابتداء المحادثات المشفرة</string>
+  <string name="the_server_to_connect_to_if_needed">الموقع الذي يتم الاتصال به، إذا دعت الحاجة</string>
+  <string name="connect_server">موقع الاتصال</string>
+  <string name="tcp_port_for_xmpp_server">منفذ ال TCP  لخادم الإكس أم بي بي</string>
+  <string name="server_port">منفذ الموقع</string>
+  <string name="xmpp_resource">مصدر إكس أم بي بي XMPP</string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">ليتم تمييز هذا الاتصال من الاتصالات الأخرى التي سجلت الدخول</string>
+  <string name="xmpp_resource_prio_title">أولوية مصدر اكس ام بي بي</string>
+  <string name="xmpp_resource_prio_summary">الرسائل المرسلة لأصدقاء لديهم أكثر من مصدر فعال في نفس الوقت سترسل للمصدر ذو الاولوية الأعلى.</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">المحادثات</string>
+  <string name="empty_account_message">لا توجد لديك حسابات تم ضبطها.\n
+\n
+اضغط هنا لإضافة حساب!</string>
+  <string name="menu_remove_contact">حذف الاتصال</string>
+  <string name="menu_contact_nickname">اﻹسم المستعار لجهة الاتصال</string>
+  <string name="menu_view_blocked">محجوب</string>
+  <string name="nickname">اسم المستعار</string>
+  <string name="confirm_delete_contact">سيتم حذف "<xliff:g id="user">%1$s</xliff:g>"</string>
+  <string name="confirm_block_contact">سيتم حجب "<xliff:g id="user">%1$s</xliff:g>"</string>
+  <string name="add_contact_success">تمت إضافة "<xliff:g id="user">%1$s</xliff:g>"</string>
+  <string name="delete_contact_success">تم حذف "<xliff:g id="user">%1$s</xliff:g>"</string>
+  <string name="block_contact_success">تم حجب "<xliff:g id="user">%1$s</xliff:g>"</string>
+  <string name="unblock_contact_success">أزيل الحجب عن "<xliff:g id="user">%1$s</xliff:g>"</string>
+  <string name="menu_verify">تحقق من جهة الاتصال</string>
+  <string name="empty_conversation_group">لا توجد محادثات\n\n
+أنقر لبدأ الدردشة!</string>
+  <string name="search_label">اتصال</string>
+  <string name="search_hint">أدخل الاسم المراد التحدث معه</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online"><xliff:g id="user">%1$s</xliff:g> متصل</string>
+  <string name="contact_away"><xliff:g id="user">%1$s</xliff:g> بالخارج</string>
+  <string name="contact_busy"><xliff:g id="user">%1$s</xliff:g> مشغول</string>
+  <string name="contact_offline"><xliff:g id="user">%1$s</xliff:g> غير متصل.</string>
+  <string name="contact_joined"><xliff:g id="user">%1$s</xliff:g> قام بالدخول</string>
+  <string name="contact_left"><xliff:g id="user">%1$s</xliff:g> قام بالخروج</string>
+  <string name="file_transfer">نقل الملفات</string>
+  <string name="accept_transfer_">قبول النقل؟</string>
+  <string name="wants_to_send_you_the_file">يريد أن يرسل لك الملف</string>
+  <string name="compose_hint">أرسل رسالة</string>
+  <string name="compose_hint_secure">أرسل رسالة آمنة</string>
+  <string name="menu_end_conversation">نهاية دردشة</string>
+  <string name="select_link_title">حدد الرابط</string>
+  <string name="delete">حذف</string>
+  <string name="export_media">صدّر ملف الوسائط؟</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt"><xliff:g id="user">%1$s</xliff:g> يدعوك لمحادثة جماعية.</string>
+  <string name="accept_invitation">قبول</string>
+  <string name="decline_invitation">رفض</string>
+  <string name="connecting_to_group_chat_">الاتصال بمحادثة جماعية…</string>
+  <string name="empty_contact_list">لم يتم العثور على جهة الاتصال.
+\n\n
+اضغط للاضافة.</string>
+  <string name="approve_subscription">نعم</string>
+  <string name="decline_subscription">لا</string>
+  <string name="approve_subscription_error">فشلت محاولة تأكيد الاشتراك من <xliff:g id="user">%1$s</xliff:g> . حاول مرة أخرى.</string>
+  <string name="decline_subscription_error">فشلت محاولة رفض الاشتراك من <xliff:g id="user">%1$s</xliff:g> . حاول مرة أخرى.</string>
+  <!--Security: OTR-->
+  <string name="otr_session_status_finished">قامت جهة الاتصال الأخرى بإيقاف التشفير بالمحادثة.</string>
+  <!--Security: OTR: Keyring-->
+  <string name="detected_Otr_keystore_import">تم اكتشاف مفتاح OTR (تشفير خارج السجل) ليتم استيراده. هل تود القيام بمسح الQR كود الآن؟</string>
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">التحقق من الهوية</string>
+  <string name="smp_question_summary">أدخل سؤال لصديقك، و الاجابة التي تتوقع منه وضعها، حتى تتحقق من هويته.</string>
+  <string name="smp_question_hint">السؤال</string>
+  <string name="qmp_answer_hint">الاجابة المتوقعة</string>
+  <string name="remote_verified_us">طرف المحادثة الآخر نجح بالتحقق من هويتك. قم الآن بالتحقق من هويته عن طريق سؤالك الخاص.</string>
+  <string name="otr_qa_title">سؤال\جواب للتحقيق OTR</string>
+  <string name="chat_encryption_title">تشفير الدردشة</string>
+  <string name="otr_qa_send">إرسال</string>
+  <string name="otr_qa_cancel">ألْغ</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">الأمن والخصوصية</string>
+  <string name="encryption_and_anonymity_title">التشفير و الخصوصية</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">اللغة</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">اللغات</string>
+  <string name="use_system_default">استخدم إفتراضي النظام</string>
+  <string name="button_yes_accept_all">نعم، اقبل الكل</string>
+  <string name="pref_delete_unsecured_media_title">حذف الملفات الغير آمنة</string>
+  <string name="pref_delete_unsecured_media_summary">حذف الملف الأساسي تلقائياً من المخزن غير الآمن بعد استراده وتصديره</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">تعديلات أخرى </string>
+  <string name="start_on_boot_summary">دائماً إبدأ و ادخل بالحسابات تلقائياً</string>
+  <string name="hide_offline_contacts">اخفاء الأسماء الغير متصلة بالشبكة</string>
+  <string name="foreground_service_title">استخدم أولوية المقدمة</string>
+  <string name="foreground_service_summary">قلل من احتمالية ان يقوم الاندرويد بإعادة تشغيل الإتصال. سيظهر إخطار في منطقة الإعلام.</string>
+  <string name="heartbeat_interval_title">فترة النبض</string>
+  <string name="heartbeat_interval_summary">استخدم قيمة أعلى لحفظ بطاريتك. القيمة العالية قد تتسبب باغلاق اتصالك بسبب عدم نشاط الاتصال.</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">إعدادات إخطارات</string>
+  <string name="notification_enabled_title">إخطارات المحادثة الفورية</string>
+  <string name="notification_enabled_summary">قم بالتنبيه بشريط التنبيه العلوي عندما تصل رسالة</string>
+  <string name="notification_vibrate_title">اهتز</string>
+  <string name="notification_vibrate_summary">اهتز أيضا عند وصول الرسائل الفورية</string>
+  <string name="notification_sound_title">الصوت</string>
+  <string name="notification_sound_summary">لعب النغمة أيضاً عندما تصل محادثة فورية</string>
+  <string name="notification_ringtone_title">استخدم نغمة خاصة بZom</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">تفعيل سجلات التنقيح</string>
+  <string name="pref_debug_summary">إخراج بيانات سجل التطبيق نحو الخرْج القياسي أو نحو logcat للتنقيح</string>
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message">بحاجة لاتصال على الشبكة (ولمعلومات خلفية) ليتم التفعيل وتسجيل الدخول.</string>
+  <string name="prompt_create_new_account_">إنشاء حساب جديد؟</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">إنشاء حساب محادثة جديد للمستخدم \'%1$s\' ؟</string>
+  <!--Alerts: Notifications-->
+  <string name="subscription_notify_text">دعوة صديق جديد من <xliff:g id="user">%s</xliff:g></string>
+  <string name="file_notify_text">ملف جديد <xliff:g id="filename">%1$s</xliff:g> من <xliff:g id="user">%2$s</xliff:g></string>
+  <string name="notify_groupchat_label">دعوة لمحادثة جماعية</string>
+  <string name="group_chat_invite_notify_text">دعوة محادثة مجموعة جديدة من <xliff:g id="user">%s</xliff:g></string>
+  <string name="new_messages_notify">رسالة جديدة من</string>
+  <string name="app_unlocked">تم التفعيل و فتح القفل</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">انتباه</string>
+  <string name="error_prefix">خطأ:</string>
+  <string name="general_error">رمز الخطأ: <xliff:g id="code">%1$d</xliff:g></string>
+  <string name="login_service_failed">غير قادر على تسجيل الدخول إلى <xliff:g id="service">%1$s</xliff:g> . حاول مرة أخرى لاحقاً. التفاصيل:    <xliff:g id="description">%2$s</xliff:g>
+</string>
+  <string name="add_list_failed">لم يتم إضافة القائمة.</string>
+  <string name="block_contact_failed">لم يتم حظر جهة الاتصال</string>
+  <string name="unblock_contact_failed">لم تتم إزالة الحظر عن جهة الاتصال</string>
+  <string name="load_contact_list_failed">لم يتم تحميل قائمة الاتصال.</string>
+  <string name="cant_connect_to_server">لا يمكن الاتصال بالموقع. يرجى التحقق من اتصالك.</string>
+  <string name="contact_already_exist"><xliff:g id="user">%1$s</xliff:g> موجود بقائمة الأسماء لديك.</string>
+  <string name="contact_blocked">تم حجب "<xliff:g id="user">%1$s</xliff:g>"</string>
+  <string name="contact_not_loaded">الرجاء الانتظار بينما نقوم بتحميل قائمة الاتصال الخاصة بك.</string>
+  <string name="network_error">حدث خطأ في الشبكة.</string>
+  <string name="wifi_not_connected_error">مطلوب اتصال واي فاي</string>
+  <string name="service_not_support">الموقع لا يدعم هذه الوظيفة.</string>
+  <string name="invalid_password">كلمة السر التي أدخلتها غير صالحة.</string>
+  <string name="internal_server_error">حصل خطأ بالموقع</string>
+  <string name="not_implemented">الموقع لا يدعم هذه الوظيفة.</string>
+  <string name="service_unavaiable">الموقع غير متوفر حاليا.</string>
+  <string name="timeout">لم يتم تنفيذ الطلب بالوقت المحدد.</string>
+  <string name="version_not_supported">الموقع لا يدعم الإصدار الحالي.</string>
+  <string name="message_queue_full">قائمة انتظار الرسائل ممتلئة</string>
+  <string name="domain_not_supported">الموقع لا يدعم إعادة التوجيه لاسم النطاق</string>
+  <string name="unknown_user">لم يتم التعرف على اسم المستخدم الذي أدخلته.</string>
+  <string name="recipient_blocked_the_user">عذرا ، تم حظر لك من قبل هذا المستخدم.</string>
+  <string name="session_expired">انتهت فترة الاتصال، الرجاء تسجيل الدخول مرة أخرى.</string>
+  <string name="forced_logout">قمت بتسجيل الدخول ببرنامج آخر</string>
+  <string name="already_logged_in">لقد قمت بتسجيل الدخول من برنامج آخر</string>
+  <string name="msisdn_error">عذرا ، تعذرت قراءة رقم الهاتف من البطاقة. يرجى الاتصال بمشغل الشبكة للحصول على مساعدة.</string>
+  <string name="not_signed_in">لست مسجَّلا حاليا.</string>
+  <string name="account_setup_error_server">حصل خطأ أثناء محاولة الاتصال بالموقع. تأكد من إعدادات الاتصال ثم حاول مرة أخرى.</string>
+  <string name="error_suspended_connection">فُقِد الاتصال بالشبكة</string>
+  <string name="unable_to_create_or_join_group_chat">تعذر إنشاء أو الانضمام لمحادثة مجموعة</string>
+  <string name="there_is_no_viewer_available_for_this_file_format">لا يوجد عارض لهذا الصنف من الملفات</string>
+  <string name="otr_keysync_warning_message">يرجى نسخ ملف \'otr_keystore.ofcaes\' من سطح مكتب أداة  OtrFileConverter إلى مجلد جذر جهاز تخزينك</string>
+  <string name="msg_sent_failed">لا يمكن إرسال هذه الرسالة.</string>
+  <string name="disconnected_warning">لا يوجد اتصال حالياً. ستُرسَل الرسائل عند إعادة الاتصال.</string>
+  <string name="error_account_password_mismatch">كلمات السر لا تتطابق</string>
+  <string name="error_account_settings_priority">يجب على الأفضلية أن تكون رقم ضمن نطاق [0 … 127]</string>
+  <string name="error_account_settings_port">يجب على رقم المنفذ أن يكون رقماً</string>
+  <string name="error_welcome_database">خطأ كبير: لا يمكن فتح أو تحميل قاعدة بيانات التطبيق. الرجاء إعادة تثبيت التطبيق أو محو البيانات.</string>
+  <string name="account_settings_title">إعدادات الحساب</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">المجموعات</string>
+  <string name="buddies">أصدقاء</string>
+  <string name="contacts">جهات الاتصال</string>
+  <string name="mtm_accept_cert">قبول شهادة التعمية من الخادم؟</string>
+  <string name="loading">جاري التحميل…</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">إعدادات</string>
+  <string name="menu_sign_out">تسجيل الخروج</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">متصل</string>
+  <string name="presence_busy">مشغول</string>
+  <string name="presence_away">بعيدا</string>
+  <string name="presence_idle">خامل</string>
+  <string name="presence_offline">غير متصل</string>
+  <string name="presence_invisible">الظهور دون اتصال</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>سعيد</item>
+    <item>حزين</item>
+    <item>يرمش</item>
+    <item>اللسان خارج</item>
+    <item>مندهش</item>
+    <item>يقبل</item>
+    <item>يصرخ</item>
+    <item>جيد</item>
+    <item>يفعل ما يقول</item>
+    <item>يتحدث بغباء</item>
+    <item>محرَج</item>
+    <item>ملاك</item>
+    <item>ملتبَس عليه</item>
+    <item>يبكي</item>
+    <item>شفاه مغلقة</item>
+    <item>يضحك</item>
+    <item>مضطرب</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>سعيد</item>
+    <item>حزين</item>
+    <item>يرمش</item>
+    <item>اللسان خارج</item>
+    <item>مندهش</item>
+    <item>يقبل</item>
+    <item>صراخ</item>
+    <item>جيد</item>
+    <item>يفعل ما يقول</item>
+    <item>يتحدث بغباء</item>
+    <item>بالحرج</item>
+    <item>ملاك</item>
+    <item>ملتبَس عليه</item>
+    <item>بكاء</item>
+    <item>شفاه مغلقة</item>
+    <item>يضحك</item>
+    <item>مضطرب</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="this_is_a_group_chat">هذه دردشة جماعية</string>
+  <string name="unable_to_securely_share_this_file">لا يمكن مشاركة هذا الملف بطريقة آمنة</string>
+  <string name="title_me">أنا</string>
+</resources>

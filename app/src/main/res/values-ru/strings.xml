@@ -1,0 +1,279 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Zom</string>
+  <string name="app_name">Zom</string>
+  <string name="im_label">Zom</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">читать мгновенные сообщения</string>
+  <string name="ro_perm_desc">
+Позволить приложениям чтение данных из мгновенных сообщений контент-провайдера.</string>
+  <string name="wo_perm_label">написать мгновенные сообщения</string>
+  <string name="wo_perm_desc">
+Позволить приложениям запись данных в мгновенные сообщения контент-провайдера.</string>
+  <string name="perm_label">Включить чат</string>
+  <string name="perm_desc">Разрешает приложениям включать чат через Intent.</string>
+  <!--General: Actions-->
+  <string name="confirm">Подтвердить</string>
+  <string name="ok">ОК</string>
+  <string name="cancel">Отмена</string>
+  <string name="yes">ОК</string>
+  <string name="no">Отмена</string>
+  <string name="connect">Подключение</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Установить Пароль</string>
+  <string name="lock_screen_confirm_passphrase">Подтверди Пароль</string>
+  <string name="lock_screen_passphrase_hint">Пароль</string>
+  <string name="lock_screen_passphrase_not_set_enter">Новый Пароль</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Подтверди Новый Пароль</string>
+  <string name="lock_screen_passphrases_not_matching">Кодовая фраза не совпадает, попробуйте еще раз</string>
+  <string name="lock_screen_skip">Я Ленивый (Без пароля!)</string>
+  <!--Views: Setup-->
+  <string name="add_account">Добавить аккаунт <xliff:g id="ACCOUNT">%1$s</xliff:g></string>
+  <string name="menu_about">О программе</string>
+  <string name="pass_err_length">Ваш пароль не был достаточно длинным</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Вход</string>
+  <string name="account_setup_example_email_address">user@domain.com</string>
+  <string name="account_setup_new_username">новый пользователь</string>
+  <string name="account_setup_password">пароль</string>
+  <string name="account_setup_password_confirm">подтвердить пароль</string>
+  <string name="btn_create_new_account">Зарегистрировать аккаунт</string>
+  <string name="account_setup_pers_now_title">Войдите в систему</string>
+  <string name="select_domain_new_account">Выбрать домен</string>
+  <string name="registering_new_account_">Создание новой учетной записи…</string>
+  <string name="signing_in_wait">Выполняется вход…</string>
+  <string name="signing_out_wait">Выполняется выход…\u2026</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">Поиск SRV записи</string>
+  <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">Использовать DNS SRV для определения XMPP из доменного имени</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Разрешать передачу имени пользователя и пароля открытым текстом, если не используется протокол защиты транспортного уровня</string>
+  <string name="allow_plain_text_auth">Разрешать авторизацию открытым текстом (без шифрования)</string>
+  <string name="require_tls_ssl_connection">Требуется TLS-соединение</string>
+  <string name="transport_encryption">Защита транспортного уровня</string>
+  <string name="how_encrypted_chats_are_started">как начинаются шифрованные чаты</string>
+  <string name="the_server_to_connect_to_if_needed">Сервер для соединения, если он нужен </string>
+  <string name="connect_server">Соединиться с сервером</string>
+  <string name="tcp_port_for_xmpp_server">TCP порт сервера XMPP</string>
+  <string name="server_port">Порт сервера</string>
+  <string name="xmpp_resource">Ресурс XMPP</string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">чтобы выделить соединение из других клиентов, которые тоже в сети</string>
+  <string name="xmpp_resource_prio_title">Приоритет ресурса XMPP</string>
+  <string name="xmpp_resource_prio_summary">Сообщения собеседникам, у которых активно несколько клиентов, будут переданы в клиент с самым высоким приоритетом</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">Беседы</string>
+  <string name="empty_account_message">У Вас нет настроенных⏎
+аккаунтов.⏎
+⏎
+Нажмите здесь для добавления!</string>
+  <string name="menu_remove_contact">Удалить контакт</string>
+  <string name="menu_contact_nickname">прозвище контакта</string>
+  <string name="menu_view_blocked">Заблокированные</string>
+  <string name="confirm_delete_contact">Контакт \<xliff:g id="USER">%1$s</xliff:g>" будет удален.</string>
+  <string name="confirm_block_contact">Контакт \<xliff:g id="USER">%1$s</xliff:g>" будет заблокирован.</string>
+  <string name="add_contact_success">Контакт \<xliff:g id="USER">%1$s</xliff:g>" добавлен.</string>
+  <string name="delete_contact_success">Контакт \<xliff:g id="USER">%1$s</xliff:g>" удален.</string>
+  <string name="block_contact_success">Контакт \<xliff:g id="USER">%1$s</xliff:g>" заблокирован.</string>
+  <string name="unblock_contact_success">Контакт \<xliff:g id="USER">%1$s</xliff:g>" разблокирован.</string>
+  <string name="menu_verify">Проверить ключ</string>
+  <string name="empty_conversation_group">Нет разговоров</string>
+  <string name="search_label">Контакт</string>
+  <string name="search_hint">введите имя собеседника</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online">Пользователь <xliff:g id="USER">%1$s</xliff:g> в сети</string>
+  <string name="contact_away">Пользователь <xliff:g id="USER">%1$s</xliff:g> отсутствует</string>
+  <string name="contact_busy">Пользователь <xliff:g id="USER">%1$s</xliff:g> занят</string>
+  <string name="contact_offline">Пользователь <xliff:g id="USER">%1$s</xliff:g> не в сети</string>
+  <string name="contact_joined">Пользователь <xliff:g id="USER">%1$s</xliff:g> присоединился к чату</string>
+  <string name="contact_left">Пользователь <xliff:g id="USER">%1$s</xliff:g> покинул чат</string>
+  <string name="file_transfer">Передача Файлов</string>
+  <string name="accept_transfer_">Подтвердить передачу?</string>
+  <string name="wants_to_send_you_the_file">хочет отправить вам файл</string>
+  <string name="compose_hint">Отправить сообщение</string>
+  <string name="compose_hint_secure">Отправить защищенное сообщение</string>
+  <string name="menu_end_conversation">Закончить чат</string>
+  <string name="select_link_title">Выберите ссылку</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt">Пользователь <xliff:g id="USER">%1$s</xliff:g> приглашает вас в групповой чат.</string>
+  <string name="accept_invitation">Принять</string>
+  <string name="decline_invitation">Отклонить</string>
+  <string name="connecting_to_group_chat_">Подключение к групповому чату…</string>
+  <string name="empty_contact_list">Контактов не найдено.⏎
+⏎
+Нажмите для добавления.</string>
+  <string name="approve_subscription">Да</string>
+  <string name="decline_subscription">Нет</string>
+  <string name="approve_subscription_error">Не удалось одобрить запрос подписки от пользователя <xliff:g id="USER">%1$s</xliff:g>. Повторите попытку позже.</string>
+  <string name="decline_subscription_error">Не удалось отклонить запрос подписки от пользователя <xliff:g id="USER">%1$s</xliff:g>. Повторите попытку позже.</string>
+  <!--Security: OTR-->
+  <string name="otr_session_status_finished">Ваш контакт остановил шифрованный чат.</string>
+  <!--Security: OTR: Keyring-->
+  <string name="detected_Otr_keystore_import">Мы обнаружили, OTR ключей для импорта. Хотели бы вы сейчас отсканировать QR пароль?</string>
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Проверка подлинности</string>
+  <string name="smp_question_summary">Введите вопрос, на который нужно будет ответить вашему собеседнику, а также правильный ответ на этот вопрос, для подтверждения их личности.</string>
+  <string name="smp_question_hint">контрольный вопрос</string>
+  <string name="qmp_answer_hint">правильный ответ</string>
+  <string name="remote_verified_us">Ваш контакт успешно прошел аутентификацию вас. Теперь проверьте подлинности контакт, задавая свой ​​вопрос.</string>
+  <string name="otr_qa_send">Отправить</string>
+  <string name="otr_qa_cancel">Отменить</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">Безопасность и Конфиденциальность</string>
+  <string name="encryption_and_anonymity_title">Шифрование и анонимность</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">Язык</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Языки</string>
+  <string name="button_yes_accept_all">Да, Подтвердить Все</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">Другие Hастройки</string>
+  <string name="start_on_boot_summary">Всегда начинайте и автоматически войдите в ранее зарегистрированные счета</string>
+  <string name="hide_offline_contacts">Скрыть контакты, отсутствующие в сети</string>
+  <string name="foreground_service_title">Выполнять с активным приоритетом.</string>
+  <string name="foreground_service_summary">Уменьшить вероятность того, что Android перезагрузит службу соединения нашей программы. В этом случае в области уведомлений появится сообщение.</string>
+  <string name="heartbeat_interval_title">Интервал сердцебиение</string>
+  <string name="heartbeat_interval_summary">Используйте более высокое значение (в минутах) для экономии заряда батареи. Высокое значение может привести к  тому что соединение  будет прервано провайдером из-за неактивности.</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Настройки уведомлений</string>
+  <string name="notification_enabled_title">Уведомления чата</string>
+  <string name="notification_enabled_summary">Уведомлять о получении сообщения чата в строке состояния</string>
+  <string name="notification_vibrate_title">Вибрация</string>
+  <string name="notification_vibrate_summary">Сигнал вибрации при получении сообщения чата</string>
+  <string name="notification_sound_title">Звуковой сигнал</string>
+  <string name="notification_sound_summary">Воспроизводить мелодию звонка при получении сообщения чата</string>
+  <string name="notification_ringtone_title">Используйте пользовательскую мелодию Zom</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">Включить протоколирование работы.</string>
+  <string name="pref_debug_summary">Показывать протокол работы  в стандартный вывод / использовать logcat  для ведения протокола.</string>
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message"><xliff:g id="PROVIDER">%1$s</xliff:g> требует, чтобы использование фоновых данных было разрешено</string>
+  <string name="prompt_create_new_account_">Создать новую учетную запись?</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">Создать новую учетную запись чата для пользователя \'%1$s\'?</string>
+  <!--Alerts: Notifications-->
+  <string name="notify_groupchat_label">Приглашение в групповой чат</string>
+  <string name="new_messages_notify">Новое сообщение(я) от</string>
+  <string name="app_unlocked">Активировано &amp; Разблокировано</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">Внимание</string>
+  <string name="general_error">Код ошибки: <xliff:g id="CODE">%1$d</xliff:g></string>
+  <string name="login_service_failed">Не удается выполнить вход в службу: <xliff:g id="SERVICE">%1$s</xliff:g>. Повторите попытку позже."\n"(Подробности: <xliff:g id="DESCRIPTION">%2$s</xliff:g>)</string>
+  <string name="add_list_failed">Список не был добавлен.</string>
+  <string name="block_contact_failed">Не удалось заблокировать контакт.</string>
+  <string name="unblock_contact_failed">Не удалось разблокировать контакт.</string>
+  <string name="load_contact_list_failed">Список контактов не был загружен.</string>
+  <string name="cant_connect_to_server">Не удается подключиться к серверу. Проверьте соединение.</string>
+  <string name="contact_already_exist">Пользователь <xliff:g id="USER">%1$s</xliff:g> уже внесен в список контактов.</string>
+  <string name="contact_blocked">Контакт \<xliff:g id="USER">%1$s</xliff:g>" заблокирован.</string>
+  <string name="contact_not_loaded">Дождитесь окончания загрузки списка контактов.</string>
+  <string name="network_error">Произошла ошибка сети.</string>
+  <string name="wifi_not_connected_error">Для этого соединения требуется WiFi</string>
+  <string name="service_not_support">Эта функция не поддерживается сервером.</string>
+  <string name="invalid_password">Неправильный пароль.</string>
+  <string name="internal_server_error">Произошла ошибка сервера.</string>
+  <string name="not_implemented">Эта функция не поддерживается сервером.</string>
+  <string name="service_unavaiable">В настоящий момент сервер недоступен.</string>
+  <string name="timeout">Время ожидания сервера истекло.</string>
+  <string name="version_not_supported">Текущая версия не поддерживается сервером.</string>
+  <string name="message_queue_full">Очередь сообщений переполнена.</string>
+  <string name="domain_not_supported">Сервер не поддерживает переадресацию на домен.</string>
+  <string name="unknown_user">Указанное имя пользователя не опознано.</string>
+  <string name="recipient_blocked_the_user">К сожалению, пользователь вас заблокировал.</string>
+  <string name="session_expired">Сеанс завершен, войдите в систему еще раз.</string>
+  <string name="forced_logout">вы вошли с использованием другого клиента.</string>
+  <string name="already_logged_in">вы уже вошли с использованием другого клиента.</string>
+  <string name="msisdn_error">Не удается получить номер телефона с SIM-карты. Обратитесь к своему оператору.</string>
+  <string name="not_signed_in">В настоящий момент вход в систему не выполнен.</string>
+  <string name="account_setup_error_server">Произошла ошибка при подключении к чат-сервера - пожалуйста, проверьте настройки и попробуйте еще раз.</string>
+  <string name="error_suspended_connection">Потеряно соединение с сетью</string>
+  <string name="unable_to_create_or_join_group_chat">Невозможно создать или присоединиться к групповому чату</string>
+  <string name="there_is_no_viewer_available_for_this_file_format">Для программы для  открытия этого типа файлов.</string>
+  <string name="otr_keysync_warning_message">Скопируйте файл \'otr_keystore.ofcaes\' от настольного инструмента OtrFileConverter в корневую директорию вашего устройства хранения</string>
+  <string name="msg_sent_failed">Не удалось отправить сообщение.</string>
+  <string name="disconnected_warning">Сообщение будет отправлено после подключения</string>
+  <string name="account_settings_title">Настройки учетной записи</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Группы</string>
+  <string name="buddies">Друзья</string>
+  <string name="contacts">Контакты</string>
+  <string name="mtm_accept_cert">Принять сертификат сервера?</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Настройки</string>
+  <string name="menu_sign_out">Выход</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber/XMPP</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">В сети</string>
+  <string name="presence_busy">Не беспокоить</string>
+  <string name="presence_away">Отсутствует</string>
+  <string name="presence_idle">Нет на месте</string>
+  <string name="presence_offline">Не в сети</string>
+  <string name="presence_invisible">Невидимый</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Счастливы</item>
+    <item>Печальный</item>
+    <item>Подмигивание</item>
+    <item>Высунутый язык</item>
+    <item>Удивленный</item>
+    <item>Целующий</item>
+    <item>Кричит</item>
+    <item>Прохладно</item>
+    <item>Деньги рот</item>
+    <item>Ноги в рот</item>
+    <item>Смущенный</item>
+    <item>Ангел</item>
+    <item>Нерешенный</item>
+    <item>Плач</item>
+    <item>Lips Are Sealed</item>
+    <item>Смеясь</item>
+    <item>Спутанный</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Счастливы</item>
+    <item>Печальный</item>
+    <item>Подмигивание</item>
+    <item>Высунутый язык</item>
+    <item>Удивленный</item>
+    <item>Целующий</item>
+    <item>Кричит</item>
+    <item>Прохладно</item>
+    <item>Деньги рот</item>
+    <item>Ноги в рот</item>
+    <item>Смущенный</item>
+    <item>Ангел</item>
+    <item>Нерешенный</item>
+    <item>Плач</item>
+    <item>Lips Are Sealed</item>
+    <item>Смеясь</item>
+    <item>Спутанный</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="title_me">Я</string>
+</resources>

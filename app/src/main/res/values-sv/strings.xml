@@ -1,0 +1,303 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Zom</string>
+  <string name="app_name">Zom</string>
+  <string name="im_label">Zom</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">läs meddelanden</string>
+  <string name="ro_perm_desc">
+Tillåt applikationer att läsa data från IM innehållsleverantör.</string>
+  <string name="wo_perm_label">skriv meddelanden</string>
+  <string name="wo_perm_desc">
+Tillåt applikationer att skriva data till IM innehållsleverantör.
+    </string>
+  <string name="perm_label">öppna chattjänsten</string>
+  <string name="perm_desc">Tillåter att ett program avsiktligen öppnar chattjänsten.</string>
+  <!--General: Actions-->
+  <string name="confirm">Bekräfta</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Avbryt</string>
+  <string name="yes">OK</string>
+  <string name="no">Avbryt</string>
+  <string name="connect">Anslut</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Bestäm lösenord</string>
+  <string name="lock_screen_confirm_passphrase">Bekräfta lösenord</string>
+  <string name="lock_screen_passphrase_hint">Lösenord</string>
+  <string name="lock_screen_passphrase_not_set_enter">Nytt lösenord</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Bekräfta nytt lösenord</string>
+  <string name="lock_screen_passphrases_not_matching">Lösenord matchade inte, var vänlig försök igen</string>
+  <string name="lock_screen_skip">Jag är lat (inget lösenord!)</string>
+  <!--Views: Setup-->
+  <string name="add_account">Lägg till kontot <xliff:g id="ACCOUNT">%1$s</xliff:g></string>
+  <string name="menu_about">Om</string>
+  <string name="signed_out_prompt_with_error">Du har loggats ut från <xliff:g id="account">%1$s</xliff:g> på grund av <xliff:g id="reason">%2$s</xliff:g></string>
+  <string name="pass_err_length">Ditt lösenord var inte långt nog</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Logga in</string>
+  <string name="account_setup_example_email_address">user@domain.com</string>
+  <string name="account_setup_new_username">nytt användarnamn</string>
+  <string name="account_setup_password">lösenord</string>
+  <string name="account_setup_password_confirm">bekräfta lösenord</string>
+  <string name="btn_create_new_account">Registrera Konto</string>
+  <string name="account_setup_pers_now_title">Logga in nu</string>
+  <string name="select_domain_new_account">Välj en domän</string>
+  <string name="registering_new_account_">Registrerar nytt konto…</string>
+  <string name="signing_in_wait">Loggar in…</string>
+  <string name="signing_out_wait">Loggar ut\u2026</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">Gör SRV koll</string>
+  <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">Använd DNS SRV för att hitta XMPP servern from domännamnet</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Tillåt användarnamnet och lösenordet att skickas som klartext när okrypterad transport används</string>
+  <string name="allow_plain_text_auth">Tillåt klartext autentisering</string>
+  <string name="require_tls_ssl_connection">Kräv TLS-anslutning</string>
+  <string name="transport_encryption">Transportkryptering</string>
+  <string name="how_encrypted_chats_are_started">hur krypterade chatter startas</string>
+  <string name="the_server_to_connect_to_if_needed">Servern att ansluta till, vid behov</string>
+  <string name="connect_server">Anslut server</string>
+  <string name="tcp_port_for_xmpp_server">TCP port för XMPP server</string>
+  <string name="server_port">Serverport</string>
+  <string name="xmpp_resource">XMPP resurs</string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">för att skilja denna anslutning från andra klienter som också är inloggade</string>
+  <string name="xmpp_resource_prio_title">XMPP resursprioritet</string>
+  <string name="xmpp_resource_prio_summary">Meddelanden till klienter med flera aktiva resurser kommer skickas till resursen med högst prioritet</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">Konversationer</string>
+  <string name="empty_account_message">Du har inga
+konton konfigurerade.
+
+Tappa här för att lägga till ett!</string>
+  <string name="menu_remove_contact">Ta bort kontakt</string>
+  <string name="menu_contact_nickname">Kontaktsmeknamn</string>
+  <string name="menu_view_blocked">Blockerad</string>
+  <string name="confirm_delete_contact">Kontakten <xliff:g id="USER">%1$s</xliff:g> tas bort.</string>
+  <string name="confirm_block_contact">Kontakten <xliff:g id="USER">%1$s</xliff:g> blockeras.</string>
+  <string name="add_contact_success">Kontakten <xliff:g id="USER">%1$s</xliff:g> har lagts till.</string>
+  <string name="delete_contact_success">Kontakten <xliff:g id="USER">%1$s</xliff:g> har tagits bort.</string>
+  <string name="block_contact_success">Kontakten <xliff:g id="USER">%1$s</xliff:g> är blockerad.</string>
+  <string name="unblock_contact_success">Blockering hävs för kontakten <xliff:g id="USER">%1$s</xliff:g>.</string>
+  <string name="menu_verify">Verifiera nyckel</string>
+  <string name="empty_conversation_group">Inga konversationer</string>
+  <string name="search_label">Kontakt</string>
+  <string name="search_hint">skriv namnet på en kontakt du vill chatta med</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online"><xliff:g id="USER">%1$s</xliff:g> är online</string>
+  <string name="contact_away"><xliff:g id="USER">%1$s</xliff:g> är borta</string>
+  <string name="contact_busy"><xliff:g id="USER">%1$s</xliff:g> är upptagen</string>
+  <string name="contact_offline"><xliff:g id="USER">%1$s</xliff:g> är offline</string>
+  <string name="contact_joined"><xliff:g id="USER">%1$s</xliff:g> är med</string>
+  <string name="contact_left"><xliff:g id="USER">%1$s</xliff:g> har lämnat chatten</string>
+  <string name="file_transfer">Filöverföring</string>
+  <string name="accept_transfer_">Acceptera överföring?</string>
+  <string name="wants_to_send_you_the_file">vill skicka dig filen</string>
+  <string name="no_connection_for_sending">Ingen anslutning tillgänglig för att skicka din delning!</string>
+  <string name="compose_hint">Skicka ett meddelande</string>
+  <string name="compose_hint_secure">Skicka säkert meddelande</string>
+  <string name="menu_end_conversation">Avsluta chatt</string>
+  <string name="select_link_title">Välj länk</string>
+  <string name="delete">Radera</string>
+  <string name="export_media">Exportera mediafil?</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt"><xliff:g id="USER">%1$s</xliff:g> har bjudit in dig till en gruppchatt.</string>
+  <string name="accept_invitation">Acceptera</string>
+  <string name="decline_invitation">Avvisa</string>
+  <string name="connecting_to_group_chat_">Ansluter till gruppchatt…</string>
+  <string name="empty_contact_list">Inga kontakter funna.
+
+Klicka för att bjuda in.</string>
+  <string name="approve_subscription_error">Det gick inte att godkänna prenumeration från <xliff:g id="USER">%1$s</xliff:g>. Försök igen lite senare.</string>
+  <string name="decline_subscription_error">Det gick inte att avvisa prenumeration från <xliff:g id="USER">%1$s</xliff:g>. Försök igen senare.</string>
+  <!--Security: OTR-->
+  <string name="otr_session_status_finished">Din kontakt har stoppat den krypterade chatten.</string>
+  <!--Security: OTR: Keyring-->
+  <string name="detected_Otr_keystore_import">Vi har upptäckt en OTR keystore för import. Vill du skanna QR lösenordet nu?</string>
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Autentisering</string>
+  <string name="smp_question_summary">Skriv en fråga och skicka till din kontakt, och svaret du förväntas få, för att verifiera att dom verkligen är de dom påstår.</string>
+  <string name="smp_question_hint">fråga</string>
+  <string name="qmp_answer_hint">förväntat svar</string>
+  <string name="remote_verified_us">Din kontakt har framgångsrikt autentiserat dig. Autentisera nu din kontakt genom att fråga in egen fråga.</string>
+  <string name="otr_qa_title">OTR Q&amp;A verifiering</string>
+  <string name="chat_encryption_title">Chattkryptering</string>
+  <string name="otr_qa_send">Skicka</string>
+  <string name="otr_qa_cancel">Avbryt</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">Säkerhet och sekretess</string>
+  <string name="encryption_and_anonymity_title">Kryptering och anonymitet</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="pref_linkify_on_tor_title">Klickbara länkar i Tor</string>
+  <string name="pref_linkify_on_tor_summary">För konton som använder Tor, gör länkar i konversationer klickbara (VARNING, möjlig integritetsläcka!)</string>
+  <string name="menu_locale">Språk</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Språk</string>
+  <string name="use_system_default">Använd systemets standardinställning</string>
+  <string name="button_yes_accept_all">Ja, acceptera alla</string>
+  <string name="pref_delete_unsecured_media_title">Radera osäker media</string>
+  <string name="pref_delete_unsecured_media_summary">När du delat en bild eller en fil - radera automatiskt originalfilen från den ursprungliga lagringsplatsen</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">Andra inställningar</string>
+  <string name="start_on_boot_summary">Starta alltid och logga automatiskt in på tidigare inloggade konton</string>
+  <string name="hide_offline_contacts">Dölj offlinekontakter</string>
+  <string name="foreground_service_title">Använd förgrundsprioritet</string>
+  <string name="foreground_service_summary">Minska chansen att Android startar om vår anslutningstjänst. Detta placerar en notifikation i notifikationsområdet.</string>
+  <string name="heartbeat_interval_title">Pulsintervall</string>
+  <string name="heartbeat_interval_summary">Använd ett högre värde (i minuter) för att spara batteri. Ett högt värde kan göra att leverantören stänger din anslutning på grund av inaktivitet.</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Aviseringsinställningar</string>
+  <string name="notification_enabled_title">Chattavisering</string>
+  <string name="notification_enabled_summary">Avisering i statusfältet när jag får chattmeddelanden</string>
+  <string name="notification_vibrate_title">Vibrera</string>
+  <string name="notification_vibrate_summary">Vibrera vid chattmeddelanden</string>
+  <string name="notification_sound_title">Ljud</string>
+  <string name="notification_sound_summary">Spela ringsignal vid chattmeddelande</string>
+  <string name="notification_ringtone_title">Använd Zom anpassad ringsignal</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">Aktivera debuggloggar</string>
+  <string name="pref_debug_summary">Skicka loggdata för appen till standard out / logcat för debuggning</string>
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message">
+Nätverkstrafik (även i bakgrunden) krävs för att kunna logga in med appen.</string>
+  <string name="prompt_create_new_account_">Skapa nytt konto?</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">Skapa nytt chattkonto för användarnamn \'%1$s\'?</string>
+  <!--Alerts: Notifications-->
+  <string name="subscription_notify_text">Ny kontaktförfrågan från <xliff:g id="user">%s</xliff:g></string>
+  <string name="file_notify_text">Ny fil <xliff:g id="filename">%1$s</xliff:g> från <xliff:g id="user">%2$s</xliff:g></string>
+  <string name="notify_groupchat_label">Inbjudan till gruppchatt</string>
+  <string name="group_chat_invite_notify_text">Ny gruppchattinbjudan från <xliff:g id="user">%s</xliff:g></string>
+  <string name="new_messages_notify">Nytt meddelande(n) från</string>
+  <string name="app_unlocked">Aktiverad &amp; olåst</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">Obs!</string>
+  <string name="error_prefix">Fel:</string>
+  <string name="general_error">Felkod <xliff:g id="CODE">%1$d</xliff:g></string>
+  <string name="login_service_failed">Det gick inte att logga in till tjänsten <xliff:g id="SERVICE">%1$s</xliff:g>. Försök igen senare."\n"(Information: <xliff:g id="DESCRIPTION">%2$s</xliff:g>)</string>
+  <string name="add_list_failed">Det gick inte att lägga till listan.</string>
+  <string name="block_contact_failed">Kontakten blockerades inte.</string>
+  <string name="unblock_contact_failed">Blockeringen hävdes inte för kontakten.</string>
+  <string name="load_contact_list_failed">Det gick inte att hämta kontaktlistan.</string>
+  <string name="cant_connect_to_server">Det går inte att ansluta till servern. Kontrollera anslutningen.</string>
+  <string name="contact_already_exist"><xliff:g id="USER">%1$s</xliff:g> finns redan i din Kontaktlista.</string>
+  <string name="contact_blocked">Kontakten <xliff:g id="USER">%1$s</xliff:g> har blockerats.</string>
+  <string name="contact_not_loaded">Vänta medan vi hämtar din Kontaktlista.</string>
+  <string name="network_error">Ett nätverksfel inträffade.</string>
+  <string name="wifi_not_connected_error">WiFi behövs för denna anslutning.</string>
+  <string name="service_not_support">Servern stöder inte den här funktionen.</string>
+  <string name="invalid_password">Lösenordet du angav är ogiltigt.</string>
+  <string name="internal_server_error">Servern upptäckte ett fel.</string>
+  <string name="not_implemented">Servern stöder inte den här funktionen.</string>
+  <string name="service_unavaiable">Servern är inte tillgänglig för tillfället.</string>
+  <string name="timeout">Tidsgränsen för servern har överskridits.</string>
+  <string name="version_not_supported">Servern stöder inte den aktuella versionen.</string>
+  <string name="message_queue_full">Meddelandekön är full.</string>
+  <string name="domain_not_supported">Servern stöder inte vidarebefordran till domänen.</string>
+  <string name="unknown_user">Användarnamnet du angav är okänt.</string>
+  <string name="recipient_blocked_the_user">Du har tyvärr blockerats av användaren.</string>
+  <string name="session_expired">Besöket har upphört att gälla. Logga in igen.</string>
+  <string name="forced_logout">du har loggat in från en annan klient.</string>
+  <string name="already_logged_in">du redan har loggat in från en annan klient.</string>
+  <string name="msisdn_error">Det går tyvärr inte att läsa telefonnumret från ditt SIM-kort. Kontakta din operatör.</string>
+  <string name="not_signed_in">Du är inte inloggad för närvarande.</string>
+  <string name="account_setup_error_server">Zom stötte på ett fel vid anslutning till chattservern - var vänlig kolla din konfigurering och försök igen.</string>
+  <string name="error_suspended_connection">Zom har tappat anslutningen till nätverket</string>
+  <string name="unable_to_create_or_join_group_chat">Kan inte skapa eller gå med i grupp chatt</string>
+  <string name="unsupported_incoming_data">Ej supporterat inkommande data, kan inte dela!</string>
+  <string name="there_is_no_viewer_available_for_this_file_format">Det finns ingen visare för detta filformat</string>
+  <string name="otr_keysync_warning_message">Var vänlig kopiera \'otr_keystore.ofcaes\' filen från OtrFileConverter verktyget till rotkatalogen på din enhet</string>
+  <string name="msg_sent_failed">Det gick inte att skicka meddelandet.</string>
+  <string name="disconnected_warning">Meddelanden kommer skickas vid återanslutning</string>
+  <string name="error_account_password_mismatch">Dina lösenord matchar inte</string>
+  <string name="error_account_settings_priority">Prioritet måste anges som ett tal mellan [0 .. 127]</string>
+  <string name="error_account_settings_port">Portnummer måste vara ett tal</string>
+  <string name="error_welcome_database">Allvarligt fel: kan inte låsa upp eller ladda appdatabasen. Vänligen installera om appen eller rensa data.</string>
+  <string name="account_settings_title">Kontoinställningar</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Grupper</string>
+  <string name="buddies">Kompisar</string>
+  <string name="contacts">Kontakter</string>
+  <string name="mtm_accept_cert">Acceptera servercertifikat?</string>
+  <string name="loading">laddar…</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Inställningar</string>
+  <string name="menu_sign_out">Logga ut</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">Online</string>
+  <string name="presence_busy">Upptagen</string>
+  <string name="presence_away">Borta</string>
+  <string name="presence_idle">Inaktiv</string>
+  <string name="presence_offline">Offline</string>
+  <string name="presence_invisible">Visa som offline</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Glad</item>
+    <item>Ledsen</item>
+    <item>Blinkar</item>
+    <item>Lipar</item>
+    <item>Förvånad</item>
+    <item>Pussar</item>
+    <item>Skriker</item>
+    <item>Cool</item>
+    <item>Dollarmun</item>
+    <item>Bortgjord</item>
+    <item>Generad</item>
+    <item>Ängel</item>
+    <item>Tveksam</item>
+    <item>Gråter</item>
+    <item>Hemlis</item>
+    <item>Skrattar</item>
+    <item>Förvirrad</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Glad</item>
+    <item>Ledsen</item>
+    <item>Blinkar</item>
+    <item>Lipar</item>
+    <item>Förvånad</item>
+    <item>Pussar</item>
+    <item>Skriker</item>
+    <item>Cool</item>
+    <item>Dollarmun</item>
+    <item>Bortgjord</item>
+    <item>Generad</item>
+    <item>Ängel</item>
+    <item>Tveksam</item>
+    <item>Gråter</item>
+    <item>Hemlis</item>
+    <item>Skrattar</item>
+    <item>Förvirrad</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="this_is_a_group_chat">Detta är en gruppchatt</string>
+  <string name="unable_to_securely_share_this_file">Kan inte dela denna fil säkert</string>
+  <string name="swipe_hint">&lt; svep vänster och höger för fler alternativ &gt;</string>
+  <string name="title_me">Jag</string>
+</resources>

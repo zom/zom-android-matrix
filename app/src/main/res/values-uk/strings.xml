@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Zom</string>
+  <string name="app_name">Zom</string>
+  <string name="im_label">Zom</string>
+  <!--General: Permissions-->
+  <!--General: Actions-->
+  <string name="confirm">Підтвердити</string>
+  <string name="ok">Гаразд</string>
+  <string name="cancel">Скасувати</string>
+  <string name="yes">Гаразд</string>
+  <string name="no">Скасувати</string>
+  <string name="connect">Підключити</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Укажіть пароль</string>
+  <string name="lock_screen_confirm_passphrase">Повторіть пароль</string>
+  <string name="lock_screen_passphrase_hint">Пароль</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Підтвердіть новий пароль</string>
+  <string name="lock_screen_passphrases_not_matching">Паролі не збігаються, спробуйте знову</string>
+  <string name="lock_screen_skip">Пропустити &gt;&gt;</string>
+  <!--Views: Setup-->
+  <string name="add_account">Додати екаунт <xliff:g id="account">%1$s</xliff:g></string>
+  <string name="menu_about">Про програму</string>
+  <string name="pass_err_length">Ваша фраза-ключ закоротка</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Увійти</string>
+  <string name="account_setup_example_email_address">користувач@домен</string>
+  <string name="account_setup_new_username">новий користувач</string>
+  <string name="account_setup_password">пароль</string>
+  <string name="account_setup_password_confirm">повторіть пароль</string>
+  <string name="btn_create_new_account">Реєстрація екаунту</string>
+  <string name="registering_new_account_">Триває реєстрація нового екаунту…</string>
+  <!--Views: Settings: Account-->
+  <string name="server_port">Порт сервера</string>
+  <!--Views: Contact list-->
+  <string name="menu_remove_contact">Видалити контакт</string>
+  <string name="menu_contact_nickname">Нік контакта</string>
+  <string name="menu_view_blocked">Заблоковано</string>
+  <string name="nickname">Нік</string>
+  <string name="confirm_delete_contact">Контакт "<xliff:g id="user">%1$s</xliff:g>" буде вилучено.</string>
+  <string name="menu_verify">Перевірка контактів</string>
+  <string name="search_label">Контакт</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online"><xliff:g id="user">%1$s</xliff:g> в мережі</string>
+  <string name="contact_away"><xliff:g id="user">%1$s</xliff:g> відійшов</string>
+  <string name="contact_busy"><xliff:g id="user">%1$s</xliff:g> зайнятий</string>
+  <string name="contact_offline"><xliff:g id="user">%1$s</xliff:g> поза мережею</string>
+  <string name="contact_joined"><xliff:g id="user">%1$s</xliff:g> приєднався</string>
+  <string name="contact_left"><xliff:g id="user">%1$s</xliff:g> покинув кімнату</string>
+  <string name="file_transfer">Передача файлів</string>
+  <string name="accept_transfer_">Прийняти передачу?</string>
+  <string name="wants_to_send_you_the_file">бажає надіслати вам файл</string>
+  <string name="compose_hint">Надіслати повідомлення</string>
+  <string name="compose_hint_secure">Надіслати захищене повідомлення</string>
+  <string name="menu_end_conversation">Закрити чат</string>
+  <string name="select_link_title">Вставити посилання</string>
+  <string name="delete">Вилучити</string>
+  <string name="export_media">Експортувати медіа-файли?</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt"><xliff:g id="user">%1$s</xliff:g> запрошує вас приєднатись до групового чату.</string>
+  <string name="accept_invitation">Прийняти</string>
+  <string name="decline_invitation">Відхилити</string>
+  <string name="connecting_to_group_chat_">Під’єднання до групового чату…</string>
+  <!--Security: OTR-->
+  <!--Security: OTR: Keyring-->
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Авторизація</string>
+  <string name="otr_qa_send">Надіслати</string>
+  <string name="otr_qa_cancel">Скасувати</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">Мова</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Мови</string>
+  <string name="use_system_default">Системна</string>
+  <string name="button_yes_accept_all">Так, приймати все</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_vibrate_title">Вібрація</string>
+  <string name="notification_sound_title">Звук</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">Увімкнути журнали відлагодження</string>
+  <!--Alerts: Dialogs-->
+  <string name="prompt_create_new_account_">Створити новий екаунт?</string>
+  <!--Alerts: Notifications-->
+  <!--Alerts: Exceptions-->
+  <string name="error">Увага</string>
+  <string name="error_prefix">Помилка:</string>
+  <string name="service_unavaiable">Сервер недосяжний.</string>
+  <string name="timeout">Час очікування сервера минув.</string>
+  <string name="error_suspended_connection">Мережа відсутня</string>
+  <string name="error_account_password_mismatch">Паролі не співпадають</string>
+  <string name="error_account_settings_port">Номер порту має бути числом</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Групи</string>
+  <string name="contacts">Контакти</string>
+  <string name="loading">завантаження…</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Налаштування</string>
+  <string name="menu_sign_out">Вийти</string>
+  <!--Other: Provider-->
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <!--Other: Smileys-->
+  <!--[Do not localize!]-->
+  <string name="title_me">Я</string>
+</resources>

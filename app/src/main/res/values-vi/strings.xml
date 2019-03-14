@@ -1,0 +1,279 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Zom</string>
+  <string name="app_name">Zom</string>
+  <string name="im_label">Zom</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">đọc nội dung chat</string>
+  <string name="ro_perm_desc">
+Cho phép ứng dụng đọc dữ liệu từ dịch vụ chat.</string>
+  <string name="wo_perm_label">gõ vào nội dung chat</string>
+  <string name="wo_perm_desc">
+Cho phép ứng dụng viết/thêm dữ liệu vào dịch vụ chat.</string>
+  <string name="perm_label">Bắt đầu thao tác chat</string>
+  <string name="perm_desc">Cho phép các ứng dụng bắt đầu sử dụng dịch vụ chat thông qua Internet.</string>
+  <!--General: Actions-->
+  <string name="confirm">Xác nhận</string>
+  <string name="ok">Đồng Ý</string>
+  <string name="cancel">Hủy Bỏ</string>
+  <string name="yes">Đồng Ý</string>
+  <string name="no">Hủy Bỏ</string>
+  <string name="connect">Kết nối</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Đặt mật khẩu</string>
+  <string name="lock_screen_confirm_passphrase">Xác nhận mật khẩu</string>
+  <string name="lock_screen_passphrase_hint">Mật khẩu</string>
+  <string name="lock_screen_passphrase_not_set_enter">Tạo mật khẩu mới</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Xác nhận mật khẩu mới</string>
+  <string name="lock_screen_passphrases_not_matching">Mật khẩu không khớp, xin vui lòng thử lại lần nữa</string>
+  <string name="lock_screen_skip">Tôi không muốn dùng mật khẩu (không cần điền mật khẩu!)</string>
+  <!--Views: Setup-->
+  <string name="add_account">Thêm &lt;xliff id=\"account\"&gt;%1$s&lt;/xliff&gt; tài khoản</string>
+  <string name="menu_about">Thông tin</string>
+  <string name="pass_err_length">Cụm từ bảo mật không đạt yêu cầu về độ dài ký tự</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Đăng nhập</string>
+  <string name="account_setup_example_email_address">user@domain.com</string>
+  <string name="account_setup_new_username">tên người dùng mới</string>
+  <string name="account_setup_password">mật khẩu</string>
+  <string name="account_setup_password_confirm">xác nhận mật khẩu</string>
+  <string name="btn_create_new_account">Đăng ký Tài Khoản</string>
+  <string name="account_setup_pers_now_title">Đăng nhập ngay</string>
+  <string name="select_domain_new_account">Chọn một tên miền</string>
+  <string name="registering_new_account_">Đăng ký tài khoản mới</string>
+  <string name="signing_in_wait">Đang đăng nhập\u2026</string>
+  <string name="signing_out_wait">Đang đăng xuất\u2026</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">Thực hiện việc dò tìm dạng SRV</string>
+  <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">Dùng DNS SRV để tìm máy chủ XMPP từ tên miền</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Cho phép tên tài khoản và mật khẩu được gửi đi theo dạng văn bản thường khi sử dụng kết nối chưa được mã hoá</string>
+  <string name="allow_plain_text_auth">Cho phép xác thực bằng văn bản thường</string>
+  <string name="require_tls_ssl_connection">Yêu cầu cần có kết nối dạng TLS</string>
+  <string name="transport_encryption">Quy Tắc Truyền Thông Tin Mã Hoá</string>
+  <string name="how_encrypted_chats_are_started">cách thức mã hóa nội dung chat lúc ban đầu</string>
+  <string name="the_server_to_connect_to_if_needed">Máy chủ kết nối vào, khi cần</string>
+  <string name="connect_server">Kết nối máy chủ</string>
+  <string name="tcp_port_for_xmpp_server">Cổng TCP cho máy chủ XMPP</string>
+  <string name="server_port">Cổng máy chủ</string>
+  <string name="xmpp_resource">Nguồn dịch vụ XMPP</string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">để phân biệt những kết nối từ nhiều ứng dụng khác cũng đã được đăng nhập vào</string>
+  <string name="xmpp_resource_prio_title">Tài nguyên ưu tiên cho XMPP</string>
+  <string name="xmpp_resource_prio_summary">Những tin gửi cho ứng dụng khách mà có nhiều tài nguyên đang hoạt động sẽ được ưu tiên khi gửi đi</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">Nội dung chat</string>
+  <string name="empty_account_message">Bạn vẫn chưa
+cấu hình tài khoản nào.
+
+Hãy chạm vào đây để thêm vào!</string>
+  <string name="menu_remove_contact">Xóa bạn chat</string>
+  <string name="menu_contact_nickname">Tên liên lạc</string>
+  <string name="menu_view_blocked">Đã chặn</string>
+  <string name="confirm_delete_contact">Bạn chat &lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt; sẽ bị xóa.</string>
+  <string name="confirm_block_contact">Bạn chat &lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt; sẽ bị chặn.</string>
+  <string name="add_contact_success">Đã thêm &lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt; vào Danh Sách Bạn Chat.</string>
+  <string name="delete_contact_success">Đã xoá bạn chat &lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt;.</string>
+  <string name="block_contact_success">Đã chặn bạn chat &lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt;.</string>
+  <string name="unblock_contact_success">Không còn chặn bạn chat &lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt;</string>
+  <string name="menu_verify">Xác Nhận Khóa</string>
+  <string name="empty_conversation_group">Hiện không có phần chat nào</string>
+  <string name="search_label">Bạn chat</string>
+  <string name="search_hint">gõ vào tên bạn chat muốn chat</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online">&lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt; đang online</string>
+  <string name="contact_away">&lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt; hiện không rảnh</string>
+  <string name="contact_busy">&lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt; đang bận việc</string>
+  <string name="contact_offline">&lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt; offline</string>
+  <string name="contact_joined">&lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt; đã tham gia kết nối</string>
+  <string name="contact_left">&lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt; đã rời khỏi phần chat</string>
+  <string name="file_transfer">Truyền tải tập tin</string>
+  <string name="accept_transfer_">Chấp nhận việc truyền tải dữ liệu?</string>
+  <string name="wants_to_send_you_the_file">muốn gửi đến bạn một số tập tin</string>
+  <string name="compose_hint">Gửi một tin nhắn</string>
+  <string name="compose_hint_secure">Gửi tin nhắn mã hóa</string>
+  <string name="menu_end_conversation">Kết thúc chat</string>
+  <string name="select_link_title">Chọn đường dẫn liên kết</string>
+  <string name="delete">Xóa</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt">&lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt; đã mời bạn tham gia vào phần chat nhóm</string>
+  <string name="accept_invitation">Chấp thuận</string>
+  <string name="decline_invitation">Từ chối</string>
+  <string name="connecting_to_group_chat_">Đang kết nối tới nhóm chat …</string>
+  <string name="empty_contact_list">Không tìm thấy liên lạc nào.
+
+Chạm vào để mời kết nối.</string>
+  <string name="approve_subscription_error">Hiện không thể đăng ký  ở &lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt;. Xin vui lòng thử lại sau.</string>
+  <string name="decline_subscription_error">Không thể từ chối phần đăng ký từ &lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt;. Xin vui lòng thử lại sau.</string>
+  <!--Security: OTR-->
+  <string name="otr_session_status_finished">Người đang chat với bạn đã dừng chế độ mã hóa trong chat</string>
+  <!--Security: OTR: Keyring-->
+  <string name="detected_Otr_keystore_import">Chương trình nhận diện một khóa OTR được nhập vào. Bạn có muốn quét mật khẩu cho QR bây giờ không?</string>
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Xác nhận</string>
+  <string name="smp_question_summary">Đánh vào một câu hỏi để gửi đi đến liên lạc của bạn, và câu trả lời bạn mong đợi, để xác nhận họ có phải là người bạn muốn trao đổi hay không</string>
+  <string name="smp_question_hint">câu hỏi để hỏi</string>
+  <string name="qmp_answer_hint">câu trả lời cần có</string>
+  <string name="remote_verified_us">Liên lạc của bạn đã xác thực bạn thành công. Bây giờ hãy xác thực họ bằng cách đặt câu hỏi của bạn.</string>
+  <string name="otr_qa_send">Gửi đi</string>
+  <string name="otr_qa_cancel">Hủy Bỏ</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">An Ninh và Riêng Tư</string>
+  <string name="encryption_and_anonymity_title">Mã hoá và Ẩn Danh</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">Ngôn Ngữ</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Các ngôn ngữ</string>
+  <string name="button_yes_accept_all">Đồng ý, chấp nhận tất cả</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">Các Chỉnh Sửa Khác</string>
+  <string name="start_on_boot_summary">Tự động chạy và đăng nhập vào tài khoản từng dùng trước đó</string>
+  <string name="hide_offline_contacts">Ẩn bạn chat không online</string>
+  <string name="foreground_service_title">Dùng tiền cảnh ưu tiên</string>
+  <string name="foreground_service_summary">Giảm xác suất mà Android có thể khởi động lại dịch vụ kết nối của chúng ta. Sẽ để thông báo vào trong khu vực thông báo. </string>
+  <string name="heartbeat_interval_title">Cường độ nhịp tim</string>
+  <string name="heartbeat_interval_summary">Dùng chỉ số cao hơn (theo phút) để tiết kiệm pin. Chỉ số cao sẽ làm cho nhà cung cấp dịch vụ đóng kết nối lại vì lầm tưởng là không có hoạt động.</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Chỉnh sửa phần thông báo</string>
+  <string name="notification_enabled_title">Thông báo khi có phần chat mới</string>
+  <string name="notification_enabled_summary">Thông báo ở thanh trạng thái khi nhận nội dung chat mới</string>
+  <string name="notification_vibrate_title">Sử dụng chế độ rung</string>
+  <string name="notification_vibrate_summary">Sử dụng chế độ rung khi có phần chat mới</string>
+  <string name="notification_sound_title">Âm Báo</string>
+  <string name="notification_sound_summary">Phát nhạc chuông trên điện thoại khi có nội dung chat mới</string>
+  <string name="notification_ringtone_title">Sử dụng nhạc chuông tự chọn cho phần trò chuyện bảo mật</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">Cho Phép Ghi Thông Tin Gỡ Rối</string>
+  <string name="pref_debug_summary">Hiển thị thông tin này trên thiết bị chuẩn hoặc trên thiết bị chuyên dụng cho việc gỡ rối</string>
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message">
+         Phần kết nối dữ liệu mạng (bao gồm cả dữ liệu nền) đều cần thiết để cho phép ứng dụng đăng nhập vào.
+    </string>
+  <string name="prompt_create_new_account_">Tạo Tài Khoản Mới</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">Tạo một tài khoản chat mới cho \'%1$s\'?</string>
+  <!--Alerts: Notifications-->
+  <string name="notify_groupchat_label">Gửi lời mời chat theo nhóm</string>
+  <string name="new_messages_notify">(Các) phần chat mới từ</string>
+  <string name="app_unlocked">Đã kích hoạt&amp; mở khóa</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">Lưu Ý</string>
+  <string name="general_error">Mã số lỗi &lt;xliff id=\"code\"&gt;%1$d&lt;/xliff&gt;</string>
+  <string name="add_list_failed">Không thêm vào được danh sách.</string>
+  <string name="block_contact_failed">Bạn chat chưa bị chặn.</string>
+  <string name="unblock_contact_failed">Bạn chat vẫn chưa được bỏ chặn.</string>
+  <string name="load_contact_list_failed">Chưa tải được danh sách bạn chat.</string>
+  <string name="cant_connect_to_server">Hiện không thể kết nối đến phía máy chủ. Xin bạn hãy vui lòng kiểm tra lại kết nối của mình.</string>
+  <string name="contact_already_exist">&lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt; hiện đã có trong Danh Sách Bạn Chat.</string>
+  <string name="contact_blocked">Bạn chat &lt;xliff id=\"user\"&gt;%1$s&lt;/xliff&gt; đã bị chặn.</string>
+  <string name="contact_not_loaded">Xin vui lòng đợi trong giây lát, chương trình đang tải Danh Sách Bạn Chat của bạn.</string>
+  <string name="network_error">Xảy ra lỗi về mạng.</string>
+  <string name="wifi_not_connected_error">Cần mạng WIFI để kết nối. </string>
+  <string name="service_not_support">Máy chủ không hỗ trợ chức năng này.</string>
+  <string name="invalid_password">Mật khẩu bạn vừa điền vào không hợp lệ.</string>
+  <string name="internal_server_error">Phía máy chủ gặp lỗi.</string>
+  <string name="not_implemented">Máy chủ không hỗ trợ chức năng này.</string>
+  <string name="service_unavaiable">Máy chủ hiện thời không hoạt động.</string>
+  <string name="timeout">Đã quá thời hạn cho phép dành cho kết nối đến phía máy chủ.</string>
+  <string name="version_not_supported">Phía máy chủ hiện không hỗ trợ phiên bản ứng dụng hiện tại.</string>
+  <string name="message_queue_full">Hàng đợi nội dung chat đã đầy</string>
+  <string name="domain_not_supported">Máy chủ không hỗ trợ chuyển tiếp đến tên miền.</string>
+  <string name="unknown_user">Không nhận diện được tên tài khoản mà bạn điền vào.</string>
+  <string name="recipient_blocked_the_user">Xin lỗi, bạn bị chặn bởi phía người dùng.</string>
+  <string name="session_expired">Phiên đăng nhập của bạn đã hết hạn, xin hãy vui lòng đăng nhập trở lại.</string>
+  <string name="forced_logout">bạn đã đăng nhập vào dịch vụ từ một ứng dụng khác.</string>
+  <string name="already_logged_in">bạn đã đăng nhập vào dịch vụ từ một ứng dụng khác.</string>
+  <string name="msisdn_error">Xin thứ lỗi, chúng tôi không thể đọc được số điện thoại từ SIM của bạn. Xin liên lạc với tổng đài để nhận giúp đỡ.</string>
+  <string name="not_signed_in">Bạn hiện vẫn chưa đăng nhập vào.</string>
+  <string name="account_setup_error_server">Zom đã gặp lỗi khi đang kết nối và máy chủ - xin vui lòng xem lại cấu hình của bạn và thử lại.</string>
+  <string name="error_suspended_connection">Zom đã bị mất kết nối vào mạng lưới</string>
+  <string name="unable_to_create_or_join_group_chat">Không thể tạo hoặc tham gia trò chuyện theo nhóm</string>
+  <string name="there_is_no_viewer_available_for_this_file_format">Không tồn tại chương trình có thể đọc định dạng file này</string>
+  <string name="otr_keysync_warning_message">Xin vui lòng sao chép tập tin \'otr_keystore.ofcaes\' từ desktop OtrFileConverter tool đến thư mục gốc trong thẻ nhớ của bạn</string>
+  <string name="msg_sent_failed">Không thể gửi được tin nhắn này.</string>
+  <string name="disconnected_warning">Các tin nhắn sẽ được gửi khi được kết nối lại</string>
+  <string name="account_settings_title">Thiết lập tài khoản</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Nhóm</string>
+  <string name="buddies">Bạn bè</string>
+  <string name="contacts">Danh bạ</string>
+  <string name="mtm_accept_cert">Chấp nhận chứng chỉ từ phía máy chủ?</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Điều chỉnh</string>
+  <string name="menu_sign_out">Đăng Xuất</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">Online</string>
+  <string name="presence_busy">Đang bận việc</string>
+  <string name="presence_away">Hiện không rảnh</string>
+  <string name="presence_idle">Ở trạng thái chờ</string>
+  <string name="presence_offline">Offline </string>
+  <string name="presence_invisible">Hiển thị dưới dạng offline</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Vui</item>
+    <item>Buồn</item>
+    <item>Nháy mắt</item>
+    <item>Lè lưởi</item>
+    <item>Ngạc nhiên</item>
+    <item>Hôn</item>
+    <item>La hét</item>
+    <item>Ngầu</item>
+    <item>Tiền trong miệng</item>
+    <item>Bàn chân trong miệng</item>
+    <item>Mắc cỡ</item>
+    <item>Thiên Thần</item>
+    <item>Lưỡng Lự</item>
+    <item>Khóc oà</item>
+    <item>Kín miệng</item>
+    <item>Cười To</item>
+    <item>Rối trí</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Vui</item>
+    <item>Buồn</item>
+    <item>Nháy mắt</item>
+    <item>Lè lưởi</item>
+    <item>Ngạc nhiên</item>
+    <item>Hôn</item>
+    <item>La hét</item>
+    <item>Ngầu</item>
+    <item>Tiền trong miệng</item>
+    <item>Bàn chân trong miệng</item>
+    <item>Mắc cỡ</item>
+    <item>Thiên Thần</item>
+    <item>Lưỡng Lự</item>
+    <item>Khóc oà</item>
+    <item>Kín miệng</item>
+    <item>Cười To</item>
+    <item>Rối trí</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="title_me">Tôi</string>
+</resources>
