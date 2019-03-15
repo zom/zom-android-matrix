@@ -182,7 +182,6 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
     protected static final int MATCH_CSP_TOKEN = 305;
 
     protected final UriMatcher mUrlMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-    private String mTransientDbName;
 
     private static final HashMap<String, String> sProviderAccountsProjectionMap;
     private static final HashMap<String, String> sAccountsByDomainProjectionMap;
@@ -1351,6 +1350,7 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
             if (mDbHelper == null) {
                 if (pkey != null) {
                     mDatabaseName = DATABASE_NAME;
+
                     Context ctx = getContext();
                     String path = ctx.getDatabasePath(mDatabaseName).getPath();
                     if (noCreate && !new File(path).exists()) {
