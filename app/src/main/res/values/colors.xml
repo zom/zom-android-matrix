@@ -64,6 +64,11 @@
      -->
      
     <color name="zom_primary">#E7275A</color>
+<!--
+    <color name="app_primary">#2C522C</color>
+    <color name="app_primary_dark">#1f2e1c</color>
+    <color name="app_accent">#eaea87</color>
+-->
 
     <array name="zom_colors">
         <item>@color/zom_primary</item>

@@ -102,7 +102,7 @@ public class OnboardingActivity extends BaseActivity {
     private ListPopupWindow mDomainList;
 
     private FindServerTask mCurrentFindServerTask;
-    private ExistingAccountTask mExistingAccountTask;
+    private boolean mLoggingIn = false;
 
     private Handler mOnboardingHandler = new Handler ();
 
@@ -740,12 +740,37 @@ public class OnboardingActivity extends BaseActivity {
         String password = ((TextView)findViewById(R.id.edtPass)).getText().toString();
         String server = ((TextView)findViewById(R.id.edtServer)).getText().toString();
 
-        if (mExistingAccountTask == null) {
+        if (!mLoggingIn) {
+
+            mLoggingIn = true;
+
             findViewById(R.id.progressExistingUser).setVisibility(View.VISIBLE);
             findViewById(R.id.progressExistingImage).setVisibility(View.VISIBLE);
 
-            mExistingAccountTask = new ExistingAccountTask();
-            mExistingAccountTask.execute(username, server, password);
+            OnboardingManager.addExistingAccount(OnboardingActivity.this, mHandler, username, server, password, new OnboardingListener() {
+                @Override
+                public void registrationSuccessful(OnboardingAccount account) {
+                    mUsername = "@" + account.username + ":" + account.domain;
+
+                    ImApp mApp = (ImApp) getApplication();
+                    mApp.setDefaultAccount(account.providerId, account.accountId);
+
+                    SignInHelper signInHelper = new SignInHelper(OnboardingActivity.this, mHandler);
+                    signInHelper.activateAccount(account.providerId, account.accountId);
+                    signInHelper.signIn(account.password, account.providerId, account.accountId, true);
+
+                    showMainScreen(false);
+
+                    mLoggingIn = false;
+                }
+
+                @Override
+                public void registrationFailed(String err) {
+                    Toast.makeText(OnboardingActivity.this,R.string.error,Toast.LENGTH_SHORT).show();
+
+                    mLoggingIn = false;
+                }
+            });
 
             return true;
         }
@@ -753,46 +778,6 @@ public class OnboardingActivity extends BaseActivity {
         return false;
     }
 
-
-    private class ExistingAccountTask extends AsyncTask<String, Void, OnboardingAccount> {
-        @Override
-        protected OnboardingAccount doInBackground(String... account) {
-            try {
-
-                OnboardingAccount result = OnboardingManager.addExistingAccount(OnboardingActivity.this, mHandler, account[0], account[1], account[2]);
-
-                return result;
-            }
-            catch (Exception e)
-            {
-                Log.e(LOG_TAG, "auto onboarding fail", e);
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(OnboardingAccount account) {
-
-            if (account != null) {
-                mUsername = "@" + account.username + ":" + account.domain;
-
-                ImApp mApp = (ImApp) getApplication();
-                mApp.setDefaultAccount(account.providerId, account.accountId);
-
-                SignInHelper signInHelper = new SignInHelper(OnboardingActivity.this, mHandler);
-                signInHelper.activateAccount(account.providerId, account.accountId);
-                signInHelper.signIn(account.password, account.providerId, account.accountId, true);
-
-                showMainScreen(false);
-
-                mExistingAccountTask = null;
-            }
-            else
-            {
-                Toast.makeText(OnboardingActivity.this,R.string.error,Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

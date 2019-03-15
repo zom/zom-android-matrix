@@ -333,7 +333,10 @@ public class OnboardingManager {
 
             settings.requery();
 
-            Looper.prepare();
+
+            if (Looper.myLooper() == null)
+                Looper.prepare();
+
             MatrixConnection conn = new MatrixConnection(context);
             conn.initUser(providerId, accountId);
 
@@ -387,9 +390,10 @@ public class OnboardingManager {
 
 
 
-    public static OnboardingAccount addExistingAccount (Activity context, Handler handler, String username, String domain, String password) {
+    public static void addExistingAccount (Activity context, Handler handler, String username, String domain, String password, OnboardingListener onboardingListener) {
 
-        OnboardingAccount result = null;
+        final OnboardingAccount result = new OnboardingAccount();
+
 
         int port = 5222;
 
@@ -401,7 +405,7 @@ public class OnboardingManager {
         long accountId = ImApp.insertOrUpdateAccount(cr, providerId, -1, username, username, password);
 
         if (accountId == -1)
-            return null;
+            return;
 
         Uri accountUri = ContentUris.withAppendedId(Imps.Account.CONTENT_URI, accountId);
 
@@ -425,7 +429,6 @@ public class OnboardingManager {
             settings.setPort(port);
             settings.requery();
 
-            result = new OnboardingAccount();
             result.username = username;
             result.domain = domain;
             result.password = password;
@@ -437,16 +440,38 @@ public class OnboardingManager {
             values.put(Imps.AccountColumns.KEEP_SIGNED_IN, 1);
             cr.update(accountUri, values, null, null);
 
+            settings.requery();
+
+            if (Looper.myLooper() == null)
+                Looper.prepare();
+
+            final MatrixConnection conn = new MatrixConnection(context);
+            conn.initUser(providerId, accountId);
+
+            conn.checkAccount(accountId, password, providerId, new MatrixConnection.LoginListener() {
+                @Override
+                public void onLoginSuccess() {
+
+                    onboardingListener.registrationSuccessful(result);
+
+                }
+
+                @Override
+                public void onLoginFailed(String message) {
+                    onboardingListener.registrationFailed(message);
+                }
+            });
+
+
             // settings closed in registerAccount
         } catch (Exception e) {
             LogCleaner.error(LOG_TAG, "error registering new account", e);
 
-
+            onboardingListener.registrationFailed(e.getMessage());
         }
 
 
         settings.close();
-        return result;
 
     }
 
