@@ -38,9 +38,9 @@ public class OnboardingManager {
     public final static int REQUEST_SCAN = 1111;
     public final static int REQUEST_CHOOSE_AVATAR = REQUEST_SCAN+1;
 
-    public final static String BASE_INVITE_URL = "https://keanu.guardianproject.info/i/#";
+    public final static String BASE_INVITE_URL = "https://zom.info/i/#";
 
-    public final static String DEFAULT_SCHEME = "keanu";
+    public final static String DEFAULT_SCHEME = "matrix";
 
     public static void inviteSMSContact (Activity context, String phoneNumber, String message)
     {
@@ -247,15 +247,9 @@ public class OnboardingManager {
         StringBuffer inviteUrl = new StringBuffer();
         inviteUrl.append(BASE_INVITE_URL);
         
-        StringBuffer code = new StringBuffer();        
+        StringBuffer code = new StringBuffer();
+        code.append("id=");
         code.append(username);
-        code.append("?otr=").append(fingerprint);
-
-        if (nickname != null)
-            code.append("&nickname=").append(nickname);
-
-        if (isMigrateLink)
-            code.append("&m=1");
 
         inviteUrl.append(Base64.encodeToString(code.toString().getBytes(), Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING));
         return inviteUrl.toString();
