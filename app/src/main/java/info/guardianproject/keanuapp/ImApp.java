@@ -974,6 +974,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
     }
 
+    /**
     public boolean doUpgrade (Activity activity, MigrateAccountTask.MigrateAccountListener listener)
     {
 
@@ -991,8 +992,8 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         };
 
         final Cursor cursorProviders = getContentResolver().query(uri, PROVIDER_PROJECTION,
-                Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" /* selection */,
-                new String[]{IMPS_CATEGORY} /* selection args */,
+                Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" ,
+                new String[]{IMPS_CATEGORY} ,
                 Imps.Provider.DEFAULT_SORT_ORDER);
 
         if (cursorProviders != null && cursorProviders.getCount() > 0) {
@@ -1015,7 +1016,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
         return result;
 
-    }
+    }**/
 
     private void showFileSizes (File fileDir)
     {

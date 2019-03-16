@@ -38,7 +38,7 @@ public class OnboardingManager {
     public final static int REQUEST_SCAN = 1111;
     public final static int REQUEST_CHOOSE_AVATAR = REQUEST_SCAN+1;
 
-    public final static String BASE_INVITE_URL = "https://zom.info/i/#";
+    public final static String BASE_INVITE_URL = "https://zom.im/i/#";
 
     public final static String DEFAULT_SCHEME = "matrix";
 
@@ -115,6 +115,7 @@ public class OnboardingManager {
             StringBuffer resp = new StringBuffer();
 
             resp.append(nickname)
+                    .append(' ')
                     .append(context.getString(R.string.is_inviting_you))
                     .append(" ")
                     .append(generateInviteLink(context,username,fingerprint,nickname));
@@ -131,12 +132,24 @@ public class OnboardingManager {
     {
         DecodedInviteLink diLink = null;
 
-        Uri inviteLink = Uri.parse(link);
-        String[] code = inviteLink.toString().split("#");
-
-        if (code[0].contains("/i/")){
+        if (link.contains("/i/#")){
 
             //this is an invite link
+
+            //this is an invite link like this: https://zom.im/i/#@earthmouse:matrix.org
+            try {
+                String matrixContact = link.substring(link.lastIndexOf("@")+1);
+
+                diLink = new DecodedInviteLink();
+                diLink.username = matrixContact;
+
+            }
+            catch (IllegalArgumentException iae)
+            {
+                Log.e(LOG_TAG,"bad link decode",iae);
+            }
+
+            /**
             try {
                 String out = new String(Base64.decode(code[1], Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING));
 
@@ -183,14 +196,28 @@ public class OnboardingManager {
             catch (IllegalArgumentException iae)
             {
              Log.e(LOG_TAG,"bad link decode",iae);
+            }**/
+        }
+        else if (link.contains("matrix.to")){
+
+            //this is an invite link like this: https://matrix.to/#/@n8fr8:matrix.org
+            try {
+                String matrixContact = link.substring(link.lastIndexOf("@")+1);
+
+                diLink = new DecodedInviteLink();
+                diLink.username = matrixContact;
+
+            }
+            catch (IllegalArgumentException iae)
+            {
+                Log.e(LOG_TAG,"bad link decode",iae);
             }
         }
-        else if (link.contains("/#/")){
+        else if (link.startsWith(DEFAULT_SCHEME)){
 
-            //this is an invite link
+            //this is an invite link like this: https://matrix.to/#/@n8fr8:matrix.org
             try {
-                String matrixContact = link.substring(link.lastIndexOf("/")+1);
-
+                String matrixContact = link.substring(link.lastIndexOf("id=")+4);
                 diLink = new DecodedInviteLink();
                 diLink.username = matrixContact;
 
@@ -217,10 +244,11 @@ public class OnboardingManager {
 
     public static String generateInviteLink (Context context, String username, String fingerprint, String nickname) throws IOException
     {
-        return generateInviteLink(context, username, fingerprint, nickname, false);
+        return generateInviteLink(context, username);
     }
 
-    public static String generateInviteLink (Context context, String username, String fingerprint, String nickname, boolean isMigrateLink) throws IOException
+    /**
+    public static String generateInviteLink (Context context, String username) throws IOException
     {
         StringBuffer inviteUrl = new StringBuffer();
         inviteUrl.append(DEFAULT_SCHEME)
@@ -240,18 +268,14 @@ public class OnboardingManager {
 
       //  inviteUrl.append(Base64.encodeToString(code.toString().getBytes(), Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING));
         return inviteUrl.toString();
-    }
+    }**/
 
-    public static String generateInviteLinkFull (Context context, String username, String fingerprint, String nickname, boolean isMigrateLink) throws IOException
+    public static String generateInviteLink(Context context, String username) throws IOException
     {
         StringBuffer inviteUrl = new StringBuffer();
         inviteUrl.append(BASE_INVITE_URL);
-        
-        StringBuffer code = new StringBuffer();
-        code.append("id=");
-        code.append(username);
-
-        inviteUrl.append(Base64.encodeToString(code.toString().getBytes(), Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING));
+        inviteUrl.append(username);
+       // inviteUrl.append(Base64.encodeToString(code.toString().getBytes(), Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING));
         return inviteUrl.toString();
     }
 

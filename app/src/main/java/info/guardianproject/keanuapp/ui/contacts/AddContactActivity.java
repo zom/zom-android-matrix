@@ -140,16 +140,26 @@ public class AddContactActivity extends BaseActivity {
             }
         });
 
-        Intent intent = getIntent();
-        String scheme = intent.getScheme();
-        if (TextUtils.equals(scheme, "keanu"))
-        {
-            addContactFromUri(intent.getData());
-        }
 
         setupActions ();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Intent intent = getIntent();
+        String scheme = intent.getScheme();
+
+        if (TextUtils.equals(scheme, "matrix"))
+        {
+            addContactFromUri(intent.getData());
+        }
+
+
+        if (intent.hasExtra("username"))
+        {
+            String newContact = intent.getStringExtra("username");
+            mNewAddress.setText(newContact);
+
+        }
 
     }
 

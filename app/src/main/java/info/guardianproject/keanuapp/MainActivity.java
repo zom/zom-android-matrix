@@ -17,7 +17,6 @@
 package info.guardianproject.keanuapp;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ComponentName;
@@ -49,6 +48,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -246,6 +246,30 @@ public class MainActivity extends BaseActivity {
         installRingtones ();
 
         applyStyle();
+
+
+        showUpgradeMessage(this);
+    }
+
+    public static void showUpgradeMessage (Activity activity) {
+
+        if (TextUtils.isEmpty(Preferences.getValue("showUpgradeMessage"))) {
+
+            android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(activity).create();
+            alertDialog.setTitle(R.string.welcome_message);
+            alertDialog.setMessage(activity.getString(R.string.upgrade_message));
+            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, activity.getString(R.string.ok),
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+
+            PreferenceManager.getDefaultSharedPreferences(activity).edit().putString("showUpgradeMessage","false").commit();
+
+        }
+
 
     }
 

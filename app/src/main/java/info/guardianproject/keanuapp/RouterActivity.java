@@ -21,6 +21,7 @@ import android.app.AlarmManager;
 import android.app.ProgressDialog;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -29,6 +30,7 @@ import android.net.Uri.Builder;
 import android.os.Bundle;
 import android.os.Message;
 import android.preference.PreferenceManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -162,7 +164,9 @@ public class RouterActivity extends AppCompatActivity implements ICacheWordSubsc
             finish();
             return;
         }
+
     }
+
 
     @SuppressWarnings("deprecation")
     private boolean cursorUnlocked() {
@@ -279,6 +283,8 @@ public class RouterActivity extends AppCompatActivity implements ICacheWordSubsc
         else
         {
             showOnboarding();
+
+            MainActivity.showUpgradeMessage (this);
         }
 
     }
