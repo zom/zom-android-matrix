@@ -5,15 +5,19 @@ import android.content.Context;
 import android.net.Uri;
 import android.opengl.Matrix;
 import android.text.TextUtils;
+import android.util.Log;
 
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
 import org.matrix.androidsdk.crypto.MXCryptoError;
+import org.matrix.androidsdk.crypto.MXDecryptionException;
+import org.matrix.androidsdk.crypto.MXEventDecryptionResult;
 import org.matrix.androidsdk.crypto.data.MXDeviceInfo;
 import org.matrix.androidsdk.crypto.data.MXUsersDevicesMap;
 import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.data.RoomMediaMessage;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
+import org.matrix.androidsdk.rest.model.Event;
 import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.rest.model.RoomMember;
 import org.matrix.androidsdk.rest.model.User;
@@ -140,94 +144,109 @@ public class MatrixChatSessionManager extends ChatSessionManager {
             return;
 
         if (TextUtils.isEmpty(message.getContentType())||message.getContentType().equals(MESSAGE_TEXT_PLAIN)) {
-            room.sendTextMessage(message.getBody(), message.getBody(), MESSAGE_TEXT_PLAIN, new RoomMediaMessage.EventCreationListener() {
 
-                @Override
-                public void onEventCreated(final RoomMediaMessage roomMediaMessage) {
-                    debug("sendMessageAsync:onEventCreated: " + roomMediaMessage);
+            Event eventReplyTo = null;
 
-                    roomMediaMessage.setEventSendingCallback(new ApiCallback<Void>() {
-                        @Override
-                        public void onNetworkError(Exception e) {
-                            debug("onNetworkError: sending message", e);
-                            message.setType(Imps.MessageType.QUEUED);
+            if (!TextUtils.isEmpty(message.getReplyId()))
+            {
+                eventReplyTo = mSession.getDataHandler().getStore().getEvent(message.getReplyId(),room.getRoomId());
+            }
 
+            sendMessageWithRoomAndReply(room, eventReplyTo, session, message, listener);
 
-                            if (listener != null)
-                                listener.onMessageSendFail(message);
-                        }
-
-                        @Override
-                        public void onMatrixError(MatrixError matrixError) {
-                            debug("onMatrixError: sending message: " + matrixError);
-                            message.setType(Imps.MessageType.QUEUED);
-
-                            if (matrixError instanceof MXCryptoError) {
-                                MXCryptoError mxCryptoError = (MXCryptoError) matrixError;
-
-                                if (matrixError.errcode.equals(mxCryptoError.UNKNOWN_DEVICES_CODE)) {
-
-                                    //TODO this just auto "knowns" all, which isn't good. we need to warn the user
-                                    MXUsersDevicesMap devices = (MXUsersDevicesMap) mxCryptoError.mExceptionData;
-                                    acceptUnknownDevices(devices);
-
-                                    //now resend!
-                                    sendMessageAsync(session, message, listener);
-                                }
-                            }
-
-                        }
-
-                        @Override
-                        public void onUnexpectedError(Exception e) {
-                            debug("onUnexpectedError: sending message", e);
-                            message.setType(Imps.MessageType.QUEUED);
-
-
-                            if (listener != null)
-                                listener.onMessageSendFail(message);
-                        }
-
-                        @Override
-                        public void onSuccess(Void aVoid) {
-
-                            debug("onSuccess: message sent: " + roomMediaMessage.getEvent().getMatrixId());
-
-                            if (mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId()))
-                                message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
-                            else
-                                message.setType(Imps.MessageType.OUTGOING);
-
-                            if (listener != null)
-                                listener.onMessageSendSuccess(message, roomMediaMessage.getEvent().eventId);
-                        }
-                    });
-                }
-
-                @Override
-                public void onEventCreationFailed(RoomMediaMessage roomMediaMessage, String s) {
-                    debug("sendMessageAsync:onEventCreationFailed: " + s + ";" + roomMediaMessage);
-
-                    if (listener != null)
-                        listener.onMessageSendFail(message);
-
-                }
-
-                @Override
-                public void onEncryptionFailed(RoomMediaMessage roomMediaMessage) {
-                    debug("sendMessageAsync:onEncryptionFailed: " + roomMediaMessage);
-
-
-                    if (listener != null)
-                        listener.onMessageSendFail(message);
-
-                }
-            });
         }
         else
         {
             sendMediaMessage(session, message, listener);
         }
+    }
+
+    private void sendMessageWithRoomAndReply (Room room, Event replyToEvent, final ChatSession session, final Message message, final ChatSessionListener listener)
+    {
+
+        room.sendTextMessage(message.getBody(), null, MESSAGE_TEXT_PLAIN, replyToEvent, new RoomMediaMessage.EventCreationListener() {
+
+            @Override
+            public void onEventCreated(final RoomMediaMessage roomMediaMessage) {
+                debug("sendMessageAsync:onEventCreated: " + roomMediaMessage);
+
+                roomMediaMessage.setEventSendingCallback(new ApiCallback<Void>() {
+                    @Override
+                    public void onNetworkError(Exception e) {
+                        debug("onNetworkError: sending message", e);
+                        message.setType(Imps.MessageType.QUEUED);
+
+
+                        if (listener != null)
+                            listener.onMessageSendFail(message);
+                    }
+
+                    @Override
+                    public void onMatrixError(MatrixError matrixError) {
+                        debug("onMatrixError: sending message: " + matrixError);
+                        message.setType(Imps.MessageType.QUEUED);
+
+                        if (matrixError instanceof MXCryptoError) {
+                            MXCryptoError mxCryptoError = (MXCryptoError) matrixError;
+
+                            if (matrixError.errcode.equals(mxCryptoError.UNKNOWN_DEVICES_CODE)) {
+
+                                //TODO this just auto "knowns" all, which isn't good. we need to warn the user
+                                MXUsersDevicesMap devices = (MXUsersDevicesMap) mxCryptoError.mExceptionData;
+                                acceptUnknownDevices(devices);
+
+                                //now resend!
+                                sendMessageAsync(session, message, listener);
+                            }
+                        }
+
+                    }
+
+                    @Override
+                    public void onUnexpectedError(Exception e) {
+                        debug("onUnexpectedError: sending message", e);
+                        message.setType(Imps.MessageType.QUEUED);
+
+
+                        if (listener != null)
+                            listener.onMessageSendFail(message);
+                    }
+
+                    @Override
+                    public void onSuccess(Void aVoid) {
+
+                        debug("onSuccess: message sent: " + roomMediaMessage.getEvent().getMatrixId());
+
+                        if (mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId()))
+                            message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
+                        else
+                            message.setType(Imps.MessageType.OUTGOING);
+
+                        if (listener != null)
+                            listener.onMessageSendSuccess(message, roomMediaMessage.getEvent().eventId);
+                    }
+                });
+            }
+
+            @Override
+            public void onEventCreationFailed(RoomMediaMessage roomMediaMessage, String s) {
+                debug("sendMessageAsync:onEventCreationFailed: " + s + ";" + roomMediaMessage);
+
+                if (listener != null)
+                    listener.onMessageSendFail(message);
+
+            }
+
+            @Override
+            public void onEncryptionFailed(RoomMediaMessage roomMediaMessage) {
+                debug("sendMessageAsync:onEncryptionFailed: " + roomMediaMessage);
+
+
+                if (listener != null)
+                    listener.onMessageSendFail(message);
+
+            }
+        });
     }
 
     public void sendMediaMessage(final ChatSession session, final Message message, final ChatSessionListener listener) {

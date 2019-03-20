@@ -620,7 +620,7 @@ public class ImUrlActivity extends Activity {
                     long providerId = resultIntent.getLongExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER, -1);
                     long accountId = resultIntent.getLongExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT, -1);
 
-                    sendOtrInBand(username, providerId, accountId);
+                    sendOtrInBand(username, providerId, accountId, null);
 
                     startChat(providerId, accountId, username, true);
 
@@ -637,7 +637,7 @@ public class ImUrlActivity extends Activity {
                         if (providers != null && accounts != null)
                             for (int i = 0; i < providers.size(); i++)
                             {
-                                sendOtrInBand(usernames.get(i), providers.get(i), accounts.get(i));
+                                sendOtrInBand(usernames.get(i), providers.get(i), accounts.get(i), null);
                             }
 
 
@@ -700,7 +700,7 @@ public class ImUrlActivity extends Activity {
             }.executeOnExecutor(ImApp.sThreadPoolExecutor,new Contact(new BaseAddress(username)));
     }
 
-    private void sendOtrInBand(String username, long providerId, long accountId) {
+    private void sendOtrInBand(String username, long providerId, long accountId, String replyId) {
 
         try
         {
@@ -714,7 +714,7 @@ public class ImUrlActivity extends Activity {
             IChatSession session = getChatSession(username);
 
             if (mSendText != null)
-                session.sendMessage(mSendText,false, false, true);
+                session.sendMessage(mSendText,false, false, true, replyId);
             else if (mSendUri != null)
             {
 

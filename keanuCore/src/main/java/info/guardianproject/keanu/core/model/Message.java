@@ -33,6 +33,7 @@ public class Message implements Parcelable {
     private int mMessageType;
     private String mContentType;
 
+    private String mReplyId;
     /**
      * @param msg
      * @throws NullPointerException if msg is null.
@@ -55,6 +56,7 @@ public class Message implements Parcelable {
         }
         mMessageType = source.readInt();
         mContentType = source.readString();
+        mReplyId = source.readString();
     }
 
     /**
@@ -142,6 +144,7 @@ public class Message implements Parcelable {
         dest.writeLong(mDate == null ? -1 : mDate.getTime());
         dest.writeInt(mMessageType);
         dest.writeString(mContentType);
+        dest.writeString(mReplyId);
     }
 
     public int describeContents() {
@@ -173,6 +176,14 @@ public class Message implements Parcelable {
     public void setContentType (String contentType)
     {
         this.mContentType = contentType;
+    }
+
+    public String getReplyId() {
+        return mReplyId;
+    }
+
+    public void setReplyId(String mReplyId) {
+        this.mReplyId = mReplyId;
     }
 
 }

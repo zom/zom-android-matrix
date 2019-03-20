@@ -13,6 +13,7 @@ import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.model.CreateRoomParams;
 import org.matrix.androidsdk.rest.model.MatrixError;
+import org.matrix.androidsdk.rest.model.PowerLevels;
 import org.matrix.androidsdk.rest.model.RoomDirectoryVisibility;
 import org.matrix.androidsdk.rest.model.RoomMember;
 import org.w3c.dom.Text;
@@ -304,6 +305,12 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         room.updateDirectoryVisibility(RoomDirectoryVisibility.DIRECTORY_VISIBILITY_PRIVATE,new BasicApiCallback("updateDirectoryVisibility:private"));
         room.updateHistoryVisibility("joined",new BasicApiCallback("updateHistoryVisibility:joined"));
         room.updateGuestAccess("forbidden", new BasicApiCallback("updateGuestAccess:forbidden"));
+
+        PowerLevels pLevels = room.getState().getPowerLevels();
+        pLevels.ban = 100;
+        pLevels.kick = 100;
+        pLevels.invite = 100;
+        room.getState().setPowerLevels(pLevels);
 
     }
 
