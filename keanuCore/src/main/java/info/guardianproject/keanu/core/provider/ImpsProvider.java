@@ -96,7 +96,7 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
     private static final String LEGACY_UNENCRYPTED_DATABASE_NAME = "imps.db";
     private static final String DATABASE_NAME = "keanu.db";
 
-    private static final int DATABASE_VERSION = 116;
+    private static final int DATABASE_VERSION = 117;
 
     protected static final int MATCH_PROVIDERS = 1;
     protected static final int MATCH_PROVIDERS_BY_ID = 2;
@@ -715,11 +715,10 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                     } finally {
                         db.endTransaction();
                     }
-                    return;
 
                 case 114:
                 case 115:
-
+                case 116:
                     try {
                         db.beginTransaction();
 
