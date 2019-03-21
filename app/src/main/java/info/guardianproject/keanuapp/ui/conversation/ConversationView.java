@@ -2509,6 +2509,7 @@ public class ConversationView {
         private int mMimeTypeColumn;
         private int mIdColumn;
         private int mPacketIdColumn;
+        private int mReplyIdColumn;
 
         private ActionMode mActionMode;
         private View mLastSelectedView;
@@ -2538,6 +2539,7 @@ public class ConversationView {
             mMimeTypeColumn = c.getColumnIndexOrThrow(Imps.Messages.MIME_TYPE);
             mIdColumn = c.getColumnIndexOrThrow(Imps.Messages._ID);
             mPacketIdColumn = c.getColumnIndexOrThrow(Imps.Messages.PACKET_ID);
+            mReplyIdColumn = c.getColumnIndexOrThrow(Imps.Messages.REPLY_ID);
         }
 
         @Override
@@ -2651,6 +2653,7 @@ public class ConversationView {
             boolean showTimeStamp = true;//(delta > SHOW_TIME_STAMP_INTERVAL);
             long timestamp = cursor.getLong(mDateColumn);
             String packetId = cursor.getString(mPacketIdColumn);
+            String replyId = cursor.getString(mReplyIdColumn);
 
             Date date = showTimeStamp ? new Date(timestamp) : null;
             boolean isDelivered = cursor.getLong(mDeliveredColumn) > 0;
@@ -2713,7 +2716,7 @@ public class ConversationView {
 
             switch (messageType) {
             case Imps.MessageType.INCOMING:
-                messageView.bindIncomingMessage(viewHolder,id, messageType, address, nickname, mimeType, body, date, mMarkup, false, encState, showContactName, mPresenceStatus, mCurrentChatSession, packetId);
+                messageView.bindIncomingMessage(viewHolder,id, messageType, address, nickname, mimeType, body, date, mMarkup, false, encState, showContactName, mPresenceStatus, mCurrentChatSession, packetId, replyId);
 
                 break;
 

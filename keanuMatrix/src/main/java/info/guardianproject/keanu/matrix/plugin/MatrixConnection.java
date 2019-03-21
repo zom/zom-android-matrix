@@ -1615,6 +1615,18 @@ public class MatrixConnection extends ImConnection {
                         message.setDateTime(new Date(event.getOriginServerTs()));
                     }
 
+                    String replyToId = null;
+
+                    if (event.getClearEvent() != null) {
+                        if (event.getClearEvent().getContent().getAsJsonObject().has("m.relates_to"))
+                            replyToId = event.getClearEvent().getContent().getAsJsonObject().getAsJsonObject("m.relates_to").getAsJsonObject("m.in_reply_to").get("event_id").getAsString();
+                    }
+                    else if (event.getContent().getAsJsonObject().has("m.relates_to"))
+                        replyToId = event.getContent().getAsJsonObject().getAsJsonObject("m.relates_to").getAsJsonObject("m.in_reply_to").get("event_id").getAsString();
+
+                            //"m.relates_to":{"m.in_reply_to":{"event_id":"$1553108333361227MMTcI:matrix.org"}}
+                    message.setReplyId(replyToId);
+
                     if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
                         message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
                     } else

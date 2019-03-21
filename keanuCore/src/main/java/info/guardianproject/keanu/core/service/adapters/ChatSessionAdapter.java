@@ -339,7 +339,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         if (mConnection.getState() != ImConnection.LOGGED_IN) {
             // connection has been suspended, save the message without send it
             long now = System.currentTimeMillis();
-            insertMessageInDb(null, text, now, Imps.MessageType.QUEUED, null);
+            insertMessageInDb(null, text, now, Imps.MessageType.QUEUED, null, replyId);
             return;
         }
 
@@ -356,7 +356,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         if (!isResend) {
 
             if (!isEphemeral) {
-                insertMessageInDb(null, text, sendTime, msg.getType(), 0, msg.getID(), null);
+                insertMessageInDb(null, text, sendTime, msg.getType(), 0, msg.getID(), null, replyId);
 
                 if (setLastMessage)
                     setLastMessage(text, sendTime);
@@ -364,7 +364,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             else
             {
                 //add empty message
-                insertMessageInDb(null, "", sendTime, Imps.MessageType.STATUS, 0, msg.getID(), null);
+                insertMessageInDb(null, "", sendTime, Imps.MessageType.STATUS, 0, msg.getID(), null, replyId);
             }
         }
 
@@ -415,7 +415,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
         long sendTime = System.currentTimeMillis();
 
-        insertMessageInDb(null, msgBody, sendTime, msg.getType(), 0, msg.getID(), mimeType);
+        insertMessageInDb(null, msgBody, sendTime, msg.getType(), 0, msg.getID(), mimeType, null);
         setLastMessage(msgBody,sendTime);
 
         return msg;
@@ -1141,9 +1141,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         }
 
         if (mIsGroupChat) {
-            insertMessageInDb(contact, null, System.currentTimeMillis(), messageType, null);
+            insertMessageInDb(contact, null, System.currentTimeMillis(), messageType, null, null);
         } else {
-            insertMessageInDb(null, null, System.currentTimeMillis(), messageType, null);
+            insertMessageInDb(null, null, System.currentTimeMillis(), messageType, null, null);
         }
     }
 
@@ -1152,8 +1152,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 new String[] { Integer.toString(type) });
     }
 
-    Uri insertMessageInDb(String contact, String body, long time, int type, String mimeType) {
-        return insertMessageInDb(contact, body, time, type, 0/*No error*/, nextID(), mimeType);
+    Uri insertMessageInDb(String contact, String body, long time, int type, String mimeType, String replyId) {
+        return insertMessageInDb(contact, body, time, type, 0/*No error*/, nextID(), mimeType, replyId);
     }
 
     /**
@@ -1177,8 +1177,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         return Imps.messageExists(mContentResolver,msgId,-1);
     }
 
-    Uri insertMessageInDb(String contact, String body, long time, int type, int errCode, String id, String mimeType) {
-        return Imps.insertMessageInDb(mContentResolver, mIsGroupChat, mContactId, false, contact, body, time, type, errCode, id, mimeType);
+    Uri insertMessageInDb(String contact, String body, long time, int type, int errCode, String id, String mimeType, String replyId) {
+        return Imps.insertMessageInDb(mContentResolver, mIsGroupChat, mContactId, false, contact, body, time, type, errCode, id, mimeType, replyId);
     }
 
     int updateMessageInDb(String id, int type, long time, String body, String newPacketId) {
@@ -1245,9 +1245,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             Uri messageUri = null;
 
             if (msg.getID() == null)
-                messageUri = insertMessageInDb(nickname, body, time, msg.getType(), msg.getContentType());
+                messageUri = insertMessageInDb(nickname, body, time, msg.getType(), msg.getContentType(), msg.getReplyId());
             else
-                messageUri = insertMessageInDb(nickname, body, time, msg.getType(), 0, msg.getID(), msg.getContentType());
+                messageUri = insertMessageInDb(nickname, body, time, msg.getType(), 0, msg.getID(), msg.getContentType(), msg.getReplyId());
 
             setLastMessage(body, time);
 
@@ -1325,7 +1325,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
         public void onSendMessageError(ChatSession ses, final Message msg, final ImErrorInfo error) {
             insertMessageInDb(null, null, System.currentTimeMillis(), Imps.MessageType.OUTGOING,
-                    error.getCode(), null, null);
+                    error.getCode(), null, null, msg.getReplyId());
 
             try {
                 final int N = mRemoteListeners.beginBroadcast();
@@ -1662,7 +1662,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                                 mIsGroupChat, getId(),
                                 true, from,
                                 filePath, System.currentTimeMillis(), type,
-                                0, offerId, mimeType);
+                                0, offerId, mimeType, null);
 
                         int percent = (int)(100);
 

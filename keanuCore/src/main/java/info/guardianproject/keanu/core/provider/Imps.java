@@ -842,6 +842,9 @@ public class Imps {
 
         /** Mime type.  If non-null, body is a URI. */
         String MIME_TYPE = "mime_type";
+
+        /** Reply ID.  If non-null, id of source message this is a reply to. */
+        String REPLY_ID = "reply_id";
     }
 
     /** This table contains messages. */
@@ -2440,7 +2443,8 @@ public class Imps {
             int type,
             int errCode,
             String id,
-            String mimeType) {
+            String mimeType,
+            String replyId) {
 
         ContentValues values = new ContentValues();
         values.put(Messages.BODY, body);
@@ -2454,6 +2458,7 @@ public class Imps {
         values.put(Messages.IS_DELIVERED, 0);
         values.put(Messages.MIME_TYPE, mimeType);
         values.put(Messages.PACKET_ID, id);
+        values.put(Messages.REPLY_ID, replyId);
 
 //        return resolver.insert(isEncrypted ? Messages.getOtrMessagesContentUriByThreadId(contactId) : Messages.getContentUriByThreadId(contactId), values);
 

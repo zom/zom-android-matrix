@@ -96,7 +96,7 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
     private static final String LEGACY_UNENCRYPTED_DATABASE_NAME = "imps.db";
     private static final String DATABASE_NAME = "keanu.db";
 
-    private static final int DATABASE_VERSION = 113;
+    private static final int DATABASE_VERSION = 116;
 
     protected static final int MATCH_PROVIDERS = 1;
     protected static final int MATCH_PROVIDERS_BY_ID = 2;
@@ -717,6 +717,47 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                     }
                     return;
 
+                case 114:
+                case 115:
+
+                    try {
+                        db.beginTransaction();
+
+                        Cursor c = db.query(TABLE_MESSAGES, null, null, null, null, null, null);
+                        if (c.getColumnIndex("reply_id")==-1)
+                        {
+                            db.execSQL("ALTER TABLE " + TABLE_MESSAGES
+                                    + " ADD COLUMN reply_id TEXT;");
+                        }
+                        c.close();
+
+                        db.setTransactionSuccessful();
+                    } catch (Throwable ex) {
+                        LogCleaner.error(LOG_TAG, ex.getMessage(), ex);
+                    } finally {
+                        db.endTransaction();
+                    }
+
+
+                    try {
+                        db.beginTransaction();
+
+                        Cursor c = db.query(TABLE_IN_MEMORY_MESSAGES, null, null, null, null, null, null);
+                        if (c.getColumnIndex("reply_id")==-1)
+                        {
+                            db.execSQL("ALTER TABLE " + TABLE_IN_MEMORY_MESSAGES
+                                    + " ADD COLUMN reply_id TEXT;");
+                        }
+                        c.close();
+
+                        db.setTransactionSuccessful();
+                    } catch (Throwable ex) {
+                        LogCleaner.error(LOG_TAG, ex.getMessage(), ex);
+                    } finally {
+                        db.endTransaction();
+                    }
+                    return;
+
                 case 1:
                 if (newVersion <= 100) {
                     return;
@@ -933,7 +974,8 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                        + "err_code INTEGER NOT NULL DEFAULT 0," + "err_msg TEXT,"
                        + "is_muc INTEGER," + "show_ts INTEGER," +
                        "is_delivered INTEGER," +
-                       "mime_type TEXT" +
+                       "mime_type TEXT," +
+                    "reply_id TEXT" +
                        ");");
 
         }
