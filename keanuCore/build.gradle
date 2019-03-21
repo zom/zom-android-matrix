@@ -10,8 +10,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 117
-        versionName "0.0.1.17"
+        versionCode project.ext.keanuLibsVersionCode
+        versionName project.ext.keanuLibsVersion
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -72,7 +72,7 @@ uploadArchives {
                 pom.project {
                         groupId 'info.guardianproject.keanuapp'
                         artifactId 'keanucore'
-                        version '0.0.1.17'
+                        version project.ext.keanuLibsVersion
                 }
         }
 }
