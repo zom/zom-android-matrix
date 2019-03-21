@@ -20,14 +20,11 @@ buildscript {
 
 allprojects {
     repositories {
+        google()
         jcenter()
         maven { url "https://jitpack.io" }
-        maven {
-            url 'https://oss.sonatype.org/content/repositories/snapshots'
-        }
-        mavenCentral()
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
         maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
-        google()
     }
     project.ext {
         keanuLibsVersionCode=118
