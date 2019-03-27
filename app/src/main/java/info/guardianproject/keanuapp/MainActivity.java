@@ -82,6 +82,7 @@ import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.ImServiceConstants;
 import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.service.StatusBarNotifier;
+import info.guardianproject.keanu.core.util.AssetUtil;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.core.util.SystemServices;
 import info.guardianproject.keanu.core.util.XmppUriHelper;
@@ -275,8 +276,10 @@ public class MainActivity extends BaseActivity {
 
     private void installRingtones ()
     {
-        //AssetUtil.installRingtone(getApplicationContext(),R.raw.bell,"Bell");
-
+        AssetUtil.installRingtone(getApplicationContext(),R.raw.bell,getString(R.string.zom_bell));
+        AssetUtil.installRingtone(getApplicationContext(),R.raw.chant,getString(R.string.zom_chant));
+        AssetUtil.installRingtone(getApplicationContext(),R.raw.yak,getString(R.string.zom_yak));
+        AssetUtil.installRingtone(getApplicationContext(),R.raw.dranyen,getString(R.string.zom_dranyen));
 
     }
 

@@ -6,5 +6,9 @@
     <string name="app_name">Keanu</string>
     <string name="im_label">Keanu</string>
     <string name="pref_clear_data">Make Some Space</string>
+    <string name="zom_bell">Zom Bell</string>
+    <string name="zom_chant">Zom Chant</string>
+    <string name="zom_yak">Zom Yak</string>
+    <string name="zom_dranyen">Zom Dranyen</string>
 
 </resources>
