@@ -156,7 +156,7 @@ public class MatrixConnection extends ImConnection {
      //   mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         //mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         mExecutor = Executors.newSingleThreadExecutor();
-        mExecutorGroups = Executors.newCachedThreadPool();
+        mExecutorGroups = new ThreadPoolExecutor(1,2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
     }
 
     @Override
@@ -332,6 +332,9 @@ public class MatrixConnection extends ImConnection {
             @Override
             public void onReadReceiptsLoaded(String s) {
                 debug ("MXSTORE: onReadReceiptsLoaded: " + s);
+
+
+
 
             }
         });
@@ -862,9 +865,8 @@ public class MatrixConnection extends ImConnection {
 
     protected void updateGroupMembers (final Room room, final ChatGroup group) {
 
-        if (!lbqGroups.contains(group))
-            lbqGroups.add(group);
-
+        if (!lbqGroups.contains(room.getRoomId()))
+            lbqGroups.add(room.getRoomId());
 
     }
 
@@ -897,8 +899,6 @@ public class MatrixConnection extends ImConnection {
 
             @Override
             public void onSuccess(final List<RoomMember> roomMembers) {
-
-              //  new GroupMemberLoader(room, group, roomMembers).run();
 
                 mExecutorGroups.execute(new GroupMemberLoader(room, group, roomMembers));
 
@@ -1304,6 +1304,7 @@ public class MatrixConnection extends ImConnection {
                     //userId who got the room receipt
                     ReceiptData data = mStore.getReceipt(roomId, userId);
                     session.onMessageReceipt(data.eventId);
+
 
                 }
             }
@@ -2087,7 +2088,7 @@ public class MatrixConnection extends ImConnection {
         }
     }
 
-    LinkedBlockingQueue<ChatGroup> lbqGroups = new LinkedBlockingQueue<>();
+    LinkedBlockingQueue<String> lbqGroups = new LinkedBlockingQueue<>();
     Timer mTimerGroupLoader;
 
     private void initGroupLoader () {
@@ -2098,7 +2099,7 @@ public class MatrixConnection extends ImConnection {
             public void run() {
 
                 while (lbqGroups.peek() != null) {
-                    ChatGroup group = lbqGroups.poll();
+                    ChatGroup group = mChatGroupManager.getChatGroup(lbqGroups.poll());
                     Room room = mDataHandler.getRoom(group.getAddress().getAddress());
                     updateGroupMembersAsync(room,group);
                     //mExecutorGroups.execute(() -> updateGroupMembersAsync(room,group));

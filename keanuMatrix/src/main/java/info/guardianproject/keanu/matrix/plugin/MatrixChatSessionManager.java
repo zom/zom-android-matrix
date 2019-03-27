@@ -197,8 +197,12 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
                                 //now resend!
                                 sendMessageAsync(session, message, listener);
+                                return;
                             }
                         }
+
+                        if (listener != null)
+                            listener.onMessageSendFail(message);
 
                     }
 
