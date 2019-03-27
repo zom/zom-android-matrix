@@ -406,7 +406,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 mSession.registerChatListener(mChatListener);
                 mChatListenerRegistered = true;
 
-              //  mSession.refreshContactFromServer();
+                mSession.refreshContactFromServer();
                 updateMembers();
 
                 List<Contact> admins = mSession.getGroupChatAdmins();
