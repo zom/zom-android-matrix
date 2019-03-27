@@ -51,6 +51,7 @@ import androidx.annotation.Nullable;
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.keanu.core.Preferences;
+import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
@@ -182,6 +183,8 @@ public class CameraActivity extends AppCompatActivity {
 
 
         });
+
+        findViewById(R.id.btnCameraVideo).setVisibility(View.GONE);
 
         findViewById(R.id.btnCameraVideo).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -315,7 +318,7 @@ public class CameraActivity extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            hideSystemUI();
+            //hideSystemUI();
         }
     }
 
@@ -427,7 +430,7 @@ public class CameraActivity extends AppCompatActivity {
             final Uri vfsUri = SecureMediaStore.createContentPath(sessionId,"cam" + new Date().getTime() + ".jpg");
 
             OutputStream out = new FileOutputStream(new File(vfsUri.getPath()));
-            bitmap = getResizedBitmap(bitmap,SecureMediaStore.DEFAULT_IMAGE_WIDTH,SecureMediaStore.DEFAULT_IMAGE_WIDTH);
+         //   bitmap = getResizedBitmap(bitmap,SecureMediaStore.DEFAULT_IMAGE_WIDTH,SecureMediaStore.DEFAULT_IMAGE_WIDTH);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for JPG*/, out);
 
             bitmap.recycle();
