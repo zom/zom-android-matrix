@@ -207,7 +207,7 @@ public class MessageListItem extends FrameLayout {
     public String getPacketId () { return packetId; }
 
     public void bindIncomingMessage(MessageViewHolder holder, int id, int messageType, String address, String nickname, final String mimeType, final String body, Date date, Markup smileyRes,
-                                    boolean scrolling, EncryptionState encryption, boolean showContact, int presenceStatus, IChatSession session, String packetId) {
+                                    boolean scrolling, EncryptionState encryption, boolean showContact, int presenceStatus, IChatSession session, String packetId, String replyId) {
 
         mHolder = holder;
         applyStyleColors();

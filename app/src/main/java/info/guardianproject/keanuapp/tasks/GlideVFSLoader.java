@@ -82,7 +82,7 @@ class GlideVFSCacheKey implements Key {
 
     @Override
     public boolean equals(Object obj) {
-        return ((GlideVFSCacheKey) obj).hashCode() == (hashCode());
+        return obj.hashCode() == (hashCode());
     }
 }
 

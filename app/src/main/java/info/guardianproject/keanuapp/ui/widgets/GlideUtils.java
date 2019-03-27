@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
+import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
@@ -63,8 +64,9 @@ public class GlideUtils {
                 info.guardianproject.iocipher.File fileImage = new info.guardianproject.iocipher.File(uri.getPath());
                 if (fileImage.exists())
                 {
+                    FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(fileImage);
                     Glide.with(context)
-                            .load(new info.guardianproject.iocipher.FileInputStream(fileImage))
+                            .load(fis)
                             .apply(noDiskCacheOptions)
                             .into(imageView);
                 }

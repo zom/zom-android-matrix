@@ -126,6 +126,11 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
         mMembers = new ArrayList<>();
         mConn = RemoteImService.getConnection(mProviderId, mAccountId);
         mLocalAddress = '@' + Imps.Account.getUserName(getContentResolver(), mAccountId) + ':' + providerSettings.getDomain();
+        try {
+            mSession = mConn.getChatSessionManager().getChatSession(mAddress);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
 
         providerSettings.close();
 
@@ -394,34 +399,38 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
         try {
             if (mSession == null) {
                 mSession = mConn.getChatSessionManager().getChatSession(mAddress);
-                if (mSession != null) {
-                    mSession.registerChatListener(mChatListener);
-                    mChatListenerRegistered = true;
 
-                    updateMembers();
-
-                    List<Contact> admins = mSession.getGroupChatAdmins();
-                    List<Contact> owners = mSession.getGroupChatOwners();
-                    if (admins != null) {
-                        for (Contact c : admins) {
-                            if (c.getAddress().getBareAddress().equals(mLocalAddress)) {
-                                mYou.affiliation = "admin";
-                                break;
-                            }
-                        }
-                    }
-                    if (owners != null) {
-                        for (Contact c : owners) {
-                            if (c.getAddress().getBareAddress().equals(mLocalAddress)) {
-                                mYou.affiliation = "owner";
-                                break;
-                            }
-                        }
-                    }
-
-
-                }
             }
+
+            if (mSession != null) {
+                mSession.registerChatListener(mChatListener);
+                mChatListenerRegistered = true;
+
+              //  mSession.refreshContactFromServer();
+                updateMembers();
+
+                List<Contact> admins = mSession.getGroupChatAdmins();
+                List<Contact> owners = mSession.getGroupChatOwners();
+                if (admins != null) {
+                    for (Contact c : admins) {
+                        if (c.getAddress().getBareAddress().equals(mLocalAddress)) {
+                            mYou.affiliation = "admin";
+                            break;
+                        }
+                    }
+                }
+                if (owners != null) {
+                    for (Contact c : owners) {
+                        if (c.getAddress().getBareAddress().equals(mLocalAddress)) {
+                            mYou.affiliation = "owner";
+                            break;
+                        }
+                    }
+                }
+
+
+            }
+
         }
         catch (RemoteException e){}
         return mSession;

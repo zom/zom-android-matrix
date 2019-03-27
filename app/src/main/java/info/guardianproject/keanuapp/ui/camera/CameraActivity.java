@@ -390,7 +390,7 @@ public class CameraActivity extends AppCompatActivity {
             Imps.insertMessageInDb(
                     getContentResolver(), false, new Date().getTime(), true, null, vfsUri.toString(),
                     System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED_VERIFIED,
-                    0, offerId, mimeType);
+                    0, offerId, mimeType, null);
 
             if (mOneAndDone) {
                 Intent data = new Intent();
@@ -439,7 +439,7 @@ public class CameraActivity extends AppCompatActivity {
             Imps.insertMessageInDb(
                     getContentResolver(), false, new Date().getTime(), true, null, vfsUri.toString(),
                     System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED_VERIFIED,
-                    0, offerId, mimeType);
+                    0, offerId, mimeType, null);
 
             if (mOneAndDone) {
                 Intent data = new Intent();

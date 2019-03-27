@@ -204,7 +204,7 @@ public class GalleryActivity extends BaseActivity {
             Imps.insertMessageInDb(
                     getContentResolver(), false, new Date().getTime(), true, null, vfsUri.toString(),
                     System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED_VERIFIED,
-                    0, offerId, info.type);
+                    0, offerId, info.type, null);
 
             mLastPhoto = null;
         }

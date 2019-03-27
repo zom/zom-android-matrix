@@ -1853,10 +1853,13 @@ public class ConversationView {
         }
 
         String msg = mComposeMessage.getText().toString();
+        String replyId = null;
 
+        if (mMessageAdapter.getLastSelectedView() != null)
+            replyId = ((MessageListItem)mMessageAdapter.getLastSelectedView()).getPacketId();
 
         if (!TextUtils.isEmpty(msg))
-            sendMessageAsync(msg);
+            sendMessageAsync(msg, replyId);
 
         sendTypingStatus (false);
 
@@ -1928,19 +1931,19 @@ public class ConversationView {
             }
             else
             {
-                sendMessageAsync(resendMsg);
+                sendMessageAsync(resendMsg, null);
             }
         }
     }
 
-    void sendMessageAsync(final String msg) {
+    void sendMessageAsync(final String msg, String replyId) {
 
         new AsyncTask<String, Void, Boolean>()
         {
 
             @Override
             protected Boolean doInBackground(String[] msgs) {
-                return sendMessage(msgs[0],false);
+                return sendMessage(msgs[0],false,replyId);
             }
 
             @Override
@@ -1958,7 +1961,7 @@ public class ConversationView {
 
     }
 
-    boolean sendMessage(String msg, boolean isResend) {
+    boolean sendMessage(String msg, boolean isResend, String replyId) {
 
         //don't send empty messages
         if (TextUtils.isEmpty(msg.trim())) {
@@ -1974,7 +1977,7 @@ public class ConversationView {
             createChatSession();
         else {
             try {
-                session.sendMessage(msg, isResend, false, true);
+                session.sendMessage(msg, isResend, false, true, replyId);
                 return true;
                 //requeryCursor();
             } catch (RemoteException e) {
@@ -2506,6 +2509,7 @@ public class ConversationView {
         private int mMimeTypeColumn;
         private int mIdColumn;
         private int mPacketIdColumn;
+        private int mReplyIdColumn;
 
         private ActionMode mActionMode;
         private View mLastSelectedView;
@@ -2519,6 +2523,11 @@ public class ConversationView {
             setHasStableIds(true);
         }
 
+        public View getLastSelectedView ()
+        {
+            return mLastSelectedView;
+        }
+
         private void resolveColumnIndex(Cursor c) {
             mNicknameColumn = c.getColumnIndexOrThrow(Imps.Messages.NICKNAME);
             mBodyColumn = c.getColumnIndexOrThrow(Imps.Messages.BODY);
@@ -2530,6 +2539,7 @@ public class ConversationView {
             mMimeTypeColumn = c.getColumnIndexOrThrow(Imps.Messages.MIME_TYPE);
             mIdColumn = c.getColumnIndexOrThrow(Imps.Messages._ID);
             mPacketIdColumn = c.getColumnIndexOrThrow(Imps.Messages.PACKET_ID);
+            mReplyIdColumn = c.getColumnIndexOrThrow(Imps.Messages.REPLY_ID);
         }
 
         @Override
@@ -2643,6 +2653,7 @@ public class ConversationView {
             boolean showTimeStamp = true;//(delta > SHOW_TIME_STAMP_INTERVAL);
             long timestamp = cursor.getLong(mDateColumn);
             String packetId = cursor.getString(mPacketIdColumn);
+            String replyId = cursor.getString(mReplyIdColumn);
 
             Date date = showTimeStamp ? new Date(timestamp) : null;
             boolean isDelivered = cursor.getLong(mDeliveredColumn) > 0;
@@ -2705,7 +2716,7 @@ public class ConversationView {
 
             switch (messageType) {
             case Imps.MessageType.INCOMING:
-                messageView.bindIncomingMessage(viewHolder,id, messageType, address, nickname, mimeType, body, date, mMarkup, false, encState, showContactName, mPresenceStatus, mCurrentChatSession, packetId);
+                messageView.bindIncomingMessage(viewHolder,id, messageType, address, nickname, mimeType, body, date, mMarkup, false, encState, showContactName, mPresenceStatus, mCurrentChatSession, packetId, replyId);
 
                 break;
 
@@ -3021,7 +3032,7 @@ public class ConversationView {
 
         stickerCode.append(":");
 
-        sendMessageAsync(stickerCode.toString());
+        sendMessageAsync(stickerCode.toString(), null);
     }
 
     void approveSubscription() {
