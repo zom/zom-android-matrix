@@ -82,6 +82,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         if (result == null)
         {
             result = new ChatGroup(addr,null,this);
+            mGroups.put(addr.getAddress(),result);
         }
 
         return result;

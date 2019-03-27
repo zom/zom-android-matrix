@@ -777,6 +777,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     }
 
     String getNickName(String username) {
+
         ImEntity participant = mChatSession.getParticipant();
         if (mIsGroupChat) {
             ChatGroup group = (ChatGroup) participant;

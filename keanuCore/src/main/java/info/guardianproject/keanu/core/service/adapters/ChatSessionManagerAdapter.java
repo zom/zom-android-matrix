@@ -79,11 +79,12 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
         return mConnection.getAdaptee().getChatSessionManager();
     }
 
-    public IChatSession createChatSession(String contactAddress, boolean isNewSession, IChatSessionListener listener) {
+    public synchronized IChatSession createChatSession(String contactAddress, boolean isNewSession, IChatSessionListener listener) {
 
         ChatGroup chatGroup = groupManager.getChatGroup(new BaseAddress(contactAddress));
-        if (chatGroup == null)
-            chatGroup = new ChatGroup(new BaseAddress(contactAddress),"",groupManager);
+        if (chatGroup == null) {
+            chatGroup = new ChatGroup(new BaseAddress(contactAddress), "", groupManager);
+        }
 
         ChatSession session = getChatSessionManager().createChatSession(chatGroup, isNewSession);
 
