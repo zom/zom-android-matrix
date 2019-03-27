@@ -66,6 +66,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -99,6 +100,7 @@ import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IContactListListener;
 import info.guardianproject.keanu.core.service.adapters.ChatSessionAdapter;
 import info.guardianproject.keanu.core.util.DatabaseUtils;
+import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanu.core.util.Downloader;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.matrix.R;
@@ -987,13 +989,16 @@ public class MatrixConnection extends ImConnection {
 
     protected void debug (String msg, MatrixError error)
     {
-        Log.w(TAG, msg + ": " + error.errcode +  "=" + error.getMessage());
+        if (Debug.DEBUG_ENABLED)
+            Log.w(TAG, msg + ": " + error.errcode +  "=" + error.getMessage());
 
     }
 
     protected void debug (String msg)
     {
-        Log.d(TAG, msg);
+        if (Debug.DEBUG_ENABLED)
+            Log.d(TAG, msg);
+
     }
 
     protected void debug (String msg, Exception e)
@@ -1048,12 +1053,38 @@ public class MatrixConnection extends ImConnection {
                 debug ("PRESENCE: from=" + event.getSender() + ": " + event.getContent());
                 mExecutor.execute(() -> handlePresence(event));
 
-
-
             }
             else if (event.getType().equals(Event.EVENT_TYPE_RECEIPT))
             {
                 debug ("RECEIPT: from=" + event.getSender() + ": " + event.getContent());
+
+                /**
+                 * {
+                 * "age" : null,
+                 * "content": {
+                 * "$155369867390511tYryz:matrix.org": {"m.read":{"@earthmouse:matrix.org":{"ts":1553698822615}}},
+                 * },
+                 * "eventId": "null",
+                 * "originServerTs": 0,
+                 * "roomId": "!gvfFCZAYqQKjvlnWcn:matrix.org",
+                 * "type": "m.receipt",
+                 * "userId": "null",
+                 * "sender": "null",
+                 * }
+                 */
+
+                Iterator<String> it = event.getContent().getAsJsonObject().keySet().iterator();
+                while(it.hasNext())
+                {
+                    String eventId = it.next();
+                    String userId = event.getContent().getAsJsonObject().getAsJsonObject(eventId).getAsJsonObject("m.read").keySet().iterator().next();
+
+                    if (!userId.equals(mSession.getMyUserId())) {
+                        ChatSession session = mChatSessionManager.getSession(event.roomId);
+                        if (session != null)
+                            session.onMessageReceipt(eventId);
+                    }
+                }
 
             }
             else if (event.getType().equals(Event.EVENT_TYPE_TYPING))
@@ -1130,11 +1161,13 @@ public class MatrixConnection extends ImConnection {
 
         @Override
         public void onEventSentStateUpdated(Event event) {
+            debug("onEventSentStateUpdated: " + event);
 
         }
 
         @Override
         public void onEventSent(Event event, String s) {
+            debug("onEventSent: " + event + " s:"  + s);
 
         }
 
@@ -1299,6 +1332,8 @@ public class MatrixConnection extends ImConnection {
             ChatSession session = mChatSessionManager.getSession(roomId);
 
             if (session != null) {
+
+                final List<ReceiptData> receipts = mDataHandler.getStore().getEventReceipts(roomId, null, false, false);
 
                 for (String userId : list) {
                     //userId who got the room receipt
