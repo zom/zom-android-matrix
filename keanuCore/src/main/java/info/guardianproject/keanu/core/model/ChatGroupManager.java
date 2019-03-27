@@ -324,4 +324,6 @@ public abstract class ChatGroupManager {
      */
     public abstract void grantAdminAsync(ChatGroup group, Contact contact);
 
+    public abstract void refreshGroup (ChatGroup group);
+
 }

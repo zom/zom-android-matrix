@@ -723,12 +723,18 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
             if (mDataHandlerListener != null)
                 mDataHandlerListener.checkLastTransferRequest ();
+
+            if (mGroup != null)
+                mGroup.addMemberListener(mListenerAdapter);
         }
     }
 
     public void unregisterChatListener(IChatListener listener) {
         if (listener != null) {
             mRemoteListeners.unregister(listener);
+
+            if (mGroup != null)
+                mGroup.removeMemberListener(mListenerAdapter);
         }
     }
 
@@ -1905,6 +1911,23 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 Uri uriContact = ContentUris.withAppendedId(Imps.Contacts.CONTENT_URI, mContactId);
                 mContentResolver.update(uriContact, values, null, null);
 
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void refreshContactFromServer() throws RemoteException {
+        try {
+            if (isGroupChatSession()) {
+                ChatGroup group = (ChatGroup)mChatSession.getParticipant();
+                if (group != null) {
+
+                    ChatGroupManager mGroupMan = mConnection.getAdaptee().getChatGroupManager();
+                    mGroupMan.refreshGroup(group);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

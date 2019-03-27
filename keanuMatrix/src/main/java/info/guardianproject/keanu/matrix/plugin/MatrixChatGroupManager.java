@@ -307,11 +307,19 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         room.updateGuestAccess("forbidden", new BasicApiCallback("updateGuestAccess:forbidden"));
 
         PowerLevels pLevels = room.getState().getPowerLevels();
-        pLevels.ban = 100;
-        pLevels.kick = 100;
-        pLevels.invite = 100;
-        room.getState().setPowerLevels(pLevels);
+        if (pLevels == null) {
+            //refresh the room?
+            room = mDataHandler.getRoom(room.getRoomId());
+            pLevels = room.getState().getPowerLevels();
+        }
 
+        //this might always be null, not sure...
+        if (pLevels != null) {
+            pLevels.ban = 100;
+            pLevels.kick = 100;
+            pLevels.invite = 100;
+            room.getState().setPowerLevels(pLevels);
+        }
     }
 
     @Override
@@ -493,5 +501,13 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
             mConn.updateGroupMembers(room, group);
         }
+    }
+
+    @Override
+    public void refreshGroup(ChatGroup group) {
+
+        Room room = mDataHandler.getRoom(group.getAddress().getAddress());
+        group.setName(room.getRoomDisplayName(mContext));
+        mConn.updateGroupMembers(room, group);
     }
 }

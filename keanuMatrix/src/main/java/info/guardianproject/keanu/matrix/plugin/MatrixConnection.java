@@ -141,8 +141,9 @@ public class MatrixConnection extends ImConnection {
     private final static String HTTPS_PREPEND = "https://";
 
     private Handler mResponseHandler = new Handler();
-    private ThreadPoolExecutor mExecutor = null;
-    private ThreadPoolExecutor mExecutorGroups = null;
+    private ExecutorService mExecutor = null;
+    //private ThreadPoolExecutor mExecutorGroups = null;
+    private ExecutorService mExecutorGroups = null;
 
     public MatrixConnection (Context context)
     {
@@ -152,9 +153,10 @@ public class MatrixConnection extends ImConnection {
         mChatGroupManager = new MatrixChatGroupManager(context, this);
         mChatSessionManager = new MatrixChatSessionManager(context, this);
 
-        mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
-        mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
-
+     //   mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        //mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        mExecutor = Executors.newSingleThreadExecutor();
+        mExecutorGroups = Executors.newCachedThreadPool();
     }
 
     @Override
@@ -337,7 +339,7 @@ public class MatrixConnection extends ImConnection {
 
         mDataHandler = new MXDataHandler(mStore, mCredentials);
         mDataHandler.addListener(mEventListener);
-        mDataHandler.setLazyLoadingEnabled(true);
+        mDataHandler.setLazyLoadingEnabled(false);
 
         mStore.setDataHandler(mDataHandler);
 
@@ -868,7 +870,7 @@ public class MatrixConnection extends ImConnection {
 
     protected void updateGroupMembersAsync (final Room room, final ChatGroup group)
     {
-        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_LOWEST);
+        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
         room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
             @Override
@@ -895,6 +897,8 @@ public class MatrixConnection extends ImConnection {
 
             @Override
             public void onSuccess(final List<RoomMember> roomMembers) {
+
+              //  new GroupMemberLoader(room, group, roomMembers).run();
 
                 mExecutorGroups.execute(new GroupMemberLoader(room, group, roomMembers));
 
@@ -2096,13 +2100,13 @@ public class MatrixConnection extends ImConnection {
                 while (lbqGroups.peek() != null) {
                     ChatGroup group = lbqGroups.poll();
                     Room room = mDataHandler.getRoom(group.getAddress().getAddress());
-
-                    mExecutorGroups.execute(() -> updateGroupMembersAsync(room,group));
+                    updateGroupMembersAsync(room,group);
+                    //mExecutorGroups.execute(() -> updateGroupMembersAsync(room,group));
                 }
 
             }
 
-        }, 0, 10000);
+        }, 0, 1000);
     }
 
     LinkedBlockingQueue<Pair<String,String>> lbqAvatars = new LinkedBlockingQueue<>();

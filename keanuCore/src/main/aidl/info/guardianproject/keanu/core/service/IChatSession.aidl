@@ -139,6 +139,11 @@ interface IChatSession {
      boolean useEncryption (boolean useEncryption);
      boolean getUseEncryption ();
 
+ /**
+     * Get group chat owner(s)
+     **/
+     void refreshContactFromServer();
+
     /**
      * Set the subject for a chat room
      **/
