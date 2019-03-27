@@ -912,7 +912,7 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
             }
             buf.append(",is_delivered INTEGER");
             buf.append(",mime_type TEXT");
-
+            buf.append(",reply_id TEXT");
             buf.append(");");
 
             String sqlStatement = buf.toString();
