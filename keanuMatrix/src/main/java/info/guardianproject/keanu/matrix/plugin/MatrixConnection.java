@@ -694,7 +694,9 @@ public class MatrixConnection extends ImConnection {
     {
         Event event = mStore.getEvent(msgId, roomId);
         Room room = mStore.getRoom(roomId);
-        room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
+        //room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
+        room.markAllAsRead(new BasicApiCallback("markAllAsRead"));
+
     }
 
     @Override
@@ -858,23 +860,28 @@ public class MatrixConnection extends ImConnection {
             if (csa != null)
                 csa.presenceChanged(Presence.AVAILABLE);
 
-            updateGroupMembers(room, group);
+            updateGroupMembers(room, group, false);
 
 
 
         }
     }
 
-    protected void updateGroupMembers (final Room room, final ChatGroup group) {
+    protected void updateGroupMembers (final Room room, final ChatGroup group, boolean priority) {
 
-        if (!lbqGroups.contains(room.getRoomId()))
+        if (priority)
+        {
+            updateGroupMembersAsync(room, group, priority);
+        }
+        else if (!lbqGroups.contains(room.getRoomId()))
             lbqGroups.add(room.getRoomId());
 
     }
 
-    protected void updateGroupMembersAsync (final Room room, final ChatGroup group)
+    protected void updateGroupMembersAsync (final Room room, final ChatGroup group, boolean priority)
     {
-        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+        if (!priority)
+            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
         room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
             @Override
@@ -902,7 +909,14 @@ public class MatrixConnection extends ImConnection {
             @Override
             public void onSuccess(final List<RoomMember> roomMembers) {
 
-                mExecutorGroups.execute(new GroupMemberLoader(room, group, roomMembers));
+                GroupMemberLoader gLoader =new GroupMemberLoader(room, group, roomMembers);
+
+                if (priority)
+                {
+                    new Thread(gLoader).start();
+                }
+                else
+                    mExecutorGroups.execute(gLoader);
 
             }
         });
@@ -956,7 +970,12 @@ public class MatrixConnection extends ImConnection {
                         group.notifyMemberRoleUpdate(contact, "member", "member");
                 }
 
-                if (members.size() < 20) {
+                if (member.membership.equals("invite"))
+                {
+                    group.notifyMemberRoleUpdate(contact, "member", "invited");
+                }
+
+                if (members.size() < 40) {
                     String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(member.getUserId(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
 
                     if (!TextUtils.isEmpty(downloadUrl)) {
@@ -2069,15 +2088,17 @@ public class MatrixConnection extends ImConnection {
                     Contact[] contacts = new Contact[searchUsersResponse.results.size()];
                     int i = 0;
                     for (User user : searchUsersResponse.results) {
-                        contacts[i++] = new Contact(new MatrixAddress(user.user_id),user.displayname,Imps.Contacts.TYPE_NORMAL);
+                        if (user.user_id != null && user.displayname != null)
+                            contacts[i++] = new Contact(new MatrixAddress(user.user_id),user.displayname,Imps.Contacts.TYPE_NORMAL);
                     }
 
-                    if (listener != null)
-                    {
-                        try {
-                            listener.onContactsPresenceUpdate(contacts);
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
+                    if (listener != null) {
+                        if (contacts != null && contacts.length > 0) {
+                            try {
+                                listener.onContactsPresenceUpdate(contacts);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }
@@ -2136,8 +2157,7 @@ public class MatrixConnection extends ImConnection {
                 while (lbqGroups.peek() != null) {
                     ChatGroup group = mChatGroupManager.getChatGroup(lbqGroups.poll());
                     Room room = mDataHandler.getRoom(group.getAddress().getAddress());
-                    updateGroupMembersAsync(room,group);
-                    //mExecutorGroups.execute(() -> updateGroupMembersAsync(room,group));
+                    mExecutorGroups.execute(() -> updateGroupMembersAsync(room,group, false));
                 }
 
             }
