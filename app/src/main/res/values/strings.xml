@@ -10,5 +10,6 @@
     <string name="zom_chant">Zom Chant</string>
     <string name="zom_yak">Zom Yak</string>
     <string name="zom_dranyen">Zom Dranyen</string>
+    <string name="status_invited">(invited)</string>
 
 </resources>

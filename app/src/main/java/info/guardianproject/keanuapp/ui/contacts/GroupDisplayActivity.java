@@ -139,8 +139,6 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
         mYou.affiliation = "none";
         mYou.role = "none";
 
-        updateSession();
-
         mRecyclerView = (RecyclerView) findViewById(R.id.rvRoot);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setAdapter(new RecyclerView.Adapter() {
@@ -300,64 +298,87 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 } else if (holder instanceof MemberViewHolder) {
                     MemberViewHolder h = (MemberViewHolder) holder;
 
-                    // Reset the padding to match other views in this hierarchy
-                    //
-                    int padding = getResources().getDimensionPixelOffset(R.dimen.detail_view_padding);
-                    h.itemView.setPadding(padding, h.itemView.getPaddingTop(), padding, h.itemView.getPaddingBottom());
-
-                    int idxMember = position - 1;
-                    final GroupMemberDisplay member = mMembers.get(idxMember);
-
-                    String nickname = member.nickname;
-                    if (TextUtils.isEmpty(nickname)) {
-                        nickname = member.username.split("@")[0].split("\\.")[0];
-                    } else {
-                        nickname = nickname.split("@")[0].split("\\.")[0];
-                    }
-
-                    if (mYou.username.contentEquals(member.username)) {
-                        nickname += " " + getString(R.string.group_you);
-                    }
-
-                    h.line1.setText(nickname);
-
-                    boolean hasRoleNone = TextUtils.isEmpty(member.role) || "none".equalsIgnoreCase(member.role);
-                    h.line1.setTextColor(hasRoleNone ? Color.GRAY : colorTextPrimary);
-
-                    h.line2.setText(member.username);
-                    if (member.affiliation != null && (member.affiliation.contentEquals("owner") || member.affiliation.contentEquals("admin"))) {
-                        h.avatarCrown.setVisibility(View.VISIBLE);
-                    } else {
-                        h.avatarCrown.setVisibility(View.GONE);
-                    }
-
-                    /**
-                    if (!member.online)
+                    if (mMembers.size() == 0)
                     {
-                        h.line1.setEnabled(false);
-                        h.line2.setEnabled(false);
-                        h.avatar.setBackgroundColor(getResources().getColor(R.color.holo_grey_light));
-                     }**/
-
-                    //h.line2.setText(member.username);
-                    if (member.avatar == null) {
-                        padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, getResources().getDisplayMetrics());
-                        member.avatar = new LetterAvatar(holder.itemView.getContext(), nickname, padding);
+                        h.line1.setText(R.string.loading);
+                        h.line2.setText("");
                     }
-                    h.avatar.setImageDrawable(member.avatar);
-                    h.avatar.setVisibility(View.VISIBLE);
-                    h.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            showMemberInfo(member);
+                    else {
+                        // Reset the padding to match other views in this hierarchy
+                        //
+                        int padding = getResources().getDimensionPixelOffset(R.dimen.detail_view_padding);
+                        h.itemView.setPadding(padding, h.itemView.getPaddingTop(), padding, h.itemView.getPaddingBottom());
+
+                        int idxMember = position - 1;
+                        final GroupMemberDisplay member = mMembers.get(idxMember);
+
+                        String nickname = member.nickname;
+                        if (TextUtils.isEmpty(nickname)) {
+                            nickname = member.username.split("@")[0].split("\\.")[0];
+                        } else {
+                            nickname = nickname.split("@")[0].split("\\.")[0];
                         }
-                    });
+
+                        if (mYou.username.contentEquals(member.username)) {
+                            nickname += " " + getString(R.string.group_you);
+                        }
+
+
+                        h.line2.setText(member.username);
+                        if (member.affiliation != null && (member.affiliation.contentEquals("owner") || member.affiliation.contentEquals("admin"))) {
+
+                            h.avatarCrown.setImageResource(R.drawable.ic_crown);
+                            h.avatarCrown.setVisibility(View.VISIBLE);
+                        }
+                        else if (member.affiliation != null && (member.affiliation.contentEquals("invited"))) {
+                            h.avatarCrown.setImageResource(R.drawable.ic_message_wait_grey);
+                            h.avatarCrown.setVisibility(View.VISIBLE);
+
+
+                        } else {
+                            h.avatarCrown.setVisibility(View.GONE);
+                        }
+
+                        h.line1.setText(nickname);
+
+                        boolean hasRoleNone = TextUtils.isEmpty(member.role) || "none".equalsIgnoreCase(member.role);
+                        h.line1.setTextColor(hasRoleNone ? Color.GRAY : colorTextPrimary);
+
+
+                        /**
+                         if (!member.online)
+                         {
+                         h.line1.setEnabled(false);
+                         h.line2.setEnabled(false);
+                         h.avatar.setBackgroundColor(getResources().getColor(R.color.holo_grey_light));
+                         }**/
+
+                        //h.line2.setText(member.username);
+                        if (member.avatar == null) {
+                            padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, getResources().getDisplayMetrics());
+                            member.avatar = new LetterAvatar(holder.itemView.getContext(), nickname, padding);
+                        }
+                        h.avatar.setImageDrawable(member.avatar);
+                        h.avatar.setVisibility(View.VISIBLE);
+                        h.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMemberInfo(member);
+                            }
+                        });
+                    }
                 }
             }
 
             @Override
             public int getItemCount() {
-                return 2 + mMembers.size();
+
+                if (mMembers.size() == 0)
+                {
+                    return 3;
+                }
+                else
+                    return 2 + mMembers.size();
             }
 
             @Override
@@ -407,7 +428,6 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 mChatListenerRegistered = true;
 
                 mSession.refreshContactFromServer();
-                updateMembers();
 
                 List<Contact> admins = mSession.getGroupChatAdmins();
                 List<Contact> owners = mSession.getGroupChatOwners();
@@ -529,22 +549,19 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
             final ArrayList<GroupMemberDisplay> listMembers = new ArrayList<>(members.values());
             // Sort members by name, but keep owners at the top
-            Collections.sort(listMembers, new Comparator<GroupMemberDisplay>() {
-                @Override
-                public int compare(GroupMemberDisplay member1, GroupMemberDisplay member2) {
-                    if (member1.affiliation == null || member2.affiliation == null)
+            Collections.sort(listMembers, (member1, member2) -> {
+                if (member1.affiliation == null || member2.affiliation == null)
+                    return 1;
+                boolean member1isImportant = (member1.affiliation.contentEquals("owner") || member1.affiliation.contentEquals("admin"));
+                boolean member2isImportant = (member2.affiliation.contentEquals("owner") || member2.affiliation.contentEquals("admin"));
+                if (member1isImportant != member2isImportant) {
+                    if (member1isImportant) {
+                        return -1;
+                    } else {
                         return 1;
-                    boolean member1isImportant = (member1.affiliation.contentEquals("owner") || member1.affiliation.contentEquals("admin"));
-                    boolean member2isImportant = (member2.affiliation.contentEquals("owner") || member2.affiliation.contentEquals("admin"));
-                    if (member1isImportant != member2isImportant) {
-                        if (member1isImportant) {
-                            return -1;
-                        } else {
-                            return 1;
-                        }
                     }
-                    return member1.nickname.compareTo(member2.nickname);
                 }
+                return member1.nickname.compareTo(member2.nickname);
             });
 
             runOnUiThread(new Runnable() {
