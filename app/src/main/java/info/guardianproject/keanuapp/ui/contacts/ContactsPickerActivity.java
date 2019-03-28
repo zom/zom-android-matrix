@@ -298,6 +298,9 @@ public class ContactsPickerActivity extends BaseActivity {
         if (response == RESULT_OK)
             if (request == REQUEST_CODE_ADD_CONTACT)
             {
+                getSupportLoaderManager().restartLoader(LOADER_ID, null, mLoaderCallbacks);
+
+                /**
                 String newContact = data.getExtras().getString(ContactsPickerActivity.EXTRA_RESULT_USERNAME);
 
                 if (newContact != null)
@@ -305,14 +308,17 @@ public class ContactsPickerActivity extends BaseActivity {
                     Intent dataNew = new Intent();
                     
                     long providerId = data.getExtras().getLong(ContactsPickerActivity.EXTRA_RESULT_PROVIDER);
+                    long accountId = data.getExtras().getLong(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT);
 
                     dataNew.putExtra(EXTRA_RESULT_USERNAME, newContact);
                     dataNew.putExtra(EXTRA_RESULT_PROVIDER, providerId);
+                    dataNew.putExtra(EXTRA_RESULT_ACCOUNT, accountId);
+
                     setResult(RESULT_OK, dataNew);
 
                     finish();
 
-                }
+                }**/
             }
 
 
@@ -602,7 +608,7 @@ public class ContactsPickerActivity extends BaseActivity {
             buf.append(")) GROUP BY (" + Imps.Contacts.USERNAME);
 
             CursorLoader loader = new CursorLoader(ContactsPickerActivity.this, mUri, ContactListItem.CONTACT_PROJECTION,
-                    buf == null ? null : buf.toString(), null, Imps.Contacts.MODE_AND_ALPHA_SORT_ORDER);
+                    buf == null ? null : buf.toString(), null, Imps.Contacts.ALPHA_SORT_ORDER);
 
             return loader;
         }

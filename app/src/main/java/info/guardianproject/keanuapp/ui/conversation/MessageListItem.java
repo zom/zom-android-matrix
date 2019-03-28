@@ -23,6 +23,7 @@ import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.ui.RoundedAvatarDrawable;
 import info.guardianproject.keanu.core.util.DatabaseUtils;
 import info.guardianproject.keanu.core.util.LinkifyHelper;
+import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 
 import info.guardianproject.keanu.core.util.SecureMediaStore;
@@ -206,7 +207,7 @@ public class MessageListItem extends FrameLayout {
 
     public String getPacketId () { return packetId; }
 
-    public void bindIncomingMessage(MessageViewHolder holder, int id, int messageType, String address, String nickname, final String mimeType, final String body, Date date, Markup smileyRes,
+    public void bindIncomingMessage(MessageViewHolder holder, int id, int messageType, String roomAddress, String userAddress, final String mimeType, final String body, Date date, Markup smileyRes,
                                     boolean scrolling, EncryptionState encryption, boolean showContact, int presenceStatus, IChatSession session, String packetId, String replyId) {
 
         mHolder = holder;
@@ -218,11 +219,13 @@ public class MessageListItem extends FrameLayout {
 
         this.packetId = packetId;
 
-        if (nickname == null)
-            nickname = address;
+        String nickname = userAddress;
+
+        if (nickname.startsWith("@"))
+            nickname = new MatrixAddress(userAddress).getUser();
 
         lastMessage = body;
-        showAvatar(address, nickname, true, presenceStatus);
+        showAvatar(userAddress, nickname, true, presenceStatus);
 
         mHolder.resetOnClickListenerMediaThumbnail();
 

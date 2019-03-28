@@ -1207,7 +1207,7 @@ public class ConversationView {
         registerChatListener();
         registerForConnEvents();
 
-        updateWarningView();
+       // updateWarningView();
     }
 
     public void stopListening() {
@@ -1447,7 +1447,18 @@ public class ConversationView {
 
         setViewType(VIEW_TYPE_CHAT);
 
-        Uri contactUri = ContentUris.withAppendedId(Imps.Contacts.CONTENT_URI, chatId);
+        mHandler.postDelayed(new Runnable (){
+            public void run ()
+            {
+                bindQuery();
+            }
+        },500);
+        return true;
+    }
+
+    private boolean bindQuery () {
+
+        Uri contactUri = ContentUris.withAppendedId(Imps.Contacts.CONTENT_URI, mLastChatId);
         Cursor c = mActivity.getContentResolver().query(contactUri, CHAT_PROJECTION, null, null, null);
 
         if (c == null)
@@ -1496,9 +1507,6 @@ public class ConversationView {
 
             if (isGroupChat()) {
                 updateGroupTitle();
-            } else {
-                if (mRemoteNickname == null)
-                    mRemoteNickname = name;
             }
 
             return true;
@@ -2052,41 +2060,6 @@ public class ConversationView {
 
             isConnected = false;
         }
-
-        /**
-        if (this.isGroupChat())
-        {
-
-            mComposeMessage.setHint(R.string.this_is_a_group_chat);
-
-
-        }
-        else if (mCurrentChatSession != null) {
-
-
-            boolean isSessionEncrypted = false;
-
-            try {
-                isSessionEncrypted = mCurrentChatSession.isEncrypted();
-            }
-            catch (Exception re){}
-
-            if (isSessionEncrypted) {
-
-
-                if (mSendButton.getVisibility() == View.GONE) {
-                    mComposeMessage.setHint(R.string.compose_hint_secure);
-                    mSendButton.setImageResource(R.drawable.ic_send_secure);
-                }
-
-
-
-
-            }
-
-        }**/
-
-
     }
 
 
