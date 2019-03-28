@@ -745,6 +745,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             mStatusBarNotifier.dismissChatNotification(mConnection.getProviderId(), baseUsername);
 
             mHasUnreadMessages = false;
+
+
         }
     }
 

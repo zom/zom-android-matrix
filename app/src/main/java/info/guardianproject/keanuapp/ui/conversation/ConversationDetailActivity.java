@@ -170,6 +170,10 @@ public class ConversationDetailActivity extends BaseActivity {
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
         );
 
+        Intent intent = getIntent();
+        processIntent(intent);
+        setIntent(null);
+
     }
 
     public void updateLastSeen (Date lastSeen)
@@ -182,6 +186,7 @@ public class ConversationDetailActivity extends BaseActivity {
 
         getSupportActionBar().setTitle(mConvoView.getTitle());
 
+        /**
         if (!mConvoView.isGroupChat()) {
             if (mConvoView.getLastSeen() != null) {
                 getSupportActionBar().setSubtitle(new PrettyTime().format(mConvoView.getLastSeen()));
@@ -203,7 +208,7 @@ public class ConversationDetailActivity extends BaseActivity {
         {
             getSupportActionBar().setSubtitle("");
 
-        }
+        }*/
 
 
         //not set color
@@ -295,18 +300,25 @@ public class ConversationDetailActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        Intent intent = getIntent();
-        processIntent(intent);
-        setIntent(null);
 
-        mConvoView.setSelected(true);
 
-        /**
-        IntentFilter regFilter = new IntentFilter();
-        regFilter .addAction(Intent.ACTION_SCREEN_OFF);
-        regFilter .addAction(Intent.ACTION_SCREEN_ON);
-        registerReceiver(receiver, regFilter);
-            **/
+
+        mHandler.postDelayed(new Runnable ()
+             {
+                 public void run () {
+
+                     mConvoView.setSelected(true);
+                     setLastRead ();
+
+
+                 }
+             },1000);
+
+
+    }
+
+    private void setLastRead ()
+    {
 
         // Set last read date now!
         if (mChatId != -1) {
@@ -314,8 +326,6 @@ public class ConversationDetailActivity extends BaseActivity {
             values.put(Imps.Chats.LAST_READ_DATE, System.currentTimeMillis());
             getContentResolver().update(ContentUris.withAppendedId(Imps.Chats.CONTENT_URI, mChatId), values, null, null);
         }
-
-
 
     }
 
@@ -370,14 +380,7 @@ public class ConversationDetailActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
 
-        if (mConvoView.isGroupChat())
-        {
-            getMenuInflater().inflate(R.menu.menu_conversation_detail_group, menu);
-        }
-        else {
-            getMenuInflater().inflate(R.menu.menu_conversation_detail, menu);
-        }
-
+        getMenuInflater().inflate(R.menu.menu_conversation_detail_group, menu);
         return true;
     }
 
