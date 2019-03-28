@@ -21,6 +21,7 @@ import android.text.TextUtils;
 import android.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -110,11 +111,12 @@ public class ChatGroup extends ImEntity {
 
         // Could be that member lists were downloaded before we had a listener attached, so make
         // sure to update the listener here.
+        /**
         for (Contact c : getMembers()) {
             Pair<String, String> roles = mMemberRolesAndAffiliations.get(c);
             listener.onMemberJoined(this, c);
             listener.onMemberRoleChanged(this, c, roles.first, roles.second);
-        }
+        }**/
     }
 
     public void removeMemberListener(GroupMemberListener listener) {
@@ -126,8 +128,8 @@ public class ChatGroup extends ImEntity {
      *
      * @return an unmodifiable collection of the members of the group.
      */
-    public List<Contact> getMembers() {
-        return Collections.unmodifiableList(new ArrayList(mMembers.values()));
+    public ArrayList<Contact> getMembers() {
+       return new ArrayList<>(mMembers.values());
     }
 
     /**

@@ -170,10 +170,6 @@ public class ConversationDetailActivity extends BaseActivity {
                 WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
         );
 
-        Intent intent = getIntent();
-        processIntent(intent);
-        setIntent(null);
-
     }
 
     public void updateLastSeen (Date lastSeen)
@@ -300,20 +296,24 @@ public class ConversationDetailActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
+        new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                Intent intent = getIntent();
+                processIntent(intent);
+                setIntent(null);
 
+                return null;
+            }
 
+            @Override
+            protected void onPostExecute(Object o) {
+                super.onPostExecute(o);
 
-        mHandler.postDelayed(new Runnable ()
-             {
-                 public void run () {
+                mConvoView.setSelected(true);
 
-                     mConvoView.setSelected(true);
-                     setLastRead ();
-
-
-                 }
-             },1000);
-
+            }
+        }.execute();
 
     }
 
