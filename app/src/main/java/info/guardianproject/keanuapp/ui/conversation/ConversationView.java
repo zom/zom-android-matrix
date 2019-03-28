@@ -266,7 +266,6 @@ public class ConversationView {
 
         if (mIsSelected)
         {
-            //  bindChat(mLastChatId);
             startListening();
 
             updateWarningView();
@@ -280,6 +279,7 @@ public class ConversationView {
             }
             catch (Exception e){}
 
+            /**
             try
             {
 
@@ -312,7 +312,7 @@ public class ConversationView {
 
             }
             catch (RemoteException re){}
-
+            **/
         }
         else
         {
