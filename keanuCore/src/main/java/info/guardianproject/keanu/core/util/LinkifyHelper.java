@@ -35,9 +35,9 @@ public class LinkifyHelper {
         Linkify.addLinks(text, geo, null);
         Linkify.addLinks(text, market, null);
         Linkify.addLinks(text, openpgp4fpr, null);
-        Linkify.addLinks(text, xmpp, null);
-        Linkify.addLinks(text, twitterHandle, "https://twitter.com/", null, returnMatchFilter);
-        Linkify.addLinks(text, hashtag, "https://twitter.com/hashtag/", null, returnMatchFilter);
+     //   Linkify.addLinks(text, xmpp, null);
+      //  Linkify.addLinks(text, twitterHandle, "https://twitter.com/", null, returnMatchFilter);
+        //Linkify.addLinks(text, hashtag, "https://twitter.com/hashtag/", null, returnMatchFilter);
         text.setText(replaceAll(text.getText(), URLSpan.class, converter));
     }
 
