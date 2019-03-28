@@ -1252,9 +1252,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             Uri messageUri = null;
 
             if (msg.getID() == null)
-                messageUri = insertMessageInDb(nickname, body, time, msg.getType(), msg.getContentType(), msg.getReplyId());
+                messageUri = insertMessageInDb(username, body, time, msg.getType(), msg.getContentType(), msg.getReplyId());
             else
-                messageUri = insertMessageInDb(nickname, body, time, msg.getType(), 0, msg.getID(), msg.getContentType(), msg.getReplyId());
+                messageUri = insertMessageInDb(username, body, time, msg.getType(), 0, msg.getID(), msg.getContentType(), msg.getReplyId());
 
             setLastMessage(body, time);
 

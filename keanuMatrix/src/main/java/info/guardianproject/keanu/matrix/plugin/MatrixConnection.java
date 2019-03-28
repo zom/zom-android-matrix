@@ -965,7 +965,7 @@ public class MatrixConnection extends ImConnection {
                 group.notifyMemberJoined(member.getUserId(), contact);
 
                 if (powerLevels != null) {
-                    if (powerLevels.getUserPowerLevel(member.getUserId()) >= powerLevels.invite)
+                    if (powerLevels.getUserPowerLevel(member.getUserId()) >= powerLevels.ban)
                         group.notifyMemberRoleUpdate(contact, "moderator", "owner");
                     else
                         group.notifyMemberRoleUpdate(contact, "member", "member");
@@ -977,7 +977,8 @@ public class MatrixConnection extends ImConnection {
                 }
 
                 if (members.size() < 40) {
-                    String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(member.getUserId(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+                    String avatarUrl = mDataHandler.getUser(member.getUserId()).getAvatarUrl();
+                    String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(avatarUrl, DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
 
                     if (!TextUtils.isEmpty(downloadUrl)) {
                         if (!hasAvatar(member.getUserId(), downloadUrl)) {
@@ -2026,7 +2027,7 @@ public class MatrixConnection extends ImConnection {
 
     private void downloadAvatarAsync (final String address, final String url)
     {
-        mExecutorGroups.execute(() -> {
+        mExecutor.execute(() -> {
             boolean hasAvatar = DatabaseUtils.doesAvatarHashExist(mContext.getContentResolver(),Imps.Avatars.CONTENT_URI,address,url);
 
             if (!hasAvatar) {
