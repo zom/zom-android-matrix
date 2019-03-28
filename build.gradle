@@ -27,8 +27,8 @@ allprojects {
         maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
     }
     project.ext {
-        keanuLibsVersionCode=120
-        keanuLibsVersion="0.0.1.20"
+        keanuLibsVersionCode=121
+        keanuLibsVersion="0.0.1.21"
     }
 }
 
