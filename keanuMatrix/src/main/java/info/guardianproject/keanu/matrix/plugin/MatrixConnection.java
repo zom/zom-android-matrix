@@ -695,9 +695,8 @@ public class MatrixConnection extends ImConnection {
     {
         Event event = mStore.getEvent(msgId, roomId);
         Room room = mStore.getRoom(roomId);
-        //room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
-        room.markAllAsRead(new BasicApiCallback("markAllAsRead"));
-
+        room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
+        //room.markAllAsRead(new BasicApiCallback("markAllAsRead"));
     }
 
     @Override
