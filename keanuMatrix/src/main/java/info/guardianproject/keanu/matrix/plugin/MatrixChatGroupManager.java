@@ -41,12 +41,13 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
     private MXSession mSession;
     private MatrixConnection mConn;
-
+    private MatrixChatSessionManager mChatSessionMgr;
     private Context mContext;
 
-    public MatrixChatGroupManager (Context context, MatrixConnection conn) {
+    public MatrixChatGroupManager (Context context, MatrixConnection conn, MatrixChatSessionManager chatSessionManager) {
         mConn = conn;
         mContext = context;
+        mChatSessionMgr = chatSessionManager;
     }
 
     public void setDataHandler (MXDataHandler dataHandler)
@@ -269,15 +270,18 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         setRoomDefaults(room);
 
         ChatGroup chatGroup = mConn.addRoomContact(room);
-        ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
-        ChatSessionAdapter adapter = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
+        ChatSession session = mChatSessionMgr.getSession(room.getRoomId());
+        if (session == null)
+            session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
+
+        ChatSessionAdapter adapter = mChatSessionMgr.getChatSessionAdapter(room.getRoomId());
         adapter.useEncryption(room.isEncrypted());
 
         if (!chatGroup.hasMemberListener())
             chatGroup.addMemberListener(adapter.getListenerAdapter());
 
         chatGroup.beginMemberUpdates();
-        chatGroup.notifyMemberJoined(mSession.getMyUserId(), mConn.getLoginUser());
+        chatGroup.notifyMemberJoined(mConn.getLoginUser().getAddress().getAddress(), mConn.getLoginUser());
         chatGroup.notifyMemberRoleUpdate(mConn.getLoginUser(), "moderator", "owner");
         chatGroup.endMemberUpdates();
 

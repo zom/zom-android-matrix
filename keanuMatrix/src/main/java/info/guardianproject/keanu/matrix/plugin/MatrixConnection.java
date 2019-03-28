@@ -152,8 +152,9 @@ public class MatrixConnection extends ImConnection {
         super (context);
 
         mContactListManager = new MatrixContactListManager(context, this);
-        mChatGroupManager = new MatrixChatGroupManager(context, this);
+
         mChatSessionManager = new MatrixChatSessionManager(context, this);
+        mChatGroupManager = new MatrixChatGroupManager(context, this,mChatSessionManager);
 
      //   mExecutor = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         //mExecutorGroups = new ThreadPoolExecutor(1, 1, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
@@ -733,22 +734,22 @@ public class MatrixConnection extends ImConnection {
 
         ArrayList<String> result = null;
 
-        List<MXDeviceInfo> devices = mDataHandler.getCrypto().getUserDevices(address);
-        if (devices != null && devices.size() > 0)
-        {
-            result = new ArrayList<>();
+        if (mDataHandler != null && mDataHandler.getCrypto() != null) {
+            List<MXDeviceInfo> devices = mDataHandler.getCrypto().getUserDevices(address);
+            if (devices != null && devices.size() > 0) {
+                result = new ArrayList<>();
 
-            for (MXDeviceInfo device : devices)
-            {
-                String deviceInfo = device.displayName()
-                        +'|' + device.deviceId
-                        +'|' + device.fingerprint()
-                        +'|' + device.isVerified();
+                for (MXDeviceInfo device : devices) {
+                    String deviceInfo = device.displayName()
+                            + '|' + device.deviceId
+                            + '|' + device.fingerprint()
+                            + '|' + device.isVerified();
 
-                result.add(deviceInfo);
+                    result.add(deviceInfo);
+
+                }
 
             }
-
         }
 
 
@@ -964,7 +965,7 @@ public class MatrixConnection extends ImConnection {
                 group.notifyMemberJoined(member.getUserId(), contact);
 
                 if (powerLevels != null) {
-                    if (powerLevels.getUserPowerLevel(member.getUserId()) > powerLevels.invite)
+                    if (powerLevels.getUserPowerLevel(member.getUserId()) >= powerLevels.invite)
                         group.notifyMemberRoleUpdate(contact, "moderator", "owner");
                     else
                         group.notifyMemberRoleUpdate(contact, "member", "member");
@@ -1092,16 +1093,19 @@ public class MatrixConnection extends ImConnection {
                  * }
                  */
 
-                Iterator<String> it = event.getContent().getAsJsonObject().keySet().iterator();
-                while(it.hasNext())
-                {
-                    String eventId = it.next();
-                    String userId = event.getContent().getAsJsonObject().getAsJsonObject(eventId).getAsJsonObject("m.read").keySet().iterator().next();
+                if (event.getContent().getAsJsonObject() != null) {
+                    Iterator<String> it = event.getContent().getAsJsonObject().keySet().iterator();
+                    while (it.hasNext()) {
+                        String eventId = it.next();
+                        if (event.getContent().getAsJsonObject().getAsJsonObject(eventId).has("m.read")) {
+                            String userId = event.getContent().getAsJsonObject().getAsJsonObject(eventId).getAsJsonObject("m.read").keySet().iterator().next();
 
-                    if (!userId.equals(mSession.getMyUserId())) {
-                        ChatSession session = mChatSessionManager.getSession(event.roomId);
-                        if (session != null)
-                            session.onMessageReceipt(eventId);
+                            if (!userId.equals(mSession.getMyUserId())) {
+                                ChatSession session = mChatSessionManager.getSession(event.roomId);
+                                if (session != null)
+                                    session.onMessageReceipt(eventId);
+                            }
+                        }
                     }
                 }
 
@@ -2118,15 +2122,19 @@ public class MatrixConnection extends ImConnection {
 
         if (room.isInvited())
         {
-            Invitation invite = new Invitation(room.getRoomId(),addrRoom,addrSender,room.getRoomDisplayName(mContext));
-            mChatGroupManager.notifyGroupInvitation(invite);
 
             ChatGroup participant = mChatGroupManager.getChatGroup(addrRoom);
             if (TextUtils.isEmpty(participant.getName()))
                 participant.setName(room.getRoomDisplayName(mContext));
 
             participant.setJoined(false);
-            ChatSession session = mChatSessionManager.createChatSession(participant, true);
+            ChatSession session = mChatSessionManager.getSession(room.getRoomId());
+            if (session == null) {
+                session = mChatSessionManager.createChatSession(participant, true);
+                Invitation invite = new Invitation(room.getRoomId(), addrRoom, addrSender, room.getRoomDisplayName(mContext));
+                mChatGroupManager.notifyGroupInvitation(invite);
+            }
+
             ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
             csa.setLastMessage(mContext.getString(R.string.room_invited));
 
