@@ -180,7 +180,11 @@
         <item name="android:layout_height">8dp</item>
     </style>
 
-
+    <style name="LightToolBarStyle" parent="Theme.AppCompat">
+        <item name="android:textColorPrimary">#a0a0a0</item>
+        <item name="android:textColorSecondary">#a0a0a0</item>
+        <item name="actionMenuTextColor">#a0a0a0</item>
+    </style>
 
 
     <!--

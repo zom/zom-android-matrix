@@ -293,6 +293,12 @@
             android:theme="@style/AppThemeNoAction"
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity
+            android:name=".ui.conversation.StoryActivity"
+            android:exported="false"
+            android:launchMode="standard"
+            android:theme="@style/AppThemeNoAction"
+            android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity
             android:name=".ui.contacts.ContactListActivity"
             android:exported="false" />
         <activity

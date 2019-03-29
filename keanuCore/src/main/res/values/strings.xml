@@ -582,7 +582,7 @@
     <string name="pref_proxy_server_port_summary">Port of SOCKS proxy</string>
 
     <string name="are_you_sure">Are you sure?</string>
-    <string name="photo_x_of_y">Photo %1$d of %2$d</string>
+    <string name="item_x_of_y">Item %1$d of %2$d</string>
 
     <string name="mtm_trust_anchor">The server certificate is not signed by a known Certificate Authority.</string>
     <string name="mtm_cert_expired">The server certificate is expired.</string>

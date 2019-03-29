@@ -57,6 +57,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.ocpsoft.prettytime.PrettyTime;
@@ -105,7 +106,7 @@ public class ConversationDetailActivity extends BaseActivity {
 
     //private AppBarLayout appBarLayout;
     private View mRootLayout;
-    private Toolbar mToolbar;
+    protected Toolbar mToolbar;
 
     private PrettyTime mPrettyTime;
 
@@ -142,19 +143,30 @@ public class ConversationDetailActivity extends BaseActivity {
         }
     };
 
+    /**
+     * Override to use another layout
+     * @return Returns a layout file id.
+     */
+    protected int getLayoutFileId() {
+        return R.layout.awesome_activity_detail;
+    }
+
+    protected ConversationView createConvoView() {
+        return new ConversationView(this);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
        // getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-        setContentView(R.layout.awesome_activity_detail);
-
+        setContentView(getLayoutFileId());
         mApp = (ImApp)getApplication();
-
-        mConvoView = new ConversationView(this);
-
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        mConvoView = createConvoView();
+
       //  appBarLayout = (AppBarLayout)findViewById(R.id.appbar);
         mRootLayout = findViewById(R.id.main_content);
 

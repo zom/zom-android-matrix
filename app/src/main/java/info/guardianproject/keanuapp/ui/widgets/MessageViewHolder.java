@@ -48,7 +48,9 @@ public class MessageViewHolder extends MediaViewHolder
        // mAudioButton = (ImageView) view.findViewById(R.id.audio_button);
 
         // disable built-in autoLink so we can add custom ones
-        mTextViewForMessages.setAutoLinkMask(0);
+        if (mTextViewForMessages != null) {
+            mTextViewForMessages.setAutoLinkMask(0);
+        }
         //mContainer.setBackgroundResource(R.drawable.message_view_rounded_light);
     }
 

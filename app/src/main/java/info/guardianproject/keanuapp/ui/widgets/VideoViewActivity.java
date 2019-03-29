@@ -247,7 +247,7 @@ public class VideoViewActivity extends AppCompatActivity {
 
     }
 
-    public class InputStreamDataSource implements DataSource {
+    public static class InputStreamDataSource implements DataSource {
 
         private Context context;
         private DataSpec dataSpec;
@@ -350,7 +350,7 @@ public class VideoViewActivity extends AppCompatActivity {
             else
             {
                 try {
-                    return getContentResolver().openInputStream(mediaUri);
+                    return context.getContentResolver().openInputStream(mediaUri);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                     return null;

@@ -1057,9 +1057,13 @@ public class ConversationView {
             }
         });
 
-        mMessageAdapter = new ConversationRecyclerViewAdapter(mActivity, null);
+        mMessageAdapter = createRecyclerViewAdapter();
         mHistory.setAdapter(mMessageAdapter);
 
+    }
+
+    protected ConversationRecyclerViewAdapter createRecyclerViewAdapter() {
+        return new ConversationRecyclerViewAdapter(mActivity, null);
     }
 
     private boolean mLastIsTyping = false;
@@ -1554,7 +1558,7 @@ public class ConversationView {
         return mHistory;
     }
 
-    private Uri mUri;
+    protected Uri mUri;
     private LoaderManager mLoaderManager;
     private int loaderId = 100001;
 
@@ -1571,13 +1575,29 @@ public class ConversationView {
 
     }
 
+    protected Loader<Cursor> createLoader() {
+        CursorLoader loader = new CursorLoader(mActivity, mUri, null, null, null, Imps.Messages.DEFAULT_SORT_ORDER);
+        return loader;
+    }
+
+    protected void loaderFinished() {
+        if (!mMessageAdapter.isScrolling()) {
+
+            mHandler.post(new Runnable() {
+
+                public void run() {
+                    if (mMessageAdapter.getItemCount() > 0) {
+                        mHistory.getLayoutManager().scrollToPosition(mMessageAdapter.getItemCount() - 1);
+                    }
+                }
+            });
+        }
+    }
+
     class MyLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
-            CursorLoader loader = new CursorLoader(mActivity, mUri, null, null, null, Imps.Messages.DEFAULT_SORT_ORDER);
-
-            return loader;
+            return createLoader();
         }
 
         @Override
@@ -1587,20 +1607,7 @@ public class ConversationView {
 
                 newCursor.setNotificationUri(mActivity.getApplicationContext().getContentResolver(), mUri);
                 mMessageAdapter.swapCursor(new DeltaCursor(newCursor));
-
-
-                if (!mMessageAdapter.isScrolling()) {
-
-                    mHandler.post(new Runnable() {
-
-                        public void run() {
-                            if (mMessageAdapter.getItemCount() > 0) {
-                                mHistory.getLayoutManager().scrollToPosition(mMessageAdapter.getItemCount() - 1);
-                            }
-                        }
-                    });
-                }
-
+                loaderFinished();
             }
 
         }
@@ -2500,13 +2507,13 @@ public class ConversationView {
         private boolean mNeedRequeryCursor;
 
         private int mNicknameColumn;
-        private int mBodyColumn;
+        protected int mBodyColumn;
         private int mDateColumn;
         private int mTypeColumn;
         private int mErrCodeColumn;
         private int mDeltaColumn;
         private int mDeliveredColumn;
-        private int mMimeTypeColumn;
+        protected int mMimeTypeColumn;
         private int mIdColumn;
         private int mPacketIdColumn;
         private int mReplyIdColumn;
@@ -2857,7 +2864,11 @@ public class ConversationView {
                 do {
                     try {
                         String mime = c.getString(mMimeTypeColumn);
-                        if (!TextUtils.isEmpty(mime) && mime.startsWith("image")) {
+                        if (!TextUtils.isEmpty(mime) && (
+                                mime.startsWith("image/") ||
+                                        mime.startsWith("audio/") ||
+                                        mime.startsWith("video/") ||
+                                        mime.contentEquals("application/pdf"))) {
                             Uri uri = Uri.parse(c.getString(mBodyColumn));
                             urisToShow.add(uri);
                             mimeTypesToShow.add(mime);
