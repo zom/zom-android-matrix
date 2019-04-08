@@ -463,7 +463,7 @@ public class ConversationView {
         }
 
         @Override
-        public void onIncomingReceipt(IChatSession ses, String packetId) throws RemoteException {
+        public void onIncomingReceipt(IChatSession ses, String packetId, boolean wasEncrypted) throws RemoteException {
 
             if (getChatSession().getId() != ses.getId())
                 return;
@@ -2538,7 +2538,7 @@ public class ConversationView {
             Cursor c = getCursor();
             c.moveToPosition(position);
             int type = c.getInt(mTypeColumn);
-            boolean isLeft = (type == Imps.MessageType.INCOMING_ENCRYPTED)||(type == Imps.MessageType.INCOMING)||(type == Imps.MessageType.INCOMING_ENCRYPTED_VERIFIED);
+            boolean isLeft = (type == Imps.MessageType.INCOMING_ENCRYPTED)||(type == Imps.MessageType.INCOMING);
 
             if (isLeft)
                 return 0;
@@ -2671,20 +2671,10 @@ public class ConversationView {
                 messageType = Imps.MessageType.INCOMING;
                 encState = MessageListItem.EncryptionState.ENCRYPTED;
             }
-            else if (messageType == Imps.MessageType.INCOMING_ENCRYPTED_VERIFIED)
-            {
-                messageType = Imps.MessageType.INCOMING;
-                 encState = MessageListItem.EncryptionState.ENCRYPTED_AND_VERIFIED;
-            }
             else if (messageType == Imps.MessageType.OUTGOING_ENCRYPTED)
             {
                 messageType = Imps.MessageType.OUTGOING;
                 encState = MessageListItem.EncryptionState.ENCRYPTED;
-            }
-            else if (messageType == Imps.MessageType.OUTGOING_ENCRYPTED_VERIFIED)
-            {
-                messageType = Imps.MessageType.OUTGOING;
-                 encState = MessageListItem.EncryptionState.ENCRYPTED_AND_VERIFIED;
             }
 
             switch (messageType) {
@@ -2695,6 +2685,8 @@ public class ConversationView {
 
             case Imps.MessageType.OUTGOING:
             case Imps.MessageType.QUEUED:
+            case Imps.MessageType.SENDING:
+
 
                 int errCode = cursor.getInt(mErrCodeColumn);
                 if (errCode != 0) {
@@ -2710,8 +2702,7 @@ public class ConversationView {
                 messageView.bindPresenceMessage(viewHolder, nickname, messageType, date, isGroupChat(), false);
             }
 
-            sendMessageRead(packetId);
-
+         //   sendMessageRead(packetId);
 
         }
 

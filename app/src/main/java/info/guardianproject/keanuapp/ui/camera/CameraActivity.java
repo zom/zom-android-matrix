@@ -392,7 +392,7 @@ public class CameraActivity extends AppCompatActivity {
             //adds in an empty message, so it can exist in the gallery and be forwarded
             Imps.insertMessageInDb(
                     getContentResolver(), false, new Date().getTime(), true, null, vfsUri.toString(),
-                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED_VERIFIED,
+                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED,
                     0, offerId, mimeType, null);
 
             if (mOneAndDone) {
@@ -441,7 +441,7 @@ public class CameraActivity extends AppCompatActivity {
             //adds in an empty message, so it can exist in the gallery and be forwarded
             Imps.insertMessageInDb(
                     getContentResolver(), false, new Date().getTime(), true, null, vfsUri.toString(),
-                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED_VERIFIED,
+                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED,
                     0, offerId, mimeType, null);
 
             if (mOneAndDone) {
