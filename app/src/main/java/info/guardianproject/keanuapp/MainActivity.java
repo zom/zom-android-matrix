@@ -638,7 +638,7 @@ public class MainActivity extends BaseActivity {
             //adds in an empty message, so it can exist in the gallery and be forwarded
             Imps.insertMessageInDb(
                     getContentResolver(), false, new Date().getTime(), true, null, vfsUri.toString(),
-                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED_VERIFIED,
+                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED,
                     0, offerId, info.type, null);
 
             mLastPhoto = null;

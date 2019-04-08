@@ -1065,7 +1065,7 @@ public class MessageListItem extends FrameLayout {
             deliveryText.append(' ');
             //this is for delivery
 
-            if (messageType == Imps.MessageType.QUEUED)
+            if (messageType == Imps.MessageType.QUEUED || messageType == Imps.MessageType.SENDING)
             {
                 //do nothing
                 deliveryText.append("X");
