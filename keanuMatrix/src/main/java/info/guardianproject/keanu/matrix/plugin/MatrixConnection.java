@@ -3,6 +3,7 @@ package info.guardianproject.keanu.matrix.plugin;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.TrafficStats;
 import android.net.Uri;
 import android.os.Handler;
@@ -32,6 +33,7 @@ import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.data.RoomState;
 import org.matrix.androidsdk.data.store.IMXStoreListener;
 import org.matrix.androidsdk.listeners.IMXEventListener;
+import org.matrix.androidsdk.listeners.MXMediaUploadListener;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.callback.SimpleApiCallback;
 import org.matrix.androidsdk.rest.client.LoginRestClient;
@@ -57,8 +59,10 @@ import org.matrix.androidsdk.rest.model.search.SearchUsersResponse;
 import org.matrix.androidsdk.util.JsonUtils;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,6 +110,7 @@ import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.matrix.R;
 
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
+import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_WIDTH;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 public class MatrixConnection extends ImConnection {
@@ -638,8 +643,11 @@ public class MatrixConnection extends ImConnection {
 
     @Override
     public void suspend() {
-      //  if (mSession != null)
-        //    mSession.setIsOnline(false);
+
+        setState(ImConnection.SUSPENDED, null);
+
+        if (mSession != null)
+            mSession.setIsOnline(false);
     }
 
     @Override
@@ -691,9 +699,9 @@ public class MatrixConnection extends ImConnection {
     }
 
     @Override
-    public void sendMessageRead (String roomId, String msgId)
+    public void sendMessageRead (String roomId, String eventId)
     {
-        Event event = mStore.getEvent(msgId, roomId);
+        Event event = mStore.getEvent(eventId, roomId);
         Room room = mStore.getRoom(roomId);
         room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
         //room.markAllAsRead(new BasicApiCallback("markAllAsRead"));
@@ -771,6 +779,41 @@ public class MatrixConnection extends ImConnection {
     public void changeNickname(String nickname) {
 
         mDataHandler.getMyUser().updateDisplayName(nickname,new BasicApiCallback("changeNickname"));
+
+        try {
+
+            byte[] avatar = DatabaseUtils.getAvatarBytesFromAddress(mContext.getContentResolver(), mUser.getAddress().getAddress());
+            if (avatar != null) {
+                InputStream stream = new ByteArrayInputStream(avatar);
+                String filename = nickname+"-avatar.jpg";
+                String mimeType = "image/jpeg";
+
+                mDataHandler.getMediaCache().uploadContent(stream, filename, mimeType, null,
+                        new MXMediaUploadListener() {
+                            @Override
+                            public void onUploadStart(final String uploadId) {
+
+                            }
+
+                            @Override
+                            public void onUploadCancel(final String uploadId) {
+
+                            }
+
+                            @Override
+                            public void onUploadError(final String uploadId, final int serverResponseCode, final String serverErrorMessage) {
+
+                            }
+
+                            @Override
+                            public void onUploadComplete(final String uploadId, final String contentUri) {
+                                mDataHandler.getMyUser().updateAvatarUrl(contentUri, new BasicApiCallback("avatarloader"));
+                            }
+                        });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -1103,9 +1146,10 @@ public class MatrixConnection extends ImConnection {
                             if (!userId.equals(mSession.getMyUserId())) {
                                 ChatSession session = mChatSessionManager.getSession(event.roomId);
                                 if (session != null)
-                                    session.onMessageReceipt(eventId);
+                                    session.onMessageReceipt(eventId, session.useEncryption());
                             }
                         }
+
                     }
                 }
 
@@ -1356,15 +1400,14 @@ public class MatrixConnection extends ImConnection {
 
             if (session != null) {
 
-                final List<ReceiptData> receipts = mDataHandler.getStore().getEventReceipts(roomId, null, false, false);
-
                 for (String userId : list) {
                     //userId who got the room receipt
                     ReceiptData data = mStore.getReceipt(roomId, userId);
-                    session.onMessageReceipt(data.eventId);
+                    session.onMessageReceipt(data.eventId, session.useEncryption());
 
 
                 }
+
             }
 
 
@@ -1662,6 +1705,12 @@ public class MatrixConnection extends ImConnection {
                 if (session == null) {
                     ImEntity participant = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId));
                     session = mChatSessionManager.createChatSession(participant, false);
+
+                    final List<ReceiptData> receipts = mDataHandler.getStore().getEventReceipts(event.roomId, null, true, false);
+                    for (ReceiptData data : receipts)
+                    {
+                        session.onMessageReceipt(data.eventId, session.useEncryption());
+                    }
                 }
 
                 ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(event.roomId);
@@ -1687,17 +1736,29 @@ public class MatrixConnection extends ImConnection {
                     else if (event.getContent().getAsJsonObject().has("m.relates_to"))
                         replyToId = event.getContent().getAsJsonObject().getAsJsonObject("m.relates_to").getAsJsonObject("m.in_reply_to").get("event_id").getAsString();
 
-                            //"m.relates_to":{"m.in_reply_to":{"event_id":"$1553108333361227MMTcI:matrix.org"}}
                     message.setReplyId(replyToId);
 
-                    if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
-                        message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
-                    } else
-                        message.setType(Imps.MessageType.INCOMING);
+                    boolean isFromMe = addrSender.mAddress.equals(mUser.getAddress().getAddress());
 
-                    session.onReceiveMessage(message, (!addrSender.mAddress.equals(mUser.getAddress().getAddress())));
+                    if (isFromMe)
+                    {
+                        if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
+                            message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
+                        } else
+                            message.setType(Imps.MessageType.OUTGOING);
+                    }
+                    else {
+                        if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
+                            message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
+                        } else
+                            message.setType(Imps.MessageType.INCOMING);
+                    }
+
+                    session.onReceiveMessage(message, !isFromMe);
 
                     csa.setContactTyping(new Contact(addrSender), false);
+
+                    sendMessageRead(event.roomId, event.eventId);
 
                 }
             }

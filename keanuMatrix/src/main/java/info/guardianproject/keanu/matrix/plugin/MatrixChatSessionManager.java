@@ -168,7 +168,10 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
             @Override
             public void onEventCreated(final RoomMediaMessage roomMediaMessage) {
+
                 debug("sendMessageAsync:onEventCreated: " + roomMediaMessage);
+                if (listener != null)
+                    listener.onMessageSendQueued(message,  roomMediaMessage.getEvent().eventId);
 
                 roomMediaMessage.setEventSendingCallback(new ApiCallback<Void>() {
                     @Override
@@ -178,7 +181,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
 
                         if (listener != null)
-                            listener.onMessageSendFail(message);
+                            listener.onMessageSendFail(message,  roomMediaMessage.getEvent().eventId);
                     }
 
                     @Override
@@ -202,7 +205,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                         }
 
                         if (listener != null)
-                            listener.onMessageSendFail(message);
+                            listener.onMessageSendFail(message, roomMediaMessage.getEvent().eventId);
 
                     }
 
@@ -213,13 +216,13 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
 
                         if (listener != null)
-                            listener.onMessageSendFail(message);
+                            listener.onMessageSendFail(message, roomMediaMessage.getEvent().eventId);
                     }
 
                     @Override
                     public void onSuccess(Void aVoid) {
 
-                        debug("onSuccess: message sent: " + roomMediaMessage.getEvent().getMatrixId());
+                        debug("onSuccess: message sent: " + roomMediaMessage.getEvent().eventId);
 
                         if (mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId()))
                             message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
@@ -237,7 +240,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                 debug("sendMessageAsync:onEventCreationFailed: " + s + ";" + roomMediaMessage);
 
                 if (listener != null)
-                    listener.onMessageSendFail(message);
+                    listener.onMessageSendFail(message, roomMediaMessage.getEvent().eventId);
 
             }
 
@@ -247,7 +250,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
 
                 if (listener != null)
-                    listener.onMessageSendFail(message);
+                    listener.onMessageSendFail(message, roomMediaMessage.getEvent().eventId);
 
             }
         });
@@ -290,7 +293,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
 
                         if (listener != null)
-                            listener.onMessageSendFail(message);
+                            listener.onMessageSendFail(message, roomMediaMessage.getEvent().eventId);
                     }
 
                     @Override
@@ -319,15 +322,14 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                         debug("onUnexpectedError: sending message", e);
                         message.setType(Imps.MessageType.QUEUED);
 
-
                         if (listener != null)
-                            listener.onMessageSendFail(message);
+                            listener.onMessageSendFail(message,  roomMediaMessage.getEvent().eventId);
                     }
 
                     @Override
                     public void onSuccess(Void aVoid) {
 
-                        debug("onSuccess: message sent: " + roomMediaMessage.getEvent().getMatrixId());
+                        debug("onSuccess: message sent: " + roomMediaMessage.getEvent().eventId);
 
                         if (mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId()))
                             message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
@@ -345,7 +347,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                 debug("sendMessageAsync:onEventCreationFailed: " + s + ";" + roomMediaMessage);
 
                 if (listener != null)
-                    listener.onMessageSendFail(message);
+                    listener.onMessageSendFail(message, roomMediaMessage.getEvent().eventId);
 
             }
 
@@ -355,7 +357,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
 
                 if (listener != null)
-                    listener.onMessageSendFail(message);
+                    listener.onMessageSendFail(message, roomMediaMessage.getEvent().eventId);
 
             }
         });
