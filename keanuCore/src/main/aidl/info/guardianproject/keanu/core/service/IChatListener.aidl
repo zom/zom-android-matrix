@@ -64,7 +64,7 @@ interface IChatListener {
     /**
      * This method is called when a new receipt has arrived.
      */
-    void onIncomingReceipt(IChatSession ses, in String packetId);
+    void onIncomingReceipt(IChatSession ses, in String packetId, in boolean wasEncrypted);
 
 	/** This method is called when OTR status changes */
 	void onStatusChanged(IChatSession ses);

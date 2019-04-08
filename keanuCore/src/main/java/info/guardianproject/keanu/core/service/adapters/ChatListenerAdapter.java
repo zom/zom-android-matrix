@@ -84,7 +84,7 @@ public class ChatListenerAdapter extends IChatListener.Stub {
     }
 
     @Override
-    public void onIncomingReceipt(IChatSession ses, String packetId) throws RemoteException {
+    public void onIncomingReceipt(IChatSession ses, String packetId, boolean wasEncrypted) throws RemoteException {
         if (Log.isLoggable(TAG, Log.DEBUG)) {
             LogCleaner.debug(TAG, "onIncomingReceipt(" + ses + "," + packetId + ")");
         }

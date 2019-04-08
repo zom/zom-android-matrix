@@ -45,6 +45,7 @@ import android.os.RemoteException;
 import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -78,6 +79,8 @@ import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.NOTIFICATION_CHANNEL_ID_SERVICE;
 import static info.guardianproject.keanu.core.KeanuConstants.PREFERENCE_KEY_TEMP_PASS;
 import static info.guardianproject.keanu.core.service.AdvancedNetworking.TRANSPORT_SS2;
+import static info.guardianproject.keanu.core.service.HeartbeatService.NETWORK_STATE_ACTION;
+import static info.guardianproject.keanu.core.service.HeartbeatService.NETWORK_STATE_EXTRA;
 
 
 public class RemoteImService extends Service implements ImService, ICacheWordSubscriber {
@@ -306,6 +309,31 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             {
                 //                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              shutdown();
                 stopSelf();
+            }
+
+            if ((!TextUtils.isEmpty(intent.getAction())) && intent.getAction().equals(NETWORK_STATE_ACTION))
+            {
+             //   NetworkConnectivityReceiver.State stateExtra = isConnected ? NetworkConnectivityReceiver.State.CONNECTED : NetworkConnectivityReceiver.State.NOT_CONNECTED;
+                int networkState = intent.getIntExtra(NETWORK_STATE_EXTRA,-1);
+
+                if (NetworkConnectivityReceiver.State.NOT_CONNECTED == NetworkConnectivityReceiver.State.values()[networkState])
+                {
+
+                    for (ImConnectionAdapter conn : mConnections.values())
+                    {
+                        conn.suspend();
+                    }
+                }
+                else
+                {
+
+                    for (ImConnectionAdapter conn : mConnections.values())
+                    {
+                        conn.reestablishSession();
+                    }
+
+                }
+
             }
 
         }

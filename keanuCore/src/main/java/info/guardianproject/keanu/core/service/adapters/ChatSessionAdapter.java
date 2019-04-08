@@ -169,8 +169,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
       //  ((Contact) mChatSession.getParticipant()).getPresence().setStatus(newPresence);
 
-        if (lastPresence != newPresence && newPresence == Presence.AVAILABLE)
-            sendPostponedMessages();
+     //   if (lastPresence != newPresence && newPresence == Presence.AVAILABLE)
+       //     sendPostponedMessages();
 
         lastPresence = newPresence;
 
@@ -309,12 +309,22 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         return ContentUris.parseId(mChatURI);
     }
 
-    public void inviteContact(String contact) {
+    public void inviteContact(String address) {
         if (!mIsGroupChat) {
             return;
         }
-        Contact invitee = new Contact(new BaseAddress(contact),contact,Imps.Contacts.TYPE_NORMAL);
-        getGroupManager().inviteUserAsync((ChatGroup) mChatSession.getParticipant(), invitee);
+
+        Contact contact = null;
+        try {
+            contact = mConnection.getContactListManager().getContactByAddress(address);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        if (contact == null)
+            contact = new Contact(new BaseAddress(address),address,Imps.Contacts.TYPE_NORMAL);
+
+        getGroupManager().inviteUserAsync((ChatGroup) mChatSession.getParticipant(), contact);
 
     }
 
@@ -349,6 +359,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         msg.setID(nextID());
 
         msg.setFrom(mConnection.getLoginUser().getAddress());
+
         msg.setType(Imps.MessageType.QUEUED);
 
         msg.setReplyId(replyId);
@@ -360,8 +371,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             if (!isEphemeral) {
                 insertMessageInDb(null, text, sendTime, msg.getType(), 0, msg.getID(), null, replyId);
 
-                if (setLastMessage)
-                    setLastMessage(text, sendTime);
             }
             else
             {
@@ -377,26 +386,46 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             }
 
             @Override
-            public void onMessageSendSuccess(Message msg, String newPacketId) {
+            public void onMessageSendSuccess(Message msg, String newMsgId) {
 
                 long sendTime = new Date().getTime();
 
                 if (msg.getDateTime() != null)
                     sendTime = msg.getDateTime().getTime();
 
-                updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, newPacketId);
+                updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, newMsgId);
 
-                msg.setID(newPacketId);
+                msg.setID(newMsgId);
+
+                if (setLastMessage)
+                    setLastMessage(text, sendTime);
+
             }
 
             @Override
-            public void onMessageSendFail(Message msg) {
+            public void onMessageSendFail(Message msg, String newMsgId) {
                 long sendTime = new Date().getTime();
 
                 if (msg.getDateTime() != null)
                     sendTime = msg.getDateTime().getTime();
 
-                updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, null);
+                updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, newMsgId);
+
+                msg.setID(newMsgId);
+
+            }
+
+            @Override
+            public void onMessageSendQueued(Message msg, String newMsgId) {
+                long sendTime = new Date().getTime();
+
+                if (msg.getDateTime() != null)
+                    sendTime = msg.getDateTime().getTime();
+
+                updateMessageInDb(msg.getID(), Imps.MessageType.SENDING, sendTime, null, newMsgId);
+
+                msg.setID(newMsgId);
+
             }
         });
 
@@ -557,13 +586,28 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     }
 
                     @Override
-                    public void onMessageSendFail(Message msg) {
+                    public void onMessageSendFail(Message msg, String newPacketId) {
                         long sendTime = new Date().getTime();
 
                         if (msg.getDateTime() != null)
                             sendTime = msg.getDateTime().getTime();
 
-                        updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, null);
+                        updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, newPacketId);
+
+
+                        msg.setID(newPacketId);
+                    }
+
+                    @Override
+                    public void onMessageSendQueued(Message msg, String newPacketId) {
+                        long sendTime = new Date().getTime();
+
+                        if (msg.getDateTime() != null)
+                            sendTime = msg.getDateTime().getTime();
+
+                        updateMessageInDb(msg.getID(),Imps.MessageType.SENDING,sendTime, null, newPacketId);
+
+                        msg.setID(newPacketId);
                     }
                 });
 
@@ -1480,8 +1524,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         }
 
         @Override
-        public void onIncomingReceipt(ChatSession ses, String id) {
-            Imps.updateConfirmInDb(mContentResolver, mContactId, id, true);
+        public void onIncomingReceipt(ChatSession ses, String id, boolean wasEncrypted) {
+            Imps.updateConfirmInDb(mContentResolver, mContactId, id, true, wasEncrypted);
         }
 
         @Override
@@ -1657,14 +1701,12 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
 
                 if (outgoing) {
-                    Imps.updateConfirmInDb(service.getContentResolver(), mContactId, offerId, true);
+                    Imps.updateConfirmInDb(service.getContentResolver(), mContactId, offerId, true, true);
                 } else {
 
                     try
                     {
-                        boolean isVerified = false;//getDefaultOtrChatSession().isKeyVerified(from);
-
-                        int type = isVerified ? Imps.MessageType.INCOMING_ENCRYPTED_VERIFIED : Imps.MessageType.INCOMING_ENCRYPTED;
+                        int type = Imps.MessageType.INCOMING_ENCRYPTED;
 
                         setLastMessage(filePath);
 

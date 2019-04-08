@@ -250,7 +250,12 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
         }
 
         @Override
-        public void onMessageSendFail(Message msg) {
+        public void onMessageSendFail(Message msg, String newPacketId) {
+
+        }
+
+        @Override
+        public void onMessageSendQueued(Message msg, String newPacketId) {
 
         }
 
