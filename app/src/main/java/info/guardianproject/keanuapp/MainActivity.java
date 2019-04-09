@@ -147,7 +147,7 @@ public class MainActivity extends BaseActivity {
                     .penaltyLog()
                     .build());
         }
-        
+
         super.onCreate(savedInstanceState);
 
 
