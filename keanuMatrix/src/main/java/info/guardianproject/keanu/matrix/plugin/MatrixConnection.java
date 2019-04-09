@@ -1271,7 +1271,7 @@ public class MatrixConnection extends ImConnection {
                 });
             }
 
-            loadStateAsync();
+            mExecutor.execute(() -> loadStateAsync());
 
         }
 
@@ -1341,8 +1341,9 @@ public class MatrixConnection extends ImConnection {
             debug ("onNewRoom: " + s);
 
             final Room room = mStore.getRoom(s);
-            handleRoomInvite (room, s);
-
+            if (room != null) {
+                handleRoomInvite(room, s);
+            }
 
         }
 
@@ -1351,8 +1352,10 @@ public class MatrixConnection extends ImConnection {
             debug ("onJoinRoom: " + s);
 
             Room room = mStore.getRoom(s);
-            if (room != null)
-                addRoomContact(room);
+            if (room != null) {
+
+                mExecutor.execute(() -> addRoomContact(room));
+            }
 
         }
 
@@ -1369,7 +1372,9 @@ public class MatrixConnection extends ImConnection {
             debug ("onRoomInternalUpdate: " + s);
             Room room = mDataHandler.getRoom(s);
             if (room != null)
-               updateGroup(room);
+            {
+                mExecutor.execute(() -> updateGroup(room));
+            }
         }
 
         @Override
