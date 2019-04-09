@@ -437,7 +437,7 @@ public class ConversationListFragment extends Fragment {
                         lastMsgType = "application/pdf";
                 }
 
-                ConversationListItem clItem = ((ConversationListItem)viewHolder.itemView.findViewById(R.id.convoitemview));
+                ConversationListItem clItem = ((ConversationListItem) viewHolder.itemView.findViewById(R.id.convoitemview));
 
                 clItem.bind(viewHolder, chatId, providerId, accountId, address, nickname, type, lastMsg, lastMsgDate, lastMsgType, presence, subscription, null, true, false, isMuted, isEncrypted);
 
@@ -448,6 +448,11 @@ public class ConversationListFragment extends Fragment {
                     ssb.setSpan(bold, 0, ssb.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
                     ssb.setSpan(black, 0, ssb.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
                     viewHolder.mLine1.setText(ssb);
+
+                    viewHolder.mMarkerUnread.setVisibility(View.VISIBLE);
+                } else
+                {
+                    viewHolder.mMarkerUnread.setVisibility(View.GONE);
                 }
 
                 clItem.setOnClickListener(new View.OnClickListener() {

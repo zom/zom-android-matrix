@@ -119,12 +119,6 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
         mAccountId = getIntent().getLongExtra("account", mApp.getDefaultAccountId());
         mLastChatId = getIntent().getLongExtra("chat", -1);
 
-        /**
-        StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                .detectAll()
-                .penaltyLog()
-                .penaltyDeath()
-                .build());**/
     }
 
     private void initData () {
@@ -424,18 +418,27 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
         }.init());
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
-       updateSession();
     }
 
     public void updateSession() {
 
-        new Thread ()
+        new AsyncTask<Void,Void,Void>()
         {
-            public void run ()
-            {
+
+            @Override
+            protected Void doInBackground(Void... voids) {
                 updateSessionAsync();
+                return null;
             }
-        }.start();
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                initRecyclerView();
+            }
+        }.execute();
+
 
     }
 
@@ -472,6 +475,8 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 }
 
 
+
+
             }
 
         }
@@ -498,40 +503,25 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     protected void onResume() {
         super.onResume();
 
-        new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] objects) {
-                initData();
-                try {
-                    mConn.getChatSessionManager().registerChatSessionListener(GroupDisplayActivity.this);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        initData();
+        try {
+            mConn.getChatSessionManager().registerChatSessionListener(GroupDisplayActivity.this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-                if (mSession != null && !mChatListenerRegistered) {
-                    try {
-                        mSession.registerChatListener(mChatListener);
-                        mChatListenerRegistered = true;
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
-                               }
-
-
-                return null;
+        if (mSession != null && !mChatListenerRegistered) {
+            try {
+                mSession.registerChatListener(mChatListener);
+                mChatListenerRegistered = true;
+            } catch (RemoteException e) {
+                e.printStackTrace();
             }
+        }
 
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
+        initRecyclerView();
 
-                initRecyclerView();
-
-
-
-            }
-        }.execute();
-
+        updateSession();
     }
 
     @Override

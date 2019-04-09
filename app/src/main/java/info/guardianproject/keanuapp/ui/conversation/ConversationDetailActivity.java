@@ -273,7 +273,6 @@ public class ConversationDetailActivity extends BaseActivity {
                     mHandler.post(new Runnable() {
                         @Override
                         public void run() {
-                            mConvoView.startListening();
                             applyStyleForToolbar();
 
                             if (intent.getBooleanExtra("isNew", false))
@@ -307,12 +306,15 @@ public class ConversationDetailActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        processIntent(getIntent());
+        setIntent(null);
+        mConvoView.setSelected(true);
 
+        /**
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
-                processIntent(getIntent());
-                setIntent(null);
+
                 return null;
             }
 
@@ -320,10 +322,10 @@ public class ConversationDetailActivity extends BaseActivity {
             protected void onPostExecute(Object o) {
                 super.onPostExecute(o);
 
-                mConvoView.setSelected(true);
+
 
             }
-        }.execute();
+        }.execute();*/
 
     }
 
