@@ -151,14 +151,24 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
     public void onCreate() {
         debug("ImService started");
 
-        mImService = mBinder;
-
         mStatusBarNotifier = new StatusBarNotifier(this);
         mServiceHandler = new ServiceHandler();
 
-       // mStatusBarNotifier.notifyError("System","Service created!");
+        mHandler = new Handler();
 
-        startForeground(notifyId, getForegroundNotification());
+        new Thread ()
+        {
+            public void run ()
+            {
+                initService();
+            }
+        }.start();
+    }
+
+    private void initService ()
+    {
+
+        mImService = mBinder;
 
         final String prev = Debug.getTrail(this, SERVICE_CREATE_TRAIL_KEY);
         if (prev != null)
@@ -171,8 +181,6 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         
         mConnections = new Hashtable<String, ImConnectionAdapter>();
         mConnectionsByUser = new Hashtable<String, ImConnectionAdapter>();
-
-        mHandler = new Handler();
 
         Debug.onServiceStart();
 
@@ -198,7 +206,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             scheduleNetworkJob();
         }
 
-        enableHeartbeat ();
+      //  enableHeartbeat ();
 
     }
 
@@ -311,6 +319,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                 stopSelf();
             }
 
+            /**
             if ((!TextUtils.isEmpty(intent.getAction())) && intent.getAction().equals(NETWORK_STATE_ACTION))
             {
              //   NetworkConnectivityReceiver.State stateExtra = isConnected ? NetworkConnectivityReceiver.State.CONNECTED : NetworkConnectivityReceiver.State.NOT_CONNECTED;
@@ -334,7 +343,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
                 }
 
-            }
+            }**/
 
         }
 

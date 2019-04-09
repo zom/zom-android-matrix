@@ -436,45 +436,38 @@ public class ImConnectionAdapter extends IImConnection.Stub {
         @Override
         public void onStateChanged(final int state, final ImErrorInfo error) {
 
-            synchronized (this) {
+            if (state != ImConnection.DISCONNECTED) {
+                mConnectionState = state;
+            }
 
-                if (state != ImConnection.DISCONNECTED) {
-                    mConnectionState = state;
+            if (state == ImConnection.LOGGED_IN && mConnectionState == ImConnection.LOGGING_OUT) {
+
+                // A bit tricky here. The engine did login successfully
+                // but the notification comes a bit late; user has already
+                // issued a cancelLogin() and that cannot be undone. Here
+                // we have to ignore the LOGGED_IN event and wait for
+                // the upcoming DISCONNECTED.
+                return;
+            }
+
+            updateAccountStatusInDb();
+
+            final int N = mRemoteConnListeners.beginBroadcast();
+            for (int i = 0; i < N; i++) {
+                IConnectionListener listener = mRemoteConnListeners.getBroadcastItem(i);
+                try {
+                    listener.onStateChanged(ImConnectionAdapter.this, state, error);
+                } catch (RemoteException e) {
+                    // The RemoteCallbackList will take care of removing the
+                    // dead listeners.
                 }
+            }
 
-                if (state == ImConnection.LOGGED_IN && mConnectionState == ImConnection.LOGGING_OUT) {
-
-                    // A bit tricky here. The engine did login successfully
-                    // but the notification comes a bit late; user has already
-                    // issued a cancelLogin() and that cannot be undone. Here
-                    // we have to ignore the LOGGED_IN event and wait for
-                    // the upcoming DISCONNECTED.
-                    return;
-                }
-
-                updateAccountStatusInDb();
-
-                synchronized (mRemoteConnListeners) {
-
-                    final int N = mRemoteConnListeners.beginBroadcast();
-                    for (int i = 0; i < N; i++) {
-                        IConnectionListener listener = mRemoteConnListeners.getBroadcastItem(i);
-                        try {
-                            listener.onStateChanged(ImConnectionAdapter.this, state, error);
-                        } catch (RemoteException e) {
-                            // The RemoteCallbackList will take care of removing the
-                            // dead listeners.
-                        }
-                    }
-
-                    mRemoteConnListeners.finishBroadcast();
-                }
+            mRemoteConnListeners.finishBroadcast();
 
 
-                if (state == ImConnection.LOGGED_IN)
-                {
-
-                }
+            if (state == ImConnection.LOGGED_IN)
+            {
 
             }
 
