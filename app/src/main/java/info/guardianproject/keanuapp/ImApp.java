@@ -98,7 +98,6 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
     public static ImApp sImApp;
 
-  //  private static IRemoteImService mImService;
 
     MyConnListener mConnectionListener;
 
@@ -308,7 +307,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         }
     }
 
-    public synchronized void startImServiceIfNeed() {
+    public void startImServiceIfNeed() {
         startImServiceIfNeed(false);
     }
 
@@ -325,12 +324,11 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
         mConnectionListener = new MyConnListener(new Handler());
 
-        synchronized (mQueue) {
-            for (Message msg : mQueue) {
-                msg.sendToTarget();
-            }
-            mQueue.clear();
+        for (Message msg : mQueue) {
+            msg.sendToTarget();
         }
+        mQueue.clear();
+
         Message msg = Message.obtain(null, EVENT_SERVICE_CONNECTED);
         mBroadcaster.broadcast(msg);
 

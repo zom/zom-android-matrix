@@ -59,4 +59,11 @@
         android:visible="false"
         />
 
+    <item
+        android:id="@+id/menu_exit"
+        android:icon="@drawable/ic_lock_outline_black_18dp"
+        android:title="@string/menu_sign_out"
+        app:showAsAction="never"
+        />
+
 </menu>

@@ -1231,6 +1231,10 @@ public class ConversationView {
 
         updateWarningView();
 
+        if (isGroupChat()) {
+            updateGroupTitle();
+        }
+
     }
 
     int mContactType = -1;
@@ -1251,8 +1255,18 @@ public class ConversationView {
 
             mSubscriptionStatus = c.getInt(SUBSCRIPTION_STATUS_COLUMN);
 
+
             if (!hasJoined())
-                showJoinGroupUI();
+            {
+                mHandler.post(new Runnable ()
+                {
+                    public void run ()
+                    {
+                        showJoinGroupUI();
+                    }
+                });
+            }
+
 
         }
 
@@ -1446,13 +1460,8 @@ public class ConversationView {
         mLastChatId = chatId;
 
         setViewType(VIEW_TYPE_CHAT);
+        bindQuery();
 
-        mHandler.postDelayed(new Runnable (){
-            public void run ()
-            {
-                bindQuery();
-            }
-        },500);
         return true;
     }
 
@@ -1501,13 +1510,11 @@ public class ConversationView {
 
             c.close();
 
-            mHandler.post(mUpdateChatCallback);
-
             initSession ();
 
-            if (isGroupChat()) {
-                updateGroupTitle();
-            }
+            mHandler.post(mUpdateChatCallback);
+
+
 
             return true;
 
@@ -1516,15 +1523,12 @@ public class ConversationView {
 
     boolean showContactName = true;
 
-    private synchronized void initSession ()
+    private void initSession ()
     {
-        updateChat();
         mCurrentChatSession = getChatSession();
         if (mCurrentChatSession == null)
             createChatSession();
     }
-
-
 
 
 
