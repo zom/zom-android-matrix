@@ -13,8 +13,8 @@ android {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 2000008
-        versionName "2.0.0-RC-8"
+        versionCode 2000009
+        versionName "2.0.0-RC-9"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -96,8 +96,8 @@ dependencies {
     implementation(name: 'olm-sdk', ext: 'aar')
 
     /*********** KeanuApp components **********/
-    implementation(name: 'keanucore-0.0.1.23', ext: 'aar')
-    implementation(name: 'keanumatrix-0.0.1.23', ext: 'aar')
+    implementation(name: 'keanucore-0.0.1.24', ext: 'aar')
+    implementation(name: 'keanumatrix-0.0.1.24', ext: 'aar')
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'
