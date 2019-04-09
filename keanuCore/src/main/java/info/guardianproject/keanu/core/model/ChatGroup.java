@@ -41,7 +41,7 @@ public class ChatGroup extends ImEntity {
     /** Store the role and affiliation for a contact in a pair data structure, the first being
      * the role and the second the affiliation.
      */
-    private HashMap<Contact, Pair<String, String>> mMemberRolesAndAffiliations;
+    private HashMap<String, Pair<String, String>> mMemberRolesAndAffiliations;
 
     private CopyOnWriteArrayList<GroupMemberListener> mMemberListeners;
 
@@ -162,7 +162,7 @@ public class ChatGroup extends ImEntity {
 
         if (contact == null) {
             mMembers.put(newContact.getAddress().getBareAddress(), newContact);
-            mMemberRolesAndAffiliations.put(newContact, new Pair<String, String>("none", "none"));
+            mMemberRolesAndAffiliations.put(newContact.getAddress().getBareAddress(), new Pair<String, String>("none", "none"));
 
             if (groupAddress != null)
                 mGroupAddressToContactMap.put(groupAddress, newContact);
@@ -184,8 +184,9 @@ public class ChatGroup extends ImEntity {
         }
 
         if (contact != null) {
-            Pair<String, String> oldValue = mMemberRolesAndAffiliations.get(contact);
-            mMemberRolesAndAffiliations.put(contact, new Pair<String, String>((role == null) ? oldValue.first : role, (affiliation == null) ? oldValue.second : affiliation));
+            //Pair<String, String> oldValue = mMemberRolesAndAffiliations.get(contact);
+            mMemberRolesAndAffiliations.remove(contact.getAddress().getBareAddress());
+            mMemberRolesAndAffiliations.put(contact.getAddress().getBareAddress(), new Pair<String, String>(role,affiliation));
             for (GroupMemberListener listener : mMemberListeners) {
                 listener.onMemberRoleChanged(this, contact, role, affiliation);
             }
@@ -247,7 +248,7 @@ public class ChatGroup extends ImEntity {
             } else {
                 notifyMemberRoleUpdate((Contact) member, "none", null);
                 Pair<String, String> oldValue = mMemberRolesAndAffiliations.get(member);
-                mMemberRolesAndAffiliations.put((Contact)member, new Pair<String, String>("none", oldValue.second));
+                mMemberRolesAndAffiliations.put(((Contact)member).getAddress().getBareAddress(), new Pair<String, String>("none", oldValue.second));
             }
         }
         if (deleteFromDB) {
@@ -260,10 +261,10 @@ public class ChatGroup extends ImEntity {
     public List<Contact> getOwners ()
     {
         ArrayList<Contact> owners = new ArrayList<>();
-        for (Contact c : mMemberRolesAndAffiliations.keySet()) {
-            Pair<String, String> roles = mMemberRolesAndAffiliations.get(c);
-            if ("owner".equalsIgnoreCase(roles.first)) {
-                owners.add(c);
+        for (String addr : mMemberRolesAndAffiliations.keySet()) {
+            Pair<String, String> roles = mMemberRolesAndAffiliations.get(addr);
+            if ("owner".equalsIgnoreCase(roles.second)) {
+                owners.add(mMembers.get(addr));
             }
         }
         return owners;
@@ -272,10 +273,10 @@ public class ChatGroup extends ImEntity {
     public List<Contact> getAdmins ()
     {
         ArrayList<Contact> admins = new ArrayList<>();
-        for (Contact c : mMemberRolesAndAffiliations.keySet()) {
-            Pair<String, String> roles = mMemberRolesAndAffiliations.get(c);
+        for (String addr : mMemberRolesAndAffiliations.keySet()) {
+            Pair<String, String> roles = mMemberRolesAndAffiliations.get(addr);
             if ("admin".equalsIgnoreCase(roles.first)) {
-                admins.add(c);
+                admins.add(mMembers.get(addr));
             }
         }
         return admins;
