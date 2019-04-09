@@ -279,40 +279,6 @@ public class ConversationView {
             }
             catch (Exception e){}
 
-            /**
-            try
-            {
-
-                if (mConn == null)
-                    if (!checkConnection())
-                        return;
-
-                if (mConn == null)
-                    return;
-
-                IContactListManager manager = mConn.getContactListManager();
-
-                Contact contact = manager.getContactByAddress(mRemoteAddress);
-
-                if (contact != null) {
-
-                    if (contact.getPresence() != null) {
-                        mLastSeen = contact.getPresence().getLastSeen();
-                        if (mLastSeen != null)
-                            mActivity.updateLastSeen(mLastSeen);
-                    }
-
-                    if (!TextUtils.isEmpty(contact.getForwardingAddress())) {
-                        showContactMoved(contact);
-                    }
-
-                }
-
-
-
-            }
-            catch (RemoteException re){}
-            **/
         }
         else
         {
