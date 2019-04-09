@@ -37,6 +37,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
@@ -82,6 +83,7 @@ import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.ImServiceConstants;
 import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.service.StatusBarNotifier;
+import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.core.util.SystemServices;
 import info.guardianproject.keanu.core.util.XmppUriHelper;
@@ -139,7 +141,15 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
+        if (Debug.DEBUG_ENABLED) {
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build());
+        }
+        
         super.onCreate(savedInstanceState);
+
 
         if (Preferences.doBlockScreenshots()) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE,
@@ -244,7 +254,7 @@ public class MainActivity extends BaseActivity {
         setToolbarTitle(0);
 
         //don't wnat this to happen to often
-        checkForUpdates();
+        //checkForUpdates();
 
         installRingtones ();
 
@@ -339,7 +349,6 @@ public class MainActivity extends BaseActivity {
         if (!VirtualFileSystem.get().isMounted()) {
             finish();
             startActivity(new Intent(this, RouterActivity.class));
-
         } else {
             ImApp app = (ImApp) getApplication();
             mApp.maybeInit(this);
@@ -348,23 +357,6 @@ public class MainActivity extends BaseActivity {
 
 
         handleIntent(getIntent());
-
-        /**
-        if (mApp.getDefaultAccountId() == -1)
-        {
-            startActivity(new Intent(this,RouterActivity.class));
-        }
-        else {
-
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    checkConnection();
-                }
-            }, 5000); //Timer is in ms here.
-
-
-        }**/
 
     }
 
@@ -752,6 +744,12 @@ public class MainActivity extends BaseActivity {
             case R.id.menu_lock_reset:
                 resetPassphrase();
                 return true;
+
+            case R.id.menu_exit:
+                handleExit();
+                return true;
+
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -813,6 +811,12 @@ public class MainActivity extends BaseActivity {
             startActivity(intent);
             finish();
         }
+    }
+
+    public void handleExit ()
+    {
+        stopService(new Intent(this,RemoteImService.class));
+        finish();
     }
 
     static class Adapter extends FragmentPagerAdapter {
