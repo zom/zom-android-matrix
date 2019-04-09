@@ -956,7 +956,8 @@ public class MatrixConnection extends ImConnection {
 
                 if (priority)
                 {
-                    new Thread(gLoader).start();
+                    gLoader.run();
+                 //   new Thread(gLoader).start();
                 }
                 else
                     mExecutorGroups.execute(gLoader);
@@ -1008,7 +1009,7 @@ public class MatrixConnection extends ImConnection {
 
                 if (powerLevels != null) {
                     if (powerLevels.getUserPowerLevel(member.getUserId()) >= powerLevels.ban)
-                        group.notifyMemberRoleUpdate(contact, "moderator", "owner");
+                        group.notifyMemberRoleUpdate(contact, "admin", "owner");
                     else
                         group.notifyMemberRoleUpdate(contact, "member", "member");
                 }
