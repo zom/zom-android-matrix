@@ -269,16 +269,28 @@ public class ConversationDetailActivity extends BaseActivity {
                 boolean bound = mConvoView.bindChat(mChatId, mAddress, mNickname);
 
                 if (bound) {
-                    mConvoView.startListening();
-                    applyStyleForToolbar();
 
-                    if (intent.getBooleanExtra("isNew", false))
-                        mConvoView.showGroupInfo();
+                    mHandler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mConvoView.startListening();
+                            applyStyleForToolbar();
+
+                            if (intent.getBooleanExtra("isNew", false))
+                                mConvoView.showGroupInfo();
+                        }
+                    });
+
+
                 } else
                     finish();
             } else {
                 finish();
             }
+        }
+        else
+        {
+            finish();
         }
     }
 
@@ -299,10 +311,8 @@ public class ConversationDetailActivity extends BaseActivity {
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
-                Intent intent = getIntent();
-                processIntent(intent);
+                processIntent(getIntent());
                 setIntent(null);
-
                 return null;
             }
 

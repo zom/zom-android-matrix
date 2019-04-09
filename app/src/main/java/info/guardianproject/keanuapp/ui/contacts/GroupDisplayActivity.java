@@ -79,6 +79,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     private long mAccountId = -1;
     private long mLastChatId = -1;
     private String mLocalAddress = null;
+    private ImApp mApp = null;
 
     private IImConnection mConn;
     private IChatSession mSession;
@@ -110,10 +111,12 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
         setContentView(R.layout.awesome_activity_group);
 
+        mApp = (ImApp)getApplication();
+
         mName = getIntent().getStringExtra("nickname");
         mAddress = getIntent().getStringExtra("address");
-        mProviderId = getIntent().getLongExtra("provider", -1);
-        mAccountId = getIntent().getLongExtra("account", -1);
+        mProviderId = getIntent().getLongExtra("provider", mApp.getDefaultProviderId());
+        mAccountId = getIntent().getLongExtra("account", mApp.getDefaultAccountId());
         mLastChatId = getIntent().getLongExtra("chat", -1);
 
         /**
