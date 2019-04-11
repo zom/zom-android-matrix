@@ -269,7 +269,8 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
                             if (isGroupEncryptionEnabled())
                             {
-                                h.checkGroupEncryption.setEnabled(false);
+                                h.checkGroupEncryption.setVisibility(View.GONE);
+                                h.actionGroupEncryption.setVisibility(View.GONE);
 
                             }
                             else {
@@ -279,6 +280,8 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                                         setGroupEncryptionEnabled(isChecked);
                                     }
                                 });
+                                h.actionGroupEncryption.setVisibility(View.VISIBLE);
+                                h.checkGroupEncryption.setVisibility(View.VISIBLE);
                                 h.checkGroupEncryption.setEnabled(true);
                             }
                         } else {
