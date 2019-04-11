@@ -4,6 +4,7 @@
     package="info.guardianproject.keanuapp"
     android:installLocation="auto"
     android:sharedUserLabel="@string/perm_label"
+
     android:usesCleartextTraffic="false">
 
     <supports-screens
@@ -90,6 +91,7 @@
         android:label="@string/ic_launcher_name"
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:allowBackup,android:label"
+        android:largeHeap="true"
         >
 
         <activity

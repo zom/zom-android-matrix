@@ -1207,7 +1207,7 @@ public class ConversationView {
 
     private void updateSessionInfo(Cursor c) {
 
-        if (c != null && (!c.isClosed()))
+        if (c != null && (!c.isClosed()) && c.getCount() > 0)
         {
             mProviderId = c.getLong(PROVIDER_COLUMN);
             mAccountId = c.getLong(ACCOUNT_COLUMN);
@@ -1439,50 +1439,50 @@ public class ConversationView {
         if (c == null)
             return false;
 
-        if (c.getColumnCount() < 8)
+        if (c.getColumnCount() < 8 || c.getCount() == 0)
             return false;
 
-            try {
-                c.moveToFirst();
-            }
-            catch (IllegalStateException ise)
-            {
-                return false;
-            }
+        try {
+            c.moveToFirst();
+        }
+        catch (IllegalStateException ise)
+        {
+            return false;
+        }
 
-            updateSessionInfo(c);
+        updateSessionInfo(c);
+
+        if (mRemoteAvatar == null)
+        {
+            try {mRemoteAvatar = DatabaseUtils.getAvatarFromCursor(c, AVATAR_COLUMN, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT);}
+            catch (Exception e){}
 
             if (mRemoteAvatar == null)
             {
-                try {mRemoteAvatar = DatabaseUtils.getAvatarFromCursor(c, AVATAR_COLUMN, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT);}
-                catch (Exception e){}
-
-                if (mRemoteAvatar == null)
-                {
-                    mRemoteAvatar = new RoundedAvatarDrawable(BitmapFactory.decodeResource(mActivity.getResources(),
-                            R.drawable.avatar_unknown));
-
-                }
-
+                mRemoteAvatar = new RoundedAvatarDrawable(BitmapFactory.decodeResource(mActivity.getResources(),
+                        R.drawable.avatar_unknown));
 
             }
 
-            if (mRemoteHeader == null)
-            {
-                try {mRemoteHeader = DatabaseUtils.getHeaderImageFromCursor(c, AVATAR_COLUMN, DEFAULT_AVATAR_WIDTH,DEFAULT_AVATAR_HEIGHT);}
-                catch (Exception e){}
-            }
+
+        }
+
+        if (mRemoteHeader == null)
+        {
+            try {mRemoteHeader = DatabaseUtils.getHeaderImageFromCursor(c, AVATAR_COLUMN, DEFAULT_AVATAR_WIDTH,DEFAULT_AVATAR_HEIGHT);}
+            catch (Exception e){}
+        }
 
 
-            c.close();
+        c.close();
 
-            initSession ();
+        initSession ();
 
-            mHandler.post(mUpdateChatCallback);
+        mHandler.post(mUpdateChatCallback);
 
 
 
-            return true;
+        return true;
 
 
     }
@@ -1798,6 +1798,7 @@ public class ConversationView {
                         }
                         else
                         {
+                            mCurrentChatSession = session;
                             if (task != null)
                                 task.execute();
                         }
