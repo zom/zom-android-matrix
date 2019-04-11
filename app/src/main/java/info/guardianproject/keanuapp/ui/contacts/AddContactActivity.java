@@ -538,36 +538,38 @@ public class AddContactActivity extends BaseActivity {
 
                 String searchString = mNewAddress.getText().toString();
                 if (searchString.length() > 1) {
-                    mConn.searchForUser(mNewAddress.getText().toString(), new IContactListListener() {
-                        @Override
-                        public void onContactChange(int type, IContactList list, Contact contact) throws RemoteException {
+                    if (mConn != null && mConn.getState() == ImConnection.LOGGED_IN) {
+                        mConn.searchForUser(searchString, new IContactListListener() {
+                            @Override
+                            public void onContactChange(int type, IContactList list, Contact contact) throws RemoteException {
 
-                        }
-
-                        @Override
-                        public void onAllContactListsLoaded() throws RemoteException {
-
-                        }
-
-                        @Override
-                        public void onContactsPresenceUpdate(Contact[] contacts) throws RemoteException {
-
-                            if (contacts != null && contacts.length > 0) {
-
-                                showUserSuggestions(contacts);
                             }
-                        }
 
-                        @Override
-                        public void onContactError(int errorType, ImErrorInfo error, String listName, Contact contact) throws RemoteException {
+                            @Override
+                            public void onAllContactListsLoaded() throws RemoteException {
 
-                        }
+                            }
 
-                        @Override
-                        public IBinder asBinder() {
-                            return null;
-                        }
-                    });
+                            @Override
+                            public void onContactsPresenceUpdate(Contact[] contacts) throws RemoteException {
+
+                                if (contacts != null && contacts.length > 0) {
+
+                                    showUserSuggestions(contacts);
+                                }
+                            }
+
+                            @Override
+                            public void onContactError(int errorType, ImErrorInfo error, String listName, Contact contact) throws RemoteException {
+
+                            }
+
+                            @Override
+                            public IBinder asBinder() {
+                                return null;
+                            }
+                        });
+                    }
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();

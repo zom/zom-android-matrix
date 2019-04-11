@@ -1531,7 +1531,6 @@ public class MatrixConnection extends ImConnection {
                 if (event.getContentAsJsonObject().has("last_active_ago"))
                     lastActiveAgo = event.getContentAsJsonObject().get("last_active_ago").getAsInt();
 
-
                 if (currentlyActive)
                     contact.setPresence(new Presence(Presence.AVAILABLE));
                 else
@@ -2138,48 +2137,50 @@ public class MatrixConnection extends ImConnection {
     @Override
     public void searchForUser (String search, IContactListListener listener)
     {
-        mSession.searchUsers(search, 10, null, new ApiCallback<SearchUsersResponse>() {
-            @Override
-            public void onNetworkError(Exception e) {
+        if (mSession != null) {
+            mSession.searchUsers(search, 10, null, new ApiCallback<SearchUsersResponse>() {
+                @Override
+                public void onNetworkError(Exception e) {
 
-            }
+                }
 
-            @Override
-            public void onMatrixError(MatrixError matrixError) {
+                @Override
+                public void onMatrixError(MatrixError matrixError) {
 
-            }
+                }
 
-            @Override
-            public void onUnexpectedError(Exception e) {
+                @Override
+                public void onUnexpectedError(Exception e) {
 
-            }
+                }
 
-            @Override
-            public void onSuccess(SearchUsersResponse searchUsersResponse) {
+                @Override
+                public void onSuccess(SearchUsersResponse searchUsersResponse) {
 
-                if (searchUsersResponse != null && searchUsersResponse.results != null) {
+                    if (searchUsersResponse != null && searchUsersResponse.results != null) {
 
-                    Contact[] contacts = new Contact[searchUsersResponse.results.size()];
-                    int i = 0;
-                    for (User user : searchUsersResponse.results) {
-                        if (user.user_id != null && user.displayname != null)
-                            contacts[i++] = new Contact(new MatrixAddress(user.user_id),user.displayname,Imps.Contacts.TYPE_NORMAL);
-                    }
+                        Contact[] contacts = new Contact[searchUsersResponse.results.size()];
+                        int i = 0;
+                        for (User user : searchUsersResponse.results) {
+                            if (user.user_id != null && user.displayname != null)
+                                contacts[i++] = new Contact(new MatrixAddress(user.user_id), user.displayname, Imps.Contacts.TYPE_NORMAL);
+                        }
 
-                    if (listener != null) {
-                        if (contacts != null && contacts.length > 0) {
-                            try {
-                                listener.onContactsPresenceUpdate(contacts);
-                            } catch (RemoteException e) {
-                                e.printStackTrace();
+                        if (listener != null) {
+                            if (contacts != null && contacts.length > 0) {
+                                try {
+                                    listener.onContactsPresenceUpdate(contacts);
+                                } catch (RemoteException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     }
+
+
                 }
-
-
-            }
-        });
+            });
+        }
     }
 
     private synchronized void handleRoomInvite (Room room, String sender)
