@@ -329,14 +329,21 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     }
 
     public void leave() {
-        if (mIsGroupChat) {
-            getGroupManager().leaveChatGroupAsync((ChatGroup) mChatSession.getParticipant());
-        }
+        ChatGroup group = (ChatGroup) mChatSession.getParticipant();
 
         mContentResolver.delete(mMessageURI, null, null);
         mContentResolver.delete(mChatURI, null, null);
         mStatusBarNotifier.dismissChatNotification(mConnection.getProviderId(), getAddress());
         mChatSessionManager.closeChatSession(this);
+
+        if (mIsGroupChat) {
+            getGroupManager().leaveChatGroupAsync(group);
+            try {
+                mConnection.getContactListManager().removeContact(group.getAddress().getAddress());
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
