@@ -13,8 +13,8 @@ public interface KeanuConstants {
     int SMALL_AVATAR_WIDTH = 64;
     int SMALL_AVATAR_HEIGHT = 64;
 
-    int DEFAULT_AVATAR_WIDTH = 512;
-    int DEFAULT_AVATAR_HEIGHT = 512;
+    int DEFAULT_AVATAR_WIDTH = 256;
+    int DEFAULT_AVATAR_HEIGHT = 256;
 
     String DEFAULT_TIMEOUT_CACHEWORD = "-1"; //one day
 

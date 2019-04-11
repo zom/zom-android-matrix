@@ -192,7 +192,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                     {
                         try {
 
-                            avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT);
+                            avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, false);
 
                             if (avatar != null)
                                 h.avatar.setImageDrawable(avatar);
