@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.os.StrictMode;
@@ -102,6 +103,8 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
     private final static int REQUEST_PICK_CONTACTS = 100;
 
+    private Handler mHandler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,6 +122,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
         mAccountId = getIntent().getLongExtra("account", mApp.getDefaultAccountId());
         mLastChatId = getIntent().getLongExtra("chat", -1);
 
+        mHandler = new Handler();
     }
 
     private void initData () {
@@ -188,7 +192,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                     {
                         try {
 
-                            avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT);
+                            avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, false);
 
                             if (avatar != null)
                                 h.avatar.setImageDrawable(avatar);
@@ -775,8 +779,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
                 inviteContacts(invitees);
 
-
-               // updateMembers();
+                mHandler.postDelayed(() -> updateSession(),3000);
             }
         }
     }

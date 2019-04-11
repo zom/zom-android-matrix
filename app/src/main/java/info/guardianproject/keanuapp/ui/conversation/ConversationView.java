@@ -2672,7 +2672,7 @@ public class ConversationView {
                 messageView.bindPresenceMessage(viewHolder, nickname, messageType, date, isGroupChat(), false);
             }
 
-         //   sendMessageRead(packetId);
+            sendMessageRead(packetId);
 
         }
 
