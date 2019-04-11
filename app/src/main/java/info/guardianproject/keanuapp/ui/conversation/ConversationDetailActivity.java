@@ -287,10 +287,7 @@ public class ConversationDetailActivity extends BaseActivity {
                 finish();
             }
         }
-        else
-        {
-            finish();
-        }
+
     }
 
     public void collapseToolbar(){

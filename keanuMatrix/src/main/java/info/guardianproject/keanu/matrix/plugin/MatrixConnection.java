@@ -43,6 +43,7 @@ import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.rest.model.PowerLevels;
 import org.matrix.androidsdk.rest.model.ReceiptData;
 import org.matrix.androidsdk.rest.model.RoomMember;
+import org.matrix.androidsdk.rest.model.TokensChunkEvents;
 import org.matrix.androidsdk.rest.model.User;
 import org.matrix.androidsdk.rest.model.bingrules.BingRule;
 import org.matrix.androidsdk.rest.model.crypto.EncryptedFileInfo;
@@ -701,10 +702,12 @@ public class MatrixConnection extends ImConnection {
     @Override
     public void sendMessageRead (String roomId, String eventId)
     {
+
         Event event = mStore.getEvent(eventId, roomId);
         Room room = mStore.getRoom(roomId);
         room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
-        //room.markAllAsRead(new BasicApiCallback("markAllAsRead"));
+      //  room.markAllAsRead(new BasicApiCallback("markAllAsRead"));
+
     }
 
     @Override
@@ -1764,8 +1767,8 @@ public class MatrixConnection extends ImConnection {
 
                     csa.setContactTyping(new Contact(addrSender), false);
 
-                    sendMessageRead(event.roomId, event.eventId);
-
+                    // if we send here, things go wrong
+                   // sendMessageRead(event.roomId, event.eventId);
                 }
             }
         }

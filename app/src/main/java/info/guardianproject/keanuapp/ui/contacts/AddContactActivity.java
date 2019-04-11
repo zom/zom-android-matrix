@@ -105,6 +105,7 @@ public class AddContactActivity extends BaseActivity {
     SimpleAlertHandler mHandler;
 
     private IImConnection mConn;
+    private boolean mAddLocalContact = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +142,8 @@ public class AddContactActivity extends BaseActivity {
         });
 
         Intent intent = getIntent();
+        mAddLocalContact = intent.getBooleanExtra("addLocalContact",true);
+
         String scheme = intent.getScheme();
         if (TextUtils.equals(scheme, "keanu"))
         {
@@ -418,7 +421,10 @@ public class AddContactActivity extends BaseActivity {
                 if (!address.startsWith("@"))
                     addAddress = '@' + address + ':' + getString(R.string.default_server);
 
-                new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(addAddress);
+                if (mAddLocalContact) {
+                    new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(addAddress);
+                }
+
                 foundOne = true;
             }
         }
@@ -605,7 +611,8 @@ public class AddContactActivity extends BaseActivity {
                             if (params.size() > 0) {
                                 String address = params.get(0);
 
-                                new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(address, null);
+                                if (mAddLocalContact)
+                                    new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(address, null);
 
                                 Intent intent = new Intent();
                                 intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, address);
@@ -619,7 +626,8 @@ public class AddContactActivity extends BaseActivity {
                             //parse each string and if they are for a new user then add the user
                             OnboardingManager.DecodedInviteLink diLink = OnboardingManager.decodeInviteLink(resultScan);
 
-                            new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(diLink.username, diLink.fingerprint, diLink.nickname);
+                            if (mAddLocalContact)
+                                new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(diLink.username, diLink.fingerprint, diLink.nickname);
 
                             Intent intent=new Intent();
                             intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, diLink.username);
