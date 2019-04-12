@@ -279,6 +279,7 @@ public class OnboardingManager {
         return inviteUrl.toString();
     }
 
+    /**
     private final static String PASSWORD_LETTERS = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789+@!#";
     private final static int PASSWORD_LENGTH = 12;
 
@@ -295,13 +296,17 @@ public class OnboardingManager {
             pw.append(PASSWORD_LETTERS.substring(index, index+1));
         }
         return pw.toString();
-    }
+    }**/
 
 
 
-    public static boolean changePassword (Activity context, long providerId, long accountId, String oldPassword, String newPassword)
+    public static boolean changeLocalPassword (Activity context, long providerId, long accountId, String password)
     {
         try {
+            final ContentResolver cr = context.getContentResolver();
+            ImPluginHelper helper = ImPluginHelper.getInstance(context);
+            ImApp.insertOrUpdateAccount(cr, providerId, accountId, null, null, password);
+
             /**
             XmppConnection xmppConn = new XmppConnection(context);
             xmppConn.initUser(providerId, accountId);
