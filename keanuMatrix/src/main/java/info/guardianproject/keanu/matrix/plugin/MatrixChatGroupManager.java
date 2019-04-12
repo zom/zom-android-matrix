@@ -267,7 +267,10 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     private void setupRoom (Room room, IChatSessionListener listener)
     {
 
-        setRoomDefaults(room);
+        boolean isEncrypted = true;
+        boolean isPrivate = true;
+
+        setRoomDefaults(room, isEncrypted, isPrivate);
 
         ChatGroup chatGroup = mConn.addRoomContact(room);
         ChatSession session = mChatSessionMgr.getSession(room.getRoomId());
@@ -275,7 +278,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
             session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
 
         ChatSessionAdapter adapter = mChatSessionMgr.getChatSessionAdapter(room.getRoomId());
-        adapter.useEncryption(room.isEncrypted());
+        adapter.useEncryption(isEncrypted);
 
         if (!chatGroup.hasMemberListener())
             chatGroup.addMemberListener(adapter.getListenerAdapter());
@@ -299,17 +302,19 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     }
 
 
-    private void setRoomDefaults (Room room)
+    private void setRoomDefaults (Room room, boolean enableEncryption, boolean isPrivate)
     {
 
-
-        if (!room.isEncrypted())
+        if (enableEncryption)
             room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
 
-        room.setIsURLPreviewAllowedByUser(false, new BasicApiCallback("setIsURLPreviewAllowedByUser:false"));
-        room.updateDirectoryVisibility(RoomDirectoryVisibility.DIRECTORY_VISIBILITY_PRIVATE,new BasicApiCallback("updateDirectoryVisibility:private"));
-        room.updateHistoryVisibility("joined",new BasicApiCallback("updateHistoryVisibility:joined"));
-        room.updateGuestAccess("forbidden", new BasicApiCallback("updateGuestAccess:forbidden"));
+
+        if (isPrivate) {
+            room.updateDirectoryVisibility(RoomDirectoryVisibility.DIRECTORY_VISIBILITY_PRIVATE, new BasicApiCallback("updateDirectoryVisibility:private"));
+            room.setIsURLPreviewAllowedByUser(false, new BasicApiCallback("setIsURLPreviewAllowedByUser:false"));
+            room.updateHistoryVisibility("joined",new BasicApiCallback("updateHistoryVisibility:joined"));
+            room.updateGuestAccess("forbidden", new BasicApiCallback("updateGuestAccess:forbidden"));
+        }
 
         PowerLevels pLevels = room.getState().getPowerLevels();
         if (pLevels == null) {
