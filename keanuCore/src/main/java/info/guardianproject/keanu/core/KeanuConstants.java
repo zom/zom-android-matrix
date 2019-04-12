@@ -26,7 +26,7 @@ public interface KeanuConstants {
     String PREFERENCE_KEY_TEMP_PASS = "temppass";
 
     //ACCOUNT SETTINGS Imps defaults
-    String DEFAULT_DEVICE_NAME = "keanu";
+    String DEFAULT_DEVICE_NAME = "device";
 
     String NOTIFICATION_CHANNEL_ID_SERVICE = "info.guardianproject.keanu.service";
     String NOTIFICATION_CHANNEL_ID_MESSAGE = "info.guardianproject.keanu.message.2";
