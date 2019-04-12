@@ -448,6 +448,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
             cr.update(accountUri, values, null, null);
 
             c.close();
+
             return id;
         } else {
             ContentValues values = new ContentValues(4);

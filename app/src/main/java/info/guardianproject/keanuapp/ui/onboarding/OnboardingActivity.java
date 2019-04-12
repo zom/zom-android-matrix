@@ -526,7 +526,13 @@ public class OnboardingActivity extends BaseActivity {
         String password = ((EditText)findViewById(R.id.edtNewPass)).getText().toString();
         String passwordConfirm = ((EditText)findViewById(R.id.edtNewPassConfirm)).getText().toString();
 
-        if (password.equals(passwordConfirm)) {
+        if (TextUtils.isEmpty(password) || password.length() < 4)
+        {
+            ((EditText)findViewById(R.id.edtNewPassConfirm)).setBackgroundColor(R.color.holo_red_dark);
+            Toast.makeText(this,R.string.pass_err_length,Toast.LENGTH_LONG).show();
+
+        }
+        else if (password.equals(passwordConfirm)) {
             mViewFlipper.setDisplayedChild(4);
 
             if (mCurrentFindServerTask != null)
@@ -537,6 +543,8 @@ public class OnboardingActivity extends BaseActivity {
         }
         else
         {
+            Toast.makeText(this,R.string.lock_screen_passphrases_not_matching,Toast.LENGTH_LONG).show();
+
             ((EditText)findViewById(R.id.edtNewPassConfirm)).setBackgroundColor(R.color.holo_red_dark);
         }
     }

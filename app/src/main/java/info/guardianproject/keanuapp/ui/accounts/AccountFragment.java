@@ -230,7 +230,7 @@ public class AccountFragment extends Fragment {
                 String newNickname = input.getText().toString();
 
                 //update just the nickname
-                ImApp.insertOrUpdateAccount(getContext().getContentResolver(), mProviderId, mAccountId, newNickname, "", null);
+                ImApp.insertOrUpdateAccount(getContext().getContentResolver(), mProviderId, mAccountId, newNickname, null, null);
 
                 if (mConn != null) {
                     try {
@@ -260,7 +260,7 @@ public class AccountFragment extends Fragment {
 
         // Set an EditText view to get user input
         final EditText input = new EditText(getContext());
-        input.setText(getAccountPassword(mProviderId));
+      //  input.setText(getAccountPassword(mProviderId));
         alert.setView(input);
 
         alert.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
@@ -268,6 +268,7 @@ public class AccountFragment extends Fragment {
                 String newPassword = input.getText().toString();
 
                 if (!TextUtils.isEmpty(newPassword)) {
+
                     new ChangePasswordTask().execute(getAccountPassword(mProviderId),newPassword);
                 }
             }
@@ -297,6 +298,25 @@ public class AccountFragment extends Fragment {
     }
 
     private String getAccountPassword(long providerId) {
+
+        String result = "";
+
+        Cursor c = getActivity().getContentResolver().query(Imps.Provider.CONTENT_URI_WITH_ACCOUNT,
+                new String[]{Imps.Provider.ACTIVE_ACCOUNT_PW}, Imps.Provider.CATEGORY + "=? AND providers." + Imps.Provider._ID + "=?" /* selection */,
+                new String[]{IMPS_CATEGORY, providerId + ""} /* selection args */,
+                Imps.Provider.DEFAULT_SORT_ORDER);
+
+        if (c != null) {
+            c.moveToFirst();
+            result = c.getString(0);
+            c.close();
+        }
+
+        return result;
+
+    }
+
+    private String updatePassword(long providerId) {
 
         String result = "";
 
@@ -638,12 +658,15 @@ public class AccountFragment extends Fragment {
                 String oldPassword = setupValues[0];
                 newPassword = setupValues[1];
 
+                /**
                 if (!oldPassword.equals(newPassword)) {
                     boolean result = OnboardingManager.changePassword(getActivity(), mProviderId, mAccountId, oldPassword, newPassword);
                     return result;
                 }
                 else
                     return false;
+                 **/
+                return true;//just change locally
             }
             catch (Exception e)
             {
