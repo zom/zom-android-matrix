@@ -21,4 +21,7 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="bot_image_rounding">10dp</dimen>
     <dimen name="profile_avatar_size">320dp</dimen>
+
+    <dimen name="story_contrib_controls_height">100dp</dimen>
+    <dimen name="story_contrib_gallery_padding">16dp</dimen>
     </resources>

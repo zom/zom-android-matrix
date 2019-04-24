@@ -298,6 +298,12 @@
             android:launchMode="standard"
             android:theme="@style/AppThemeNoAction"
             android:windowSoftInputMode="stateHidden|adjustPan" />
+        <activity android:name=".ui.conversation.AddUpdateMediaActivity"
+            android:theme="@style/AppThemeNoAction"
+            android:exported="false" />
+        <activity android:name=".ui.stories.StoryGalleryActivity"
+            android:theme="@style/AppThemeNoAction"
+            android:exported="false" />
         <activity
             android:name=".ui.contacts.ContactListActivity"
             android:exported="false" />

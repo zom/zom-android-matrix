@@ -460,6 +460,10 @@ public class ConversationListFragment extends Fragment {
                         intent.putExtra("id", chatId);
                         intent.putExtra("address", address);
                         intent.putExtra("nickname", nickname);
+                        if (isStory && true) {
+                            // If admin, enter contrib mode
+                            intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE, true);
+                        }
                         context.startActivity(intent);
                     }
                 });

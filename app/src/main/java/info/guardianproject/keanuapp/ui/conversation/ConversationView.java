@@ -193,7 +193,7 @@ public class ConversationView {
     EditText mComposeMessage;
     ShareRequest mShareDraft;
 
-    private ImageButton mSendButton, mMicButton;
+    protected ImageButton mSendButton, mMicButton;
     private TextView mButtonTalk;
     private ImageButton mButtonAttach;
     private View mViewAttach;

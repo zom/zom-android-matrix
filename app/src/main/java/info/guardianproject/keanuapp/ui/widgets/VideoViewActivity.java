@@ -34,12 +34,14 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.TransferListener;
 import com.google.android.exoplayer2.util.Util;
 
 import java.io.EOFException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -261,6 +263,11 @@ public class VideoViewActivity extends AppCompatActivity {
         }
 
         @Override
+        public void addTransferListener(TransferListener transferListener) {
+
+        }
+
+        @Override
         public long open(DataSpec dataSpec) throws IOException {
             try {
                 inputStream = convertUriToInputStream(context, dataSpec.uri);
@@ -316,6 +323,11 @@ public class VideoViewActivity extends AppCompatActivity {
         @Override
         public Uri getUri() {
             return dataSpec.uri;
+        }
+
+        @Override
+        public Map<String, List<String>> getResponseHeaders() {
+            return null;
         }
 
         @Override

@@ -17,7 +17,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -34,7 +33,6 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.barteksc.pdfviewer.PDFView;
-import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
@@ -49,17 +47,16 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
-import info.guardianproject.keanu.core.provider.Imps;
-import info.guardianproject.keanu.core.util.SecureMediaStore;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.ImUrlActivity;
+import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.nearby.NearbyShareActivity;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
@@ -79,33 +76,6 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
     private ArrayList<String> messagePacketIds;
 
     private boolean mShowResend = false;
-
-    private class MediaInfo extends Object {
-        private final Uri uri;
-        private final String mimeType;
-
-        public MediaInfo(Uri uri, String mimeType) {
-            this.uri = uri;
-            this.mimeType = mimeType;
-        }
-
-        public boolean isImage() {
-            return TextUtils.isEmpty(mimeType) || mimeType.startsWith("image/");
-        }
-
-        public boolean isAudio() {
-            return !TextUtils.isEmpty(mimeType) && mimeType.startsWith("audio/");
-        }
-
-        public boolean isVideo() {
-            return !TextUtils.isEmpty(mimeType) && mimeType.startsWith("video/");
-        }
-
-        public boolean isPDF() {
-            return !TextUtils.isEmpty(mimeType) && mimeType.contentEquals("application/pdf");
-        }
-
-    }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override

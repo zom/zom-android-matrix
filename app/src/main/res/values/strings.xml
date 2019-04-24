@@ -7,4 +7,6 @@
     <string name="im_label">Keanu</string>
     <string name="pref_clear_data">Make Some Space</string>
 
+    <string name="story_mic_tap_to_upload">Tap to upload audio, hold to record</string>
+    <string name="story_gallery_all">All</string>
 </resources>

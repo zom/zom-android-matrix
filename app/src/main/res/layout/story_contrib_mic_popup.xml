@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/btnClose"
+    android:layout_width="wrap_content"
+    android:layout_height="40dp"
+    android:textSize="14sp"
+    android:drawableStart="@drawable/ic_close_white_24dp"
+    android:drawableLeft="@drawable/ic_close_white_24dp"
+    android:text="@string/story_mic_tap_to_upload"
+    android:textColor="@android:color/white"
+    android:gravity="center"
+    android:background="@drawable/story_contrib_mic_popup_background"
+    >
+
+</TextView>
