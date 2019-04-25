@@ -154,15 +154,41 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                 ContentResolver cr = context.getContentResolver();
                 Uri uri = MediaStore.Files.getContentUri("external");
 
-                String[] projection = null; // TODO - only use columns we need!!!
+                String[] projection = new String[]{
+                    MediaStore.Files.FileColumns._ID,
+                    MediaStore.Files.FileColumns.DATA,
+                    MediaStore.Files.FileColumns.MEDIA_TYPE,
+                    MediaStore.Files.FileColumns.MIME_TYPE
+                };
 
                 String sortOrder = MediaStore.Files.FileColumns.DATE_ADDED + " DESC";
-                String selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " != " + MediaStore.Files.FileColumns.MEDIA_TYPE_NONE;
-                selection += " OR " + MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
-                String[] selectionArgs = new String[] {"Application/PDF"};
 
-                Cursor cursor = cr.query(uri, projection, selection, selectionArgs, sortOrder);
-                return cursor;
+                String selection = null;
+                String[] selectionArgs = null;
+
+                switch (mediaType) {
+                    case Pdf:
+                        selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " = " + MediaStore.Files.FileColumns.MEDIA_TYPE_NONE;
+                        selection += " AND " + MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
+                        selectionArgs = new String[] {"Application/PDF"};
+                        break;
+                    case Audio:
+                        selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " = " + MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO;
+                        break;
+                    case Image:
+                        selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " = " + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
+                        break;
+                    case Video:
+                        selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " = " + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
+                        break;
+                    default:
+                        selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " != " + MediaStore.Files.FileColumns.MEDIA_TYPE_NONE;
+                        selection += " OR " + MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
+                        selectionArgs = new String[] {"Application/PDF"};
+                        break;
+                }
+
+                return cr.query(uri, projection, selection, selectionArgs, sortOrder);
             } catch (Exception e) {
                 e.printStackTrace();
             }

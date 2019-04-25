@@ -53,6 +53,7 @@ public class StoryGalleryActivity extends AppCompatActivity implements GalleryAd
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         tabLayout = findViewById(R.id.tabLayout);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -96,6 +97,10 @@ public class StoryGalleryActivity extends AppCompatActivity implements GalleryAd
         int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.story_contrib_gallery_padding);
         recyclerViewGallery.addItemDecoration(new GalleryItemDecoration(spanCount, spacingInPixels, false));
         setGalleryAdapter();
+
+        // Check for args to select one of the tabs
+        int galleryMode = getIntent().getIntExtra(ARG_GALLERY_MODE, GALLERY_MODE_ALL);
+        tabLayout.getTabAt(galleryMode).select();
     }
 
     @Override
