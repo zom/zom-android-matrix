@@ -1,6 +1,7 @@
 package info.guardianproject.keanuapp.ui.stories;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -19,8 +20,9 @@ import android.view.WindowManager;
 
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
 
-public class StoryGalleryActivity extends AppCompatActivity {
+public class StoryGalleryActivity extends AppCompatActivity implements GalleryAdapter.GalleryAdapterListener {
     public static int GALLERY_MODE_ALL = 0;
     public static int GALLERY_MODE_PDF = 1;
     public static int GALLERY_MODE_IMAGE = 2;
@@ -28,6 +30,7 @@ public class StoryGalleryActivity extends AppCompatActivity {
     public static int GALLERY_MODE_AUDIO = 4;
 
     public static String ARG_GALLERY_MODE = "gallery_mode";
+    public static String RESULT_SELECTED_MEDIA = "selected_media";
 
     private static final int REQUEST_CODE_READ_PERMISSIONS = 1;
 
@@ -112,7 +115,7 @@ public class StoryGalleryActivity extends AppCompatActivity {
                     REQUEST_CODE_READ_PERMISSIONS);
             return;
         }
-        recyclerViewGallery.setAdapter(new GalleryAdapter(this));
+        recyclerViewGallery.setAdapter(new GalleryAdapter(this, this));
     }
 
     @Override
@@ -124,5 +127,13 @@ public class StoryGalleryActivity extends AppCompatActivity {
                 setGalleryAdapter();
             }
         }
+    }
+
+    @Override
+    public void onMediaItemClicked(MediaInfo media) {
+        Intent resultData = new Intent();
+        resultData.putExtra(RESULT_SELECTED_MEDIA, media);
+        setResult(RESULT_OK, resultData);
+        finish();
     }
 }

@@ -8,14 +8,19 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.File;
+
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
+import info.guardianproject.keanuapp.ui.widgets.GlideUtils;
+import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
 
 /**
  * Created by N-Pex on 2019-04-12.
@@ -23,6 +28,10 @@ import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
 public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder> {
     public static final String LOGTAG = "GalleryAdapter";
     public static final boolean LOGGING = true;
+
+    public interface GalleryAdapterListener {
+        void onMediaItemClicked(MediaInfo media);
+    }
 
     public enum MediaType {
         All,
@@ -33,12 +42,14 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
     }
 
     private final Context context;
+    private final GalleryAdapterListener listener;
     private MediaType mediaType = MediaType.All;
     private LoadCursorTask loadCursorTask;
 
-    public GalleryAdapter(Context context) {
+    public GalleryAdapter(Context context, GalleryAdapterListener listener) {
         super(context, null);
         this.context = context;
+        this.listener = listener;
     }
 
     public void setMediaType(MediaType mediaType) {
@@ -62,55 +73,46 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
         try {
             int uriColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
             int typeColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE);
+            int mimeTypeColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE);
             if (uriColumn >= 0 && typeColumn >= 0) {
                 String data = cursor.getString(uriColumn);
+
+                // We know it's a file uri here, it's from MediaStore.Files
+                Uri uri = Uri.fromFile(new File(data));
                 int mediaType = cursor.getInt(typeColumn);
+                String mimeType = (mimeTypeColumn >= 0) ? cursor.getString(mimeTypeColumn) : "";
                 switch (mediaType) {
                     case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-                        String mUri = getRealPathFromURI(context, Uri.parse(data), "VIDEO");
                         holder.imageView.setImageBitmap(ThumbnailUtils.createVideoThumbnail(
-                                mUri, MediaStore.Video.Thumbnails.MINI_KIND));
+                                uri.getPath(), MediaStore.Video.Thumbnails.MINI_KIND));
                         break;
                     case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-                        holder.imageView.setImageURI(Uri.parse(data));
+                        GlideUtils.loadImageFromUri(context, uri, holder.imageView);
                         break;
 
                     case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
                         holder.imageView.setImageResource(R.drawable.ic_audiotrack_white_24dp);
                         break;
                 }
+
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (listener != null) {
+                            listener.onMediaItemClicked(new MediaInfo(uri, mimeType));
+                        }
+                    }
+                });
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static String getRealPathFromURI(Context context,Uri contentURI,String type) {
-
-        String result  = null;
-        try {
-            Cursor cursor = context.getContentResolver().query(contentURI, null, null, null, null);
-            if (cursor == null) { // Source is Dropbox or other similar local file path
-                result = contentURI.getPath();
-                Log.d("TAG", "result******************" + result);
-            } else {
-                cursor.moveToFirst();
-                int idx = 0;
-                if(type.equalsIgnoreCase("IMAGE")){
-                    idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
-                }else if(type.equalsIgnoreCase("VIDEO")){
-                    idx = cursor.getColumnIndex(MediaStore.Video.VideoColumns.DATA);
-                }else if(type.equalsIgnoreCase("AUDIO")){
-                    idx = cursor.getColumnIndex(MediaStore.Audio.AudioColumns.DATA);
-                }
-                result = cursor.getString(idx);
-                Log.d("TAG", "result*************else*****" + result);
-                cursor.close();
-            }
-        } catch (Exception e){
-            Log.e("TAG", "Exception ",e);
-        }
-        return result;
+    @Override
+    public void onViewRecycled(@NonNull GalleryViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.imageView.setImageDrawable(null);
     }
 
     @Override

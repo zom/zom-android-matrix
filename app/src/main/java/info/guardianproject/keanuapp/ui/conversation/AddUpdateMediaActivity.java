@@ -9,6 +9,7 @@ import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -50,7 +51,7 @@ import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
 import info.guardianproject.keanuapp.ui.widgets.PopupDialog;
 import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
 
-public class AddUpdateMediaActivity extends CameraActivity {
+public class AddUpdateMediaActivity extends CameraActivity implements GalleryAdapter.GalleryAdapterListener {
 
     private static final int REQUEST_CODE_GALLERY = 1;
     private static final int REQUEST_CODE_READ_PERMISSIONS = 2;
@@ -208,7 +209,7 @@ public class AddUpdateMediaActivity extends CameraActivity {
                     REQUEST_CODE_READ_PERMISSIONS);
             return;
         }
-        recyclerViewGallery.setAdapter(new GalleryAdapter(this));
+        recyclerViewGallery.setAdapter(new GalleryAdapter(this, this));
     }
 
     @Override
@@ -222,6 +223,16 @@ public class AddUpdateMediaActivity extends CameraActivity {
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_GALLERY && resultCode == RESULT_OK && data != null) {
+            MediaInfo selectedMedia = data.getParcelableExtra(StoryGalleryActivity.RESULT_SELECTED_MEDIA);
+            if (selectedMedia != null) {
+                onMediaItemClicked(selectedMedia);
+            }
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -470,6 +481,12 @@ public class AddUpdateMediaActivity extends CameraActivity {
         LoopingMediaSource loopingSource = new LoopingMediaSource(mediaSource);
         exoPlayer.prepare(loopingSource);
         exoPlayer.setPlayWhenReady(true); //run file/link when ready to play.
+    }
+
+    @Override
+    public void onMediaItemClicked(MediaInfo mediaInfo) {
+        addedMedia.add(mediaInfo);
+        setViewerMode(true);
     }
 
     public class GalleryOnerowItemDecoration extends RecyclerView.ItemDecoration {
