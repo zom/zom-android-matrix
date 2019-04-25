@@ -4,12 +4,10 @@ import android.Manifest;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.ActivityCompat;
@@ -34,7 +32,6 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
-import com.google.android.exoplayer2.ui.PlaybackControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
@@ -47,7 +44,6 @@ import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.camera.CameraActivity;
 import info.guardianproject.keanuapp.ui.stories.GalleryAdapter;
-import info.guardianproject.keanuapp.ui.stories.GalleryItemDecoration;
 import info.guardianproject.keanuapp.ui.stories.StoryGalleryActivity;
 import info.guardianproject.keanuapp.ui.widgets.GlideUtils;
 import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
@@ -92,6 +88,9 @@ public class AddUpdateMediaActivity extends CameraActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        mCameraView.setLayerType(View.LAYER_TYPE_HARDWARE, null); // Make sure its hardware, so texture preview works as expected!
+
         mOneAndDone = false;
 
         // Secured from screen shots?
@@ -329,6 +328,9 @@ public class AddUpdateMediaActivity extends CameraActivity {
             if (exoPlayer != null) {
                 exoPlayer.setPlayWhenReady(false);
             }
+            for (MediaInfo media : addedMedia) {
+                // TODO - delete from VFS!
+            }
             addedMedia.clear();
             mCameraView.setVisibility(View.VISIBLE);
             mCameraView.open();
@@ -442,7 +444,7 @@ public class AddUpdateMediaActivity extends CameraActivity {
                     new DefaultTrackSelector(videoTrackSelectionFactory);
 
             exoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
-            previewVideo.setUseController(true);
+            //previewVideo.setUseController(true);
 
             // Bind the player to the view.
             previewVideo.setPlayer(exoPlayer);
@@ -465,8 +467,8 @@ public class AddUpdateMediaActivity extends CameraActivity {
         };
         MediaSource mediaSource = new ExtractorMediaSource(inputStreamDataSource.getUri(),
                 factory, new DefaultExtractorsFactory(), null, null);
-        //LoopingMediaSource loopingSource = new LoopingMediaSource(mediaSource);
-        exoPlayer.prepare(mediaSource);
+        LoopingMediaSource loopingSource = new LoopingMediaSource(mediaSource);
+        exoPlayer.prepare(loopingSource);
         exoPlayer.setPlayWhenReady(true); //run file/link when ready to play.
     }
 

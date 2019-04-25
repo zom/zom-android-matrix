@@ -27,7 +27,9 @@
             app:cameraGestureTap="focusWithMarker"
             app:cameraGrid="off"
             app:cameraMode="picture"
-            app:cameraPlaySounds="true" />
+            app:cameraPlaySounds="true"
+            app:cameraPreview="texture"
+            />
         <ImageView
             android:id="@+id/previewPhoto"
             android:layout_width="match_parent"
@@ -36,6 +38,9 @@
             android:id="@+id/previewVideo"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:use_controller="true"
+            app:controller_layout_id="@layout/story_contrib_media_controller"
+            app:resize_mode="fill"
             />
         <LinearLayout
             android:id="@+id/llControls"

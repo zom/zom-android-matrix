@@ -3,16 +3,20 @@ package info.guardianproject.keanuapp.ui.camera;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.ImageView;
+
+import androidx.annotation.Nullable;
 
 import com.otaliastudios.cameraview.BitmapCallback;
 import com.otaliastudios.cameraview.CameraListener;
@@ -28,6 +32,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,13 +42,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.Nullable;
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.keanu.core.Preferences;
-import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
+import info.guardianproject.keanuapp.R;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
@@ -119,15 +123,13 @@ public class CameraActivity extends AppCompatActivity {
                 super.onPictureTaken(result);
 
                 if (isRecordingVideo) {
-
+                    startVideoRecording ();
                     result.toBitmap(new BitmapCallback() {
                         @Override
                         public void onBitmapReady(@Nullable Bitmap bitmap) {
                             thumbnail = bitmap;
                         }
                     });
-
-                    startVideoRecording ();
                 }
                 else {
                     result.toBitmap(bitmap -> {
@@ -160,6 +162,16 @@ public class CameraActivity extends AppCompatActivity {
                 super.onCameraClosed();
 
             }
+        });
+        mCameraView.setVideoSize(source -> {
+            ArrayList<Size> result = new ArrayList<>();
+
+            for (Size size : source)
+            {
+                if (size.getWidth() < 1000)
+                    result.add(size);
+            }
+            return result;
         });
 
         View btnCamera = findViewById(R.id.btnCamera);
@@ -254,7 +266,7 @@ public class CameraActivity extends AppCompatActivity {
             isRecordingVideo = false;
         } else {
             isRecordingVideo = true;
-            mCameraView.takePictureSnapshot();
+            startVideoRecording();
         }
     }
 
@@ -268,18 +280,6 @@ public class CameraActivity extends AppCompatActivity {
         mCameraView.setVideoCodec(VideoCodec.H_264);
         mCameraView.setVideoBitRate(VIDEO_KBITRATE * 1000);
         mCameraView.setAudioBitRate(AUDIO_KBITRATE * 1000);
-
-        mCameraView.setVideoSize(source -> {
-            ArrayList<Size> result = new ArrayList<>();
-
-            for (Size size : source)
-            {
-                if (size.getWidth() < 1000)
-                    result.add(size);
-            }
-
-            return result;
-        });
 
         ((ImageView)findViewById(R.id.btnCameraVideo)).setImageResource(R.drawable.ic_video_stop);
 
@@ -374,11 +374,18 @@ public class CameraActivity extends AppCompatActivity {
             final Uri vfsUri = SecureMediaStore.createContentPath(sessionId,"cam" + new Date().getTime() + ".mp4");
 
             OutputStream out = new info.guardianproject.iocipher.FileOutputStream(new File(vfsUri.getPath()));
+            InputStream in = new java.io.FileInputStream(fileVideo);
+            IOUtils.copyLarge(in, out);
+            in.close();
+            out.close();
 
-            IOUtils.copyLarge(new java.io.FileInputStream(fileVideo),out);
+            if (thumbnail == null) {
+                thumbnail = ThumbnailUtils.createVideoThumbnail(fileVideo.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
+            }
 
             fileVideo.delete();
             System.gc();
+
 
             if (thumbnail != null)
                 thumbnail.compress(Bitmap.CompressFormat.JPEG,
