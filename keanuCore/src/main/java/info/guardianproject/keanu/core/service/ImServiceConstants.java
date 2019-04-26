@@ -46,6 +46,9 @@ public class ImServiceConstants {
     /** Use EXTRA_INTENT_ACCOUNT_ID to include the account id in an intent. */
     public static final String EXTRA_INTENT_ACCOUNT_ID = "accountId";
 
+    /** Use EXTRA_INTENT_CHAT_ID to include the chat id in an intent. */
+    public static final String EXTRA_INTENT_CHAT_ID = "chatId";
+
     /**
      * Use EXTRA_INTENT_LIST_NAME to include the contact list name in an intent.
      */

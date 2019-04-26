@@ -563,9 +563,10 @@ public class ImConnectionAdapter extends IImConnection.Stub {
             values.put(Imps.Invitation.ACCOUNT, mAccountId);
             values.put(Imps.Invitation.INVITE_ID, invitation.getInviteID());
             values.put(Imps.Invitation.SENDER, sender);
-            values.put(Imps.Invitation.GROUP_NAME, invitation.getGroupAddress().getUser());
+            values.put(Imps.Invitation.GROUP_NAME, invitation.getReason());
             values.put(Imps.Invitation.NOTE, invitation.getReason());
             values.put(Imps.Invitation.STATUS, Imps.Invitation.STATUS_PENDING);
+
             ContentResolver resolver = mService.getContentResolver();
             Uri uri = resolver.insert(Imps.Invitation.CONTENT_URI, values);
             long id = ContentUris.parseId(uri);

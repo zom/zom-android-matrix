@@ -1107,10 +1107,13 @@ public class MatrixConnection extends ImConnection {
                         if (event.getContent().getAsJsonObject().getAsJsonObject(eventId).has("m.read")) {
                             String userId = event.getContent().getAsJsonObject().getAsJsonObject(eventId).getAsJsonObject("m.read").keySet().iterator().next();
 
-                            if (!userId.equals(mSession.getMyUserId())) {
-                                ChatSession session = mChatSessionManager.getSession(event.roomId);
-                                if (session != null)
+                            ChatSession session = mChatSessionManager.getSession(event.roomId);
+                            if (session != null) {
+                                if (!userId.equals(mSession.getMyUserId())) {
                                     session.onMessageReceipt(eventId, session.useEncryption());
+                                } else {
+                                    mChatSessionManager.getChatSessionAdapter(event.roomId).markAsRead();
+                                }
                             }
                         }
 
@@ -2160,14 +2163,17 @@ public class MatrixConnection extends ImConnection {
 
             participant.setJoined(false);
             ChatSession session = mChatSessionManager.getSession(room.getRoomId());
+
             if (session == null) {
                 session = mChatSessionManager.createChatSession(participant, true);
-                Invitation invite = new Invitation(room.getRoomId(), addrRoom, addrSender, room.getRoomDisplayName(mContext));
+
+                ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
+                csa.setLastMessage(mContext.getString(R.string.room_invited));
+
+                Invitation invite = new Invitation(room.getRoomId(), csa.getId(), addrRoom, addrSender, room.getRoomDisplayName(mContext));
                 mChatGroupManager.notifyGroupInvitation(invite);
             }
 
-            ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
-            csa.setLastMessage(mContext.getString(R.string.room_invited));
 
         }
         else if (room.isMember())

@@ -20,28 +20,33 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class Invitation implements Parcelable {
-    private String mId;
+    private String mInviteId;
     private Address mGroupAddress;
     private Address mSender;
     private String mReason;
+    private long mChatId = -1;
 
-    public Invitation(String id, Address groupAddress, Address sender, String reason) {
-        mId = id;
+    public Invitation(String inviteId, long chatId, Address groupAddress, Address sender, String reason) {
+        mInviteId = inviteId;
+        mChatId = chatId;
         mGroupAddress = groupAddress;
         mSender = sender;
         mReason = reason;
     }
 
     public Invitation(Parcel source) {
-        mId = source.readString();
+        mInviteId = source.readString();
+        mChatId = source.readLong();
         mGroupAddress = AddressParcelHelper.readFromParcel(source);
         mSender = AddressParcelHelper.readFromParcel(source);
         mReason = source.readString();
     }
 
     public String getInviteID() {
-        return mId;
+        return mInviteId;
     }
+
+    public long getChatID() { return mChatId; }
 
     public Address getGroupAddress() {
         return mGroupAddress;
@@ -56,7 +61,8 @@ public class Invitation implements Parcelable {
     }
 
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(mId);
+        dest.writeString(mInviteId);
+        dest.writeLong(mChatId);
         AddressParcelHelper.writeToParcel(dest, mGroupAddress);
         AddressParcelHelper.writeToParcel(dest, mSender);
         dest.writeString(mReason);

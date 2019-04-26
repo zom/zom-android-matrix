@@ -799,7 +799,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
             mHasUnreadMessages = false;
 
-
         }
     }
 
