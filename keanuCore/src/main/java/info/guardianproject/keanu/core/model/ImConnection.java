@@ -207,7 +207,7 @@ public abstract class ImConnection {
 
     /** Immediate logout */
 
-    public abstract void logout();
+    public abstract void logout(boolean fullLogout);
 
     /** Suspend connection with the IM server. */
     public abstract void suspend();

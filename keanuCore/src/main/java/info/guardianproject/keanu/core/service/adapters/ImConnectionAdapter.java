@@ -242,10 +242,10 @@ public class ImConnectionAdapter extends IImConnection.Stub {
     }
 
     @Override
-    public void logout() {
+    public void logout(boolean fullLogout) {
        // OtrChatManager.endSessionsForAccount(mConnection.getLoginUser());
         mConnectionState = ImConnection.LOGGING_OUT;
-        mConnection.logout();
+        mConnection.logout(fullLogout);
     }
 
     @Override
@@ -255,7 +255,7 @@ public class ImConnectionAdapter extends IImConnection.Stub {
             return;
         }
         mConnectionState = ImConnection.LOGGING_OUT;
-        mConnection.logout();
+        mConnection.logout(false);
     }
 
     public void suspend() {

@@ -59,7 +59,6 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
         mConnection = connection;
         ImConnection connAdaptee = connection.getAdaptee();
-
         connAdaptee.getChatSessionManager().setAdapter(this);
 
         mActiveChatSessionAdapters = new HashMap<String, ChatSessionAdapter>();

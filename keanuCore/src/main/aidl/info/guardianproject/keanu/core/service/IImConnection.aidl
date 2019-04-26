@@ -44,7 +44,7 @@ interface IImConnection {
      *          client must load contacts manually.
      */
     void login(String passwordTempt, boolean autoLoadContacts, boolean retry);
-    void logout();
+    void logout(boolean fullLogout);
     void cancelLogin();
 
     Presence getUserPresence();
