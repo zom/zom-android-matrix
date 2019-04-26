@@ -118,7 +118,10 @@ public class AddContactActivity extends BaseActivity {
 
         mApp = (ImApp)getApplication();
 
-        mConn = RemoteImService.getConnection(mApp.getDefaultProviderId(),mApp.getDefaultAccountId());
+        long providerId = getIntent().getLongExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER,mApp.getDefaultProviderId());
+        long accountId = getIntent().getLongExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT,mApp.getDefaultAccountId());
+
+        mConn = RemoteImService.getConnection(providerId, accountId);
 
         mHandler = new SimpleAlertHandler(this);
 

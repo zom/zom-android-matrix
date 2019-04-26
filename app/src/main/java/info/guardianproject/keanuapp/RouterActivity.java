@@ -284,7 +284,7 @@ public class RouterActivity extends AppCompatActivity implements ICacheWordSubsc
         {
             showOnboarding();
 
-            MainActivity.showUpgradeMessage (this);
+
         }
 
     }

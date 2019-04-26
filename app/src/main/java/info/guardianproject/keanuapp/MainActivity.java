@@ -259,30 +259,9 @@ public class MainActivity extends BaseActivity {
         applyStyle();
 
 
-        showUpgradeMessage(this);
     }
 
-    public static void showUpgradeMessage (Activity activity) {
 
-        if (TextUtils.isEmpty(Preferences.getValue("showUpgradeMessage"))) {
-
-            android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(activity).create();
-            alertDialog.setTitle(R.string.welcome_message);
-            alertDialog.setMessage(activity.getString(R.string.upgrade_message));
-            alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, activity.getString(R.string.ok),
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
-
-            PreferenceManager.getDefaultSharedPreferences(activity).edit().putString("showUpgradeMessage","false").commit();
-
-        }
-
-
-    }
 
     private void installRingtones ()
     {
@@ -382,6 +361,7 @@ public class MainActivity extends BaseActivity {
 
 
         handleIntent(getIntent());
+
 
     }
 
@@ -517,6 +497,11 @@ public class MainActivity extends BaseActivity {
               long accountId = intent.getLongExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT,mApp.getDefaultAccountId());
 
               startChat(providerId, accountId, username, true);
+
+          }
+            else if (intent.getBooleanExtra("firstTime",false))
+          {
+              inviteContact ();
 
           }
 

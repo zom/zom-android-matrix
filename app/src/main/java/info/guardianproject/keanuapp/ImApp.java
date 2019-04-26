@@ -754,10 +754,9 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
     public boolean setDefaultAccount (long providerId, long accountId, String username, String nickname)
     {
-        mDefaultProviderId = providerId;
-        mDefaultAccountId = accountId;
-        mDefaultUsername = username;
         mDefaultNickname = nickname;
+        mDefaultUsername = username;
+        setDefaultAccount (providerId, accountId);
         return true;
     }
 
@@ -765,6 +764,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
     {
         mDefaultProviderId = providerId;
         mDefaultAccountId = accountId;
+        settings.edit().putLong("defaultAccountId",mDefaultAccountId).commit();
 
         final Uri uri = Imps.Provider.CONTENT_URI_WITH_ACCOUNT;
         String[] PROVIDER_PROJECTION = {
@@ -784,21 +784,17 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
         if (cursorProviders != null && cursorProviders.getCount() > 0) {
             cursorProviders.moveToFirst();
-            mDefaultProviderId = cursorProviders.getLong(0);
-            mDefaultAccountId = cursorProviders.getLong(1);
             mDefaultUsername = cursorProviders.getString(2);
             mDefaultNickname = cursorProviders.getString(3);
 
-            settings.edit().putLong("defaultAccountId",mDefaultAccountId).commit();
-
             Cursor pCursor = getContentResolver().query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(mDefaultProviderId)}, null);
 
-            Imps.ProviderSettings.QueryMap settings = new Imps.ProviderSettings.QueryMap(
+            Imps.ProviderSettings.QueryMap settingsProvider = new Imps.ProviderSettings.QueryMap(
                     pCursor, getContentResolver(), mDefaultProviderId, false /* don't keep updated */, null /* no handler */);
 
-            mDefaultUsername = '@' + mDefaultUsername + ':' + settings.getDomain();
+            mDefaultUsername = '@' + mDefaultUsername + ':' + settingsProvider.getDomain();
 
-            settings.close();
+            settingsProvider.close();
             cursorProviders.close();
 
             return true;
