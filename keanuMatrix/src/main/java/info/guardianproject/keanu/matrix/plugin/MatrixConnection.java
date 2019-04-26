@@ -365,65 +365,10 @@ public class MatrixConnection extends ImConnection {
 
     private void checkAccount (String password, LoginListener listener)
     {
-        android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-
-        String username = mUser.getAddress().getUser();
-        setState(ImConnection.LOGGING_IN, null);
-
         if (password == null)
             password = Imps.Account.getPassword(mContext.getContentResolver(), mAccountId);
 
-        mLoginRestClient.loginWithUser(username, password, mDeviceName, mDeviceId, new SimpleApiCallback<Credentials>() {
-
-            @Override
-            public void onSuccess(Credentials credentials) {
-
-                if (listener != null)
-                    listener.onLoginSuccess();
-
-                mLoginRestClient.logout(new SimpleApiCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-
-                    }
-                });
-            }
-
-
-            @Override
-            public void onNetworkError(Exception e) {
-                super.onNetworkError(e);
-
-                debug("loginWithUser: OnNetworkError", e);
-
-                if (listener != null)
-                    listener.onLoginFailed(e.getMessage());
-
-            }
-
-            @Override
-            public void onMatrixError(MatrixError e) {
-                super.onMatrixError(e);
-
-                if (listener != null)
-                    listener.onLoginFailed(e.getMessage());
-
-                debug("loginWithUser: onMatrixError: " + e.mErrorBodyAsString);
-
-            }
-
-            @Override
-            public void onUnexpectedError(Exception e) {
-                super.onUnexpectedError(e);
-
-                debug("loginWithUser: onUnexpectedError", e);
-                if (listener != null)
-                    listener.onLoginFailed(e.getMessage());
-
-
-            }
-        });
-
+        loginAsync(password, listener);
     }
 
     private void loginAsync (String password, LoginListener listener)
@@ -470,6 +415,9 @@ public class MatrixConnection extends ImConnection {
             mConfig.setCredentials(mCredentials);
 
             initSession (enableEncryption, initialToken);
+
+            if (listener != null)
+                listener.onLoginSuccess();
         }
         else {
             mLoginRestClient.loginWithUser(username, password, mDeviceName, mDeviceId, new SimpleApiCallback<Credentials>() {
@@ -610,31 +558,34 @@ public class MatrixConnection extends ImConnection {
     @Override
     public void logoutAsync() {
 
-
-        logout();
+        logout(false);
     }
 
     @Override
-    public void logout() {
+    public void logout(boolean fullLogout) {
 
 
         setState(ImConnection.LOGGING_OUT, null);
 
-        if (mSession.isAlive()) {
-
+        if (fullLogout)
+        {
             mSession.stopEventStream();
             mSession.isOnline();
+            mSession.logout(mContext,new BasicApiCallback("loggout full"));
+            String username = mUser.getAddress().getUser();
+            File fileCredsJson = new File("/" + username + "/creds.json");
+            if (fileCredsJson.exists())
+                fileCredsJson.delete();
+            
+
+        }
+        else if (mSession.isAlive()) {
+
+            //we don't do a full logout here, since "logout" in Keanu parlance is just going offline
+            mSession.stopEventStream();
+            mSession.setIsOnline(false);
             setState(ImConnection.DISCONNECTED, null);
 
-            /**
-            mSession.logout(mContext, new SimpleApiCallback<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-
-                    setState(ImConnection.DISCONNECTED, null);
-
-                }
-            });**/
         }
         else
         {
@@ -909,7 +860,6 @@ public class MatrixConnection extends ImConnection {
             updateGroupMembers(room, group, false);
 
 
-
         }
     }
 
@@ -985,6 +935,8 @@ public class MatrixConnection extends ImConnection {
 
         public void run() {
 
+            ArrayList<String> userList = new ArrayList<>();
+
             final PowerLevels powerLevels = room.getState().getPowerLevels();
 
             group.beginMemberUpdates();
@@ -992,6 +944,7 @@ public class MatrixConnection extends ImConnection {
             for (RoomMember member : members) {
                 debug("RoomMember: " + room.getRoomId() + ": " + member.getName() + " (" + member.getUserId() + ")");
 
+                userList.add(member.getUserId());
                 Contact contact = mContactListManager.getContact(member.getUserId());
 
                 if (contact == null) {
@@ -1037,6 +990,11 @@ public class MatrixConnection extends ImConnection {
 
             group.endMemberUpdates();
 
+
+            if (room.isEncrypted())
+                mDataHandler.getCrypto().ensureOlmSessionsForUsers(userList,new BasicApiCallback("ensureOlmSessions"));
+
+
         }
     };
 
@@ -1050,6 +1008,8 @@ public class MatrixConnection extends ImConnection {
 
                 if (!csa.getUseEncryption() == isEncrypted)
                     csa.updateEncryptionState(isEncrypted);
+
+
             }
         }
     }
