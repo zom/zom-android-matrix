@@ -2513,7 +2513,7 @@ public class Imps {
         return result;
     }
 
-    public static int updateConfirmInDb(ContentResolver resolver, long threadId, String msgId, boolean isDelivered, boolean wasEncrypted) {
+    public static int updateConfirmInDb(ContentResolver resolver, long chatId, String msgId, boolean isDelivered, boolean wasEncrypted) {
 
 
         Builder builder = Messages.OTR_MESSAGES_CONTENT_URI_BY_PACKET_ID.buildUpon();
@@ -2521,7 +2521,7 @@ public class Imps {
 
         ContentValues values = new ContentValues(1);
         values.put(Messages.IS_DELIVERED, isDelivered);
-        values.put(Messages.THREAD_ID,threadId);
+        values.put(Messages.THREAD_ID,chatId);
 
         if (Imps.messageExists(resolver,msgId, MessageType.QUEUED)) {
             if (wasEncrypted)
@@ -2540,6 +2540,58 @@ public class Imps {
         }
 
         return result;
+    }
+
+    public static int updateAllConfirmInDb(ContentResolver resolver, long threadId, String packetId, boolean isDelivered, boolean wasEncrypted) {
+
+        int internalMsgId = getInternalMessageId(resolver, packetId);
+
+        if (internalMsgId != -1) {
+            Builder builder = Messages.OTR_MESSAGES_CONTENT_URI_BY_THREAD_ID.buildUpon();
+            builder.appendPath(threadId+"");
+
+            ContentValues values = new ContentValues(1);
+            values.put(Messages.IS_DELIVERED, isDelivered);
+            values.put(Messages.THREAD_ID,threadId);
+
+            String where = Messages._ID + "<=" + internalMsgId + " AND " + Messages.IS_DELIVERED + "=0";
+            String[] selArgs = null;
+
+            int result = resolver.update(builder.build(), values, where, selArgs);
+
+            if (result == 0) {
+                builder = Messages.CONTENT_URI_MESSAGES_BY_THREAD_ID.buildUpon();
+                builder.appendPath(threadId+"");
+                result = resolver.update(builder.build(), values, where, selArgs);
+            }
+
+            return result;
+        }
+
+        return 0;
+    }
+
+    public static int getInternalMessageId (ContentResolver resolver, String id)
+    {
+
+        int msgId = -1;
+
+        Builder builder = Messages.OTR_MESSAGES_CONTENT_URI_BY_PACKET_ID.buildUpon();
+        builder.appendPath(id);
+        String[] projection = {Messages._ID};
+        Cursor c = resolver.query(builder.build(),projection, null, null, null);
+        if (c != null)
+        {
+            if (c.getCount() > 0) {
+                c.moveToFirst();
+                msgId = c.getInt(0);
+            }
+
+            c.close();
+
+        }
+
+        return msgId;
     }
 
     public static boolean messageExists (ContentResolver resolver, String id)

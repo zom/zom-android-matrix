@@ -1081,6 +1081,45 @@ public class MatrixConnection extends ImConnection {
                 mExecutor.execute(() -> handlePresence(event));
 
             }
+            else if (event.getType().equals(Event.EVENT_TYPE_READ_MARKER))
+            {
+                debug ("READ MARKER: from=" + event.getSender() + ": " + event.getContent());
+
+                /**
+                 * {
+                 * "age" : null,
+                 * "content": {
+                 * "$155369867390511tYryz:matrix.org": {"m.read":{"@earthmouse:matrix.org":{"ts":1553698822615}}},
+                 * },
+                 * "eventId": "null",
+                 * "originServerTs": 0,
+                 * "roomId": "!gvfFCZAYqQKjvlnWcn:matrix.org",
+                 * "type": "m.receipt",
+                 * "userId": "null",
+                 * "sender": "null",
+                 * }
+                 */
+
+                if (event.getContent().getAsJsonObject() != null) {
+                    Iterator<String> it = event.getContent().getAsJsonObject().keySet().iterator();
+                    while (it.hasNext()) {
+                        String eventId = it.next();
+                        if (event.getContent().getAsJsonObject().getAsJsonObject(eventId).has("m.read")) {
+                            String userId = event.getContent().getAsJsonObject().getAsJsonObject(eventId).getAsJsonObject("m.read").keySet().iterator().next();
+
+                            ChatSession session = mChatSessionManager.getSession(event.roomId);
+                            if (session != null) {
+                                if (!userId.equals(mSession.getMyUserId())) {
+                                    session.onMessageReceipt(eventId, session.useEncryption());
+                                } else {
+                                    mChatSessionManager.getChatSessionAdapter(event.roomId).markAsRead();
+                                }
+                            }
+                        }
+
+                    }
+                }
+            }
             else if (event.getType().equals(Event.EVENT_TYPE_RECEIPT))
             {
                 debug ("RECEIPT: from=" + event.getSender() + ": " + event.getContent());
@@ -1375,7 +1414,7 @@ public class MatrixConnection extends ImConnection {
                 for (String userId : list) {
                     //userId who got the room receipt
                     ReceiptData data = mStore.getReceipt(roomId, userId);
-                    session.onMessageReceipt(data.eventId, session.useEncryption());
+                    session.onMessageReadMarker(data.eventId, session.useEncryption());
 
 
                 }

@@ -91,7 +91,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                                                              + Imps.MessageType.OUTGOING;
 
     /** The registered remote listeners. */
-    final RemoteCallbackList<IChatListener> mRemoteListeners = new RemoteCallbackList<IChatListener>();
+  //  final RemoteCallbackList<IChatListener> mRemoteListeners = new RemoteCallbackList<IChatListener>();
+    final ArrayList<IChatListener> mRemoteListeners = new ArrayList<>();
 
     ImConnectionAdapter mConnection;
     ChatSessionManagerAdapter mChatSessionManager;
@@ -772,7 +773,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     public void registerChatListener(IChatListener listener) {
         if (listener != null) {
-            mRemoteListeners.register(listener);
+            mRemoteListeners.add(listener);
 
             if (mDataHandlerListener != null)
                 mDataHandlerListener.checkLastTransferRequest ();
@@ -784,7 +785,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     public void unregisterChatListener(IChatListener listener) {
         if (listener != null) {
-            mRemoteListeners.unregister(listener);
+            mRemoteListeners.remove(listener);
 
             if (mGroup != null)
                 mGroup.removeMemberListener(mListenerAdapter);
@@ -1317,31 +1318,28 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 return false; //couldn't write to database
             }
 
-            int max = 3;
-            int n = 0;
 
-            while (n++ < max) {
-                try {
+            try {
 
-                    int N = mRemoteListeners.beginBroadcast();
-                    for (int i = 0; i < N; i++) {
-                        IChatListener listener = mRemoteListeners.getBroadcastItem(i);
-                        try {
-                            wasMessageSeen = listener.onIncomingMessage(ChatSessionAdapter.this, msg);
-                        } catch (RemoteException e) {
-                            // The RemoteCallbackList will take care of removing the
-                            // dead listeners.
-                        }
+              //  int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
+                    try {
+                        wasMessageSeen = listener.onIncomingMessage(ChatSessionAdapter.this, msg);
+                    } catch (RemoteException e) {
+                        // The RemoteCallbackList will take care of removing the
+                        // dead listeners.
                     }
-                    mRemoteListeners.finishBroadcast();
-
-                    break;
-                } catch (Exception e) {
-                    Log.w(TAG, "error notifying of new messages", e);
-                    try { Thread.sleep(500);}catch(Exception e2){}//wait for broadcast to be over
-
                 }
+
+            } catch (Exception e) {
+                Log.w(TAG, "error notifying of new messages", e);
+
             }
+            finally{
+             // mRemoteListeners.finishBroadcast();
+            }
+
 
 
 
@@ -1389,9 +1387,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     error.getCode(), null, null, msg.getReplyId());
 
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+            //    final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onSendMessageError(ChatSessionAdapter.this, msg, error);
                     } catch (RemoteException e) {
@@ -1399,7 +1397,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+             //   mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
@@ -1416,9 +1414,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
                 try {
 
-                    final int N = mRemoteListeners.beginBroadcast();
-                    for (int i = 0; i < N; i++) {
-                        IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+                  //  final int N = mRemoteListeners.beginBroadcast();
+                    for (int i = 0; i < mRemoteListeners.size(); i++) {
+                        IChatListener listener = mRemoteListeners.get(i);
                         try {
                             listener.onGroupSubjectChanged(ChatSessionAdapter.this);
                         } catch (RemoteException e) {
@@ -1426,7 +1424,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                             // dead listeners.
                         }
                     }
-                    mRemoteListeners.finishBroadcast();
+               //     mRemoteListeners.finishBroadcast();
 
                 }
                 catch (Exception e){}
@@ -1441,9 +1439,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             insertGroupMemberInDb(contact);
 
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+             //   final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onContactJoined(ChatSessionAdapter.this, contact);
                     } catch (RemoteException e) {
@@ -1451,7 +1449,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+             //   mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
@@ -1460,9 +1458,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         public void onMemberRoleChanged(ChatGroup chatGroup, Contact contact, String role, String affiliation) {
             updateGroupMemberRoleAndAffiliationInDb(contact, role, affiliation);
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+            //    final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onContactRoleChanged(ChatSessionAdapter.this, contact);
                     } catch (RemoteException e) {
@@ -1470,7 +1468,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+               // mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
@@ -1479,9 +1477,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             deleteGroupMemberInDb(contact);
 
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+            //    final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onContactLeft(ChatSessionAdapter.this, contact);
                     } catch (RemoteException e) {
@@ -1489,7 +1487,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+               // mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
@@ -1497,9 +1495,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         public void onError(ChatGroup group, final ImErrorInfo error) {
             // TODO: insert an error message?
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+                //final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onInviteError(ChatSessionAdapter.this, error);
                     } catch (RemoteException e) {
@@ -1507,16 +1505,16 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+               // mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
 
         public void notifyChatSessionConverted() {
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+               // final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onConvertedToGroupChat(ChatSessionAdapter.this);
                     } catch (RemoteException e) {
@@ -1524,7 +1522,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+             //   mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
@@ -1532,6 +1530,11 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         @Override
         public void onIncomingReceipt(ChatSession ses, String id, boolean wasEncrypted) {
             Imps.updateConfirmInDb(mContentResolver, mContactId, id, true, wasEncrypted);
+        }
+
+        @Override
+        public void onIncomingReadMarker(ChatSession ses, String id, boolean wasEncrypted) {
+            Imps.updateAllConfirmInDb(mContentResolver, mContactId, id, true, wasEncrypted);
         }
 
         @Override
@@ -1550,9 +1553,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         public void onBeginMemberUpdates(ChatGroup group) {
             beginGroupMemberUpdates(group);
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+               // final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onBeginMemberListUpdate(ChatSessionAdapter.this);
                     } catch (RemoteException e) {
@@ -1560,7 +1563,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+             //   mRemoteListeners.finishBroadcast();
 
             }
             catch (Exception e){}
@@ -1571,9 +1574,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             endGroupMemberUpdates(group);
             try {
 
-            final int N = mRemoteListeners.beginBroadcast();
-            for (int i = 0; i < N; i++) {
-                IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+           // final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                IChatListener listener = mRemoteListeners.get(i);
                 try {
                     listener.onEndMemberListUpdate(ChatSessionAdapter.this);
                 } catch (RemoteException e) {
@@ -1581,7 +1584,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     // dead listeners.
                 }
             }
-            mRemoteListeners.finishBroadcast();
+          //  mRemoteListeners.finishBroadcast();
 
             }
             catch (Exception e){}
@@ -1730,9 +1733,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         int N = 0;
 
                         try {
-                            N = mRemoteListeners.beginBroadcast();
-                            for (int i = 0; i < N; i++) {
-                                IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+                       //     N = mRemoteListeners.beginBroadcast();
+                            for (int i = 0; i < mRemoteListeners.size(); i++) {
+                                IChatListener listener = mRemoteListeners.get(i);
                                 try {
                                     listener.onIncomingFileTransferProgress(sanitizedPath, percent);
                                 } catch (RemoteException e) {
@@ -1740,7 +1743,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                                     // dead listeners.
                                 }
                             }
-                            mRemoteListeners.finishBroadcast();
+                            //mRemoteListeners.finishBroadcast();
                         }
                         catch (Exception e){}
 
@@ -1774,9 +1777,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             String sanitizedPath = SystemServices.sanitize(path[path.length - 1]);
 
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+              //  final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onIncomingFileTransferError(sanitizedPath, reason);
                     } catch (RemoteException e) {
@@ -1784,7 +1787,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+             //   mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
@@ -1799,9 +1802,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
             try
             {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+               // final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onIncomingFileTransferProgress(sanitizedPath, percent);
                     } catch (RemoteException e) {
@@ -1816,7 +1819,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             }
             finally
             {
-                mRemoteListeners.finishBroadcast();
+               // mRemoteListeners.finishBroadcast();
             }
         }
 
@@ -1854,12 +1857,12 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             {
                 try
                 {
-                    final int N = mRemoteListeners.beginBroadcast();
+                 //   final int N = mRemoteListeners.beginBroadcast();
 
-                    if (N > 0)
+                    if (mRemoteListeners.size() > 0)
                     {
-                        for (int i = 0; i < N; i++) {
-                            IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+                        for (int i = 0; i < mRemoteListeners.size(); i++) {
+                            IChatListener listener = mRemoteListeners.get(i);
                             try {
                                 listener.onIncomingFileTransfer(from, transferUrl);
                             } catch (RemoteException e) {
@@ -1882,7 +1885,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 }
                 finally
                 {
-                    mRemoteListeners.finishBroadcast();
+                   // mRemoteListeners.finishBroadcast();
                 }
 
                 mAcceptTransfer = false; //for now, wait for the user callback
@@ -1899,9 +1902,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     public synchronized void setContactTyping (Contact contact, boolean isTyping)
     {
         try {
-            int N = mRemoteListeners.beginBroadcast();
-            for (int i = 0; i < N; i++) {
-                IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+           // int N = mRemoteListeners.beginBroadcast();
+            for (int i = 0; i < mRemoteListeners.size(); i++) {
+                IChatListener listener = mRemoteListeners.get(i);
                 try {
                     listener.onContactTyping(ChatSessionAdapter.this, contact, isTyping);
                 } catch (RemoteException e) {
@@ -1909,7 +1912,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     // dead listeners.
                 }
             }
-            mRemoteListeners.finishBroadcast();
+        //    mRemoteListeners.finishBroadcast();
         }
         catch (IllegalStateException ise)
         {
