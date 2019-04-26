@@ -608,7 +608,7 @@ public class OnboardingActivity extends BaseActivity {
                                 mNewAccount = account;
 
                                 ImApp mApp = (ImApp)getApplication();
-                                mApp.setDefaultAccount(account.providerId,account.accountId);
+                                mApp.setDefaultAccount(account.providerId,account.accountId,account.username,account.nickname);
 
                                 mOnboardingHandler.post(new Runnable ()
                                 {
@@ -761,7 +761,7 @@ public class OnboardingActivity extends BaseActivity {
                     mUsername = "@" + account.username + ":" + account.domain;
 
                     ImApp mApp = (ImApp) getApplication();
-                    mApp.setDefaultAccount(account.providerId, account.accountId);
+                    mApp.setDefaultAccount(account.providerId, account.accountId, username, username);
 
                     SignInHelper signInHelper = new SignInHelper(OnboardingActivity.this, mHandler);
                     signInHelper.activateAccount(account.providerId, account.accountId);

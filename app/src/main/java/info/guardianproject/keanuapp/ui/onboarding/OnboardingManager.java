@@ -138,7 +138,7 @@ public class OnboardingManager {
 
             //this is an invite link like this: https://zom.im/i/#@earthmouse:matrix.org
             try {
-                String matrixContact = link.substring(link.lastIndexOf("@")+1);
+                String matrixContact = link.substring(link.lastIndexOf("@"));
 
                 diLink = new DecodedInviteLink();
                 diLink.username = matrixContact;
@@ -202,7 +202,7 @@ public class OnboardingManager {
 
             //this is an invite link like this: https://matrix.to/#/@n8fr8:matrix.org
             try {
-                String matrixContact = link.substring(link.lastIndexOf("@")+1);
+                String matrixContact = link.substring(link.lastIndexOf("@"));
 
                 diLink = new DecodedInviteLink();
                 diLink.username = matrixContact;
@@ -217,7 +217,7 @@ public class OnboardingManager {
 
             //this is an invite link like this: https://matrix.to/#/@n8fr8:matrix.org
             try {
-                String matrixContact = link.substring(link.lastIndexOf("id=")+4);
+                String matrixContact = link.substring(link.lastIndexOf("id=")+3);
                 diLink = new DecodedInviteLink();
                 diLink.username = matrixContact;
 
@@ -361,7 +361,7 @@ public class OnboardingManager {
             }
 
             settings.requery();
-
+            settings.close();
 
             if (Looper.myLooper() == null)
                 Looper.prepare();
@@ -412,7 +412,6 @@ public class OnboardingManager {
 
         }
 
-        settings.close();
 
 
     }

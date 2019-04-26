@@ -752,6 +752,14 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         ImPluginHelper.getInstance(this).loadAvailablePlugins();
     }
 
+    public boolean setDefaultAccount (long providerId, long accountId, String username, String nickname)
+    {
+        mDefaultProviderId = providerId;
+        mDefaultAccountId = accountId;
+        mDefaultUsername = username;
+        mDefaultNickname = nickname;
+        return true;
+    }
 
     public boolean setDefaultAccount (long providerId, long accountId)
     {
