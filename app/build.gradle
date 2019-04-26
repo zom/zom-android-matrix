@@ -60,8 +60,8 @@ android {
          altbrand {
              dimension "release"
 	         applicationId "im.zom.messenger"
-             versionCode 2000012
-             versionName "2.0.0-RC-12"
+             versionCode 2000013
+             versionName "2.0.0-RC-13"
          }
 
      }
