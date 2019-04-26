@@ -252,7 +252,7 @@ public class DeviceDisplayActivity extends BaseActivity {
 
                                 deviceDisplay.deviceName = st.nextToken();
                                 deviceDisplay.deviceId = st.nextToken();
-                                deviceDisplay.deviceFingerprint = prettyPrintFingerprint(st.nextToken());
+                                deviceDisplay.deviceFingerprint = prettyPrintFingerprint(st.nextToken() + " ");
                                 deviceDisplay.isVerified = Boolean.parseBoolean(st.nextToken());
 
                                 mDevices.add(deviceDisplay);

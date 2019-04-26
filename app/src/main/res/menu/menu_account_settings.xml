@@ -3,10 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
-
+<!--
     <item
         android:id="@+id/menu_migrate"
         android:title="@string/migrate_menu"
+        app:showAsAction="never" />
+-->
+
+    <item
+        android:id="@+id/menu_refresh"
+        android:title="@string/menu_refresh"
         app:showAsAction="never" />
 
     <item

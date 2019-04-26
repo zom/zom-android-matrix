@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -85,6 +86,7 @@ import info.guardianproject.keanu.core.util.ImPluginHelper;
 import info.guardianproject.keanu.core.util.Languages;
 import info.guardianproject.keanuapp.tasks.MigrateAccountTask;
 
+import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_DEVICE_NAME;
 import static info.guardianproject.keanu.core.KeanuConstants.IMPS_CATEGORY;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.NOTIFICATION_CHANNEL_ID_MESSAGE;
@@ -491,6 +493,31 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
                 mQueue.add(msg);
             }
         }
+    }
+
+    public static void refreshAccount (ContentResolver resolver, long accountId, long providerId)
+    {
+
+        IImConnection conn = getConnection(providerId, accountId);
+
+        try {
+            conn.logout(true);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        String newDeviceId =  DEFAULT_DEVICE_NAME + "-"
+                + UUID.randomUUID().toString().substring(0, 8);
+
+        Cursor cursor = resolver.query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(providerId)}, null);
+
+        Imps.ProviderSettings.QueryMap providerSettings = new Imps.ProviderSettings.QueryMap(
+                cursor, resolver, providerId, false, null);
+
+        providerSettings.setDeviceName(newDeviceId);
+        providerSettings.close();
+        cursor.close();
+
     }
 
     public static void deleteAccount (ContentResolver resolver, long accountId, long providerId)

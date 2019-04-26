@@ -87,7 +87,7 @@ public class SignoutActivity extends ThemeableActivity {
 
             IImConnection conn = RemoteImService.getConnection(providerId,accountId);
             if (conn != null) {
-                conn.logout();
+                conn.logout(false);
             } else {
                 // Normally, we can always get the connection when user chose to
                 // sign out. However, if the application crash unexpectedly, the
