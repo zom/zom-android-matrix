@@ -13,3 +13,4 @@ local.properties
 gradle.properties
 releases/*
 app/release/*
+app/primary/*

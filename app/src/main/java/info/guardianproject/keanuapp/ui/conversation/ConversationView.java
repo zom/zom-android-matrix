@@ -1169,6 +1169,7 @@ public class ConversationView {
     public void startListening() {
 
         mIsListening = true;
+        checkConnection ();
 
         registerChatListener();
         registerForConnEvents();
@@ -1979,42 +1980,58 @@ public class ConversationView {
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
             log("registerChatListener " + mLastChatId);
         }
-        try {
 
+        getChatSession(new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                try {
+                    mCurrentChatSession.registerChatListener(mChatListener);
 
-            if (getChatSession() != null) {
-                getChatSession().registerChatListener(mChatListener);
+                    if (mConn != null)
+                    {
+                        IContactListManager listMgr = mConn.getContactListManager();
+                        listMgr.registerContactListListener(mContactListListener);
+                    }
+
+                } catch (RemoteException e) {
+                    Log.w(LOG_TAG, "<ChatView> registerChatListener fail:" + e.getMessage());
+                }
+
+                return null;
             }
 
-            if (mConn != null)
-            {
-                IContactListManager listMgr = mConn.getContactListManager();
-                listMgr.registerContactListListener(mContactListListener);
+        });
 
-            }
-
-        } catch (Exception e) {
-            Log.w(LOG_TAG, "<ChatView> registerChatListener fail:" + e.getMessage());
-        }
     }
 
     void unregisterChatListener() {
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
             log("unregisterChatListener " + mLastChatId);
         }
-        try {
-            if (getChatSession() != null) {
-                getChatSession().unregisterChatListener(mChatListener);
+
+
+        getChatSession(new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                try {
+                    mCurrentChatSession.unregisterChatListener(mChatListener);
+
+                    if (mConn != null) {
+                        IContactListManager listMgr = mConn.getContactListManager();
+                        listMgr.unregisterContactListListener(mContactListListener);
+
+                    }
+
+                } catch (RemoteException e) {
+                    Log.w(LOG_TAG, "<ChatView> registerChatListener fail:" + e.getMessage());
+                }
+
+                return null;
             }
 
-            if (mConn != null) {
-                IContactListManager listMgr = mConn.getContactListManager();
-                listMgr.unregisterContactListListener(mContactListListener);
+        });
 
-            }
-        } catch (Exception e) {
-            Log.w(LOG_TAG, "<ChatView> unregisterChatListener fail:" + e.getMessage());
-        }
+
     }
 
     void updateWarningView() {

@@ -2,7 +2,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.3.21'
+    ext.kotlin_version = '1.3.31'
 
     repositories {
         google()
@@ -27,8 +27,8 @@ allprojects {
         maven { url "https://raw.githubusercontent.com/guardianproject/gpmaven/master" }
     }
     project.ext {
-        keanuLibsVersionCode=128
-        keanuLibsVersion="0.0.1.28"
+        keanuLibsVersionCode=130
+        keanuLibsVersion="0.0.1.30"
     }
 }
 

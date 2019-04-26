@@ -214,7 +214,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
                 setKeepSignedIn(mAccountId, false);
 
                 if (loggedInToOldAccount)
-                    mConn.logout();
+                    mConn.logout(true);
 
                 return mNewAccount;
 
