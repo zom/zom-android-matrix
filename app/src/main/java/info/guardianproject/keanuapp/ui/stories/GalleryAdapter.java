@@ -3,10 +3,17 @@ package info.guardianproject.keanuapp.ui.stories;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.MediaCodec;
+import android.media.MediaExtractor;
+import android.media.MediaFormat;
+import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -15,12 +22,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.RequiresApi;
+
 import java.io.File;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
 import info.guardianproject.keanuapp.ui.widgets.GlideUtils;
 import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
+import info.guardianproject.keanuapp.ui.widgets.VisualizerView;
+
+import static android.media.MediaFormat.KEY_CHANNEL_COUNT;
+import static android.media.MediaFormat.KEY_SAMPLE_RATE;
 
 /**
  * Created by N-Pex on 2019-04-12.
@@ -83,15 +100,14 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                 String mimeType = (mimeTypeColumn >= 0) ? cursor.getString(mimeTypeColumn) : "";
                 switch (mediaType) {
                     case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-                        holder.imageView.setImageBitmap(ThumbnailUtils.createVideoThumbnail(
-                                uri.getPath(), MediaStore.Video.Thumbnails.MINI_KIND));
+                        new ThumbnailLoader(context, holder, mediaType, uri).execute();
                         break;
                     case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
                         GlideUtils.loadImageFromUri(context, uri, holder.imageView);
                         break;
 
                     case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
-                        holder.imageView.setImageResource(R.drawable.ic_audiotrack_white_24dp);
+                        new ThumbnailLoader(context, holder, mediaType, uri).execute();
                         break;
                 }
 
@@ -222,6 +238,61 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                 if (LOGGING)
                     Log.v(LOGTAG, "LoadCursorTask: finished");
                 changeCursor(cursor);
+            }
+        }
+    }
+
+    private static class ThumbnailLoader extends AsyncTask <Void, Void, Bitmap> {
+        private final int mediaType;
+        private final Uri uri;
+        WeakReference<Context> _context;
+        WeakReference<GalleryViewHolder> _owner;
+
+        ThumbnailLoader(Context context, GalleryViewHolder owner, int mediaType, Uri uri) {
+            _context = new WeakReference<Context>(context);
+            _owner = new WeakReference<GalleryViewHolder>(owner);
+            this.mediaType = mediaType;
+            this.uri = uri;
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... voids) {
+            switch (mediaType) {
+                case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
+                    return ThumbnailUtils.createVideoThumbnail(
+                            uri.getPath(), MediaStore.Video.Thumbnails.MINI_KIND);
+                case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
+                    Context context = _context.get();
+                    if (context != null) {
+                        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+                        byte[] rawArt;
+                        BitmapFactory.Options bfo = new BitmapFactory.Options();
+
+                        mmr.setDataSource(context, uri);
+                        rawArt = mmr.getEmbeddedPicture();
+                        if (null != rawArt) {
+                            return BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+                        }
+                    }
+                    break;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap result) {
+            super.onPostExecute(result);
+            GalleryViewHolder owner = _owner.get();
+            if (owner != null) {
+                if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO) {
+                    if (result == null) {
+                        owner.imageView.setImageResource(R.drawable.ic_audiotrack_white_24dp);
+                    } else {
+                        owner.imageView.setImageBitmap(result);
+                    }
+                } else {
+                    owner.imageView.setImageBitmap(result);
+                }
             }
         }
     }

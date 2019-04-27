@@ -300,6 +300,7 @@
             android:windowSoftInputMode="stateHidden|adjustPan" />
         <activity android:name=".ui.conversation.AddUpdateMediaActivity"
             android:theme="@style/AppThemeNoAction"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="false" />
         <activity android:name=".ui.stories.StoryGalleryActivity"
             android:theme="@style/AppThemeNoAction"

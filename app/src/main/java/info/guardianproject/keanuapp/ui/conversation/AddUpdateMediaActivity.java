@@ -16,6 +16,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,7 +24,9 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -38,6 +41,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -46,12 +50,14 @@ import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.camera.CameraActivity;
 import info.guardianproject.keanuapp.ui.stories.GalleryAdapter;
 import info.guardianproject.keanuapp.ui.stories.StoryGalleryActivity;
+import info.guardianproject.keanuapp.ui.widgets.AudioRecorder;
 import info.guardianproject.keanuapp.ui.widgets.GlideUtils;
 import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
 import info.guardianproject.keanuapp.ui.widgets.PopupDialog;
 import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
+import info.guardianproject.keanuapp.ui.widgets.VisualizerView;
 
-public class AddUpdateMediaActivity extends CameraActivity implements GalleryAdapter.GalleryAdapterListener {
+public class AddUpdateMediaActivity extends CameraActivity implements GalleryAdapter.GalleryAdapterListener, AudioRecorder.AudioRecorderListener {
 
     private static final int REQUEST_CODE_GALLERY = 1;
     private static final int REQUEST_CODE_READ_PERMISSIONS = 2;
@@ -67,8 +73,10 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     private View sendButton;
     private ImageView previewPhoto;
     private SimpleExoPlayerView previewVideo;
+    private VisualizerView previewAudio;
     private SimpleExoPlayer exoPlayer;
     private ProgressBar progressBar;
+    private AudioRecorder audioRecorder;
 
     private ArrayList<MediaInfo> addedMedia = new ArrayList<>();
 
@@ -140,8 +148,17 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
         microphoneButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                microphoneButtonLongPressed();
+                captureAudioStart();
                 return true;
+            }
+        });
+        microphoneButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (audioRecorder != null && audioRecorder.isAudioRecording() && (event.getActionMasked() == MotionEvent.ACTION_UP || event.getActionMasked() == MotionEvent.ACTION_CANCEL)) {
+                    captureAudioStop(); // Stop!
+                }
+                return false;
             }
         });
 
@@ -156,6 +173,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
 
         previewPhoto = findViewById(R.id.previewPhoto);
         previewVideo = findViewById(R.id.previewVideo);
+        previewAudio = findViewById(R.id.previewAudio);
 
         progressBar = findViewById(R.id.progress_circular);
 
@@ -316,38 +334,48 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
             bottomSheet.setVisibility(View.GONE);
             sendButton.setVisibility(addedMedia.size() > 0 ? View.VISIBLE : View.GONE);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);
+            mCameraView.close();
+            mCameraView.setVisibility(View.GONE);
+
             MediaInfo addedPhoto = addedPhoto();
             if (addedPhoto != null) {
-                mCameraView.close();
-                mCameraView.setVisibility(View.GONE);
                 previewPhoto.setVisibility(View.VISIBLE);
                 GlideUtils.loadImageFromUri(this, addedPhoto.uri, previewPhoto);
             } else {
                 previewPhoto.setVisibility(View.GONE);
             }
+
             MediaInfo addedVideo = addedVideo();
             if (addedVideo != null) {
-                mCameraView.close();
-                mCameraView.setVisibility(View.GONE);
                 previewVideo.setVisibility(View.VISIBLE);
                 showVideoPreview(addedVideo);
             } else {
                 previewVideo.setVisibility(View.GONE);
             }
-
+            MediaInfo addedAudio = addedAudio();
+            if (addedAudio != null) {
+                previewVideo.setVisibility(View.VISIBLE);
+                previewAudio.setVisibility(View.VISIBLE);
+                showAudioPreview(addedAudio);
+            } else {
+                previewVideo.setVisibility(View.GONE);
+            }
         } else {
             if (exoPlayer != null) {
                 exoPlayer.setPlayWhenReady(false);
             }
             for (MediaInfo media : addedMedia) {
-                // TODO - delete from VFS!
+                releaseMedia(media);
             }
             addedMedia.clear();
             mCameraView.setVisibility(View.VISIBLE);
             mCameraView.open();
             previewPhoto.setVisibility(View.GONE);
             previewVideo.setVisibility(View.GONE);
+            previewAudio.setVisibility(View.GONE);
+            microphoneButton.setVisibility(View.VISIBLE);
             cameraButton.setVisibility(View.VISIBLE);
+            cameraFlipButton.setVisibility(View.VISIBLE);
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
             bottomSheet.setVisibility(View.VISIBLE);
             sendButton.setVisibility(View.GONE);
@@ -389,10 +417,27 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
         openGallery(StoryGalleryActivity.GALLERY_MODE_AUDIO);
     }
 
-    private void microphoneButtonLongPressed() {
+    private void captureAudioStart() {
         if (!hasShownMicPopup) {
             showMicPopup();
             return;
+        }
+
+        // Start recording!
+        if (audioRecorder == null) {
+            audioRecorder = new AudioRecorder(this, this);
+        } else if (audioRecorder.isAudioRecording()) {
+            audioRecorder.stopAudioRecording(true);
+        }
+        setViewerMode(true);
+        previewAudio.setVisibility(View.VISIBLE);
+        audioRecorder.setVisualizerView(previewAudio);
+        audioRecorder.startAudioRecording();
+    }
+
+    private void captureAudioStop() {
+        if (audioRecorder != null && audioRecorder.isAudioRecording()) {
+            audioRecorder.stopAudioRecording(false);
         }
     }
 
@@ -426,6 +471,15 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
         return null;
     }
 
+    private MediaInfo addedPdf() {
+        for (MediaInfo media : addedMedia) {
+            if (media.isPDF()) {
+                return media;
+            }
+        }
+        return null;
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -444,6 +498,28 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
         }
     }
 
+    private void updatePlayerPosition() {
+        previewAudio.removeCallbacks(updatePlayerPositionRunnable);
+        previewAudio.post(updatePlayerPositionRunnable);
+    }
+
+    private Runnable updatePlayerPositionRunnable = new Runnable() {
+        @Override
+        public void run() {
+            long duration = exoPlayer.getDuration();
+            long pos = exoPlayer.getCurrentPosition();
+            if (duration == 0) {
+                previewAudio.setPlayFraction(0);
+            } else {
+                previewAudio.setPlayFraction((float)pos / (float)duration);
+            }
+
+            if (exoPlayer.getPlaybackState() == Player.STATE_READY) {
+                previewAudio.post(updatePlayerPositionRunnable);
+            }
+        }
+    };
+
     private void showVideoPreview(MediaInfo mediaInfo) {
         // Had the player been setup?
         if (exoPlayer == null) {
@@ -455,6 +531,17 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
                     new DefaultTrackSelector(videoTrackSelectionFactory);
 
             exoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+            exoPlayer.addListener(new Player.EventListener() {
+                @Override
+                public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                    updatePlayerPosition();
+                }
+
+                @Override
+                public void onSeekProcessed() {
+                    updatePlayerPosition();
+                }
+            });
             //previewVideo.setUseController(true);
 
             // Bind the player to the view.
@@ -478,15 +565,50 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
         };
         MediaSource mediaSource = new ExtractorMediaSource(inputStreamDataSource.getUri(),
                 factory, new DefaultExtractorsFactory(), null, null);
-        LoopingMediaSource loopingSource = new LoopingMediaSource(mediaSource);
-        exoPlayer.prepare(loopingSource);
+
+        //LoopingMediaSource loopingSource = new LoopingMediaSource(mediaSource);
+        exoPlayer.prepare(mediaSource);
         exoPlayer.setPlayWhenReady(true); //run file/link when ready to play.
+    }
+
+    private void showAudioPreview(MediaInfo mediaInfo) {
+        previewAudio.loadAudioFile(mediaInfo.uri);
+        showVideoPreview(mediaInfo);
     }
 
     @Override
     public void onMediaItemClicked(MediaInfo mediaInfo) {
+        MediaInfo old = null;
+        if (mediaInfo.isImage()) {
+            old = addedPhoto();
+        } else if (mediaInfo.isAudio()) {
+            old = addedAudio();
+        } else if (mediaInfo.isVideo()) {
+            old = addedVideo();
+        } else if (mediaInfo.isPDF()) {
+            old = addedPdf();
+        }
+        if (old != null) {
+            addedMedia.remove(old);
+            releaseMedia(old);
+        }
         addedMedia.add(mediaInfo);
         setViewerMode(true);
+    }
+
+    private void releaseMedia(MediaInfo mediaInfo) {
+        // TODO - remove from VFS if stored!
+        if (mediaInfo.isAudio()) {
+            if (mediaInfo.uri.getPath().startsWith(getFilesDir().getPath())) {
+                // Local recording, delete!
+                new File(mediaInfo.uri.getPath()).delete();
+            }
+        }
+    }
+
+    @Override
+    public void onAudioRecorded(Uri uri) {
+        onMediaItemClicked(new MediaInfo(uri, "audio/mp4"));
     }
 
     public class GalleryOnerowItemDecoration extends RecyclerView.ItemDecoration {

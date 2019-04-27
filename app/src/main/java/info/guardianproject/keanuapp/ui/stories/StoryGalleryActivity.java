@@ -1,6 +1,7 @@
 package info.guardianproject.keanuapp.ui.stories;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
@@ -10,12 +11,15 @@ import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import info.guardianproject.keanu.core.Preferences;
@@ -36,7 +40,7 @@ public class StoryGalleryActivity extends AppCompatActivity implements GalleryAd
 
     private Toolbar toolbar;
     private TabLayout tabLayout;
-    private RecyclerView recyclerViewGallery;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,30 +58,30 @@ public class StoryGalleryActivity extends AppCompatActivity implements GalleryAd
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        viewPager = findViewById(R.id.viewPager);
+        viewPager.setOffscreenPageLimit(5);
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int i, float v, int i1) {
+
+            }
+
+            @Override
+            public void onPageSelected(int i) {
+                tabLayout.getTabAt(i).select();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int i) {
+
+            }
+        });
+
         tabLayout = findViewById(R.id.tabLayout);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if (recyclerViewGallery.getAdapter() != null && recyclerViewGallery.getAdapter() instanceof GalleryAdapter) {
-                    GalleryAdapter adapter = (GalleryAdapter)recyclerViewGallery.getAdapter();
-                    switch (tab.getPosition()) {
-                        case 1:
-                            adapter.setMediaType(GalleryAdapter.MediaType.Pdf);
-                            break;
-                        case 2:
-                            adapter.setMediaType(GalleryAdapter.MediaType.Image);
-                            break;
-                        case 3:
-                            adapter.setMediaType(GalleryAdapter.MediaType.Video);
-                            break;
-                        case 4:
-                            adapter.setMediaType(GalleryAdapter.MediaType.Audio);
-                            break;
-                        default:
-                            adapter.setMediaType(GalleryAdapter.MediaType.All);
-                            break;
-                    }
-                }
+                viewPager.setCurrentItem(tab.getPosition());
             }
 
             @Override
@@ -90,12 +94,7 @@ public class StoryGalleryActivity extends AppCompatActivity implements GalleryAd
 
             }
         });
-        recyclerViewGallery = findViewById(R.id.rvGallery);
-        int spanCount = 5;
-        GridLayoutManager llm = new GridLayoutManager(this, spanCount, GridLayoutManager.VERTICAL, false);
-        recyclerViewGallery.setLayoutManager(llm);
-        int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.story_contrib_gallery_padding);
-        recyclerViewGallery.addItemDecoration(new GalleryItemDecoration(spanCount, spacingInPixels, false));
+
         setGalleryAdapter();
 
         // Check for args to select one of the tabs
@@ -120,7 +119,7 @@ public class StoryGalleryActivity extends AppCompatActivity implements GalleryAd
                     REQUEST_CODE_READ_PERMISSIONS);
             return;
         }
-        recyclerViewGallery.setAdapter(new GalleryAdapter(this, this));
+        viewPager.setAdapter(new GalleryPagerAdapter());
     }
 
     @Override
@@ -140,5 +139,58 @@ public class StoryGalleryActivity extends AppCompatActivity implements GalleryAd
         resultData.putExtra(RESULT_SELECTED_MEDIA, media);
         setResult(RESULT_OK, resultData);
         finish();
+    }
+
+    private class GalleryPagerAdapter extends PagerAdapter {
+
+        @Override
+        public int getCount() {
+            return 5;
+        }
+
+        @Override
+        public boolean isViewFromObject(@NonNull View view, @NonNull Object o) {
+            return (View)o == view;
+        }
+
+        @NonNull
+        @Override
+        public Object instantiateItem(@NonNull ViewGroup container, int position) {
+            Context context = StoryGalleryActivity.this;
+            RecyclerView rv = new RecyclerView(context);
+            int spanCount = 5;
+            GridLayoutManager llm = new GridLayoutManager(context, spanCount, GridLayoutManager.VERTICAL, false);
+            rv.setLayoutManager(llm);
+            int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.story_contrib_gallery_padding);
+            rv.addItemDecoration(new GalleryItemDecoration(spanCount, spacingInPixels, false));
+            GalleryAdapter adapter = new GalleryAdapter(context, StoryGalleryActivity.this);
+
+            switch (position) {
+                case 1:
+                    adapter.setMediaType(GalleryAdapter.MediaType.Pdf);
+                    break;
+                case 2:
+                    adapter.setMediaType(GalleryAdapter.MediaType.Image);
+                    break;
+                case 3:
+                    adapter.setMediaType(GalleryAdapter.MediaType.Video);
+                    break;
+                case 4:
+                    adapter.setMediaType(GalleryAdapter.MediaType.Audio);
+                    break;
+                default:
+                    adapter.setMediaType(GalleryAdapter.MediaType.All);
+                    break;
+            }
+            rv.setAdapter(adapter);
+
+            container.addView(rv);
+            return rv;
+        }
+
+        @Override
+        public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+            container.removeView((View)object);
+        }
     }
 }

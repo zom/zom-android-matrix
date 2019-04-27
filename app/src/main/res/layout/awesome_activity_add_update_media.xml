@@ -42,6 +42,13 @@
             app:controller_layout_id="@layout/story_contrib_media_controller"
             app:resize_mode="fill"
             />
+        <info.guardianproject.keanuapp.ui.widgets.VisualizerView
+            android:id="@+id/previewAudio"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="240dp"
+            />
         <LinearLayout
             android:id="@+id/llControls"
             android:layout_width="match_parent"

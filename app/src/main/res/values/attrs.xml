@@ -18,4 +18,8 @@
     <attr name="itemWidthPadding" format="dimension"/>
     <attr name="itemHeightPadding" format="dimension"/>
   </declare-styleable>
+  <declare-styleable name="VisualizerView">
+    <attr name="barWidth" format="dimension" />
+    <attr name="gapWidth" format="dimension" />
+  </declare-styleable>
 </resources>
