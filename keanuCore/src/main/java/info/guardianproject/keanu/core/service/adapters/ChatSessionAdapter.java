@@ -1268,9 +1268,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 return false;
 
             String body = msg.getBody();
-            String username = msg.getFrom().getAddress();
+       //     String username = msg.getFrom().getAddress();
             String bareUsername = msg.getFrom().getAddress();
-            String nickname = getNickName(username);
+            String nickname = getNickName(bareUsername);
 
             long time = msg.getDateTime().getTime();
 
@@ -1307,9 +1307,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             Uri messageUri = null;
 
             if (msg.getID() == null)
-                messageUri = insertMessageInDb(username, body, time, msg.getType(), msg.getContentType(), msg.getReplyId());
+                messageUri = insertMessageInDb(nickname + '|' + bareUsername, body, time, msg.getType(), msg.getContentType(), msg.getReplyId());
             else
-                messageUri = insertMessageInDb(username, body, time, msg.getType(), 0, msg.getID(), msg.getContentType(), msg.getReplyId());
+                messageUri = insertMessageInDb(nickname + '|' + bareUsername, body, time, msg.getType(), 0, msg.getID(), msg.getContentType(), msg.getReplyId());
 
             setLastMessage(body, time);
 
