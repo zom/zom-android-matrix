@@ -3,11 +3,15 @@ package info.guardianproject.keanuapp.ui.conversation;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.PagerSnapHelper;
@@ -16,8 +20,10 @@ import android.support.v7.widget.SnapHelper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
@@ -45,18 +51,28 @@ import java.io.InputStream;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ui.widgets.AudioRecorder;
+import info.guardianproject.keanuapp.ui.widgets.CircularPulseImageButton;
+import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
 import info.guardianproject.keanuapp.ui.widgets.MessageViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.PZSImageView;
+import info.guardianproject.keanuapp.ui.widgets.StoryExoPlayerManager;
 import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
+import info.guardianproject.keanuapp.ui.widgets.VisualizerView;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 /**
  * Created by N-Pex on 2019-03-28.
  */
-public class StoryView extends ConversationView {
+public class StoryView extends ConversationView implements AudioRecorder.AudioRecorderListener {
     private final ProgressBar progressBar;
     private final SnapHelper snapHelper;
+    private final SimpleExoPlayerView previewAudio;
+    private AudioRecorder audioRecorder;
+
+    // If this is set, we are in "preview audio" mode.
+    private MediaInfo recordedAudio;
 
     public StoryView(ConversationDetailActivity activity) {
         super(activity);
@@ -81,6 +97,48 @@ public class StoryView extends ConversationView {
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
+        mMicButton.setOnClickListener(null);
+        mMicButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                captureAudioStart();
+                return true;
+            }
+        });
+        mMicButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (audioRecorder != null && audioRecorder.isAudioRecording() && (event.getActionMasked() == MotionEvent.ACTION_UP || event.getActionMasked() == MotionEvent.ACTION_CANCEL)) {
+                    captureAudioStop(); // Stop!
+                }
+                return false;
+            }
+        });
+        previewAudio = activity.findViewById(R.id.previewAudio);
+        previewAudio.setVisibility(View.GONE);
+   }
+
+
+    @Override
+    protected void onSendButtonClicked() {
+        // If we have recorded audio, send that!
+        if (recordedAudio != null) {
+            // TODO!
+            setRecordedAudio(null);
+            return;
+        }
+        super.onSendButtonClicked();
+    }
+
+    @Override
+    protected void sendMessage() {
+        super.sendMessage();
+        View view = mActivity.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+
     }
 
     private void updateProgressCurrentPage() {
@@ -109,6 +167,59 @@ public class StoryView extends ConversationView {
     @Override
     protected ConversationRecyclerViewAdapter createRecyclerViewAdapter() {
         return new StoryRecyclerViewAdapter(mActivity, null);
+    }
+
+    private void captureAudioStart() {
+        mComposeMessage.setVisibility(View.INVISIBLE);
+
+        // Start recording!
+        if (audioRecorder == null) {
+            audioRecorder = new AudioRecorder(previewAudio.getContext(), this);
+        } else if (audioRecorder.isAudioRecording()) {
+            audioRecorder.stopAudioRecording(true);
+        }
+        StoryExoPlayerManager.recordAudio(audioRecorder, previewAudio);
+        audioRecorder.startAudioRecording();
+
+        ((CircularPulseImageButton)mMicButton).setAnimating(true);
+    }
+
+    private void captureAudioStop() {
+        ((CircularPulseImageButton)mMicButton).setAnimating(false);
+        if (audioRecorder != null && audioRecorder.isAudioRecording()) {
+            audioRecorder.stopAudioRecording(false);
+        }
+    }
+
+    private void setRecordedAudio(MediaInfo recordedAudio) {
+        this.recordedAudio = recordedAudio;
+        if (this.recordedAudio != null) {
+            mMicButton.setVisibility(View.GONE);
+            mSendButton.setVisibility(View.VISIBLE);
+            Drawable d = ActivityCompat.getDrawable(mActivity, R.drawable.ic_close_white_24dp).mutate();
+            DrawableCompat.setTint(d, Color.GRAY);
+            mActivity.getSupportActionBar().setHomeAsUpIndicator(d);
+            mActivity.setBackButtonHandler(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    StoryExoPlayerManager.stop(previewAudio);
+                    setRecordedAudio(null);
+                }
+            });
+        } else {
+            mActivity.getSupportActionBar().setHomeAsUpIndicator(null);
+            mActivity.setBackButtonHandler(null);
+            previewAudio.setVisibility(View.GONE);
+            mComposeMessage.setVisibility(View.VISIBLE);
+            mComposeMessage.setText("");
+            mMicButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onAudioRecorded(Uri uri) {
+        setRecordedAudio(new MediaInfo(uri, "audio/mp4"));
+        StoryExoPlayerManager.play(recordedAudio, previewAudio);
     }
 
     class StoryRecyclerViewAdapter extends ConversationRecyclerViewAdapter implements PZSImageView.PSZImageViewImageMatrixListener {

@@ -36,6 +36,11 @@
             android:id="@+id/previewPhoto"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+        <com.github.barteksc.pdfviewer.PDFView
+            android:id="@+id/previewPdf"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
         <com.google.android.exoplayer2.ui.SimpleExoPlayerView
             android:id="@+id/previewVideo"
             android:layout_width="match_parent"
@@ -44,21 +49,6 @@
             app:player_layout_id="@layout/story_contrib_exo_player"
             app:controller_layout_id="@layout/story_contrib_media_controller"
             app:resize_mode="fill"
-            />
-        <com.github.barteksc.pdfviewer.PDFView
-            android:id="@+id/previewPdf"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-        <info.guardianproject.keanuapp.ui.widgets.VisualizerView
-            android:id="@+id/previewAudio"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:layout_centerVertical="true"
-            app:color="@android:color/white"
-            app:alphaPlayed="0.8"
-            app:alphaUnplayed="0.2"
-            android:background="@android:color/transparent"
             />
         <LinearLayout
             android:id="@+id/llControls"

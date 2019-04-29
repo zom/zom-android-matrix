@@ -462,7 +462,7 @@ public class ConversationListFragment extends Fragment {
                         intent.putExtra("nickname", nickname);
                         if (isStory && true) {
                             // If admin, enter contrib mode
-                            intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE, true);
+                            intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE, false);
                         }
                         context.startActivity(intent);
                     }

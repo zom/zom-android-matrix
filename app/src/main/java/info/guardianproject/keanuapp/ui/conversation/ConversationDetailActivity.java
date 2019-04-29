@@ -109,6 +109,7 @@ public class ConversationDetailActivity extends BaseActivity {
     protected Toolbar mToolbar;
 
     private PrettyTime mPrettyTime;
+    private View.OnClickListener backButtonHandler;
 
     private Handler mHandler = new Handler()
     {
@@ -363,9 +364,22 @@ public class ConversationDetailActivity extends BaseActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (getBackButtonHandler() != null) {
+            backButtonHandler.onClick(null);
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                if (getBackButtonHandler() != null) {
+                    backButtonHandler.onClick(null);
+                    return true;
+                }
                 finish();
                 return true;
             case R.id.menu_end_conversation:
@@ -1076,6 +1090,13 @@ public class ConversationDetailActivity extends BaseActivity {
         }
     }
 
+    public View.OnClickListener getBackButtonHandler() {
+        return backButtonHandler;
+    }
+
+    public void setBackButtonHandler(View.OnClickListener backButtonHandler) {
+        this.backButtonHandler = backButtonHandler;
+    }
 
     public static final int REQUEST_PICK_CONTACTS = RESULT_FIRST_USER + 1;
     public static final int REQUEST_SEND_IMAGE = REQUEST_PICK_CONTACTS + 1;

@@ -13,7 +13,8 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.exoplayer2.ui.AspectRatioFrameLayout android:id="@id/exo_content_frame"
         android:layout_width="match_parent"
@@ -41,6 +42,18 @@
             android:gravity="center"
             android:background="@color/exo_error_message_background_color"
             android:padding="16dp"/>
+
+        <info.guardianproject.keanuapp.ui.widgets.VisualizerView
+            android:layout_gravity="bottom"
+            android:id="@+id/exo_visualizer_view"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginBottom="@dimen/story_contrib_controls_plus_toolbar_height"
+            app:color="@android:color/white"
+            app:alphaPlayed="0.8"
+            app:alphaUnplayed="0.2"
+            android:background="#20000000"
+            />
 
     </com.google.android.exoplayer2.ui.AspectRatioFrameLayout>
 

@@ -751,121 +751,129 @@ public class ConversationView {
         mButtonDeleteVoice = (ImageView)mActivity.findViewById(R.id.btnDeleteVoice);
         mViewDeleteVoice = mActivity.findViewById(R.id.viewDeleteVoice);
 
-        mButtonDeleteVoice.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
+        if (mButtonDeleteVoice != null) {
+            mButtonDeleteVoice.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
 
-                if(motionEvent.getAction() == MotionEvent.ACTION_MOVE)
-                {
-                    int resolvedColor = mHistory.getResources().getColor(android.R.color.holo_red_light);
-                    mButtonDeleteVoice.setBackgroundColor(resolvedColor);
+                    if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                        int resolvedColor = mHistory.getResources().getColor(android.R.color.holo_red_light);
+                        mButtonDeleteVoice.setBackgroundColor(resolvedColor);
+                    }
+
+                    return false;
                 }
-
-                return false;
-            }
-        });
-
+            });
+        }
 
         mButtonAttach = (ImageButton) mActivity.findViewById(R.id.btnAttach);
         mViewAttach = mActivity.findViewById(R.id.attachPanel);
 
-        mButtonAttach.setOnClickListener(new View.OnClickListener() {
+        if (mButtonAttach != null) {
+            mButtonAttach.setOnClickListener(new View.OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-
-
-                toggleAttachMenu ();
-            }
-
-        });
-
-        mActivity.findViewById(R.id.mediaPreviewCancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clearMediaDraft();
-
-            }
-        });
-
-        mActivity.findViewById(R.id.btnAttachPicture).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                mViewAttach.setVisibility(View.INVISIBLE);
-                mActivity.startImagePicker();
-            }
-
-        });
-
-        mActivity.findViewById(R.id.btnTakePicture).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                mViewAttach.setVisibility(View.INVISIBLE);
-                mActivity.startPhotoTaker();
-            }
-
-        });
+                @Override
+                public void onClick(View v) {
 
 
-        mActivity.findViewById(R.id.btnAttachAudio).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                mViewAttach.setVisibility(View.INVISIBLE);
-                mActivity.startFilePicker("audio/*");
-            }
-
-        });
-
-        mActivity.findViewById(R.id.btnAttachFile).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                mViewAttach.setVisibility(View.INVISIBLE);
-                mActivity.startFilePicker("*/*");
-            }
-
-        });
-
-        mActivity.findViewById(R.id.btnAttachSticker).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                toggleAttachMenu();
-                showStickers();
-            }
-
-        });
-
-
-
-        mMicButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-
-                //this is the tap to change to hold to talk mode
-                if (mMicButton.getVisibility() == View.VISIBLE) {
-                    mComposeMessage.setVisibility(View.GONE);
-                    mMicButton.setVisibility(View.GONE);
-
-                    // Check if no view has focus:
-                    View view = mActivity.getCurrentFocus();
-                    if (view != null) {
-                        InputMethodManager imm = (InputMethodManager)mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                    }
-
-                    mSendButton.setImageResource(R.drawable.ic_keyboard_black_36dp);
-                    mSendButton.setVisibility(View.VISIBLE);
-                    mButtonTalk.setVisibility(View.VISIBLE);
-
+                    toggleAttachMenu();
                 }
-            }
 
-        });
+            });
+        }
+
+        View mediaPreviewCancel = mActivity.findViewById(R.id.mediaPreviewCancel);
+        if (mediaPreviewCancel != null) {
+            mediaPreviewCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    clearMediaDraft();
+                }
+            });
+        }
+
+        View btnAttachPicture = mActivity.findViewById(R.id.btnAttachPicture);
+        if (btnAttachPicture != null) {
+            btnAttachPicture.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mViewAttach.setVisibility(View.INVISIBLE);
+                    mActivity.startImagePicker();
+                }
+            });
+        }
+
+        View btnTakePicture = mActivity.findViewById(R.id.btnTakePicture);
+        if (btnTakePicture != null) {
+            btnTakePicture.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mViewAttach.setVisibility(View.INVISIBLE);
+                    mActivity.startPhotoTaker();
+                }
+            });
+        }
+
+        View btnAttachAudio = mActivity.findViewById(R.id.btnAttachAudio);
+        if (btnAttachAudio != null) {
+            btnAttachAudio.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mViewAttach.setVisibility(View.INVISIBLE);
+                    mActivity.startFilePicker("audio/*");
+                }
+            });
+        }
+
+        View btnAttachFile = mActivity.findViewById(R.id.btnAttachFile);
+        if (btnAttachFile != null) {
+            btnAttachFile.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mViewAttach.setVisibility(View.INVISIBLE);
+                    mActivity.startFilePicker("*/*");
+                }
+            });
+        }
+
+        View btnAttachSticker = mActivity.findViewById(R.id.btnAttachSticker);
+        if (btnAttachSticker != null) {
+            btnAttachSticker.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    toggleAttachMenu();
+                    showStickers();
+                }
+            });
+        }
+
+        if (mMicButton != null) {
+            mMicButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+
+                    //this is the tap to change to hold to talk mode
+                    if (mMicButton.getVisibility() == View.VISIBLE) {
+                        mComposeMessage.setVisibility(View.GONE);
+                        mMicButton.setVisibility(View.GONE);
+
+                        // Check if no view has focus:
+                        View view = mActivity.getCurrentFocus();
+                        if (view != null) {
+                            InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                        }
+
+                        mSendButton.setImageResource(R.drawable.ic_keyboard_black_36dp);
+                        mSendButton.setVisibility(View.VISIBLE);
+                        mButtonTalk.setVisibility(View.VISIBLE);
+
+                    }
+                }
+
+            });
+        }
 
 
         final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
@@ -889,44 +897,48 @@ public class ConversationView {
             }
         });
 
-        mMicButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return gestureDetector.onTouchEvent(motionEvent);
+        if (mMicButton != null) {
+            mMicButton.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    return gestureDetector.onTouchEvent(motionEvent);
 
-            }
-        });
+                }
+            });
+        }
 
-        mButtonTalk.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch( View btnTalk , MotionEvent theMotion ) {
-                switch ( theMotion.getAction() ) {
-                    case MotionEvent.ACTION_DOWN:
-                        mActivity.startAudioRecording();
-                        mButtonTalk.setText(mActivity.getString(R.string.recording_release));
-                        mViewDeleteVoice.setVisibility(View.VISIBLE);
-
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        boolean inBounds = inViewInBounds(btnTalk,(int)theMotion.getX(),(int)theMotion.getY());
-                        if (!inBounds)
-                            mButtonTalk.setText(mActivity.getString(R.string.recording_delete));
-                        else {
+        if (mButtonTalk != null) {
+            mButtonTalk.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View btnTalk, MotionEvent theMotion) {
+                    switch (theMotion.getAction()) {
+                        case MotionEvent.ACTION_DOWN:
+                            mActivity.startAudioRecording();
                             mButtonTalk.setText(mActivity.getString(R.string.recording_release));
                             mViewDeleteVoice.setVisibility(View.VISIBLE);
-                        }
-                            break;
-                    case MotionEvent.ACTION_UP:
-                        mButtonTalk.setText(mActivity.getString(R.string.push_to_talk));
-                        boolean send = inViewInBounds(btnTalk,(int)theMotion.getX(),(int)theMotion.getY());
-                        mActivity.stopAudioRecording(send);
-                        mViewDeleteVoice.setVisibility(View.GONE);
 
-                        break;
+                            break;
+                        case MotionEvent.ACTION_MOVE:
+                            boolean inBounds = inViewInBounds(btnTalk, (int) theMotion.getX(), (int) theMotion.getY());
+                            if (!inBounds)
+                                mButtonTalk.setText(mActivity.getString(R.string.recording_delete));
+                            else {
+                                mButtonTalk.setText(mActivity.getString(R.string.recording_release));
+                                mViewDeleteVoice.setVisibility(View.VISIBLE);
+                            }
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            mButtonTalk.setText(mActivity.getString(R.string.push_to_talk));
+                            boolean send = inViewInBounds(btnTalk, (int) theMotion.getX(), (int) theMotion.getY());
+                            mActivity.stopAudioRecording(send);
+                            mViewDeleteVoice.setVisibility(View.GONE);
+
+                            break;
+                    }
+                    return true;
                 }
-                return true;
-            }
-        });
+            });
+        }
         /**
         mHistory.setOnItemLongClickListener(new OnItemLongClickListener ()
         {
@@ -1040,20 +1052,7 @@ public class ConversationView {
 
         mSendButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
-                if (mComposeMessage.getVisibility() == View.VISIBLE)
-                    sendMessage();
-                else
-                {
-                    mSendButton.setImageResource(R.drawable.ic_send_secure);
-
-                    mSendButton.setVisibility(View.GONE);
-                    mButtonTalk.setVisibility(View.GONE);
-                    mComposeMessage.setVisibility(View.VISIBLE);
-                    mMicButton.setVisibility(View.VISIBLE);
-
-
-                }
+                onSendButtonClicked();
             }
         });
 
@@ -1061,6 +1060,22 @@ public class ConversationView {
         mHistory.setAdapter(mMessageAdapter);
 
     }
+
+    protected void onSendButtonClicked() {
+        if (mComposeMessage.getVisibility() == View.VISIBLE)
+            sendMessage();
+        else {
+            mSendButton.setImageResource(R.drawable.ic_send_secure);
+
+            mSendButton.setVisibility(View.GONE);
+            if (mButtonTalk != null) {
+                mButtonTalk.setVisibility(View.GONE);
+            }
+            mComposeMessage.setVisibility(View.VISIBLE);
+            mMicButton.setVisibility(View.VISIBLE);
+        }
+    }
+
 
     protected ConversationRecyclerViewAdapter createRecyclerViewAdapter() {
         return new ConversationRecyclerViewAdapter(mActivity, null);
@@ -1850,7 +1865,7 @@ public class ConversationView {
         return (this.mContactType & Imps.Contacts.TYPE_MASK) == Imps.Contacts.TYPE_GROUP;
     }
 
-    void sendMessage() {
+    protected void sendMessage() {
 
         if (mShareDraft != null)
         {
@@ -2127,7 +2142,7 @@ public class ConversationView {
 
     private void toggleInputMode ()
     {
-        if (mButtonTalk.getVisibility() == View.GONE) {
+        if (mButtonTalk == null || mButtonTalk.getVisibility() == View.GONE) {
             if (mComposeMessage.getText().length() > 0 && mSendButton.getVisibility() == View.GONE) {
                 mMicButton.setVisibility(View.GONE);
                 mSendButton.setVisibility(View.VISIBLE);
@@ -2184,8 +2199,10 @@ public class ConversationView {
             case SHOW_TYPING:
 
                 boolean isTyping = msg.getData().getBoolean("typing");
-                mActivity.findViewById(R.id.tvTyping).setVisibility(isTyping ? View.VISIBLE : View.GONE);
-
+                View typingView = mActivity.findViewById(R.id.tvTyping);
+                if (typingView != null) {
+                    typingView.setVisibility(isTyping ? View.VISIBLE : View.GONE);
+                }
              default:
                  updateWarningView();
             }

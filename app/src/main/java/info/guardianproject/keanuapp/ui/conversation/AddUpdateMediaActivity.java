@@ -24,23 +24,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.github.barteksc.pdfviewer.PDFView;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DataSpec;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -55,7 +43,7 @@ import info.guardianproject.keanuapp.ui.widgets.CircularPulseImageButton;
 import info.guardianproject.keanuapp.ui.widgets.GlideUtils;
 import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
 import info.guardianproject.keanuapp.ui.widgets.PopupDialog;
-import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
+import info.guardianproject.keanuapp.ui.widgets.StoryExoPlayerManager;
 import info.guardianproject.keanuapp.ui.widgets.VisualizerView;
 
 public class AddUpdateMediaActivity extends CameraActivity implements GalleryAdapter.GalleryAdapterListener, AudioRecorder.AudioRecorderListener {
@@ -75,9 +63,6 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     private ImageView previewPhoto;
     private SimpleExoPlayerView previewVideo;
     private PDFView previewPdf;
-    private VisualizerView previewAudio;
-    private SimpleExoPlayer exoPlayer;
-    private DefaultTrackSelector trackSelector;
     private ProgressBar progressBar;
     private AudioRecorder audioRecorder;
 
@@ -177,7 +162,6 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
         previewPhoto = findViewById(R.id.previewPhoto);
         previewVideo = findViewById(R.id.previewVideo);
         previewPdf = findViewById(R.id.previewPdf);
-        previewAudio = findViewById(R.id.previewAudio);
 
         progressBar = findViewById(R.id.progress_circular);
 
@@ -359,15 +343,12 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
 
             if (addedAudio != null) {
                 previewVideo.setVisibility(View.VISIBLE);
-                previewAudio.setVisibility(View.VISIBLE);
                 showAudioPreview(addedAudio);
             } else if (addedVideo != null) {
                 previewVideo.setVisibility(View.VISIBLE);
-                previewAudio.setVisibility(View.GONE);
                 showVideoPreview(addedVideo);
             } else {
                 previewVideo.setVisibility(View.GONE);
-                previewAudio.setVisibility(View.GONE);
             }
 
             if (addedPdf != null) {
@@ -377,9 +358,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
                 previewPdf.setVisibility(View.GONE);
             }
         } else {
-            if (exoPlayer != null) {
-                exoPlayer.setPlayWhenReady(false);
-            }
+            StoryExoPlayerManager.stop(previewVideo);
             for (MediaInfo media : addedMedia) {
                 releaseMedia(media);
             }
@@ -389,7 +368,6 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
             previewPhoto.setVisibility(View.GONE);
             previewVideo.setVisibility(View.GONE);
             previewPdf.setVisibility(View.GONE);
-            previewAudio.setVisibility(View.GONE);
             microphoneButton.setVisibility(View.VISIBLE);
             cameraButton.setVisibility(View.VISIBLE);
             cameraFlipButton.setVisibility(View.VISIBLE);
@@ -447,8 +425,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
             audioRecorder.stopAudioRecording(true);
         }
         setViewerMode(true);
-        previewAudio.setVisibility(View.VISIBLE);
-        audioRecorder.setVisualizerView(previewAudio);
+        StoryExoPlayerManager.recordAudio(audioRecorder, previewVideo);
         audioRecorder.startAudioRecording();
 
         microphoneButton.setAnimating(true);
@@ -518,83 +495,12 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
         }
     }
 
-    private void updatePlayerPosition() {
-        previewAudio.removeCallbacks(updatePlayerPositionRunnable);
-        previewAudio.post(updatePlayerPositionRunnable);
-    }
-
-    private Runnable updatePlayerPositionRunnable = new Runnable() {
-        @Override
-        public void run() {
-            long duration = exoPlayer.getDuration();
-            long pos = exoPlayer.getCurrentPosition();
-            if (duration == 0) {
-                previewAudio.setPlayFraction(0);
-            } else {
-                previewAudio.setPlayFraction((float)pos / (float)duration);
-            }
-
-            if (exoPlayer.getPlaybackState() == Player.STATE_READY) {
-                previewAudio.post(updatePlayerPositionRunnable);
-            }
-        }
-    };
-
     private void showVideoPreview(MediaInfo mediaInfo) {
-        // Had the player been setup?
-        if (exoPlayer == null) {
-
-            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter(); //test
-
-            TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
-            trackSelector =
-                    new DefaultTrackSelector(videoTrackSelectionFactory);
-
-            exoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector);
-            exoPlayer.addListener(new Player.EventListener() {
-                @Override
-                public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                    updatePlayerPosition();
-                }
-
-                @Override
-                public void onSeekProcessed() {
-                    updatePlayerPosition();
-                }
-            });
-
-            // Bind the player to the view.
-            previewVideo.setPlayer(exoPlayer);
-        }
-
-        previewVideo.getVideoSurfaceView().setAlpha(mediaInfo.isAudio() ? 0 : 1);
-
-        DataSpec dataSpec = new DataSpec(mediaInfo.uri);
-        final VideoViewActivity.InputStreamDataSource inputStreamDataSource = new VideoViewActivity.InputStreamDataSource(this, dataSpec);
-        try {
-            inputStreamDataSource.open(dataSpec);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        DataSource.Factory factory = new DataSource.Factory() {
-
-            @Override
-            public DataSource createDataSource() {
-                return inputStreamDataSource;
-            }
-        };
-        MediaSource mediaSource = new ExtractorMediaSource(inputStreamDataSource.getUri(),
-                factory, new DefaultExtractorsFactory(), null, null);
-
-        //LoopingMediaSource loopingSource = new LoopingMediaSource(mediaSource);
-        exoPlayer.prepare(mediaSource);
-        exoPlayer.setPlayWhenReady(true); //run file/link when ready to play.
+        StoryExoPlayerManager.play(mediaInfo, previewVideo);
     }
 
     private void showAudioPreview(MediaInfo mediaInfo) {
-        previewAudio.loadAudioFile(mediaInfo.uri);
-        showVideoPreview(mediaInfo);
+        StoryExoPlayerManager.play(mediaInfo, previewVideo);
     }
 
     private void showPdfPreview(MediaInfo mediaInfo) {

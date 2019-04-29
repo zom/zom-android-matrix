@@ -132,6 +132,7 @@
     <string name="compose_hint_secure">Send private message</string>
     <string name="menu_end_conversation">End chat</string>
     <string name="select_link_title">Select link</string>
+    <string name="compose_hint_story">Ask a question…</string>
 
     <string name="delete">Delete</string>
     <string name="export_media">Export Media File?</string>

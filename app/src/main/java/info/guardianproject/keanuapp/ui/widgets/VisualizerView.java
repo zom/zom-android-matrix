@@ -19,6 +19,10 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -45,6 +49,9 @@ public class VisualizerView extends View {
     private int alphaUnplayed = 255;
     private int numBars;
     private float playFraction = 0.0f;
+
+    // An optional ExoPlayer instance attached to this view
+    private SimpleExoPlayer exoPlayer;
 
     public VisualizerView(Context context) {
         super(context);
@@ -87,14 +94,57 @@ public class VisualizerView extends View {
         paint.setColor(color);
     }
 
-    public float getPlayFraction() {
+    private float getPlayFraction() {
         return playFraction;
     }
 
-    public void setPlayFraction(float playFraction) {
+    private void setPlayFraction(float playFraction) {
         this.playFraction = playFraction;
         invalidate();
     }
+
+    public SimpleExoPlayer getExoPlayer() {
+        return exoPlayer;
+    }
+
+    public void setExoPlayer(SimpleExoPlayer exoPlayer) {
+        this.exoPlayer = exoPlayer;
+        this.exoPlayer.addListener(new Player.EventListener() {
+            @Override
+            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                updatePlayerPosition();
+            }
+
+            @Override
+            public void onSeekProcessed() {
+                updatePlayerPosition();
+            }
+        });
+    }
+
+    private void updatePlayerPosition() {
+        removeCallbacks(updatePlayerPositionRunnable);
+        post(updatePlayerPositionRunnable);
+    }
+
+    private Runnable updatePlayerPositionRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (exoPlayer != null) {
+                long duration = exoPlayer.getDuration();
+                long pos = exoPlayer.getCurrentPosition();
+                if (duration == 0) {
+                    setPlayFraction(0);
+                } else {
+                    setPlayFraction((float) pos / (float) duration);
+                }
+
+                if (exoPlayer.getPlaybackState() == Player.STATE_READY) {
+                    post(updatePlayerPositionRunnable);
+                }
+            }
+        }
+    };
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -158,6 +208,13 @@ public class VisualizerView extends View {
             canvas.drawRect(x - paint.getStrokeWidth() / 2.0f, yStart, x + paint.getStrokeWidth() / 2.0f, yEnd, paint);
         }
         canvas.drawLine(0, getHeight() / 2.0f, getWidth(), getHeight() / 2.0f, paint);
+    }
+
+    public void reset() {
+        if (singleBytes != null) {
+            singleBytes.clear();
+        }
+        mBytes = null;
     }
 
     public void updateVisualizerSingleValue(int audioAmplitude) {
