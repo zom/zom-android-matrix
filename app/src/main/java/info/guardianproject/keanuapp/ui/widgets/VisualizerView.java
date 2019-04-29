@@ -6,6 +6,8 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.media.AudioFormat;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
@@ -35,11 +37,12 @@ public class VisualizerView extends View {
 
     private ArrayList<Byte> singleBytes;
     private byte[] mBytes;
-    private Paint mForePaint = new Paint();
-    private Paint mBackPaint = new Paint();
+    private Paint paint = new Paint();
     private AudioFileLoader audioLoader;
     private int barWidth;
     private int gapWidth;
+    private int alphaPlayed = 255;
+    private int alphaUnplayed = 255;
     private int numBars;
     private float playFraction = 0.0f;
 
@@ -59,11 +62,11 @@ public class VisualizerView extends View {
     }
 
     private void init(AttributeSet attrs) {
+        setWillNotDraw(false);
         mBytes = null;
-        mForePaint.setAntiAlias(true);
-        mForePaint.setColor(Color.rgb(150, 150, 150));
-        mBackPaint.setAntiAlias(true);
-        mBackPaint.setColor(Color.rgb(240, 150, 150));
+        paint.setAntiAlias(true);
+
+        int color = Color.rgb(255, 255, 255);
 
         barWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics());
         gapWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, getResources().getDisplayMetrics());
@@ -71,23 +74,17 @@ public class VisualizerView extends View {
         if (attrs != null) {
             TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.VisualizerView);
             if (a != null) {
-                TypedValue out = new TypedValue();
-                if (a.getValue(R.styleable.VisualizerView_barWidth, out)) {
-                    if (out.type == TypedValue.TYPE_DIMENSION) {
-                        barWidth = a.getDimensionPixelSize(R.styleable.VisualizerView_barWidth, barWidth);
-                    }
-                }
-                if (a.getValue(R.styleable.VisualizerView_gapWidth, out)) {
-                    if (out.type == TypedValue.TYPE_DIMENSION) {
-                        gapWidth = a.getDimensionPixelSize(R.styleable.VisualizerView_gapWidth, gapWidth);
-                    }
-                }
+                barWidth = a.getDimensionPixelSize(R.styleable.VisualizerView_barWidth, barWidth);
+                gapWidth = a.getDimensionPixelSize(R.styleable.VisualizerView_gapWidth, gapWidth);
+                color = a.getColor(R.styleable.VisualizerView_color, color);
+                alphaPlayed = (int) (255 * a.getFloat(R.styleable.VisualizerView_alphaPlayed, alphaPlayed));
+                alphaUnplayed = (int) (255 * a.getFloat(R.styleable.VisualizerView_alphaUnplayed, alphaUnplayed));
                 a.recycle();
             }
         }
 
-        mForePaint.setStrokeWidth(barWidth);
-        mBackPaint.setStrokeWidth(barWidth);
+        paint.setStrokeWidth(barWidth);
+        paint.setColor(color);
     }
 
     public float getPlayFraction() {
@@ -118,20 +115,23 @@ public class VisualizerView extends View {
         if (mBytes == null) {
             return;
         }
-        drawBars(canvas, mForePaint, false);
-        drawBars(canvas, mBackPaint, true);
+
+        // Calc width
+        int n = Math.min(numBars, (mBytes == null) ? 0 : mBytes.length);
+        int w = n * barWidth + Math.max(0, n - 1) * gapWidth;
+        float x = getPlayFraction() * w;
+
+        canvas.saveLayerAlpha(0, 0, x, getHeight(), alphaPlayed,
+                Canvas.ALL_SAVE_FLAG);
+        drawBars(canvas, paint);
+        canvas.restore();
+        canvas.saveLayerAlpha(x, 0, getWidth(), getHeight(), alphaUnplayed,
+                Canvas.ALL_SAVE_FLAG);
+        drawBars(canvas, paint);
+        canvas.restore();
     }
 
-    private void drawBars(Canvas canvas, Paint paint, boolean clip) {
-        if (clip) {
-            canvas.save();
-
-            // Calc width
-            int n = Math.min(numBars, (mBytes == null) ? 0 : mBytes.length);
-            int w = n * barWidth + Math.max(0, n - 1) * gapWidth;
-            canvas.clipRect(0, 0, getPlayFraction() * w, getHeight());
-        }
-
+    private void drawBars(Canvas canvas, Paint paint) {
         float fIndex = 0;
         float fDelta = Math.max(1.0f, (float) mBytes.length / (float) numBars);
         for (int i = 0; i < numBars; i++) {
@@ -155,12 +155,9 @@ public class VisualizerView extends View {
             float yEnd = (float) sum / 255.0f * ((float) getHeight() / 2.0f);
             yStart += getHeight() / 2.0f;
             yEnd += getHeight() / 2.0f;
-            canvas.drawLine(x, yStart, x, yEnd, paint);
+            canvas.drawRect(x - paint.getStrokeWidth() / 2.0f, yStart, x + paint.getStrokeWidth() / 2.0f, yEnd, paint);
         }
-
-        if (clip) {
-            canvas.restore();
-        }
+        canvas.drawLine(0, getHeight() / 2.0f, getWidth(), getHeight() / 2.0f, paint);
     }
 
     public void updateVisualizerSingleValue(int audioAmplitude) {
@@ -322,8 +319,9 @@ public class VisualizerView extends View {
 
                 byte[] result = new byte[output.size()];
                 int idx = 0;
+                float maxValue = outputMax; // 32768.0f;
                 for (Integer value : output) {
-                    byte converted = (byte)(255.0f * (float)value / 32768.0f - Math.abs(Byte.MIN_VALUE));
+                    byte converted = (byte)(255.0f * (float)value / maxValue - Math.abs(Byte.MIN_VALUE));
                     Log.d("TAG", "Value " + value + " now " + converted);
                     result[idx++] = converted;
                 }

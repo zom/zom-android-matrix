@@ -98,16 +98,18 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                 Uri uri = Uri.fromFile(new File(data));
                 int mediaType = cursor.getInt(typeColumn);
                 String mimeType = (mimeTypeColumn >= 0) ? cursor.getString(mimeTypeColumn) : "";
+                long id = getItemId(cursor.getPosition());
                 switch (mediaType) {
                     case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-                        new ThumbnailLoader(context, holder, mediaType, uri).execute();
+                        new ThumbnailLoader(context, holder, mediaType, uri, id).execute();
                         break;
                     case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-                        GlideUtils.loadImageFromUri(context, uri, holder.imageView);
+                        new ThumbnailLoader(context, holder, mediaType, uri, id).execute();
                         break;
 
                     case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
-                        new ThumbnailLoader(context, holder, mediaType, uri).execute();
+                        holder.imageView.setImageResource(R.drawable.ic_audiotrack_white_24dp);
+                        new ThumbnailLoader(context, holder, mediaType, uri, id).execute();
                         break;
                 }
 
@@ -245,23 +247,38 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
     private static class ThumbnailLoader extends AsyncTask <Void, Void, Bitmap> {
         private final int mediaType;
         private final Uri uri;
+        private long id;
         WeakReference<Context> _context;
         WeakReference<GalleryViewHolder> _owner;
 
-        ThumbnailLoader(Context context, GalleryViewHolder owner, int mediaType, Uri uri) {
+        ThumbnailLoader(Context context, GalleryViewHolder owner, int mediaType, Uri uri, long id) {
             _context = new WeakReference<Context>(context);
             _owner = new WeakReference<GalleryViewHolder>(owner);
             this.mediaType = mediaType;
             this.uri = uri;
+            this.id = id;
         }
 
         @Override
         protected Bitmap doInBackground(Void... voids) {
             switch (mediaType) {
-                case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-                    return ThumbnailUtils.createVideoThumbnail(
-                            uri.getPath(), MediaStore.Video.Thumbnails.MINI_KIND);
-                case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
+                case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO: {
+                    Context context = _context.get();
+                    if (context != null) {
+                        return MediaStore.Video.Thumbnails.getThumbnail(context.getContentResolver(), id, MediaStore.Video.Thumbnails.MINI_KIND, null);
+                    }
+                }
+                break;
+                    //return ThumbnailUtils.createVideoThumbnail(
+                     //       uri.getPath(), MediaStore.Video.Thumbnails.MINI_KIND);
+                case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE: {
+                    Context context = _context.get();
+                    if (context != null) {
+                        return MediaStore.Images.Thumbnails.getThumbnail(context.getContentResolver(), id, MediaStore.Video.Thumbnails.MINI_KIND, null);
+                    }
+                }
+                break;
+                case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO: {
                     Context context = _context.get();
                     if (context != null) {
                         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
@@ -274,7 +291,8 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                             return BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
                         }
                     }
-                    break;
+                }
+                break;
             }
             return null;
         }
@@ -285,8 +303,15 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
             GalleryViewHolder owner = _owner.get();
             if (owner != null) {
                 if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO) {
+                    if (result != null) {
+                        owner.imageView.setImageBitmap(result);
+                    }
+                } else if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
                     if (result == null) {
-                        owner.imageView.setImageResource(R.drawable.ic_audiotrack_white_24dp);
+                        Context context = _context.get();
+                        if (context != null) {
+                            GlideUtils.loadImageFromUri(context, uri, owner.imageView);
+                        }
                     } else {
                         owner.imageView.setImageBitmap(result);
                     }

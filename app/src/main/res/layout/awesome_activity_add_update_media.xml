@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.conversation.AddUpdateMediaActivity">
+    tools:context=".ui.conversation.AddUpdateMediaActivity"
+    android:background="@android:color/black"
+    >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -39,15 +41,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:use_controller="true"
+            app:player_layout_id="@layout/story_contrib_exo_player"
             app:controller_layout_id="@layout/story_contrib_media_controller"
             app:resize_mode="fill"
             />
         <info.guardianproject.keanuapp.ui.widgets.VisualizerView
             android:id="@+id/previewAudio"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="240dp"
+            android:layout_height="200dp"
+            android:layout_centerVertical="true"
+            app:color="@android:color/white"
+            app:alphaPlayed="0.8"
+            app:alphaUnplayed="0.2"
+            android:background="@android:color/transparent"
             />
         <LinearLayout
             android:id="@+id/llControls"
@@ -57,24 +63,33 @@
             android:orientation="horizontal"
             android:gravity="center"
             >
-            <ImageButton
+            <info.guardianproject.keanuapp.ui.widgets.CircularPulseImageButton
                 android:id="@+id/btnMicrophone"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="6dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:layout_gravity="center"
                 android:src="@drawable/ic_mic_black_36dp"
                 android:tint="@android:color/white"
                 android:background="@null"
-                />
-            <ImageButton
+                android:scaleType="centerInside"
+                app:lineWidth="4dp"
+                app:color="@android:color/white"
+                app:durationExpand="930"
+                app:durationGap="330" />
+            <info.guardianproject.keanuapp.ui.widgets.CircularPulseImageButton
                 android:id="@+id/btnCameraVideo"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="6dp"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:layout_gravity="center"
                 android:src="@drawable/ic_video_rec"
                 android:background="@null"
+                android:scaleType="centerInside"
+                app:lineWidth="4dp"
+                app:color="@android:color/white"
+                app:durationExpand="930"
+                app:durationGap="330"
                 />
             <ImageButton
                 android:id="@+id/toggle_camera"
