@@ -5,15 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.media.MediaCodec;
-import android.media.MediaExtractor;
-import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -22,22 +16,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.annotation.RequiresApi;
-
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
 import info.guardianproject.keanuapp.ui.widgets.GlideUtils;
 import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
-import info.guardianproject.keanuapp.ui.widgets.VisualizerView;
-
-import static android.media.MediaFormat.KEY_CHANNEL_COUNT;
-import static android.media.MediaFormat.KEY_SAMPLE_RATE;
 
 /**
  * Created by N-Pex on 2019-04-12.
@@ -157,26 +142,23 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
         loadCursorTask.execute();
     }
 
-    private class LoadCursorTask extends AsyncTask<Void, Void, Cursor>
-    {
+    private class LoadCursorTask extends AsyncTask<Void, Void, Cursor> {
         private Cursor cursor = null;
 
-        LoadCursorTask()
-        {
+        LoadCursorTask() {
         }
 
         @Override
-        protected Cursor doInBackground(Void... values)
-        {
+        protected Cursor doInBackground(Void... values) {
             try {
                 ContentResolver cr = context.getContentResolver();
                 Uri uri = MediaStore.Files.getContentUri("external");
 
                 String[] projection = new String[]{
-                    MediaStore.Files.FileColumns._ID,
-                    MediaStore.Files.FileColumns.DATA,
-                    MediaStore.Files.FileColumns.MEDIA_TYPE,
-                    MediaStore.Files.FileColumns.MIME_TYPE
+                        MediaStore.Files.FileColumns._ID,
+                        MediaStore.Files.FileColumns.DATA,
+                        MediaStore.Files.FileColumns.MEDIA_TYPE,
+                        MediaStore.Files.FileColumns.MIME_TYPE
                 };
 
                 String sortOrder = MediaStore.Files.FileColumns.DATE_ADDED + " DESC";
@@ -188,7 +170,7 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                     case Pdf:
                         selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " = " + MediaStore.Files.FileColumns.MEDIA_TYPE_NONE;
                         selection += " AND " + MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
-                        selectionArgs = new String[] {"Application/PDF"};
+                        selectionArgs = new String[]{"Application/PDF"};
                         break;
                     case Audio:
                         selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " = " + MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO;
@@ -202,7 +184,7 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                     default:
                         selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " != " + MediaStore.Files.FileColumns.MEDIA_TYPE_NONE;
                         selection += " OR " + MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
-                        selectionArgs = new String[] {"Application/PDF"};
+                        selectionArgs = new String[]{"Application/PDF"};
                         break;
                 }
 
@@ -225,8 +207,7 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
         }
 
         @Override
-        protected void onPostExecute(Cursor cursor)
-        {
+        protected void onPostExecute(Cursor cursor) {
             synchronized (GalleryAdapter.this) {
                 if (loadCursorTask == this) {
                     loadCursorTask = null;
@@ -244,7 +225,7 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
         }
     }
 
-    private static class ThumbnailLoader extends AsyncTask <Void, Void, Bitmap> {
+    private static class ThumbnailLoader extends AsyncTask<Void, Void, Bitmap> {
         private final int mediaType;
         private final Uri uri;
         private long id;
@@ -269,8 +250,6 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                     }
                 }
                 break;
-                    //return ThumbnailUtils.createVideoThumbnail(
-                     //       uri.getPath(), MediaStore.Video.Thumbnails.MINI_KIND);
                 case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE: {
                     Context context = _context.get();
                     if (context != null) {
