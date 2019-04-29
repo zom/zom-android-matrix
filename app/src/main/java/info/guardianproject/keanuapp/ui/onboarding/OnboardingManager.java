@@ -15,6 +15,7 @@ import info.guardianproject.keanuapp.ui.qr.QrScanActivity;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -31,6 +32,7 @@ import android.provider.Telephony;
 import android.util.Base64;
 import android.util.Log;
 
+import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_DEVICE_NAME;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 public class OnboardingManager {
@@ -343,6 +345,11 @@ public class OnboardingManager {
         settings.setTlsCertVerify(true);
         settings.setAllowPlainAuth(false);
 
+        String newDeviceId =  DEFAULT_DEVICE_NAME + "-"
+                + UUID.randomUUID().toString().substring(0, 8);
+
+        settings.setDeviceName(newDeviceId);
+
         try
         {
             settings.setDomain(domain);
@@ -450,6 +457,11 @@ public class OnboardingManager {
         settings.setAllowPlainAuth(false);
 
         settings.setDoDnsSrv(doDnsSrvLookup);
+
+        String newDeviceId =  DEFAULT_DEVICE_NAME + "-"
+                + UUID.randomUUID().toString().substring(0, 8);
+
+        settings.setDeviceName(newDeviceId);
 
         try {
 
