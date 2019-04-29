@@ -198,7 +198,7 @@ public class MatrixConnection extends ImConnection {
         mUserPresence = new Presence(Presence.AVAILABLE, null, Presence.CLIENT_TYPE_MOBILE);
 
         mDeviceName = providerSettings.getDeviceName();
-        mDeviceId = mDeviceName;//providerSettings.getDeviceName(); //make them the same for now
+        mDeviceId = null;//mDeviceName;//providerSettings.getDeviceName(); //make them the same for now
 
         providerSettings.close();
 
@@ -307,7 +307,7 @@ public class MatrixConnection extends ImConnection {
         mCredentials = new Credentials();
         mCredentials.userId = mUser.getAddress().getAddress();
         mCredentials.homeServer = HTTPS_PREPEND + server;
-        mCredentials.deviceId = mDeviceId;
+      //  mCredentials.deviceId = mDeviceId;
 
         mConfig.setCredentials(mCredentials);
         mConfig.forceUsageOfTlsVersions();
@@ -383,7 +383,7 @@ public class MatrixConnection extends ImConnection {
             password = Imps.Account.getPassword(mContext.getContentResolver(), mAccountId);
 
         final boolean enableEncryption = true;
-        final String initialToken = Preferences.getValue(mUser.getAddress().getUser() + ".sync");
+        final String initialToken = null;//Preferences.getValue(mUser.getAddress().getUser() + ".sync");
 
         File fileCredsJson = new File("/" + username + "/creds.json");
 
@@ -446,7 +446,7 @@ public class MatrixConnection extends ImConnection {
                         debug("error turning creds into json",e);
                     }
 
-                    mCredentials.deviceId = mDeviceId;
+                  //  mCredentials.deviceId = mDeviceId;
                     mConfig.setCredentials(mCredentials);
 
                     initSession (enableEncryption, initialToken);
@@ -509,9 +509,7 @@ public class MatrixConnection extends ImConnection {
                 mChatGroupManager.setSession(mSession);
                 mChatSessionManager.setSession(mSession);
 
-                mSession.startEventStream(initialToken);
-                setState(LOGGED_IN, null);
-                mSession.setIsOnline(true);
+
 
                 mSession.enableCrypto(true, new ApiCallback<Void>() {
                     @Override
@@ -536,6 +534,9 @@ public class MatrixConnection extends ImConnection {
                     public void onSuccess(Void aVoid) {
 
                         debug("getCrypto().start.onSuccess");
+                        mSession.startEventStream(initialToken);
+                        setState(LOGGED_IN, null);
+                        mSession.setIsOnline(true);
 
                         mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
 
@@ -1204,13 +1205,14 @@ public class MatrixConnection extends ImConnection {
                     }
                 });
             }
+            /**
             else if (!TextUtils.isEmpty(event.type)) {
                 if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
                     mSession.getCrypto().reRequestRoomKeyForEvent(event);
                 }
-            }
+            }**/
 
-            Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
+        //    Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
 
         }
 
@@ -1230,11 +1232,12 @@ public class MatrixConnection extends ImConnection {
                 handleRoomInvite(room, event.sender);
             }
 
+            /**
             if (!TextUtils.isEmpty(event.type)) {
                 if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
                     mSession.getCrypto().reRequestRoomKeyForEvent(event);
                 }
-            }
+            }**/
 
         }
 
@@ -1270,7 +1273,7 @@ public class MatrixConnection extends ImConnection {
                     public void onRoomKeyRequest(IncomingRoomKeyRequest request) {
 
                         debug ("onRoomKeyRequest: " + request);
-                        downloadKeys(request.mUserId,request.mDeviceId);
+//                        downloadKeys(request.mUserId,request.mDeviceId);
 
                     }
 
