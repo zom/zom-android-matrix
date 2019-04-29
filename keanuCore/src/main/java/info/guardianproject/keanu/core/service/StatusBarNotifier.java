@@ -286,7 +286,6 @@ public class StatusBarNotifier {
 
             if (info == null) {
                 info = new NotificationInfo(providerId, accountId);
-                mNotificationInfos.add(info);
                 info.setInfo(sender, title, message, null, intent);
 
             }
@@ -294,13 +293,13 @@ public class StatusBarNotifier {
                 sbMessage.append(message);
                 info.setInfo(sender, title, message, sbMessage.toString(), intent);
             }
+
+            mNotificationInfos.add(info);
+
         }
 
         mNotificationManager.notify(info.computeNotificationId(),
                 info.createNotification(tickerText, lightWeightNotify, iconSmall, iconLarge, intent, doVibrateSound));
-
-
-
 
 
     }

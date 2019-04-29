@@ -1938,16 +1938,8 @@ public class Imps {
                 ProviderSettings.setXmppResource(mContentResolver, mProviderId, resource);
             }
 
-            public synchronized String getDeviceName() {
-                String currentResource = getString(XMPP_RESOURCE, DEFAULT_DEVICE_NAME);
-                String defaultResource;
-                if (currentResource.equals(DEFAULT_DEVICE_NAME)) {
-                    defaultResource = DEFAULT_DEVICE_NAME + "-"
-                                      + UUID.randomUUID().toString().substring(0, 8);
-                    setDeviceName(defaultResource);
-                    return defaultResource;
-                }
-                return currentResource;
+            public String getDeviceName() {
+                return getString(XMPP_RESOURCE, DEFAULT_DEVICE_NAME);
             }
 
             public void setPort(int port) {
