@@ -53,6 +53,7 @@ public class AccountsFragment extends ListFragment {
         }
 
 
+
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
 
         // Get the list
@@ -107,6 +108,8 @@ public class AccountsFragment extends ListFragment {
 
                 @Override
                 public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
+
+                    newCursor.setNotificationUri(mActivity.getApplicationContext().getContentResolver(), uri);
                     mAdapter.swapCursor(newCursor);
                 }
 
