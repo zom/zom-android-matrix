@@ -23,6 +23,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.github.barteksc.pdfviewer.PDFView;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -38,10 +39,13 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import info.guardianproject.keanu.core.Preferences;
+import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.camera.CameraActivity;
 import info.guardianproject.keanuapp.ui.stories.GalleryAdapter;
@@ -70,6 +74,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     private View sendButton;
     private ImageView previewPhoto;
     private SimpleExoPlayerView previewVideo;
+    private PDFView previewPdf;
     private VisualizerView previewAudio;
     private SimpleExoPlayer exoPlayer;
     private DefaultTrackSelector trackSelector;
@@ -171,6 +176,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
 
         previewPhoto = findViewById(R.id.previewPhoto);
         previewVideo = findViewById(R.id.previewVideo);
+        previewPdf = findViewById(R.id.previewPdf);
         previewAudio = findViewById(R.id.previewAudio);
 
         progressBar = findViewById(R.id.progress_circular);
@@ -349,6 +355,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
 
             MediaInfo addedAudio = addedAudio();
             MediaInfo addedVideo = addedVideo();
+            MediaInfo addedPdf = addedPdf();
 
             if (addedAudio != null) {
                 previewVideo.setVisibility(View.VISIBLE);
@@ -362,6 +369,13 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
                 previewVideo.setVisibility(View.GONE);
                 previewAudio.setVisibility(View.GONE);
             }
+
+            if (addedPdf != null) {
+                previewPdf.setVisibility(View.VISIBLE);
+                showPdfPreview(addedPdf);
+            } else {
+                previewPdf.setVisibility(View.GONE);
+            }
         } else {
             if (exoPlayer != null) {
                 exoPlayer.setPlayWhenReady(false);
@@ -374,6 +388,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
             mCameraView.open();
             previewPhoto.setVisibility(View.GONE);
             previewVideo.setVisibility(View.GONE);
+            previewPdf.setVisibility(View.GONE);
             previewAudio.setVisibility(View.GONE);
             microphoneButton.setVisibility(View.VISIBLE);
             cameraButton.setVisibility(View.VISIBLE);
@@ -580,6 +595,33 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     private void showAudioPreview(MediaInfo mediaInfo) {
         previewAudio.loadAudioFile(mediaInfo.uri);
         showVideoPreview(mediaInfo);
+    }
+
+    private void showPdfPreview(MediaInfo mediaInfo) {
+        try {
+            InputStream is = null;
+            if (SecureMediaStore.isVfsUri(mediaInfo.uri)) {
+                is = (new info.guardianproject.iocipher.FileInputStream(mediaInfo.uri.getPath()));
+            } else {
+                is = (getContentResolver().openInputStream(mediaInfo.uri));
+            }
+            if (is != null) {
+                previewPdf.fromStream(is)
+                        .enableSwipe(true) // allows to block changing pages using swipe
+                        .swipeHorizontal(false)
+                        .enableDoubletap(true)
+                        .defaultPage(0)
+                        .enableAnnotationRendering(false) // render annotations (such as comments, colors or forms)
+                        .password(null)
+                        .scrollHandle(null)
+                        .enableAntialiasing(true) // improve rendering a little bit on low-res screens
+                        // spacing between pages in dp. To define spacing color, set view background
+                        .spacing(0)
+                        .load();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

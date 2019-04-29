@@ -45,6 +45,11 @@
             app:controller_layout_id="@layout/story_contrib_media_controller"
             app:resize_mode="fill"
             />
+        <com.github.barteksc.pdfviewer.PDFView
+            android:id="@+id/previewPdf"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
         <info.guardianproject.keanuapp.ui.widgets.VisualizerView
             android:id="@+id/previewAudio"
             android:layout_width="match_parent"
@@ -62,6 +67,7 @@
             android:layout_alignParentBottom="true"
             android:orientation="horizontal"
             android:gravity="center"
+            android:background="#20000000"
             >
             <info.guardianproject.keanuapp.ui.widgets.CircularPulseImageButton
                 android:id="@+id/btnMicrophone"
@@ -125,7 +131,7 @@
         android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
+        android:background="#20000000"
         android:fitsSystemWindows="true"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         app:elevation="0dp"

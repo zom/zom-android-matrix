@@ -5,9 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
+import android.graphics.pdf.PdfDocument;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -84,19 +87,25 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                 int mediaType = cursor.getInt(typeColumn);
                 String mimeType = (mimeTypeColumn >= 0) ? cursor.getString(mimeTypeColumn) : "";
                 long id = getItemId(cursor.getPosition());
-                switch (mediaType) {
-                    case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-                        new ThumbnailLoader(context, holder, mediaType, uri, id).execute();
-                        break;
-                    case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-                        new ThumbnailLoader(context, holder, mediaType, uri, id).execute();
-                        break;
+                if (mimeType.equalsIgnoreCase("application/pdf")) {
+                    holder.imageView.setImageResource(R.drawable.ic_pdf_24dp);
+                    new ThumbnailLoader(context, holder, MediaStore.Files.FileColumns.MEDIA_TYPE_NONE, uri, id).execute();
+                } else {
+                    switch (mediaType) {
+                        case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
+                            new ThumbnailLoader(context, holder, mediaType, uri, id).execute();
+                            break;
+                        case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
+                            new ThumbnailLoader(context, holder, mediaType, uri, id).execute();
+                            break;
 
-                    case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
-                        holder.imageView.setImageResource(R.drawable.ic_audiotrack_white_24dp);
-                        new ThumbnailLoader(context, holder, mediaType, uri, id).execute();
-                        break;
+                        case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
+                            holder.imageView.setImageResource(R.drawable.ic_audiotrack_white_24dp);
+                            new ThumbnailLoader(context, holder, mediaType, uri, id).execute();
+                            break;
+                    }
                 }
+
 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -168,9 +177,8 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
 
                 switch (mediaType) {
                     case Pdf:
-                        selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " = " + MediaStore.Files.FileColumns.MEDIA_TYPE_NONE;
-                        selection += " AND " + MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
-                        selectionArgs = new String[]{"Application/PDF"};
+                        selection = MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
+                        selectionArgs = new String[]{"application/pdf"};
                         break;
                     case Audio:
                         selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " = " + MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO;
@@ -272,6 +280,29 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                     }
                 }
                 break;
+                case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE: {
+                    Context context = _context.get();
+                    GalleryViewHolder holder = _owner.get();
+                    if (context != null && holder != null) {
+                        int width = holder.imageView.getWidth();
+                        int height = holder.imageView.getHeight();
+                        if (width == 0) {
+                            width = 512;
+                        }
+                        if (height == 0) {
+                            height = 384;
+                        }
+                        try {
+                            Bitmap thumb = null;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+                                thumb = DocumentsContract.getDocumentThumbnail(context.getContentResolver(), uri, new Point(width, height), null);
+                            }
+                            return thumb;
+                        } catch (Exception ignored) {}
+                    }
+
+                }
+                break;
             }
             return null;
         }
@@ -281,7 +312,8 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
             super.onPostExecute(result);
             GalleryViewHolder owner = _owner.get();
             if (owner != null) {
-                if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO) {
+                if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO ||
+                    mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE) {
                     if (result != null) {
                         owner.imageView.setImageBitmap(result);
                     }
