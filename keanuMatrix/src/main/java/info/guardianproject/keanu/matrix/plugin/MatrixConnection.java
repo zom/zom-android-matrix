@@ -113,6 +113,7 @@ import info.guardianproject.keanu.matrix.R;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_WIDTH;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static org.matrix.androidsdk.rest.model.Event.EVENT_TYPE_MESSAGE_ENCRYPTED;
 
 public class MatrixConnection extends ImConnection {
 
@@ -197,7 +198,7 @@ public class MatrixConnection extends ImConnection {
         mUserPresence = new Presence(Presence.AVAILABLE, null, Presence.CLIENT_TYPE_MOBILE);
 
         mDeviceName = providerSettings.getDeviceName();
-        mDeviceId = providerSettings.getDeviceName(); //make them the same for now
+        mDeviceId = mDeviceName;//providerSettings.getDeviceName(); //make them the same for now
 
         providerSettings.close();
 
@@ -1203,6 +1204,11 @@ public class MatrixConnection extends ImConnection {
                     }
                 });
             }
+            else if (!TextUtils.isEmpty(event.type)) {
+                if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
+                    mSession.getCrypto().reRequestRoomKeyForEvent(event);
+                }
+            }
 
             Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
 
@@ -1225,7 +1231,7 @@ public class MatrixConnection extends ImConnection {
             }
 
             if (!TextUtils.isEmpty(event.type)) {
-                if (event.type.equals("m.room.encrypted")) {
+                if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
                     mSession.getCrypto().reRequestRoomKeyForEvent(event);
                 }
             }
@@ -2185,7 +2191,7 @@ public class MatrixConnection extends ImConnection {
         }
     }
 
-    private synchronized void handleRoomInvite (Room room, String sender)
+    private void handleRoomInvite (Room room, String sender)
     {
         MatrixAddress addrRoom = new MatrixAddress(room.getRoomId());
         MatrixAddress addrSender = null;
