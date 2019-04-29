@@ -155,7 +155,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
             @Override
             public void onClick(View v) {
                 // Done, send!
-                //TODO
+                //TODO Story - Do the sending here!
             }
         });
 
@@ -551,7 +551,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     }
 
     private void releaseMedia(MediaInfo mediaInfo) {
-        // TODO - remove from VFS if stored!
+        // TODO Story - remove from VFS if stored!
         if (mediaInfo.isAudio()) {
             if (mediaInfo.uri.getPath().startsWith(getFilesDir().getPath())) {
                 // Local recording, delete!

@@ -123,7 +123,7 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
     protected void onSendButtonClicked() {
         // If we have recorded audio, send that!
         if (recordedAudio != null) {
-            // TODO!
+            // TODO Story - Send the audio! It's in recorderAudio.uri (not in VFS). Need to delete afterwards.
             setRecordedAudio(null);
             return;
         }
