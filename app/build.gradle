@@ -13,8 +13,8 @@ android {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 2024
-        versionName "0.0.2.4"
+        versionCode 20213
+        versionName "0.0.2.13"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
@@ -88,12 +88,12 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.android.support:appcompat-v7:28.0.0-beta01'
+    implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.google.zxing:core:3.3.2'
+    implementation 'com.google.zxing:core:3.3.3'
     implementation 'info.guardianproject.panic:panic:0.5'
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.0.0'
@@ -112,7 +112,7 @@ dependencies {
     implementation 'com.otaliastudios:cameraview:2.0.0-beta04'
 
     implementation 'commons-codec:commons-codec:1.10'
-    implementation 'commons-io:commons-io:2.5'
+    implementation 'commons-io:commons-io:2.6'
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.8.5'
