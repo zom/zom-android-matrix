@@ -86,6 +86,17 @@ public abstract class ChatSessionManager {
         if (sessionAdapter == null)
         {
 
+            //wait here
+            while (mAdapter == null) {
+
+                try {
+                    Thread.sleep(1000);
+                }
+                catch (Exception e){}
+
+
+            }
+
             if (participant instanceof ChatGroup) {
                 ChatSession session = new ChatSession((ChatGroup) participant, this);
                 sessionAdapter = mAdapter.getChatSessionAdapter(session, isNewSession);

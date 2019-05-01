@@ -138,9 +138,15 @@ public class ChatSession {
             return false;
     }
 
-    public void onMessageReceipt(String id) {
+    public void onMessageReadMarker(String id, boolean wasEncrypted) {
         if (mListener != null)
-            mListener.onIncomingReceipt(this, id);
+            mListener.onIncomingReadMarker(this, id, wasEncrypted);
+
+    }
+
+    public void onMessageReceipt(String id, boolean wasEncrypted) {
+        if (mListener != null)
+            mListener.onIncomingReceipt(this, id, wasEncrypted);
 
     }
 

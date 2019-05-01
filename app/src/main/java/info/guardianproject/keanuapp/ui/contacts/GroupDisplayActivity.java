@@ -12,8 +12,10 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.os.StrictMode;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
@@ -78,6 +80,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     private long mAccountId = -1;
     private long mLastChatId = -1;
     private String mLocalAddress = null;
+    private ImApp mApp = null;
 
     private IImConnection mConn;
     private IChatSession mSession;
@@ -100,6 +103,8 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
     private final static int REQUEST_PICK_CONTACTS = 100;
 
+    private Handler mHandler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,11 +114,18 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
         setContentView(R.layout.awesome_activity_group);
 
+        mApp = (ImApp)getApplication();
+
         mName = getIntent().getStringExtra("nickname");
         mAddress = getIntent().getStringExtra("address");
-        mProviderId = getIntent().getLongExtra("provider", -1);
-        mAccountId = getIntent().getLongExtra("account", -1);
+        mProviderId = getIntent().getLongExtra("provider", mApp.getDefaultProviderId());
+        mAccountId = getIntent().getLongExtra("account", mApp.getDefaultAccountId());
         mLastChatId = getIntent().getLongExtra("chat", -1);
+
+        mHandler = new Handler();
+    }
+
+    private void initData () {
 
         Cursor cursor = getContentResolver().query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(mProviderId)}, null);
 
@@ -139,10 +151,11 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
         mYou.affiliation = "none";
         mYou.role = "none";
 
-        updateSession();
+    }
+
+    private void initRecyclerView () {
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rvRoot);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setAdapter(new RecyclerView.Adapter() {
 
             private static final int VIEW_TYPE_MEMBER = 0;
@@ -179,7 +192,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                     {
                         try {
 
-                            avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT);
+                            avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, false);
 
                             if (avatar != null)
                                 h.avatar.setImageDrawable(avatar);
@@ -253,13 +266,24 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                     if (Preferences.doGroupEncryption() &&  canInviteOthers(mYou)) {
                         if (mSession != null) {
                             h.checkGroupEncryption.setChecked(isGroupEncryptionEnabled());
-                            h.checkGroupEncryption.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                                @Override
-                                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                                    setGroupEncryptionEnabled(isChecked);
-                                }
-                            });
-                            h.checkGroupEncryption.setEnabled(true);
+
+                            if (isGroupEncryptionEnabled())
+                            {
+                                h.checkGroupEncryption.setVisibility(View.GONE);
+                                h.actionGroupEncryption.setVisibility(View.GONE);
+
+                            }
+                            else {
+                                h.checkGroupEncryption.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                                    @Override
+                                    public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                                        setGroupEncryptionEnabled(isChecked);
+                                    }
+                                });
+                                h.actionGroupEncryption.setVisibility(View.VISIBLE);
+                                h.checkGroupEncryption.setVisibility(View.VISIBLE);
+                                h.checkGroupEncryption.setEnabled(true);
+                            }
                         } else {
                             h.checkGroupEncryption.setEnabled(false);
                         }
@@ -300,64 +324,94 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 } else if (holder instanceof MemberViewHolder) {
                     MemberViewHolder h = (MemberViewHolder) holder;
 
-                    // Reset the padding to match other views in this hierarchy
-                    //
-                    int padding = getResources().getDimensionPixelOffset(R.dimen.detail_view_padding);
-                    h.itemView.setPadding(padding, h.itemView.getPaddingTop(), padding, h.itemView.getPaddingBottom());
-
-                    int idxMember = position - 1;
-                    final GroupMemberDisplay member = mMembers.get(idxMember);
-
-                    String nickname = member.nickname;
-                    if (TextUtils.isEmpty(nickname)) {
-                        nickname = member.username.split("@")[0].split("\\.")[0];
-                    } else {
-                        nickname = nickname.split("@")[0].split("\\.")[0];
-                    }
-
-                    if (mYou.username.contentEquals(member.username)) {
-                        nickname += " " + getString(R.string.group_you);
-                    }
-
-                    h.line1.setText(nickname);
-
-                    boolean hasRoleNone = TextUtils.isEmpty(member.role) || "none".equalsIgnoreCase(member.role);
-                    h.line1.setTextColor(hasRoleNone ? Color.GRAY : colorTextPrimary);
-
-                    h.line2.setText(member.username);
-                    if (member.affiliation != null && (member.affiliation.contentEquals("owner") || member.affiliation.contentEquals("admin"))) {
-                        h.avatarCrown.setVisibility(View.VISIBLE);
-                    } else {
-                        h.avatarCrown.setVisibility(View.GONE);
-                    }
-
-                    /**
-                    if (!member.online)
+                    if (mMembers.size() == 0)
                     {
-                        h.line1.setEnabled(false);
-                        h.line2.setEnabled(false);
-                        h.avatar.setBackgroundColor(getResources().getColor(R.color.holo_grey_light));
-                     }**/
-
-                    //h.line2.setText(member.username);
-                    if (member.avatar == null) {
-                        padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, getResources().getDisplayMetrics());
-                        member.avatar = new LetterAvatar(holder.itemView.getContext(), nickname, padding);
+                        h.line1.setText(R.string.loading);
+                        h.line2.setText("");
                     }
-                    h.avatar.setImageDrawable(member.avatar);
-                    h.avatar.setVisibility(View.VISIBLE);
-                    h.itemView.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            showMemberInfo(member);
+                    else {
+                        // Reset the padding to match other views in this hierarchy
+                        //
+                        int padding = getResources().getDimensionPixelOffset(R.dimen.detail_view_padding);
+                        h.itemView.setPadding(padding, h.itemView.getPaddingTop(), padding, h.itemView.getPaddingBottom());
+
+                        int idxMember = position - 1;
+                        final GroupMemberDisplay member = mMembers.get(idxMember);
+
+                        String nickname = member.nickname;
+                        if (TextUtils.isEmpty(nickname)) {
+                            nickname = member.username.split("@")[0].split("\\.")[0];
+                        } else {
+                            nickname = nickname.split("@")[0].split("\\.")[0];
                         }
-                    });
+
+                        if (mYou.username.contentEquals(member.username)) {
+                            nickname += " " + getString(R.string.group_you);
+                        }
+
+
+                        h.line2.setText(member.username);
+                        if (member.affiliation != null && (member.affiliation.contentEquals("owner") || member.affiliation.contentEquals("admin"))) {
+
+                            h.avatarCrown.setImageResource(R.drawable.ic_crown);
+                            h.avatarCrown.setVisibility(View.VISIBLE);
+                        }
+                        else if (member.affiliation != null && (member.affiliation.contentEquals("invited"))) {
+                            h.avatarCrown.setImageResource(R.drawable.ic_message_wait_grey);
+                            h.avatarCrown.setVisibility(View.VISIBLE);
+
+
+                        } else {
+                            h.avatarCrown.setVisibility(View.GONE);
+                        }
+
+                        h.line1.setText(nickname);
+
+                        boolean hasRoleNone = TextUtils.isEmpty(member.role) || "none".equalsIgnoreCase(member.role);
+                        h.line1.setTextColor(hasRoleNone ? Color.GRAY : colorTextPrimary);
+
+
+                        /**
+                         if (!member.online)
+                         {
+                         h.line1.setEnabled(false);
+                         h.line2.setEnabled(false);
+                         h.avatar.setBackgroundColor(getResources().getColor(R.color.holo_grey_light));
+                         }**/
+                        if (member.avatar == null) {
+                            try {
+                                member.avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), member.username, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
+                            } catch (DecoderException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (member.avatar == null) {
+                            padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, getResources().getDisplayMetrics());
+                            member.avatar = new LetterAvatar(holder.itemView.getContext(), nickname, padding);
+                        }
+
+                        h.avatar.setImageDrawable(member.avatar);
+                        h.avatar.setVisibility(View.VISIBLE);
+                        h.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                showMemberInfo(member);
+                            }
+                        });
+                    }
                 }
             }
 
             @Override
             public int getItemCount() {
-                return 2 + mMembers.size();
+
+                if (mMembers.size() == 0)
+                {
+                    return 3;
+                }
+                else
+                    return 2 + mMembers.size();
             }
 
             @Override
@@ -369,12 +423,13 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 return VIEW_TYPE_MEMBER;
             }
         }.init());
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
     }
 
     public void updateSession() {
 
-        new AsyncTask<Void, Void, Void> ()
+        new AsyncTask<Void,Void,Void>()
         {
 
             @Override
@@ -387,12 +442,11 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             protected void onPostExecute(Void aVoid) {
                 super.onPostExecute(aVoid);
 
-                // Update recycler view adapter (if set) to enable session dependent stuff, like notifications
-                if (mRecyclerView != null) {
-                    mRecyclerView.getAdapter().notifyDataSetChanged();
-                }
+                initRecyclerView();
             }
         }.execute();
+
+
     }
 
     private IChatSession updateSessionAsync() {
@@ -406,8 +460,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 mSession.registerChatListener(mChatListener);
                 mChatListenerRegistered = true;
 
-              //  mSession.refreshContactFromServer();
-                updateMembers();
+                mSession.refreshContactFromServer();
 
                 List<Contact> admins = mSession.getGroupChatAdmins();
                 List<Contact> owners = mSession.getGroupChatOwners();
@@ -429,6 +482,8 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 }
 
 
+
+
             }
 
         }
@@ -438,12 +493,12 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
     @Override
     public void onChatSessionCreated(IChatSession session) throws RemoteException {
-        updateSession();
+       // updateSession();
     }
 
     @Override
     public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
-        updateSession();
+       // updateSession();
     }
 
     @Override
@@ -455,8 +510,9 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     protected void onResume() {
         super.onResume();
 
+        initData();
         try {
-            mConn.getChatSessionManager().registerChatSessionListener(this);
+            mConn.getChatSessionManager().registerChatSessionListener(GroupDisplayActivity.this);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -470,93 +526,99 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             }
         }
 
+        initRecyclerView();
+
         updateSession();
     }
 
     @Override
     protected void onPause() {
-        try {
-            mConn.getChatSessionManager().unregisterChatSessionListener(this);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (mSession != null) {
+        super.onPause();
+
+        if (mConn != null) {
             try {
-                mSession.unregisterChatListener(mChatListener);
-                mChatListenerRegistered = false;
-            } catch (RemoteException e) {
+                mConn.getChatSessionManager().unregisterChatSessionListener(this);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
+            if (mSession != null) {
+                try {
+                    mSession.unregisterChatListener(mChatListener);
+                    mChatListenerRegistered = false;
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-        super.onPause();
+
     }
 
-    private synchronized void updateMembers() {
+    private void updateMembers() {
 
+            new Thread ()
+            {
+                public void run ()
+                {
 
-            final HashMap<String, GroupMemberDisplay> members = new HashMap<>();
+                    final HashMap<String, GroupMemberDisplay> members = new HashMap<>();
 
-            String[] projection = {Imps.GroupMembers.USERNAME, Imps.GroupMembers.NICKNAME, Imps.GroupMembers.ROLE, Imps.GroupMembers.AFFILIATION};
-            Uri memberUri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, mLastChatId);
-            ContentResolver cr = getContentResolver();
-            Cursor c = cr.query(memberUri, projection, null, null, null);
-            if (c != null) {
-                int colUsername = c.getColumnIndex(Imps.GroupMembers.USERNAME);
-                int colNickname = c.getColumnIndex(Imps.GroupMembers.NICKNAME);
-                int colRole = c.getColumnIndex(Imps.GroupMembers.ROLE);
-                int colAffiliation = c.getColumnIndex(Imps.GroupMembers.AFFILIATION);
+                    String[] projection = {Imps.GroupMembers.USERNAME, Imps.GroupMembers.NICKNAME, Imps.GroupMembers.ROLE, Imps.GroupMembers.AFFILIATION};
+                    Uri memberUri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, mLastChatId);
+                    ContentResolver cr = getContentResolver();
 
-                while (c.moveToNext()) {
-                    GroupMemberDisplay member = new GroupMemberDisplay();
-                    member.username = c.getString(colUsername);
-                    member.nickname = c.getString(colNickname);
-                    member.role = c.getString(colRole);
-                    member.affiliation = c.getString(colAffiliation);
-                    try {
-                        member.avatar = DatabaseUtils.getAvatarFromAddress(cr, member.username, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
-                    } catch (DecoderException e) {
-                        e.printStackTrace();
-                    }
+                    StringBuilder buf = new StringBuilder();
+                    buf.append(Imps.Messages.NICKNAME).append(" IS NOT NULL ");
 
-                    if (mLocalAddress.contentEquals(member.username)) {
-                        mYou = member;
-                    }
+                    Cursor c = cr.query(memberUri, projection, buf.toString(), null, Imps.GroupMembers.ROLE+","+Imps.GroupMembers.AFFILIATION);
+                    if (c != null) {
+                        int colUsername = c.getColumnIndex(Imps.GroupMembers.USERNAME);
+                        int colNickname = c.getColumnIndex(Imps.GroupMembers.NICKNAME);
+                        int colRole = c.getColumnIndex(Imps.GroupMembers.ROLE);
+                        int colAffiliation = c.getColumnIndex(Imps.GroupMembers.AFFILIATION);
 
-                    members.put(member.username, member);
-                }
-                c.close();
-            }
+                        while (c.moveToNext()) {
+                            GroupMemberDisplay member = new GroupMemberDisplay();
+                            member.username = c.getString(colUsername);
+                            member.nickname = c.getString(colNickname);
+                            member.role = c.getString(colRole);
+                            member.affiliation = c.getString(colAffiliation);
+                            if (mLocalAddress.contentEquals(member.username)) {
+                                mYou = member;
+                            }
 
-            final ArrayList<GroupMemberDisplay> listMembers = new ArrayList<>(members.values());
-            // Sort members by name, but keep owners at the top
-            Collections.sort(listMembers, new Comparator<GroupMemberDisplay>() {
-                @Override
-                public int compare(GroupMemberDisplay member1, GroupMemberDisplay member2) {
-                    if (member1.affiliation == null || member2.affiliation == null)
-                        return 1;
-                    boolean member1isImportant = (member1.affiliation.contentEquals("owner") || member1.affiliation.contentEquals("admin"));
-                    boolean member2isImportant = (member2.affiliation.contentEquals("owner") || member2.affiliation.contentEquals("admin"));
-                    if (member1isImportant != member2isImportant) {
-                        if (member1isImportant) {
-                            return -1;
-                        } else {
-                            return 1;
+                            members.put(member.username, member);
                         }
+                        c.close();
                     }
-                    return member1.nickname.compareTo(member2.nickname);
+
+                    mMembers = new ArrayList<>(members.values());
+                    // Sort members by name, but keep owners at the top
+                    Collections.sort(mMembers, new Comparator<GroupMemberDisplay>() {
+                        @Override
+                        public int compare(GroupMemberDisplay member1, GroupMemberDisplay member2) {
+                            if (member1.affiliation == null || member2.affiliation == null)
+                                return 1;
+                            boolean member1isImportant = (member1.affiliation.contentEquals("owner") || member1.affiliation.contentEquals("admin"));
+                            boolean member2isImportant = (member2.affiliation.contentEquals("owner") || member2.affiliation.contentEquals("admin"));
+                            if (member1isImportant != member2isImportant) {
+                                if (member1isImportant) {
+                                    return -1;
+                                } else {
+                                    return 1;
+                                }
+                            }
+                            return member1.nickname.compareTo(member2.nickname);
+                        }
+                    });
+
+                    runOnUiThread(() -> {
+                        if (mRecyclerView != null && mRecyclerView.getAdapter() != null)
+                            mRecyclerView.getAdapter().notifyDataSetChanged();
+                    });
+
+
                 }
-            });
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    mMembers = listMembers;
-
-                    if (mRecyclerView != null && mRecyclerView.getAdapter() != null)
-                        mRecyclerView.getAdapter().notifyDataSetChanged();
-                }
-            });
-
+            }.start();
 
 
     }
@@ -720,8 +782,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
                 inviteContacts(invitees);
 
-
-               // updateMembers();
+                mHandler.postDelayed(() -> updateSession(),3000);
             }
         }
     }
@@ -914,35 +975,9 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     private void leaveGroup ()
     {
         try {
-            IChatSessionManager manager = mConn.getChatSessionManager();
-            IChatSession session = manager.getChatSession(mAddress);
 
-            if (session == null)
-
-                session = manager.createChatSession(mAddress, true, new IChatSessionListener() {
-                    @Override
-                    public void onChatSessionCreated(IChatSession session) throws RemoteException {
-                        session.leave();
-
-                        //clear the stack and go back to the main activity
-                        Intent intent = new Intent(GroupDisplayActivity.this, MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    }
-
-                    @Override
-                    public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
-
-                    }
-
-                    @Override
-                    public IBinder asBinder() {
-                        return null;
-                    }
-                });
-
-            if (session != null) {
-                session.leave();
+            if (mSession != null) {
+                mSession.leave();
 
                 //clear the stack and go back to the main activity
                 Intent intent = new Intent(this, MainActivity.class);

@@ -59,7 +59,6 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
         mConnection = connection;
         ImConnection connAdaptee = connection.getAdaptee();
-
         connAdaptee.getChatSessionManager().setAdapter(this);
 
         mActiveChatSessionAdapters = new HashMap<String, ChatSessionAdapter>();
@@ -79,11 +78,12 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
         return mConnection.getAdaptee().getChatSessionManager();
     }
 
-    public IChatSession createChatSession(String contactAddress, boolean isNewSession, IChatSessionListener listener) {
+    public synchronized IChatSession createChatSession(String contactAddress, boolean isNewSession, IChatSessionListener listener) {
 
         ChatGroup chatGroup = groupManager.getChatGroup(new BaseAddress(contactAddress));
-        if (chatGroup == null)
-            chatGroup = new ChatGroup(new BaseAddress(contactAddress),"",groupManager);
+        if (chatGroup == null) {
+            chatGroup = new ChatGroup(new BaseAddress(contactAddress), "", groupManager);
+        }
 
         ChatSession session = getChatSessionManager().createChatSession(chatGroup, isNewSession);
 
@@ -249,7 +249,12 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
         }
 
         @Override
-        public void onMessageSendFail(Message msg) {
+        public void onMessageSendFail(Message msg, String newPacketId) {
+
+        }
+
+        @Override
+        public void onMessageSendQueued(Message msg, String newPacketId) {
 
         }
 

@@ -185,25 +185,25 @@ public class ContactListManagerAdapter extends IContactListManager.Stub {
                 mTemporaryContacts.remove(address);
             }
         } else {**/
-            synchronized (mContactLists) {
-                for (ContactListAdapter list : mContactLists.values()) {
-                    int resCode = list.removeContact(address);
-                    if (ImErrorInfo.ILLEGAL_CONTACT_ADDRESS == resCode) {
-                        // Did not find in this list, continue to remove from
-                        // other list.
-                        continue;
-                    }
-                    if (ImErrorInfo.NO_ERROR != resCode) {
-                        return resCode;
-                    }
-                }
 
+            for (ContactListAdapter list : mContactLists.values()) {
+                int resCode = list.removeContact(address);
+                if (ImErrorInfo.ILLEGAL_CONTACT_ADDRESS == resCode) {
+                    // Did not find in this list, continue to remove from
+                    // other list.
+                    continue;
+                }
+                if (ImErrorInfo.NO_ERROR != resCode) {
+                    return resCode;
+                }
             }
+
+
        // }
 
         String selection = Imps.Contacts.USERNAME + "=?";
         String[] selectionArgs = { address };
-        mResolver.delete(mContactUrl, selection, selectionArgs);
+        int rowsDeleted = mResolver.delete(mContactUrl, selection, selectionArgs);
 
         return ImErrorInfo.NO_ERROR;
     }

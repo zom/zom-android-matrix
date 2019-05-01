@@ -39,6 +39,7 @@ import java.io.InputStream;
 import java.net.URLConnection;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -90,7 +91,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                                                              + Imps.MessageType.OUTGOING;
 
     /** The registered remote listeners. */
-    final RemoteCallbackList<IChatListener> mRemoteListeners = new RemoteCallbackList<IChatListener>();
+  //  final RemoteCallbackList<IChatListener> mRemoteListeners = new RemoteCallbackList<IChatListener>();
+    final ArrayList<IChatListener> mRemoteListeners = new ArrayList<>();
 
     ImConnectionAdapter mConnection;
     ChatSessionManagerAdapter mChatSessionManager;
@@ -168,8 +170,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
       //  ((Contact) mChatSession.getParticipant()).getPresence().setStatus(newPresence);
 
-        if (lastPresence != newPresence && newPresence == Presence.AVAILABLE)
-            sendPostponedMessages();
+     //   if (lastPresence != newPresence && newPresence == Presence.AVAILABLE)
+       //     sendPostponedMessages();
 
         lastPresence = newPresence;
 
@@ -192,9 +194,10 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             if (!hasLastMessage())
                 setLastMessage(" ");
 
+            /**
             for (Contact c : group.getMembers()) {
                 mContactStatusMap.put(c.getName(), c.getPresence().getStatus());
-            }
+            }**/
             
         } catch (Exception e) {
             // TODO Auto-generated catch block
@@ -252,7 +255,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     public String[] getParticipants() {
         if (mIsGroupChat) {
             Contact self = mConnection.getLoginUser();
-            List<Contact> members = mGroup.getMembers();
+            Collection<Contact> members = mGroup.getMembers();
             if (members.size() > 0) {
                 String[] result = new String[members.size()];
                 int index = 0;
@@ -307,24 +310,41 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         return ContentUris.parseId(mChatURI);
     }
 
-    public void inviteContact(String contact) {
+    public void inviteContact(String address) {
         if (!mIsGroupChat) {
             return;
         }
-        Contact invitee = new Contact(new BaseAddress(contact),contact,Imps.Contacts.TYPE_NORMAL);
-        getGroupManager().inviteUserAsync((ChatGroup) mChatSession.getParticipant(), invitee);
+
+        Contact contact = null;
+        try {
+            contact = mConnection.getContactListManager().getContactByAddress(address);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        if (contact == null)
+            contact = new Contact(new BaseAddress(address),address,Imps.Contacts.TYPE_NORMAL);
+
+        getGroupManager().inviteUserAsync((ChatGroup) mChatSession.getParticipant(), contact);
 
     }
 
     public void leave() {
-        if (mIsGroupChat) {
-            getGroupManager().leaveChatGroupAsync((ChatGroup) mChatSession.getParticipant());
-        }
+        ChatGroup group = (ChatGroup) mChatSession.getParticipant();
 
         mContentResolver.delete(mMessageURI, null, null);
         mContentResolver.delete(mChatURI, null, null);
         mStatusBarNotifier.dismissChatNotification(mConnection.getProviderId(), getAddress());
         mChatSessionManager.closeChatSession(this);
+
+        if (mIsGroupChat) {
+            getGroupManager().leaveChatGroupAsync(group);
+            try {
+                mConnection.getContactListManager().removeContact(group.getAddress().getAddress());
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
@@ -347,6 +367,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         msg.setID(nextID());
 
         msg.setFrom(mConnection.getLoginUser().getAddress());
+
         msg.setType(Imps.MessageType.QUEUED);
 
         msg.setReplyId(replyId);
@@ -358,8 +379,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             if (!isEphemeral) {
                 insertMessageInDb(null, text, sendTime, msg.getType(), 0, msg.getID(), null, replyId);
 
-                if (setLastMessage)
-                    setLastMessage(text, sendTime);
             }
             else
             {
@@ -375,26 +394,46 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             }
 
             @Override
-            public void onMessageSendSuccess(Message msg, String newPacketId) {
+            public void onMessageSendSuccess(Message msg, String newMsgId) {
 
                 long sendTime = new Date().getTime();
 
                 if (msg.getDateTime() != null)
                     sendTime = msg.getDateTime().getTime();
 
-                updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, newPacketId);
+                updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, newMsgId);
 
-                msg.setID(newPacketId);
+                msg.setID(newMsgId);
+
+                if (setLastMessage)
+                    setLastMessage(text, sendTime);
+
             }
 
             @Override
-            public void onMessageSendFail(Message msg) {
+            public void onMessageSendFail(Message msg, String newMsgId) {
                 long sendTime = new Date().getTime();
 
                 if (msg.getDateTime() != null)
                     sendTime = msg.getDateTime().getTime();
 
-                updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, null);
+                updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, newMsgId);
+
+                msg.setID(newMsgId);
+
+            }
+
+            @Override
+            public void onMessageSendQueued(Message msg, String newMsgId) {
+                long sendTime = new Date().getTime();
+
+                if (msg.getDateTime() != null)
+                    sendTime = msg.getDateTime().getTime();
+
+                updateMessageInDb(msg.getID(), Imps.MessageType.SENDING, sendTime, null, newMsgId);
+
+                msg.setID(newMsgId);
+
             }
         });
 
@@ -555,13 +594,28 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     }
 
                     @Override
-                    public void onMessageSendFail(Message msg) {
+                    public void onMessageSendFail(Message msg, String newPacketId) {
                         long sendTime = new Date().getTime();
 
                         if (msg.getDateTime() != null)
                             sendTime = msg.getDateTime().getTime();
 
-                        updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, null);
+                        updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, newPacketId);
+
+
+                        msg.setID(newPacketId);
+                    }
+
+                    @Override
+                    public void onMessageSendQueued(Message msg, String newPacketId) {
+                        long sendTime = new Date().getTime();
+
+                        if (msg.getDateTime() != null)
+                            sendTime = msg.getDateTime().getTime();
+
+                        updateMessageInDb(msg.getID(),Imps.MessageType.SENDING,sendTime, null, newPacketId);
+
+                        msg.setID(newPacketId);
                     }
                 });
 
@@ -719,7 +773,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     public void registerChatListener(IChatListener listener) {
         if (listener != null) {
-            mRemoteListeners.register(listener);
+            mRemoteListeners.add(listener);
 
             if (mDataHandlerListener != null)
                 mDataHandlerListener.checkLastTransferRequest ();
@@ -731,7 +785,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     public void unregisterChatListener(IChatListener listener) {
         if (listener != null) {
-            mRemoteListeners.unregister(listener);
+            mRemoteListeners.remove(listener);
 
             if (mGroup != null)
                 mGroup.removeMemberListener(mListenerAdapter);
@@ -745,6 +799,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             mStatusBarNotifier.dismissChatNotification(mConnection.getProviderId(), baseUsername);
 
             mHasUnreadMessages = false;
+
         }
     }
 
@@ -777,6 +832,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     }
 
     String getNickName(String username) {
+
         ImEntity participant = mChatSession.getParticipant();
         if (mIsGroupChat) {
             ChatGroup group = (ChatGroup) participant;
@@ -1212,9 +1268,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 return false;
 
             String body = msg.getBody();
-            String username = msg.getFrom().getAddress();
+       //     String username = msg.getFrom().getAddress();
             String bareUsername = msg.getFrom().getAddress();
-            String nickname = getNickName(username);
+            String nickname = getNickName(bareUsername);
 
             long time = msg.getDateTime().getTime();
 
@@ -1251,9 +1307,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             Uri messageUri = null;
 
             if (msg.getID() == null)
-                messageUri = insertMessageInDb(nickname, body, time, msg.getType(), msg.getContentType(), msg.getReplyId());
+                messageUri = insertMessageInDb(nickname + '|' + bareUsername, body, time, msg.getType(), msg.getContentType(), msg.getReplyId());
             else
-                messageUri = insertMessageInDb(nickname, body, time, msg.getType(), 0, msg.getID(), msg.getContentType(), msg.getReplyId());
+                messageUri = insertMessageInDb(nickname + '|' + bareUsername, body, time, msg.getType(), 0, msg.getID(), msg.getContentType(), msg.getReplyId());
 
             setLastMessage(body, time);
 
@@ -1262,31 +1318,28 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 return false; //couldn't write to database
             }
 
-            int max = 3;
-            int n = 0;
 
-            while (n++ < max) {
-                try {
-                    synchronized (mRemoteListeners) {
-                        int N = mRemoteListeners.beginBroadcast();
-                        for (int i = 0; i < N; i++) {
-                            IChatListener listener = mRemoteListeners.getBroadcastItem(i);
-                            try {
-                                wasMessageSeen = listener.onIncomingMessage(ChatSessionAdapter.this, msg);
-                            } catch (RemoteException e) {
-                                // The RemoteCallbackList will take care of removing the
-                                // dead listeners.
-                            }
-                        }
-                        mRemoteListeners.finishBroadcast();
+            try {
+
+              //  int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
+                    try {
+                        wasMessageSeen = listener.onIncomingMessage(ChatSessionAdapter.this, msg);
+                    } catch (RemoteException e) {
+                        // The RemoteCallbackList will take care of removing the
+                        // dead listeners.
                     }
-                    break;
-                } catch (Exception e) {
-                    Log.w(TAG, "error notifying of new messages", e);
-                    try { Thread.sleep(500);}catch(Exception e2){}//wait for broadcast to be over
-
                 }
+
+            } catch (Exception e) {
+                Log.w(TAG, "error notifying of new messages", e);
+
             }
+            finally{
+             // mRemoteListeners.finishBroadcast();
+            }
+
 
 
 
@@ -1334,9 +1387,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     error.getCode(), null, null, msg.getReplyId());
 
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+            //    final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onSendMessageError(ChatSessionAdapter.this, msg, error);
                     } catch (RemoteException e) {
@@ -1344,7 +1397,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+             //   mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
@@ -1360,19 +1413,19 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 mContentResolver.update(uriContact, values, null, null);
 
                 try {
-                    synchronized (mRemoteListeners) {
-                        final int N = mRemoteListeners.beginBroadcast();
-                        for (int i = 0; i < N; i++) {
-                            IChatListener listener = mRemoteListeners.getBroadcastItem(i);
-                            try {
-                                listener.onGroupSubjectChanged(ChatSessionAdapter.this);
-                            } catch (RemoteException e) {
-                                // The RemoteCallbackList will take care of removing the
-                                // dead listeners.
-                            }
+
+                  //  final int N = mRemoteListeners.beginBroadcast();
+                    for (int i = 0; i < mRemoteListeners.size(); i++) {
+                        IChatListener listener = mRemoteListeners.get(i);
+                        try {
+                            listener.onGroupSubjectChanged(ChatSessionAdapter.this);
+                        } catch (RemoteException e) {
+                            // The RemoteCallbackList will take care of removing the
+                            // dead listeners.
                         }
-                        mRemoteListeners.finishBroadcast();
                     }
+               //     mRemoteListeners.finishBroadcast();
+
                 }
                 catch (Exception e){}
             }
@@ -1386,9 +1439,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             insertGroupMemberInDb(contact);
 
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+             //   final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onContactJoined(ChatSessionAdapter.this, contact);
                     } catch (RemoteException e) {
@@ -1396,7 +1449,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+             //   mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
@@ -1405,9 +1458,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         public void onMemberRoleChanged(ChatGroup chatGroup, Contact contact, String role, String affiliation) {
             updateGroupMemberRoleAndAffiliationInDb(contact, role, affiliation);
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+            //    final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onContactRoleChanged(ChatSessionAdapter.this, contact);
                     } catch (RemoteException e) {
@@ -1415,7 +1468,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+               // mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
@@ -1424,9 +1477,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             deleteGroupMemberInDb(contact);
 
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+            //    final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onContactLeft(ChatSessionAdapter.this, contact);
                     } catch (RemoteException e) {
@@ -1434,7 +1487,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+               // mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
@@ -1442,9 +1495,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         public void onError(ChatGroup group, final ImErrorInfo error) {
             // TODO: insert an error message?
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+                //final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onInviteError(ChatSessionAdapter.this, error);
                     } catch (RemoteException e) {
@@ -1452,16 +1505,16 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+               // mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
 
         public void notifyChatSessionConverted() {
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+               // final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onConvertedToGroupChat(ChatSessionAdapter.this);
                     } catch (RemoteException e) {
@@ -1469,14 +1522,19 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+             //   mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
 
         @Override
-        public void onIncomingReceipt(ChatSession ses, String id) {
-            Imps.updateConfirmInDb(mContentResolver, mContactId, id, true);
+        public void onIncomingReceipt(ChatSession ses, String id, boolean wasEncrypted) {
+            Imps.updateConfirmInDb(mContentResolver, mContactId, id, true, wasEncrypted);
+        }
+
+        @Override
+        public void onIncomingReadMarker(ChatSession ses, String id, boolean wasEncrypted) {
+            Imps.updateAllConfirmInDb(mContentResolver, mContactId, id, true, wasEncrypted);
         }
 
         @Override
@@ -1495,19 +1553,18 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         public void onBeginMemberUpdates(ChatGroup group) {
             beginGroupMemberUpdates(group);
             try {
-                synchronized (mRemoteListeners) {
-                    final int N = mRemoteListeners.beginBroadcast();
-                    for (int i = 0; i < N; i++) {
-                        IChatListener listener = mRemoteListeners.getBroadcastItem(i);
-                        try {
-                            listener.onBeginMemberListUpdate(ChatSessionAdapter.this);
-                        } catch (RemoteException e) {
-                            // The RemoteCallbackList will take care of removing the
-                            // dead listeners.
-                        }
+               // final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
+                    try {
+                        listener.onBeginMemberListUpdate(ChatSessionAdapter.this);
+                    } catch (RemoteException e) {
+                        // The RemoteCallbackList will take care of removing the
+                        // dead listeners.
                     }
-                    mRemoteListeners.finishBroadcast();
                 }
+             //   mRemoteListeners.finishBroadcast();
+
             }
             catch (Exception e){}
         }
@@ -1516,19 +1573,19 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         public void onEndMemberUpdates(ChatGroup group) {
             endGroupMemberUpdates(group);
             try {
-                synchronized (mRemoteListeners) {
-                    final int N = mRemoteListeners.beginBroadcast();
-                    for (int i = 0; i < N; i++) {
-                        IChatListener listener = mRemoteListeners.getBroadcastItem(i);
-                        try {
-                            listener.onEndMemberListUpdate(ChatSessionAdapter.this);
-                        } catch (RemoteException e) {
-                            // The RemoteCallbackList will take care of removing the
-                            // dead listeners.
-                        }
-                    }
-                    mRemoteListeners.finishBroadcast();
+
+           // final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                IChatListener listener = mRemoteListeners.get(i);
+                try {
+                    listener.onEndMemberListUpdate(ChatSessionAdapter.this);
+                } catch (RemoteException e) {
+                    // The RemoteCallbackList will take care of removing the
+                    // dead listeners.
                 }
+            }
+          //  mRemoteListeners.finishBroadcast();
+
             }
             catch (Exception e){}
         }
@@ -1653,14 +1710,12 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
 
                 if (outgoing) {
-                    Imps.updateConfirmInDb(service.getContentResolver(), mContactId, offerId, true);
+                    Imps.updateConfirmInDb(service.getContentResolver(), mContactId, offerId, true, true);
                 } else {
 
                     try
                     {
-                        boolean isVerified = false;//getDefaultOtrChatSession().isKeyVerified(from);
-
-                        int type = isVerified ? Imps.MessageType.INCOMING_ENCRYPTED_VERIFIED : Imps.MessageType.INCOMING_ENCRYPTED;
+                        int type = Imps.MessageType.INCOMING_ENCRYPTED;
 
                         setLastMessage(filePath);
 
@@ -1678,9 +1733,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         int N = 0;
 
                         try {
-                            N = mRemoteListeners.beginBroadcast();
-                            for (int i = 0; i < N; i++) {
-                                IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+                       //     N = mRemoteListeners.beginBroadcast();
+                            for (int i = 0; i < mRemoteListeners.size(); i++) {
+                                IChatListener listener = mRemoteListeners.get(i);
                                 try {
                                     listener.onIncomingFileTransferProgress(sanitizedPath, percent);
                                 } catch (RemoteException e) {
@@ -1688,7 +1743,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                                     // dead listeners.
                                 }
                             }
-                            mRemoteListeners.finishBroadcast();
+                            //mRemoteListeners.finishBroadcast();
                         }
                         catch (Exception e){}
 
@@ -1715,16 +1770,16 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         }
 
         @Override
-        public synchronized void onTransferFailed(boolean outgoing, String offerId, String from, String url, String reason) {
+        public void onTransferFailed(boolean outgoing, String offerId, String from, String url, String reason) {
 
 
             String[] path = url.split("/");
             String sanitizedPath = SystemServices.sanitize(path[path.length - 1]);
 
             try {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+              //  final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onIncomingFileTransferError(sanitizedPath, reason);
                     } catch (RemoteException e) {
@@ -1732,13 +1787,13 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         // dead listeners.
                     }
                 }
-                mRemoteListeners.finishBroadcast();
+             //   mRemoteListeners.finishBroadcast();
             }
             catch (Exception e){}
         }
 
         @Override
-        public synchronized void onTransferProgress(boolean outgoing, String offerId, String from, String url, float percentF) {
+        public void onTransferProgress(boolean outgoing, String offerId, String from, String url, float percentF) {
 
             int percent = (int)(100*percentF);
 
@@ -1747,9 +1802,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
             try
             {
-                final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < N; i++) {
-                    IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+               // final int N = mRemoteListeners.beginBroadcast();
+                for (int i = 0; i < mRemoteListeners.size(); i++) {
+                    IChatListener listener = mRemoteListeners.get(i);
                     try {
                         listener.onIncomingFileTransferProgress(sanitizedPath, percent);
                     } catch (RemoteException e) {
@@ -1764,7 +1819,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             }
             finally
             {
-                mRemoteListeners.finishBroadcast();
+               // mRemoteListeners.finishBroadcast();
             }
         }
 
@@ -1802,12 +1857,12 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             {
                 try
                 {
-                    final int N = mRemoteListeners.beginBroadcast();
+                 //   final int N = mRemoteListeners.beginBroadcast();
 
-                    if (N > 0)
+                    if (mRemoteListeners.size() > 0)
                     {
-                        for (int i = 0; i < N; i++) {
-                            IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+                        for (int i = 0; i < mRemoteListeners.size(); i++) {
+                            IChatListener listener = mRemoteListeners.get(i);
                             try {
                                 listener.onIncomingFileTransfer(from, transferUrl);
                             } catch (RemoteException e) {
@@ -1830,7 +1885,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 }
                 finally
                 {
-                    mRemoteListeners.finishBroadcast();
+                   // mRemoteListeners.finishBroadcast();
                 }
 
                 mAcceptTransfer = false; //for now, wait for the user callback
@@ -1847,9 +1902,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     public synchronized void setContactTyping (Contact contact, boolean isTyping)
     {
         try {
-            int N = mRemoteListeners.beginBroadcast();
-            for (int i = 0; i < N; i++) {
-                IChatListener listener = mRemoteListeners.getBroadcastItem(i);
+           // int N = mRemoteListeners.beginBroadcast();
+            for (int i = 0; i < mRemoteListeners.size(); i++) {
+                IChatListener listener = mRemoteListeners.get(i);
                 try {
                     listener.onContactTyping(ChatSessionAdapter.this, contact, isTyping);
                 } catch (RemoteException e) {
@@ -1857,7 +1912,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     // dead listeners.
                 }
             }
-            mRemoteListeners.finishBroadcast();
+        //    mRemoteListeners.finishBroadcast();
         }
         catch (IllegalStateException ise)
         {

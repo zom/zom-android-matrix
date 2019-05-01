@@ -160,10 +160,11 @@ public class ContactsPickerActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(ContactsPickerActivity.this, AddContactActivity.class);
+                i.putExtra("addLocalContact",false);
                 startActivityForResult(i, REQUEST_CODE_ADD_CONTACT);
             }
         });
-        btnAddContact.setVisibility(isGroupOnlyMode ? View.GONE : View.VISIBLE);
+        btnAddContact.setVisibility(View.VISIBLE);
 
         // Make sure the tag view can not be more than a third of the screen
         View root = findViewById(R.id.llRoot);
@@ -257,8 +258,9 @@ public class ContactsPickerActivity extends BaseActivity {
 
     private void setGroupMode(boolean groupMode) {
         setTitle(groupMode ? R.string.add_people : R.string.choose_friend);
-        mLayoutContactSelect.setVisibility(groupMode ? View.GONE : View.VISIBLE);
-        mLayoutGroupSelect.setVisibility(groupMode ? View.VISIBLE : View.GONE);
+        //mLayoutContactSelect.setVisibility(groupMode ? View.GONE : View.VISIBLE);
+        //mLayoutGroupSelect.setVisibility(groupMode ? View.VISIBLE : View.GONE);
+
         int newChoiceMode = (groupMode ? ListView.CHOICE_MODE_MULTIPLE : ListView.CHOICE_MODE_SINGLE);
         if (mListView.getChoiceMode() != newChoiceMode) {
             mListView.setChoiceMode(newChoiceMode);
@@ -298,22 +300,26 @@ public class ContactsPickerActivity extends BaseActivity {
         if (response == RESULT_OK)
             if (request == REQUEST_CODE_ADD_CONTACT)
             {
+
                 String newContact = data.getExtras().getString(ContactsPickerActivity.EXTRA_RESULT_USERNAME);
 
                 if (newContact != null)
                 {
-                    Intent dataNew = new Intent();
-                    
-                    long providerId = data.getExtras().getLong(ContactsPickerActivity.EXTRA_RESULT_PROVIDER);
-
-                    dataNew.putExtra(EXTRA_RESULT_USERNAME, newContact);
-                    dataNew.putExtra(EXTRA_RESULT_PROVIDER, providerId);
-                    setResult(RESULT_OK, dataNew);
-
+                    Intent result = new Intent();
+                    result.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, newContact);
+                    result.putExtra(EXTRA_RESULT_PROVIDER, data.getExtras().getLong(ContactsPickerActivity.EXTRA_RESULT_PROVIDER));
+                    result.putExtra(EXTRA_RESULT_ACCOUNT, data.getExtras().getLong(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT));
+                    setResult(RESULT_OK, result);
                     finish();
 
                 }
+                else
+                {
+                    getSupportLoaderManager().restartLoader(LOADER_ID, null, mLoaderCallbacks);
+
+                }
             }
+
 
 
     }
@@ -491,6 +497,7 @@ public class ContactsPickerActivity extends BaseActivity {
             Cursor cursor = (Cursor) mAdapter.getItem(index);
             String userName = cursor.getString(ContactListItem.COLUMN_CONTACT_USERNAME);
 
+
             SelectedContact contact = new SelectedContact(id,
                     userName,
                     (int) cursor.getLong(ContactListItem.COLUMN_CONTACT_ACCOUNT),
@@ -501,6 +508,8 @@ public class ContactsPickerActivity extends BaseActivity {
             updateStartGroupChatMenu();
         }
     }
+
+
 
     private boolean isSelected(long id) {
         return mSelection.indexOfKey(id) >= 0;
@@ -602,7 +611,7 @@ public class ContactsPickerActivity extends BaseActivity {
             buf.append(")) GROUP BY (" + Imps.Contacts.USERNAME);
 
             CursorLoader loader = new CursorLoader(ContactsPickerActivity.this, mUri, ContactListItem.CONTACT_PROJECTION,
-                    buf == null ? null : buf.toString(), null, Imps.Contacts.MODE_AND_ALPHA_SORT_ORDER);
+                    buf == null ? null : buf.toString(), null, Imps.Contacts.ALPHA_SORT_ORDER);
 
             return loader;
         }

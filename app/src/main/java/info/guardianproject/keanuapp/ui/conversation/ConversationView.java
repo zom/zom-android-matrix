@@ -266,7 +266,6 @@ public class ConversationView {
 
         if (mIsSelected)
         {
-            //  bindChat(mLastChatId);
             startListening();
 
             updateWarningView();
@@ -279,39 +278,6 @@ public class ConversationView {
                 mCurrentChatSession.markAsRead();
             }
             catch (Exception e){}
-
-            try
-            {
-
-                if (mConn == null)
-                    if (!checkConnection())
-                        return;
-
-                if (mConn == null)
-                    return;
-
-                IContactListManager manager = mConn.getContactListManager();
-
-                Contact contact = manager.getContactByAddress(mRemoteAddress);
-
-                if (contact != null) {
-
-                    if (contact.getPresence() != null) {
-                        mLastSeen = contact.getPresence().getLastSeen();
-                        if (mLastSeen != null)
-                            mActivity.updateLastSeen(mLastSeen);
-                    }
-
-                    if (!TextUtils.isEmpty(contact.getForwardingAddress())) {
-                        showContactMoved(contact);
-                    }
-
-                }
-
-
-
-            }
-            catch (RemoteException re){}
 
         }
         else
@@ -463,7 +429,7 @@ public class ConversationView {
         }
 
         @Override
-        public void onIncomingReceipt(IChatSession ses, String packetId) throws RemoteException {
+        public void onIncomingReceipt(IChatSession ses, String packetId, boolean wasEncrypted) throws RemoteException {
 
             if (getChatSession().getId() != ses.getId())
                 return;
@@ -1222,11 +1188,12 @@ public class ConversationView {
     public void startListening() {
 
         mIsListening = true;
+        checkConnection ();
 
         registerChatListener();
         registerForConnEvents();
 
-        updateWarningView();
+       // updateWarningView();
     }
 
     public void stopListening() {
@@ -1250,13 +1217,17 @@ public class ConversationView {
 
         updateWarningView();
 
+        if (isGroupChat()) {
+            updateGroupTitle();
+        }
+
     }
 
     int mContactType = -1;
 
     private void updateSessionInfo(Cursor c) {
 
-        if (c != null && (!c.isClosed()))
+        if (c != null && (!c.isClosed()) && c.getCount() > 0)
         {
             mProviderId = c.getLong(PROVIDER_COLUMN);
             mAccountId = c.getLong(ACCOUNT_COLUMN);
@@ -1270,8 +1241,18 @@ public class ConversationView {
 
             mSubscriptionStatus = c.getInt(SUBSCRIPTION_STATUS_COLUMN);
 
+
             if (!hasJoined())
-                showJoinGroupUI();
+            {
+                mHandler.post(new Runnable ()
+                {
+                    public void run ()
+                    {
+                        showJoinGroupUI();
+                    }
+                });
+            }
+
 
         }
 
@@ -1465,77 +1446,75 @@ public class ConversationView {
         mLastChatId = chatId;
 
         setViewType(VIEW_TYPE_CHAT);
+        bindQuery();
 
-        Uri contactUri = ContentUris.withAppendedId(Imps.Contacts.CONTENT_URI, chatId);
+        return true;
+    }
+
+    private boolean bindQuery () {
+
+        Uri contactUri = ContentUris.withAppendedId(Imps.Contacts.CONTENT_URI, mLastChatId);
         Cursor c = mActivity.getContentResolver().query(contactUri, CHAT_PROJECTION, null, null, null);
 
         if (c == null)
             return false;
 
-        if (c.getColumnCount() < 8)
+        if (c.getColumnCount() < 8 || c.getCount() == 0)
             return false;
 
-            try {
-                c.moveToFirst();
-            }
-            catch (IllegalStateException ise)
-            {
-                return false;
-            }
+        try {
+            c.moveToFirst();
+        }
+        catch (IllegalStateException ise)
+        {
+            return false;
+        }
 
-            updateSessionInfo(c);
+        updateSessionInfo(c);
+
+        if (mRemoteAvatar == null)
+        {
+            try {mRemoteAvatar = DatabaseUtils.getAvatarFromCursor(c, AVATAR_COLUMN, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT);}
+            catch (Exception e){}
 
             if (mRemoteAvatar == null)
             {
-                try {mRemoteAvatar = DatabaseUtils.getAvatarFromCursor(c, AVATAR_COLUMN, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT);}
-                catch (Exception e){}
-
-                if (mRemoteAvatar == null)
-                {
-                    mRemoteAvatar = new RoundedAvatarDrawable(BitmapFactory.decodeResource(mActivity.getResources(),
-                            R.drawable.avatar_unknown));
-
-                }
-
+                mRemoteAvatar = new RoundedAvatarDrawable(BitmapFactory.decodeResource(mActivity.getResources(),
+                        R.drawable.avatar_unknown));
 
             }
 
-            if (mRemoteHeader == null)
-            {
-                try {mRemoteHeader = DatabaseUtils.getHeaderImageFromCursor(c, AVATAR_COLUMN, DEFAULT_AVATAR_WIDTH,DEFAULT_AVATAR_HEIGHT);}
-                catch (Exception e){}
-            }
+
+        }
+
+        if (mRemoteHeader == null)
+        {
+            try {mRemoteHeader = DatabaseUtils.getHeaderImageFromCursor(c, AVATAR_COLUMN, DEFAULT_AVATAR_WIDTH,DEFAULT_AVATAR_HEIGHT);}
+            catch (Exception e){}
+        }
 
 
-            c.close();
+        c.close();
 
-            mHandler.post(mUpdateChatCallback);
+        initSession ();
 
-            initSession ();
+        mHandler.post(mUpdateChatCallback);
 
-            if (isGroupChat()) {
-                updateGroupTitle();
-            } else {
-                if (mRemoteNickname == null)
-                    mRemoteNickname = name;
-            }
 
-            return true;
+
+        return true;
 
 
     }
 
     boolean showContactName = true;
 
-    private synchronized void initSession ()
+    private void initSession ()
     {
-        updateChat();
         mCurrentChatSession = getChatSession();
         if (mCurrentChatSession == null)
             createChatSession();
     }
-
-
 
 
 
@@ -1842,6 +1821,7 @@ public class ConversationView {
                         }
                         else
                         {
+                            mCurrentChatSession = session;
                             if (task != null)
                                 task.execute();
                         }
@@ -2022,42 +2002,58 @@ public class ConversationView {
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
             log("registerChatListener " + mLastChatId);
         }
-        try {
 
+        getChatSession(new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                try {
+                    mCurrentChatSession.registerChatListener(mChatListener);
 
-            if (getChatSession() != null) {
-                getChatSession().registerChatListener(mChatListener);
+                    if (mConn != null)
+                    {
+                        IContactListManager listMgr = mConn.getContactListManager();
+                        listMgr.registerContactListListener(mContactListListener);
+                    }
+
+                } catch (RemoteException e) {
+                    Log.w(LOG_TAG, "<ChatView> registerChatListener fail:" + e.getMessage());
+                }
+
+                return null;
             }
 
-            if (mConn != null)
-            {
-                IContactListManager listMgr = mConn.getContactListManager();
-                listMgr.registerContactListListener(mContactListListener);
+        });
 
-            }
-
-        } catch (Exception e) {
-            Log.w(LOG_TAG, "<ChatView> registerChatListener fail:" + e.getMessage());
-        }
     }
 
     void unregisterChatListener() {
         if (Log.isLoggable(LOG_TAG, Log.DEBUG)) {
             log("unregisterChatListener " + mLastChatId);
         }
-        try {
-            if (getChatSession() != null) {
-                getChatSession().unregisterChatListener(mChatListener);
+
+
+        getChatSession(new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                try {
+                    mCurrentChatSession.unregisterChatListener(mChatListener);
+
+                    if (mConn != null) {
+                        IContactListManager listMgr = mConn.getContactListManager();
+                        listMgr.unregisterContactListListener(mContactListListener);
+
+                    }
+
+                } catch (RemoteException e) {
+                    Log.w(LOG_TAG, "<ChatView> registerChatListener fail:" + e.getMessage());
+                }
+
+                return null;
             }
 
-            if (mConn != null) {
-                IContactListManager listMgr = mConn.getContactListManager();
-                listMgr.unregisterContactListListener(mContactListListener);
+        });
 
-            }
-        } catch (Exception e) {
-            Log.w(LOG_TAG, "<ChatView> unregisterChatListener fail:" + e.getMessage());
-        }
+
     }
 
     void updateWarningView() {
@@ -2074,41 +2070,6 @@ public class ConversationView {
 
             isConnected = false;
         }
-
-        /**
-        if (this.isGroupChat())
-        {
-
-            mComposeMessage.setHint(R.string.this_is_a_group_chat);
-
-
-        }
-        else if (mCurrentChatSession != null) {
-
-
-            boolean isSessionEncrypted = false;
-
-            try {
-                isSessionEncrypted = mCurrentChatSession.isEncrypted();
-            }
-            catch (Exception re){}
-
-            if (isSessionEncrypted) {
-
-
-                if (mSendButton.getVisibility() == View.GONE) {
-                    mComposeMessage.setHint(R.string.compose_hint_secure);
-                    mSendButton.setImageResource(R.drawable.ic_send_secure);
-                }
-
-
-
-
-            }
-
-        }**/
-
-
     }
 
 
@@ -2589,7 +2550,7 @@ public class ConversationView {
             Cursor c = getCursor();
             c.moveToPosition(position);
             int type = c.getInt(mTypeColumn);
-            boolean isLeft = (type == Imps.MessageType.INCOMING_ENCRYPTED)||(type == Imps.MessageType.INCOMING)||(type == Imps.MessageType.INCOMING_ENCRYPTED_VERIFIED);
+            boolean isLeft = (type == Imps.MessageType.INCOMING_ENCRYPTED)||(type == Imps.MessageType.INCOMING);
 
             if (isLeft)
                 return 0;
@@ -2722,20 +2683,10 @@ public class ConversationView {
                 messageType = Imps.MessageType.INCOMING;
                 encState = MessageListItem.EncryptionState.ENCRYPTED;
             }
-            else if (messageType == Imps.MessageType.INCOMING_ENCRYPTED_VERIFIED)
-            {
-                messageType = Imps.MessageType.INCOMING;
-                 encState = MessageListItem.EncryptionState.ENCRYPTED_AND_VERIFIED;
-            }
             else if (messageType == Imps.MessageType.OUTGOING_ENCRYPTED)
             {
                 messageType = Imps.MessageType.OUTGOING;
                 encState = MessageListItem.EncryptionState.ENCRYPTED;
-            }
-            else if (messageType == Imps.MessageType.OUTGOING_ENCRYPTED_VERIFIED)
-            {
-                messageType = Imps.MessageType.OUTGOING;
-                 encState = MessageListItem.EncryptionState.ENCRYPTED_AND_VERIFIED;
             }
 
             switch (messageType) {
@@ -2746,6 +2697,8 @@ public class ConversationView {
 
             case Imps.MessageType.OUTGOING:
             case Imps.MessageType.QUEUED:
+            case Imps.MessageType.SENDING:
+
 
                 int errCode = cursor.getInt(mErrCodeColumn);
                 if (errCode != 0) {
@@ -2762,7 +2715,6 @@ public class ConversationView {
             }
 
             sendMessageRead(packetId);
-
 
         }
 

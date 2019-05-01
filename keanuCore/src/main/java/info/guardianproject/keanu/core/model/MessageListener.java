@@ -56,7 +56,15 @@ public interface MessageListener {
      * @param ses the {@link ChatSession}.
      * @param id the message ID.
      */
-    public void onIncomingReceipt(ChatSession ses, String id);
+    public void onIncomingReceipt(ChatSession ses, String id, boolean wasEncrypted);
+
+    /**
+     * Called when a message receipt was received.
+     *
+     * @param ses the {@link ChatSession}.
+     * @param id the message ID.
+     */
+    public void onIncomingReadMarker(ChatSession ses, String id, boolean wasEncrypted);
 
     /**
      * Called when we determine that the remote supports message delivery

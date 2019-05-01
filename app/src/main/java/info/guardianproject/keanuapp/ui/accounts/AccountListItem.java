@@ -71,6 +71,9 @@ public class AccountListItem extends LinearLayout {
 
     private boolean mShowLongName = false;
 
+    private ImApp mApp = null;
+
+
     private static Handler mHandler = new Handler()
     {
 
@@ -93,6 +96,9 @@ public class AccountListItem extends LinearLayout {
         mActivity = activity;
         mResolver = mActivity.getContentResolver();
         mSignInManager = signInManager;
+
+        mApp = (ImApp)mActivity.getApplication();
+
 
         mShowLongName = showLongName;
 
@@ -131,11 +137,10 @@ public class AccountListItem extends LinearLayout {
             @Override
             public boolean onLongClick(View v) {
 
-                ImApp app = (ImApp)mActivity.getApplication();
-
-                app.setDefaultAccount(mProviderId, mAccountId);
+                mApp.setDefaultAccount(mProviderId, mAccountId);
 
                 Snackbar.make(v, "Default account changed", Snackbar.LENGTH_LONG).show();
+
 
                 return true;
             }
@@ -241,6 +246,9 @@ public class AccountListItem extends LinearLayout {
                         mProviderNameText = activeUserName;// + '@' + userDomain;
                     else
                         mProviderNameText = nickname;
+
+                    if (providerId == mApp.getDefaultProviderId() && accountId == mApp.getDefaultAccountId())
+                        mProviderNameText += " ✔";
 
                     switch (connectionStatus) {
 

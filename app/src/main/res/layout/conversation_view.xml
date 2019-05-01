@@ -122,7 +122,21 @@
         android:scaleType="centerCrop"
         android:layout_margin="3dp"
         android:layout_gravity="left|top"
+        android:src="@drawable/avatar_unknown"
+
         />
 
+    <ImageView
+        android:id="@+id/markerUnread"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:scaleType="centerCrop"
+        android:layout_marginTop="44dp"
+        android:layout_marginLeft="44dp"
+        android:layout_gravity="left|top"
+        android:src="@drawable/circle_tintable"
+        android:tint="@color/holo_red_dark"
+        android:visibility="gone"
+        />
 
 </view>

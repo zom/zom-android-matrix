@@ -61,6 +61,7 @@ import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
 import info.guardianproject.keanuapp.tasks.SignInHelper;
 import info.guardianproject.keanuapp.ui.LockScreenActivity;
 import info.guardianproject.keanuapp.ui.accounts.AccountViewFragment;
+import info.guardianproject.keanuapp.ui.contacts.AddContactActivity;
 import info.guardianproject.keanuapp.ui.contacts.ContactsPickerActivity;
 import info.guardianproject.keanuapp.ui.conversation.ConversationDetailActivity;
 import info.guardianproject.keanuapp.ui.legacy.SimpleAlertHandler;
@@ -413,11 +414,14 @@ public class ImUrlActivity extends Activity {
                 ImApp app = (ImApp)getApplication();
                 app.initAccountInfo();
 
-                new AddContactAsyncTask(app.getDefaultProviderId(), app.getDefaultAccountId()).executeOnExecutor(ImApp.sThreadPoolExecutor,diLink.username,diLink.fingerprint,diLink.nickname);
+                //new AddContactAsyncTask(app.getDefaultProviderId(), app.getDefaultAccountId()).executeOnExecutor(ImApp.sThreadPoolExecutor,diLink.username,diLink.fingerprint,diLink.nickname);
+                Intent intentAdd = new Intent(this, AddContactActivity.class);
+                intentAdd.putExtra("username", diLink.username);
+                startActivity(intentAdd);
 
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("newcontact",diLink.username);
-                setResult(RESULT_OK,resultIntent);
+//                Intent resultIntent = new Intent();
+  //              resultIntent.putExtra("newcontact",diLink.username);
+    //            setResult(RESULT_OK,resultIntent);
 
                 //if they are for a group chat, then add the group
                 return false; //the work is done so we will finish!

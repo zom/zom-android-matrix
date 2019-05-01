@@ -13,8 +13,8 @@ public interface KeanuConstants {
     int SMALL_AVATAR_WIDTH = 64;
     int SMALL_AVATAR_HEIGHT = 64;
 
-    int DEFAULT_AVATAR_WIDTH = 512;
-    int DEFAULT_AVATAR_HEIGHT = 512;
+    int DEFAULT_AVATAR_WIDTH = 256;
+    int DEFAULT_AVATAR_HEIGHT = 256;
 
     String DEFAULT_TIMEOUT_CACHEWORD = "-1"; //one day
 
@@ -26,7 +26,7 @@ public interface KeanuConstants {
     String PREFERENCE_KEY_TEMP_PASS = "temppass";
 
     //ACCOUNT SETTINGS Imps defaults
-    String DEFAULT_DEVICE_NAME = "keanu";
+    String DEFAULT_DEVICE_NAME = "device";
 
     String NOTIFICATION_CHANNEL_ID_SERVICE = "info.guardianproject.keanu.service";
     String NOTIFICATION_CHANNEL_ID_MESSAGE = "info.guardianproject.keanu.message.2";

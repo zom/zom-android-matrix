@@ -151,7 +151,7 @@ public class StatusBarNotifier {
         }
         String title = contact.getName();
         String message = mContext.getString(R.string.invite_accepted);
-        Intent intent = getDefaultIntent(accountId, providerId);//new Intent(Intent.ACTION_VIEW);
+        Intent intent = getDefaultIntent(accountId, providerId);
         intent.setAction(Intent.ACTION_VIEW);
         intent.putExtra(ImServiceConstants.EXTRA_INTENT_FROM_ADDRESS, contact.getAddress().getBareAddress());
         intent.setType(Imps.Contacts.CONTENT_ITEM_TYPE);
@@ -164,9 +164,11 @@ public class StatusBarNotifier {
     public void notifyGroupInvitation(long providerId, long accountId, long invitationId,
             Invitation invitation) {
 
-        Intent intent = getDefaultIntent(accountId, providerId);//new Intent(Intent.ACTION_VIEW);
+        Intent intent = getDefaultIntent(accountId, providerId);
         intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(ContentUris.withAppendedId(Imps.Chats.CONTENT_URI, invitationId),Imps.Chats.CONTENT_ITEM_TYPE);
+        intent.setDataAndType(ContentUris.withAppendedId(Imps.Invitation.CONTENT_URI, invitationId),Imps.Invitation.CONTENT_ITEM_TYPE);
+        intent.putExtra(ImServiceConstants.EXTRA_INTENT_FROM_ADDRESS, invitation.getInviteID());
+        intent.putExtra(ImServiceConstants.EXTRA_INTENT_CHAT_ID, invitation.getChatID());
         intent.addCategory(IMPS_CATEGORY);
 
         String title = invitation.getReason();
@@ -284,7 +286,6 @@ public class StatusBarNotifier {
 
             if (info == null) {
                 info = new NotificationInfo(providerId, accountId);
-                mNotificationInfos.add(info);
                 info.setInfo(sender, title, message, null, intent);
 
             }
@@ -292,13 +293,13 @@ public class StatusBarNotifier {
                 sbMessage.append(message);
                 info.setInfo(sender, title, message, sbMessage.toString(), intent);
             }
+
+            mNotificationInfos.add(info);
+
         }
 
         mNotificationManager.notify(info.computeNotificationId(),
                 info.createNotification(tickerText, lightWeightNotify, iconSmall, iconLarge, intent, doVibrateSound));
-
-
-
 
 
     }

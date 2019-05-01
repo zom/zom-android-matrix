@@ -15,6 +15,7 @@ import info.guardianproject.keanuapp.ui.qr.QrScanActivity;
 import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.HashMap;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -31,6 +32,7 @@ import android.provider.Telephony;
 import android.util.Base64;
 import android.util.Log;
 
+import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_DEVICE_NAME;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 public class OnboardingManager {
@@ -38,9 +40,9 @@ public class OnboardingManager {
     public final static int REQUEST_SCAN = 1111;
     public final static int REQUEST_CHOOSE_AVATAR = REQUEST_SCAN+1;
 
-    public final static String BASE_INVITE_URL = "https://keanu.guardianproject.info/i/#";
+    public final static String BASE_INVITE_URL = "https://zom.im/i/#";
 
-    public final static String DEFAULT_SCHEME = "keanu";
+    public final static String DEFAULT_SCHEME = "matrix";
 
     public static void inviteSMSContact (Activity context, String phoneNumber, String message)
     {
@@ -115,6 +117,7 @@ public class OnboardingManager {
             StringBuffer resp = new StringBuffer();
 
             resp.append(nickname)
+                    .append(' ')
                     .append(context.getString(R.string.is_inviting_you))
                     .append(" ")
                     .append(generateInviteLink(context,username,fingerprint,nickname));
@@ -131,12 +134,24 @@ public class OnboardingManager {
     {
         DecodedInviteLink diLink = null;
 
-        Uri inviteLink = Uri.parse(link);
-        String[] code = inviteLink.toString().split("#");
-
-        if (code[0].contains("/i/")){
+        if (link.contains("/i/#")){
 
             //this is an invite link
+
+            //this is an invite link like this: https://zom.im/i/#@earthmouse:matrix.org
+            try {
+                String matrixContact = link.substring(link.lastIndexOf("@"));
+
+                diLink = new DecodedInviteLink();
+                diLink.username = matrixContact;
+
+            }
+            catch (IllegalArgumentException iae)
+            {
+                Log.e(LOG_TAG,"bad link decode",iae);
+            }
+
+            /**
             try {
                 String out = new String(Base64.decode(code[1], Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING));
 
@@ -183,14 +198,28 @@ public class OnboardingManager {
             catch (IllegalArgumentException iae)
             {
              Log.e(LOG_TAG,"bad link decode",iae);
+            }**/
+        }
+        else if (link.contains("matrix.to")){
+
+            //this is an invite link like this: https://matrix.to/#/@n8fr8:matrix.org
+            try {
+                String matrixContact = link.substring(link.lastIndexOf("@"));
+
+                diLink = new DecodedInviteLink();
+                diLink.username = matrixContact;
+
+            }
+            catch (IllegalArgumentException iae)
+            {
+                Log.e(LOG_TAG,"bad link decode",iae);
             }
         }
-        else if (link.contains("/#/")){
+        else if (link.startsWith(DEFAULT_SCHEME)){
 
-            //this is an invite link
+            //this is an invite link like this: https://matrix.to/#/@n8fr8:matrix.org
             try {
-                String matrixContact = link.substring(link.lastIndexOf("/")+1);
-
+                String matrixContact = link.substring(link.lastIndexOf("id=")+3);
                 diLink = new DecodedInviteLink();
                 diLink.username = matrixContact;
 
@@ -217,10 +246,11 @@ public class OnboardingManager {
 
     public static String generateInviteLink (Context context, String username, String fingerprint, String nickname) throws IOException
     {
-        return generateInviteLink(context, username, fingerprint, nickname, false);
+        return generateInviteLink(context, username);
     }
 
-    public static String generateInviteLink (Context context, String username, String fingerprint, String nickname, boolean isMigrateLink) throws IOException
+    /**
+    public static String generateInviteLink (Context context, String username) throws IOException
     {
         StringBuffer inviteUrl = new StringBuffer();
         inviteUrl.append(DEFAULT_SCHEME)
@@ -240,27 +270,18 @@ public class OnboardingManager {
 
       //  inviteUrl.append(Base64.encodeToString(code.toString().getBytes(), Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING));
         return inviteUrl.toString();
-    }
+    }**/
 
-    public static String generateInviteLinkFull (Context context, String username, String fingerprint, String nickname, boolean isMigrateLink) throws IOException
+    public static String generateInviteLink(Context context, String username) throws IOException
     {
         StringBuffer inviteUrl = new StringBuffer();
         inviteUrl.append(BASE_INVITE_URL);
-        
-        StringBuffer code = new StringBuffer();        
-        code.append(username);
-        code.append("?otr=").append(fingerprint);
-
-        if (nickname != null)
-            code.append("&nickname=").append(nickname);
-
-        if (isMigrateLink)
-            code.append("&m=1");
-
-        inviteUrl.append(Base64.encodeToString(code.toString().getBytes(), Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING));
+        inviteUrl.append(username);
+       // inviteUrl.append(Base64.encodeToString(code.toString().getBytes(), Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING));
         return inviteUrl.toString();
     }
 
+    /**
     private final static String PASSWORD_LETTERS = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789+@!#";
     private final static int PASSWORD_LENGTH = 12;
 
@@ -277,13 +298,17 @@ public class OnboardingManager {
             pw.append(PASSWORD_LETTERS.substring(index, index+1));
         }
         return pw.toString();
-    }
+    }**/
 
 
 
-    public static boolean changePassword (Activity context, long providerId, long accountId, String oldPassword, String newPassword)
+    public static boolean changeLocalPassword (Activity context, long providerId, long accountId, String password)
     {
         try {
+            final ContentResolver cr = context.getContentResolver();
+            ImPluginHelper helper = ImPluginHelper.getInstance(context);
+            ImApp.insertOrUpdateAccount(cr, providerId, accountId, null, null, password);
+
             /**
             XmppConnection xmppConn = new XmppConnection(context);
             xmppConn.initUser(providerId, accountId);
@@ -320,6 +345,11 @@ public class OnboardingManager {
         settings.setTlsCertVerify(true);
         settings.setAllowPlainAuth(false);
 
+        String newDeviceId =  DEFAULT_DEVICE_NAME + "-"
+                + UUID.randomUUID().toString().substring(0, 8);
+
+        settings.setDeviceName(newDeviceId);
+
         try
         {
             settings.setDomain(domain);
@@ -338,7 +368,7 @@ public class OnboardingManager {
             }
 
             settings.requery();
-
+            settings.close();
 
             if (Looper.myLooper() == null)
                 Looper.prepare();
@@ -389,7 +419,6 @@ public class OnboardingManager {
 
         }
 
-        settings.close();
 
 
     }
@@ -428,6 +457,11 @@ public class OnboardingManager {
         settings.setAllowPlainAuth(false);
 
         settings.setDoDnsSrv(doDnsSrvLookup);
+
+        String newDeviceId =  DEFAULT_DEVICE_NAME + "-"
+                + UUID.randomUUID().toString().substring(0, 8);
+
+        settings.setDeviceName(newDeviceId);
 
         try {
 

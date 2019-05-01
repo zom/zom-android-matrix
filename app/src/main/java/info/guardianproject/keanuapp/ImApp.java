@@ -53,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -85,6 +86,7 @@ import info.guardianproject.keanu.core.util.ImPluginHelper;
 import info.guardianproject.keanu.core.util.Languages;
 import info.guardianproject.keanuapp.tasks.MigrateAccountTask;
 
+import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_DEVICE_NAME;
 import static info.guardianproject.keanu.core.KeanuConstants.IMPS_CATEGORY;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.NOTIFICATION_CHANNEL_ID_MESSAGE;
@@ -98,7 +100,6 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
     public static ImApp sImApp;
 
-  //  private static IRemoteImService mImService;
 
     MyConnListener mConnectionListener;
 
@@ -308,7 +309,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         }
     }
 
-    public synchronized void startImServiceIfNeed() {
+    public void startImServiceIfNeed() {
         startImServiceIfNeed(false);
     }
 
@@ -325,12 +326,11 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
         mConnectionListener = new MyConnListener(new Handler());
 
-        synchronized (mQueue) {
-            for (Message msg : mQueue) {
-                msg.sendToTarget();
-            }
-            mQueue.clear();
+        for (Message msg : mQueue) {
+            msg.sendToTarget();
         }
+        mQueue.clear();
+
         Message msg = Message.obtain(null, EVENT_SERVICE_CONNECTED);
         mBroadcaster.broadcast(msg);
 
@@ -450,6 +450,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
             cr.update(accountUri, values, null, null);
 
             c.close();
+
             return id;
         } else {
             ContentValues values = new ContentValues(4);
@@ -492,6 +493,31 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
                 mQueue.add(msg);
             }
         }
+    }
+
+    public static void refreshAccount (ContentResolver resolver, long accountId, long providerId)
+    {
+
+        IImConnection conn = getConnection(providerId, accountId);
+
+        try {
+            conn.logout(true);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        String newDeviceId =  DEFAULT_DEVICE_NAME + "-"
+                + UUID.randomUUID().toString().substring(0, 8);
+
+        Cursor cursor = resolver.query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(providerId)}, null);
+
+        Imps.ProviderSettings.QueryMap providerSettings = new Imps.ProviderSettings.QueryMap(
+                cursor, resolver, providerId, false, null);
+
+        providerSettings.setDeviceName(newDeviceId);
+        providerSettings.close();
+        cursor.close();
+
     }
 
     public static void deleteAccount (ContentResolver resolver, long accountId, long providerId)
@@ -726,11 +752,19 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         ImPluginHelper.getInstance(this).loadAvailablePlugins();
     }
 
+    public boolean setDefaultAccount (long providerId, long accountId, String username, String nickname)
+    {
+        mDefaultNickname = nickname;
+        mDefaultUsername = username;
+        setDefaultAccount (providerId, accountId);
+        return true;
+    }
 
     public boolean setDefaultAccount (long providerId, long accountId)
     {
         mDefaultProviderId = providerId;
         mDefaultAccountId = accountId;
+        settings.edit().putLong("defaultAccountId",mDefaultAccountId).commit();
 
         final Uri uri = Imps.Provider.CONTENT_URI_WITH_ACCOUNT;
         String[] PROVIDER_PROJECTION = {
@@ -750,21 +784,17 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
         if (cursorProviders != null && cursorProviders.getCount() > 0) {
             cursorProviders.moveToFirst();
-            mDefaultProviderId = cursorProviders.getLong(0);
-            mDefaultAccountId = cursorProviders.getLong(1);
             mDefaultUsername = cursorProviders.getString(2);
             mDefaultNickname = cursorProviders.getString(3);
 
-            settings.edit().putLong("defaultAccountId",mDefaultAccountId).commit();
-
             Cursor pCursor = getContentResolver().query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(mDefaultProviderId)}, null);
 
-            Imps.ProviderSettings.QueryMap settings = new Imps.ProviderSettings.QueryMap(
+            Imps.ProviderSettings.QueryMap settingsProvider = new Imps.ProviderSettings.QueryMap(
                     pCursor, getContentResolver(), mDefaultProviderId, false /* don't keep updated */, null /* no handler */);
 
-            mDefaultUsername = '@' + mDefaultUsername + ':' + settings.getDomain();
+            mDefaultUsername = '@' + mDefaultUsername + ':' + settingsProvider.getDomain();
 
-            settings.close();
+            settingsProvider.close();
             cursorProviders.close();
 
             return true;
@@ -974,6 +1004,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
     }
 
+    /**
     public boolean doUpgrade (Activity activity, MigrateAccountTask.MigrateAccountListener listener)
     {
 
@@ -991,8 +1022,8 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         };
 
         final Cursor cursorProviders = getContentResolver().query(uri, PROVIDER_PROJECTION,
-                Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" /* selection */,
-                new String[]{IMPS_CATEGORY} /* selection args */,
+                Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" ,
+                new String[]{IMPS_CATEGORY} ,
                 Imps.Provider.DEFAULT_SORT_ORDER);
 
         if (cursorProviders != null && cursorProviders.getCount() > 0) {
@@ -1015,7 +1046,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
         return result;
 
-    }
+    }**/
 
     private void showFileSizes (File fileDir)
     {

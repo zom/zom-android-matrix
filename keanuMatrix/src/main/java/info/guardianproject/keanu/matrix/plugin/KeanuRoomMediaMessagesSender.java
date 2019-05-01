@@ -134,6 +134,7 @@ class KeanuRoomMediaMessagesSender {
                 if (null == roomMediaMessage.getEvent()) {
                     Message message;
                     String mimeType = roomMediaMessage.getMimeType(mContext);
+                    boolean includeReply = false;
 
                     // avoid null case
                     if (null == mimeType) {
@@ -141,7 +142,7 @@ class KeanuRoomMediaMessagesSender {
                     }
 
                     if (null == roomMediaMessage.getUri()) {
-                        message = buildTextMessage(roomMediaMessage);
+                        message = buildTextMessage(roomMediaMessage, includeReply);
                     } else if (mimeType.startsWith("image/")) {
                         message = buildImageMessage(roomMediaMessage);
                     } else if (mimeType.startsWith("video/")) {
@@ -345,7 +346,7 @@ class KeanuRoomMediaMessagesSender {
      * @param roomMediaMessage the RoomMediaMessage.
      * @return the message
      */
-    private Message buildTextMessage(RoomMediaMessage roomMediaMessage) {
+    private Message buildTextMessage(RoomMediaMessage roomMediaMessage, boolean includeReply) {
         CharSequence sequence = roomMediaMessage.getText();
         String htmlText = roomMediaMessage.getHtmlText();
         String text = null;
@@ -379,7 +380,7 @@ class KeanuRoomMediaMessagesSender {
 
         // Deals with in reply to event
         Event replyToEvent = roomMediaMessage.getReplyToEvent();
-        if (replyToEvent != null) {
+        if (replyToEvent != null && includeReply) {
             // Cf. https://docs.google.com/document/d/1BPd4lBrooZrWe_3s_lHw_e-Dydvc7bXbm02_sV2k6Sc
             String msgType = JsonUtils.getMessageMsgType(replyToEvent.getContentAsJsonObject());
 

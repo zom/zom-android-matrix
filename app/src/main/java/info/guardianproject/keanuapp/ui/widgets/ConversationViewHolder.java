@@ -1,5 +1,6 @@
 package info.guardianproject.keanuapp.ui.widgets;
 
+import android.media.Image;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -20,6 +21,7 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder
     public ImageView mStatusIcon;
     public View mContainer;
     public ImageView mMediaThumb;
+    public ImageView mMarkerUnread;
 
     public ConversationViewHolder(View view)
     {
@@ -36,6 +38,7 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder
 
         mMediaThumb = (ImageView)view.findViewById(R.id.media_thumbnail);
 
+        mMarkerUnread = (ImageView)view.findViewById(R.id.markerUnread);
     }
 
     public void onItemSelected ()

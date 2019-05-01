@@ -26,7 +26,6 @@ import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.iocipher.VirtualFileSystem;
 
-import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 /**
  * Copyright (C) 2014 Guardian Project.  All rights reserved.
@@ -42,6 +41,7 @@ public class SecureMediaStore {
     private static final String LEGACY_BLOB_NAME = "media.db";
 
     public static final int DEFAULT_IMAGE_WIDTH = 1080;
+    private final static String LOG_TAG = "SecureMediaStore";
 
 
     public static void unmount() {

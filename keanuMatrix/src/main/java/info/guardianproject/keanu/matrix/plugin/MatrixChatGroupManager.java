@@ -41,12 +41,13 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
     private MXSession mSession;
     private MatrixConnection mConn;
-
+    private MatrixChatSessionManager mChatSessionMgr;
     private Context mContext;
 
-    public MatrixChatGroupManager (Context context, MatrixConnection conn) {
+    public MatrixChatGroupManager (Context context, MatrixConnection conn, MatrixChatSessionManager chatSessionManager) {
         mConn = conn;
         mContext = context;
+        mChatSessionMgr = chatSessionManager;
     }
 
     public void setDataHandler (MXDataHandler dataHandler)
@@ -82,6 +83,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         if (result == null)
         {
             result = new ChatGroup(addr,null,this);
+            mGroups.put(addr.getAddress(),result);
         }
 
         return result;
@@ -265,22 +267,28 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     private void setupRoom (Room room, IChatSessionListener listener)
     {
 
-        setRoomDefaults(room);
+        boolean isEncrypted = true;
+        boolean isPrivate = true;
+
+        setRoomDefaults(room, isEncrypted, isPrivate);
 
         ChatGroup chatGroup = mConn.addRoomContact(room);
-        ChatSession session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
-        ChatSessionAdapter adapter = mConn.getChatSessionManager().getChatSessionAdapter(room.getRoomId());
-        adapter.useEncryption(room.isEncrypted());
+        ChatSession session = mChatSessionMgr.getSession(room.getRoomId());
+        if (session == null)
+            session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
+
+        ChatSessionAdapter adapter = mChatSessionMgr.getChatSessionAdapter(room.getRoomId());
+        adapter.useEncryption(isEncrypted);
 
         if (!chatGroup.hasMemberListener())
             chatGroup.addMemberListener(adapter.getListenerAdapter());
 
         chatGroup.beginMemberUpdates();
-        chatGroup.notifyMemberJoined(mSession.getMyUserId(), mConn.getLoginUser());
+        chatGroup.notifyMemberJoined(mConn.getLoginUser().getAddress().getAddress(), mConn.getLoginUser());
         chatGroup.notifyMemberRoleUpdate(mConn.getLoginUser(), "moderator", "owner");
         chatGroup.endMemberUpdates();
 
-        mConn.updateGroupMembersAsync(room,chatGroup);
+        mConn.updateGroupMembersAsync(room,chatGroup, true);
 
         if (listener != null) {
 
@@ -294,17 +302,19 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     }
 
 
-    private void setRoomDefaults (Room room)
+    private void setRoomDefaults (Room room, boolean enableEncryption, boolean isPrivate)
     {
 
-
-        if (!room.isEncrypted())
+        if (enableEncryption)
             room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM, new BasicApiCallback("CreateRoomEncryption"));
 
-        room.setIsURLPreviewAllowedByUser(false, new BasicApiCallback("setIsURLPreviewAllowedByUser:false"));
-        room.updateDirectoryVisibility(RoomDirectoryVisibility.DIRECTORY_VISIBILITY_PRIVATE,new BasicApiCallback("updateDirectoryVisibility:private"));
-        room.updateHistoryVisibility("joined",new BasicApiCallback("updateHistoryVisibility:joined"));
-        room.updateGuestAccess("forbidden", new BasicApiCallback("updateGuestAccess:forbidden"));
+
+        if (isPrivate) {
+            room.updateDirectoryVisibility(RoomDirectoryVisibility.DIRECTORY_VISIBILITY_PRIVATE, new BasicApiCallback("updateDirectoryVisibility:private"));
+            room.setIsURLPreviewAllowedByUser(false, new BasicApiCallback("setIsURLPreviewAllowedByUser:false"));
+            room.updateHistoryVisibility("joined",new BasicApiCallback("updateHistoryVisibility:joined"));
+            room.updateGuestAccess("forbidden", new BasicApiCallback("updateGuestAccess:forbidden"));
+        }
 
         PowerLevels pLevels = room.getState().getPowerLevels();
         if (pLevels == null) {
@@ -414,12 +424,10 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
                 @Override
                 public void onSuccess(Void aVoid) {
-                    mConn.updateGroupMembers(room, group);
+                    mConn.updateGroupMembers(room, group, false);
 
                 }
             });
-
-            mConn.updateGroupMembers(room, group);
 
 
         }
@@ -499,7 +507,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
             RoomMember member = room.getMember(contact.getAddress().getAddress());
             room.getState().getPowerLevels().setUserPowerLevel(member.getUserId(),100);
 
-            mConn.updateGroupMembers(room, group);
+            mConn.updateGroupMembers(room, group, true);
         }
     }
 
@@ -508,6 +516,6 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
         Room room = mDataHandler.getRoom(group.getAddress().getAddress());
         group.setName(room.getRoomDisplayName(mContext));
-        mConn.updateGroupMembers(room, group);
+        mConn.updateGroupMembers(room, group, true);
     }
 }

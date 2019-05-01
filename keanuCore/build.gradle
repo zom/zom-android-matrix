@@ -34,7 +34,7 @@ dependencies {
     implementation 'net.zetetic:android-database-sqlcipher:3.5.4@aar'
     implementation 'info.guardianproject.iocipher:IOCipher:0.4'
     implementation 'commons-codec:commons-codec:1.10'
-    implementation 'commons-io:commons-io:2.5'
+    implementation 'commons-io:commons-io:2.6'
     implementation 'org.thoughtcrime.ssl.pinning:AndroidPinning:1.0.0'
     implementation 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'
     implementation 'info.guardianproject.netcipher:netcipher-httpclient:2.0.0-alpha1'
@@ -44,13 +44,12 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
     implementation 'com.google.protobuf:protobuf-java:3.4.0'
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'com.jrummyapps:android-shell:1.0.1'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
     // Network
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
-    implementation 'com.google.code.gson:gson:2.8.2'
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
     implementation 'com.squareup.okhttp3:okhttp-urlconnection:3.12.1'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.12.1'

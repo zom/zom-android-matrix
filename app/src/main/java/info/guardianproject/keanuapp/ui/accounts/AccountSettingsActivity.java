@@ -176,6 +176,13 @@ public class AccountSettingsActivity extends PreferenceActivity implements
 
     }
 
+    private void refreshAccount ()
+    {
+
+        ((ImApp)getApplication()).refreshAccount(getContentResolver(),mAccountId, mProviderId);
+
+    }
+
     private void confirmDeleteAccount ()
     {
 
@@ -292,11 +299,11 @@ public class AccountSettingsActivity extends PreferenceActivity implements
                 if(arg0.getItemId() == R.id.menu_delete){
                     deleteAccount();
                 }
-                else if(arg0.getItemId() == R.id.menu_migrate) {
+                else if(arg0.getItemId() == R.id.menu_refresh) {
 
 
 
-                    migrateAccount ();
+                    refreshAccount();
 
 
                 }

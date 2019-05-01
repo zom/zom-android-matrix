@@ -34,6 +34,8 @@ public interface ChatSessionListener {
 
     public void onMessageSendSuccess (Message msg, String newMessageId);
 
-    public void onMessageSendFail (Message msg);
+    public void onMessageSendQueued (Message msg, String newMessageId);
+
+    public void onMessageSendFail (Message msg, String newMessageId);
 
 }

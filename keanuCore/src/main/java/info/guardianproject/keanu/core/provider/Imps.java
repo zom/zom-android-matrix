@@ -768,24 +768,16 @@ public class Imps {
         int STATUS = 7;
         /* the message cannot be sent now, but will be sent later */
         int QUEUED = 8;
-        /* off The Record status is turned off */
-        int OTR_IS_TURNED_OFF = 9;
-        /* off the record status is turned on */
-        int OTR_IS_TURNED_ON = 10;
-        /* off the record status turned on by user */
-        int OTR_TURNED_ON_BY_USER = 11;
-        /* off the record status turned on by buddy */
-        int OTR_TURNED_ON_BY_BUDDY = 12;
+
+        /* the message cannot be sent now, but will be sent later */
+        int SENDING = 9;
 
         /* received message */
         int INCOMING_ENCRYPTED = 13;
-        /* received message */
-        int INCOMING_ENCRYPTED_VERIFIED = 14;
 
         /* received message */
         int OUTGOING_ENCRYPTED = 15;
-        /* received message */
-        int OUTGOING_ENCRYPTED_VERIFIED = 16;
+
     }
 
     /** The common columns for messages table */
@@ -1946,16 +1938,8 @@ public class Imps {
                 ProviderSettings.setXmppResource(mContentResolver, mProviderId, resource);
             }
 
-            public synchronized String getDeviceName() {
-                String currentResource = getString(XMPP_RESOURCE, DEFAULT_DEVICE_NAME);
-                String defaultResource;
-                if (currentResource.equals(DEFAULT_DEVICE_NAME)) {
-                    defaultResource = DEFAULT_DEVICE_NAME + "-"
-                                      + UUID.randomUUID().toString().substring(0, 8);
-                    setDeviceName(defaultResource);
-                    return defaultResource;
-                }
-                return currentResource;
+            public String getDeviceName() {
+                return getString(XMPP_RESOURCE, DEFAULT_DEVICE_NAME);
             }
 
             public void setPort(int port) {
@@ -2495,10 +2479,10 @@ public class Imps {
         return result;
     }
 
-    public static int updateMessageInDb(ContentResolver resolver, String id, int type, long time, long contactId, String newPacketId) {
+    public static int updateMessageInDb(ContentResolver resolver, String oldPacketId, int type, long time, long contactId, String newPacketId) {
 
         Builder builder = Messages.OTR_MESSAGES_CONTENT_URI_BY_PACKET_ID.buildUpon();
-        builder.appendPath(id);
+        builder.appendPath(oldPacketId);
 
         ContentValues values = new ContentValues();
         values.put(Messages.TYPE, type);
@@ -2514,20 +2498,30 @@ public class Imps {
         if (result == 0)
         {
             builder = Messages.CONTENT_URI_MESSAGES_BY_PACKET_ID.buildUpon();
-            builder.appendPath(id);
+            builder.appendPath(oldPacketId);
             result = resolver.update(builder.build(), values, null, null);
         }
 
         return result;
     }
 
-    public static int updateConfirmInDb(ContentResolver resolver, long threadId, String msgId, boolean isDelivered) {
+    public static int updateConfirmInDb(ContentResolver resolver, long chatId, String msgId, boolean isDelivered, boolean wasEncrypted) {
+
+
         Builder builder = Messages.OTR_MESSAGES_CONTENT_URI_BY_PACKET_ID.buildUpon();
         builder.appendPath(msgId);
 
         ContentValues values = new ContentValues(1);
         values.put(Messages.IS_DELIVERED, isDelivered);
-        values.put(Messages.THREAD_ID,threadId);
+        values.put(Messages.THREAD_ID,chatId);
+
+        if (Imps.messageExists(resolver,msgId, MessageType.QUEUED)) {
+            if (wasEncrypted)
+                values.put(Messages.TYPE, MessageType.OUTGOING_ENCRYPTED);
+            else
+                values.put(Messages.TYPE, MessageType.OUTGOING);
+        }
+
         int result = resolver.update(builder.build(), values, null, null);
 
         if (result == 0)
@@ -2538,6 +2532,58 @@ public class Imps {
         }
 
         return result;
+    }
+
+    public static int updateAllConfirmInDb(ContentResolver resolver, long threadId, String packetId, boolean isDelivered, boolean wasEncrypted) {
+
+        int internalMsgId = getInternalMessageId(resolver, packetId);
+
+        if (internalMsgId != -1) {
+            Builder builder = Messages.OTR_MESSAGES_CONTENT_URI_BY_THREAD_ID.buildUpon();
+            builder.appendPath(threadId+"");
+
+            ContentValues values = new ContentValues(1);
+            values.put(Messages.IS_DELIVERED, isDelivered);
+            values.put(Messages.THREAD_ID,threadId);
+
+            String where = Messages._ID + "<=" + internalMsgId + " AND " + Messages.IS_DELIVERED + "=0";
+            String[] selArgs = null;
+
+            int result = resolver.update(builder.build(), values, where, selArgs);
+
+            if (result == 0) {
+                builder = Messages.CONTENT_URI_MESSAGES_BY_THREAD_ID.buildUpon();
+                builder.appendPath(threadId+"");
+                result = resolver.update(builder.build(), values, where, selArgs);
+            }
+
+            return result;
+        }
+
+        return 0;
+    }
+
+    public static int getInternalMessageId (ContentResolver resolver, String id)
+    {
+
+        int msgId = -1;
+
+        Builder builder = Messages.OTR_MESSAGES_CONTENT_URI_BY_PACKET_ID.buildUpon();
+        builder.appendPath(id);
+        String[] projection = {Messages._ID};
+        Cursor c = resolver.query(builder.build(),projection, null, null, null);
+        if (c != null)
+        {
+            if (c.getCount() > 0) {
+                c.moveToFirst();
+                msgId = c.getInt(0);
+            }
+
+            c.close();
+
+        }
+
+        return msgId;
     }
 
     public static boolean messageExists (ContentResolver resolver, String id)
@@ -2554,6 +2600,7 @@ public class Imps {
                 result = true;
 
             c.close();
+
         }
 
         return result;

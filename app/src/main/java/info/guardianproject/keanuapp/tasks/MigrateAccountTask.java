@@ -142,7 +142,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
                 }
 
                 String fingerprint = "";
-                String inviteLink = OnboardingManager.generateInviteLink(mContext, newAccountId, fingerprint, nickname, true);
+                String inviteLink = OnboardingManager.generateInviteLink(mContext, newAccountId);
 
                 String migrateMessage = mContext.getString(R.string.migrate_message) + ' ' + inviteLink;
                 IChatSessionManager sessionMgr = mConn.getChatSessionManager();
@@ -214,7 +214,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
                 setKeepSignedIn(mAccountId, false);
 
                 if (loggedInToOldAccount)
-                    mConn.logout();
+                    mConn.logout(true);
 
                 return mNewAccount;
 

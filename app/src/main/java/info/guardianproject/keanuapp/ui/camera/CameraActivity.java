@@ -45,6 +45,8 @@ import java.util.concurrent.TimeUnit;
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.keanu.core.Preferences;
+import info.guardianproject.keanu.core.util.Debug;
+import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.R;
@@ -180,7 +182,7 @@ public class CameraActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     btnCameraClicked();
-                }
+		}
             });
         }
 
@@ -316,7 +318,7 @@ public class CameraActivity extends AppCompatActivity {
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
-            hideSystemUI();
+            //hideSystemUI();
         }
     }
 
@@ -397,7 +399,7 @@ public class CameraActivity extends AppCompatActivity {
             //adds in an empty message, so it can exist in the gallery and be forwarded
             Imps.insertMessageInDb(
                     getContentResolver(), false, new Date().getTime(), true, null, vfsUri.toString(),
-                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED_VERIFIED,
+                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED,
                     0, offerId, mimeType, null);
 
             if (mOneAndDone) {
@@ -437,7 +439,7 @@ public class CameraActivity extends AppCompatActivity {
             final Uri vfsUri = SecureMediaStore.createContentPath(sessionId,"cam" + new Date().getTime() + ".jpg");
 
             OutputStream out = new FileOutputStream(new File(vfsUri.getPath()));
-            bitmap = getResizedBitmap(bitmap,SecureMediaStore.DEFAULT_IMAGE_WIDTH,SecureMediaStore.DEFAULT_IMAGE_WIDTH);
+         //   bitmap = getResizedBitmap(bitmap,SecureMediaStore.DEFAULT_IMAGE_WIDTH,SecureMediaStore.DEFAULT_IMAGE_WIDTH);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100 /*ignored for JPG*/, out);
 
             bitmap.recycle();
@@ -448,7 +450,7 @@ public class CameraActivity extends AppCompatActivity {
             //adds in an empty message, so it can exist in the gallery and be forwarded
             Imps.insertMessageInDb(
                     getContentResolver(), false, new Date().getTime(), true, null, vfsUri.toString(),
-                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED_VERIFIED,
+                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED,
                     0, offerId, mimeType, null);
 
             if (mOneAndDone) {
