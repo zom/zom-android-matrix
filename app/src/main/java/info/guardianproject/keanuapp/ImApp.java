@@ -752,11 +752,19 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         ImPluginHelper.getInstance(this).loadAvailablePlugins();
     }
 
+    public boolean setDefaultAccount (long providerId, long accountId, String username, String nickname)
+    {
+        mDefaultNickname = nickname;
+        mDefaultUsername = username;
+        setDefaultAccount (providerId, accountId);
+        return true;
+    }
 
     public boolean setDefaultAccount (long providerId, long accountId)
     {
         mDefaultProviderId = providerId;
         mDefaultAccountId = accountId;
+        settings.edit().putLong("defaultAccountId",mDefaultAccountId).commit();
 
         final Uri uri = Imps.Provider.CONTENT_URI_WITH_ACCOUNT;
         String[] PROVIDER_PROJECTION = {
@@ -776,21 +784,17 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
         if (cursorProviders != null && cursorProviders.getCount() > 0) {
             cursorProviders.moveToFirst();
-            mDefaultProviderId = cursorProviders.getLong(0);
-            mDefaultAccountId = cursorProviders.getLong(1);
             mDefaultUsername = cursorProviders.getString(2);
             mDefaultNickname = cursorProviders.getString(3);
 
-            settings.edit().putLong("defaultAccountId",mDefaultAccountId).commit();
-
             Cursor pCursor = getContentResolver().query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(mDefaultProviderId)}, null);
 
-            Imps.ProviderSettings.QueryMap settings = new Imps.ProviderSettings.QueryMap(
+            Imps.ProviderSettings.QueryMap settingsProvider = new Imps.ProviderSettings.QueryMap(
                     pCursor, getContentResolver(), mDefaultProviderId, false /* don't keep updated */, null /* no handler */);
 
-            mDefaultUsername = '@' + mDefaultUsername + ':' + settings.getDomain();
+            mDefaultUsername = '@' + mDefaultUsername + ':' + settingsProvider.getDomain();
 
-            settings.close();
+            settingsProvider.close();
             cursorProviders.close();
 
             return true;
@@ -1000,6 +1004,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
     }
 
+    /**
     public boolean doUpgrade (Activity activity, MigrateAccountTask.MigrateAccountListener listener)
     {
 
@@ -1017,8 +1022,8 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         };
 
         final Cursor cursorProviders = getContentResolver().query(uri, PROVIDER_PROJECTION,
-                Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" /* selection */,
-                new String[]{IMPS_CATEGORY} /* selection args */,
+                Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" ,
+                new String[]{IMPS_CATEGORY} ,
                 Imps.Provider.DEFAULT_SORT_ORDER);
 
         if (cursorProviders != null && cursorProviders.getCount() > 0) {
@@ -1041,7 +1046,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
         return result;
 
-    }
+    }**/
 
     private void showFileSizes (File fileDir)
     {

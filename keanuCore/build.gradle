@@ -34,7 +34,7 @@ dependencies {
     implementation 'net.zetetic:android-database-sqlcipher:3.5.4@aar'
     implementation 'info.guardianproject.iocipher:IOCipher:0.4'
     implementation 'commons-codec:commons-codec:1.10'
-    implementation 'commons-io:commons-io:2.5'
+    implementation 'commons-io:commons-io:2.6'
     implementation 'org.thoughtcrime.ssl.pinning:AndroidPinning:1.0.0'
     implementation 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'
     implementation 'info.guardianproject.netcipher:netcipher-httpclient:2.0.0-alpha1'

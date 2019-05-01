@@ -17,7 +17,6 @@
 package info.guardianproject.keanuapp;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.ComponentName;
@@ -50,6 +49,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -83,6 +83,7 @@ import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.ImServiceConstants;
 import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.service.StatusBarNotifier;
+import info.guardianproject.keanu.core.util.AssetUtil;
 import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.core.util.SystemServices;
@@ -177,10 +178,6 @@ public class MainActivity extends BaseActivity {
         adapter.addFragment(mConversationList, getString(R.string.title_chats), R.drawable.ic_message_white_36dp);
         adapter.addFragment(mContactList, getString(R.string.contacts), R.drawable.ic_people_white_36dp);
         adapter.addFragment(mMoreFragment, getString(R.string.title_more), R.drawable.ic_more_horiz_white_36dp);
-
-        mAccountFragment = new AccountFragment();
-      //  fragAccount.setArguments();
-
         adapter.addFragment(mAccountFragment, getString(R.string.title_me), R.drawable.ic_face_white_24dp);
 
         mViewPager.setAdapter(adapter);
@@ -208,6 +205,7 @@ public class MainActivity extends BaseActivity {
             public void onTabSelected(TabLayout.Tab tab) {
 
                 mViewPager.setCurrentItem(tab.getPosition());
+
                 setToolbarTitle(tab.getPosition());
                 applyStyleColors ();
             }
@@ -260,12 +258,14 @@ public class MainActivity extends BaseActivity {
 
         applyStyle();
 
+
     }
+
+
 
     private void installRingtones ()
     {
-        //AssetUtil.installRingtone(getApplicationContext(),R.raw.bell,"Bell");
-
+      //  AssetUtil.installRingtone(getApplicationContext(),R.raw.custom_ringtone,getString(R.string.custom_ringtone));
 
     }
 
@@ -297,6 +297,7 @@ public class MainActivity extends BaseActivity {
                 break;
             case 3:
                 sb.append(getString(R.string.me_title));
+                mAccountFragment.setUserVisibleHint(true);
                 break;
         }
 
@@ -357,6 +358,7 @@ public class MainActivity extends BaseActivity {
 
 
         handleIntent(getIntent());
+
 
     }
 
@@ -492,6 +494,11 @@ public class MainActivity extends BaseActivity {
               long accountId = intent.getLongExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT,mApp.getDefaultAccountId());
 
               startChat(providerId, accountId, username, true);
+
+          }
+            else if (intent.getBooleanExtra("firstTime",false))
+          {
+              inviteContact ();
 
           }
 

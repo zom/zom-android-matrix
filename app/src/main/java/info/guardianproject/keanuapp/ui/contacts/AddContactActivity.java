@@ -118,7 +118,10 @@ public class AddContactActivity extends BaseActivity {
 
         mApp = (ImApp)getApplication();
 
-        mConn = RemoteImService.getConnection(mApp.getDefaultProviderId(),mApp.getDefaultAccountId());
+        long providerId = getIntent().getLongExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER,mApp.getDefaultProviderId());
+        long accountId = getIntent().getLongExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT,mApp.getDefaultAccountId());
+
+        mConn = RemoteImService.getConnection(providerId, accountId);
 
         mHandler = new SimpleAlertHandler(this);
 
@@ -141,18 +144,28 @@ public class AddContactActivity extends BaseActivity {
             }
         });
 
-        Intent intent = getIntent();
-        mAddLocalContact = intent.getBooleanExtra("addLocalContact",true);
-
-        String scheme = intent.getScheme();
-        if (TextUtils.equals(scheme, "keanu"))
-        {
-            addContactFromUri(intent.getData());
-        }
 
         setupActions ();
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        Intent intent = getIntent();
+        mAddLocalContact = intent.getBooleanExtra("addLocalContact",true);
+
+        String scheme = intent.getScheme();
+
+        if (TextUtils.equals(scheme, "matrix"))
+        {
+            addContactFromUri(intent.getData());
+        }
+
+
+        if (intent.hasExtra("username"))
+        {
+            String newContact = intent.getStringExtra("username");
+            mNewAddress.setText(newContact);
+
+        }
 
     }
 
