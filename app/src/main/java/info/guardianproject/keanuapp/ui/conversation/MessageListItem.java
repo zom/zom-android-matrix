@@ -219,7 +219,7 @@ public class MessageListItem extends FrameLayout {
 
         this.packetId = packetId;
 
-        String nickname = userAddress;
+        String nickname = userAddress.split("\\|")[0];
 
         if (nickname.startsWith("@"))
             nickname = new MatrixAddress(userAddress).getUser();

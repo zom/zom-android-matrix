@@ -93,6 +93,7 @@ public class ConversationListFragment extends Fragment {
         mRecView =  (RecyclerView)view.findViewById(R.id.recyclerview);
         mEmptyView = view.findViewById(R.id.empty_view);
 
+        /**
         mUpgradeView = view.findViewById(R.id.upgrade_view);
         mUpgradeImage = (ImageView)view.findViewById(R.id.upgrade_view_image);
         mUpgradeDesc = (TextView)view.findViewById(R.id.upgrade_view_text);
@@ -103,7 +104,7 @@ public class ConversationListFragment extends Fragment {
             public void onClick(View view) {
                 doUpgrade();
             }
-        });
+        });**/
 
 
         mEmptyViewImage = view.findViewById(R.id.empty_view_image);
@@ -124,7 +125,6 @@ public class ConversationListFragment extends Fragment {
         view.setBackgroundColor(themeColorBg);
             */
 
-        checkUpgrade();
 
         return view;
     }
@@ -626,6 +626,7 @@ public class ConversationListFragment extends Fragment {
 
     }
 
+    /**
     private void checkUpgrade ()
     {
         if (((ImApp)getActivity().getApplication()).needsAccountUpgrade())
@@ -634,6 +635,7 @@ public class ConversationListFragment extends Fragment {
         }
 
     }
+
 
 
     private MigrateAccountTask.MigrateAccountListener mMigrateTaskListener;
@@ -694,5 +696,5 @@ public class ConversationListFragment extends Fragment {
             ((ImApp) getActivity().getApplication()).doUpgrade(getActivity(), mMigrateTaskListener);
 
         }
-    }
+    }**/
 }
