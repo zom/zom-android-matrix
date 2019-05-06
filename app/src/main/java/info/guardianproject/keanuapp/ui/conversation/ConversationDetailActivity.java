@@ -317,7 +317,7 @@ public class ConversationDetailActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         processIntent(getIntent());
-        setIntent(null);
+    //    setIntent(null);
         mConvoView.setSelected(true);
 
         /**

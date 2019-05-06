@@ -13,6 +13,8 @@ public class StoryActivity extends ConversationDetailActivity {
     // Use this flag as a boolean EXTRA to enable contributor mode (as opposed to viewer mode)
     public static final String ARG_CONTRIBUTOR_MODE = "contributor_mode";
 
+    public static final String TAG_STORYMODE_INDICATOR = "#session";
+
     private boolean contributorMode() {
         return getIntent().getBooleanExtra(ARG_CONTRIBUTOR_MODE, false);
     }
