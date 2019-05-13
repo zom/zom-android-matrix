@@ -136,6 +136,12 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 cursor, getContentResolver(), mProviderId, false, null);
 
         mMembers = new ArrayList<>();
+
+        if (mProviderId == -1) {
+            mProviderId = getIntent().getLongExtra("provider", mApp.getDefaultProviderId());
+            mAccountId = getIntent().getLongExtra("account", mApp.getDefaultAccountId());
+        }
+
         mConn = RemoteImService.getConnection(mProviderId, mAccountId);
         mLocalAddress = '@' + Imps.Account.getUserName(getContentResolver(), mAccountId) + ':' + providerSettings.getDomain();
         try {
@@ -434,6 +440,9 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
             @Override
             protected Void doInBackground(Void... voids) {
+                if (mConn == null)
+                    initData();
+                
                 updateSessionAsync();
                 return null;
             }
@@ -451,9 +460,9 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
     private IChatSession updateSessionAsync() {
         try {
-            if (mSession == null) {
-                mSession = mConn.getChatSessionManager().getChatSession(mAddress);
 
+            if (mSession == null && mConn != null) {
+                mSession = mConn.getChatSessionManager().getChatSession(mAddress);
             }
 
             if (mSession != null) {

@@ -104,7 +104,6 @@ public class AddContactActivity extends BaseActivity {
     ImApp mApp;
     SimpleAlertHandler mHandler;
 
-    private IImConnection mConn;
     private boolean mAddLocalContact = true;
 
     @Override
@@ -117,11 +116,6 @@ public class AddContactActivity extends BaseActivity {
         setTitle("");
 
         mApp = (ImApp)getApplication();
-
-        long providerId = getIntent().getLongExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER,mApp.getDefaultProviderId());
-        long accountId = getIntent().getLongExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT,mApp.getDefaultAccountId());
-
-        mConn = RemoteImService.getConnection(providerId, accountId);
 
         mHandler = new SimpleAlertHandler(this);
 
@@ -182,7 +176,6 @@ public class AddContactActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
 
-        checkConnection();
 
     }
 
@@ -541,6 +534,8 @@ public class AddContactActivity extends BaseActivity {
         }
     }
 
+    private IImConnection mConn;
+
     private TextWatcher mTextWatcher = new TextWatcher() {
         public void afterTextChanged(Editable s) {
 
@@ -551,6 +546,10 @@ public class AddContactActivity extends BaseActivity {
 
                 String searchString = mNewAddress.getText().toString();
                 if (searchString.length() > 1) {
+
+                    if (mConn == null)
+                        mConn = checkConnection();
+
                     if (mConn != null && mConn.getState() == ImConnection.LOGGED_IN) {
                         mConn.searchForUser(searchString, new IContactListListener() {
                             @Override
@@ -691,21 +690,25 @@ public class AddContactActivity extends BaseActivity {
     }
 
 
-    private boolean checkConnection() {
+    private IImConnection checkConnection() {
         try {
-            if (mApp.getDefaultProviderId() != -1) {
-                IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
 
-                if (conn.getState() == ImConnection.DISCONNECTED
-                        || conn.getState() == ImConnection.SUSPENDED
-                        || conn.getState() == ImConnection.SUSPENDING)
-                    return false;
+            long providerId = getIntent().getLongExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER,mApp.getDefaultProviderId());
+            long accountId = getIntent().getLongExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT,mApp.getDefaultAccountId());
+
+
+            if (providerId != -1 && accountId != -1) {
+                IImConnection conn = RemoteImService.getConnection(providerId, accountId);
+
+               return conn;
             }
 
-            return true;
+
         } catch (Exception e) {
-            return false;
         }
+
+        return null;
+
 
     }
     private static final String[] PROVIDER_PROJECTION = {

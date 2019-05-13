@@ -1044,7 +1044,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
         try {
 
             if (providerId == -1 || accountId == -1)
-                throw new RuntimeException("getConnection() needs valid values: " + providerId + "," + accountId);
+                throw null;
 
             if (mImService != null) {
                 IImConnection im = mImService.getConnection(providerId, accountId);
