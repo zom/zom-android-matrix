@@ -290,8 +290,11 @@ public class ConversationDetailActivity extends BaseActivity {
                         public void run() {
                             applyStyleForToolbar();
 
-                            if (intent.getBooleanExtra("isNew", false))
+                            if (intent.getBooleanExtra("isNew", false)) {
                                 mConvoView.showGroupInfo();
+                                intent.putExtra("isNew", false);
+                            }
+
                         }
                     });
 
