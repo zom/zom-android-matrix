@@ -63,7 +63,6 @@ public class StatusBarNotifier {
     private Context mContext;
     private NotificationManager mNotificationManager;
 
-    private Handler mHandler;
     private ArrayList<NotificationInfo> mNotificationInfos;
     private long mLastSoundPlayedMs;
 
@@ -77,7 +76,6 @@ public class StatusBarNotifier {
         mContext = context;
         mNotificationManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
-        mHandler = new Handler();
         mNotificationInfos = new ArrayList<>();
     }
 
