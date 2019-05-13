@@ -42,7 +42,7 @@ dependencies {
     /************* Matrix SDK management **************/
     // use the matrix SDK as external lib
     implementation(name: 'matrix-sdk', ext: 'aar')
-    implementation(name: 'olm-sdk', ext: 'aar')
+    implementation(name: 'olm-sdk-release-3.1.2', ext: 'aar')
     implementation project(':keanuCore')
 
     implementation 'info.guardianproject.iocipher:IOCipher:0.4'
