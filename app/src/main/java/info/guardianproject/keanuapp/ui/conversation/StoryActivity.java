@@ -1,5 +1,6 @@
 package info.guardianproject.keanuapp.ui.conversation;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -15,6 +16,14 @@ public class StoryActivity extends ConversationDetailActivity {
     public static final String ARG_CONTRIBUTOR_MODE = "contributor_mode";
 
     public static final String TAG_STORYMODE_INDICATOR = "#session";
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        Intent intent = new Intent(this, AddUpdateMediaActivity.class);
+        startActivity(intent);
+    }
 
     private boolean contributorMode() {
         return getIntent().getBooleanExtra(ARG_CONTRIBUTOR_MODE, false);

@@ -75,6 +75,7 @@ public class StoryIntroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.awesome_activity_story_intro);
 
+        getSupportActionBar().hide();
         setupStoryMode();
     }
 
