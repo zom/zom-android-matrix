@@ -22,7 +22,7 @@
     <dimen name="bot_image_rounding">10dp</dimen>
     <dimen name="profile_avatar_size">320dp</dimen>
 
-    <dimen name="story_contrib_controls_height">100dp</dimen>
+    <dimen name="story_contrib_controls_height">65dp</dimen>
     <dimen name="story_contrib_controls_plus_toolbar_height">200dp</dimen>
     <dimen name="story_contrib_gallery_padding">4dp</dimen>
     </resources>

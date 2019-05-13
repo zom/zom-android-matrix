@@ -53,6 +53,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
+        android:layout_paddingBottom="@dimen/story_contrib_controls_height"
         android:fitsSystemWindows="true"
         app:controller_layout_id="@layout/story_contrib_media_controller"
         app:player_layout_id="@layout/story_contrib_exo_player"
@@ -64,7 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/story_contrib_controls_height"
         android:layout_gravity="bottom"
-        android:background="#333333"
+        android:background="#888888"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="3dp">
@@ -80,7 +81,8 @@
             android:imeOptions="actionSend|flagNoEnterAction"
             android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine|textImeMultiLine"
             android:padding="2dp"
-            android:textColor="?messageTextPrimary"
+            android:textColor="@android:color/white"
+            android:tint="@android:color/white"
 
             />
 

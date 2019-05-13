@@ -21,8 +21,10 @@ public class StoryActivity extends ConversationDetailActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = new Intent(this, AddUpdateMediaActivity.class);
-        startActivity(intent);
+        if (contributorMode()) {
+            Intent intent = new Intent(this, AddUpdateMediaActivity.class);
+            startActivity(intent);
+        }
     }
 
     private boolean contributorMode() {
