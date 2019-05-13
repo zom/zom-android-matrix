@@ -462,17 +462,14 @@ public class ConversationListFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         Context context = v.getContext();
+
                         //TODO Story - Determine when to open story mode
                         boolean isStory = nickname.contains(TAG_STORYMODE_INDICATOR);
-                        Intent intent = new Intent(context, isStory ? StoryActivity.class : ConversationDetailActivity.class);
+                        Intent intent = new Intent(context, isStory ? StoryIntroActivity.class : ConversationDetailActivity.class);
                         intent.putExtra("id", chatId);
                         intent.putExtra("address", address);
                         intent.putExtra("nickname", nickname);
-                        if (isStory) {
-                            // If admin, enter contrib mode
-                            // TODO Story - How do we get admin right(s) info here? Send true or false below for contrib mode/viewer mode.
-                            intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE, true);
-                        }
+
                         context.startActivity(intent);
                     }
                 });

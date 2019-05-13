@@ -89,6 +89,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.impl.BaseAddress;
@@ -210,7 +211,7 @@ public class ConversationView {
 
     private ConversationRecyclerViewAdapter mMessageAdapter;
  //   private boolean isServiceUp;
-    private IChatSession mCurrentChatSession;
+    protected IChatSession mCurrentChatSession;
 
     long mLastChatId=-1;
     String mRemoteNickname;
@@ -3097,6 +3098,7 @@ public class ConversationView {
             mActivity.finish();
         }
     }
+
 
 
 

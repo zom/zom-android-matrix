@@ -1,6 +1,7 @@
 package info.guardianproject.keanuapp.ui.conversation;
 
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import info.guardianproject.keanuapp.R;

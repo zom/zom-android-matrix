@@ -51,22 +51,22 @@ android {
     // when Gradle merges variant sources and configurations. You must assign
     // each product flavor you configure to one of the flavor dimensions.
 
-     flavorDimensions "release"
+    flavorDimensions "release"
 
-     productFlavors {
+    productFlavors {
 
-         primary {// Assigns this product flavor to the "mode" flavor dimension.
-             dimension "release"}
+        primary {// Assigns this product flavor to the "mode" flavor dimension.
+            dimension "release"
+        }
 
 
+        altbrand {
+            dimension "release"
+            applicationIdSuffix ".altbrand"
+            versionNameSuffix "-altbrand"
+        }
 
-         altbrand {
-             dimension "release"
-             applicationIdSuffix ".altbrand"
-             versionNameSuffix "-altbrand"
-         }
-
-     }
+    }
 
     repositories {
         flatDir {
@@ -125,8 +125,8 @@ dependencies {
     //*********** KeanuApp components ********** /
     implementation project(':keanuCore')
     implementation project(':keanuMatrix')
-  //  implementation 'info.guardianproject.keanuapp:keanuCore:+'
-   // implementation 'info.guardianproject.keanuapp:keanuMatrix:+'
+    //  implementation 'info.guardianproject.keanuapp:keanuCore:+'
+    // implementation 'info.guardianproject.keanuapp:keanuMatrix:+'
 
     //from here: https://github.com/guardianproject/proofmode
     implementation 'org.witness:android-libproofmode:0.0.3'

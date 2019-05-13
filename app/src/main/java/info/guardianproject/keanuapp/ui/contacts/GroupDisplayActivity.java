@@ -442,7 +442,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             protected Void doInBackground(Void... voids) {
                 if (mConn == null)
                     initData();
-                
+
                 updateSessionAsync();
                 return null;
             }

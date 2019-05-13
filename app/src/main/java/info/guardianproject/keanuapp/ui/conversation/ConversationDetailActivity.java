@@ -97,7 +97,7 @@ public class ConversationDetailActivity extends BaseActivity {
     private String mAddress = null;
     private String mNickname = null;
 
-    private ConversationView mConvoView = null;
+    protected ConversationView mConvoView = null;
 
     MediaRecorder mMediaRecorder = null;
     File mAudioFilePath = null;
@@ -110,6 +110,8 @@ public class ConversationDetailActivity extends BaseActivity {
 
     private PrettyTime mPrettyTime;
     private View.OnClickListener backButtonHandler;
+
+    private boolean mIsContributor = false;
 
     private Handler mHandler = new Handler()
     {
@@ -292,7 +294,6 @@ public class ConversationDetailActivity extends BaseActivity {
                                 mConvoView.showGroupInfo();
                         }
                     });
-
 
                 } else
                     finish();
