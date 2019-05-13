@@ -64,7 +64,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/story_contrib_controls_height"
         android:layout_gravity="bottom"
-        android:background="#20000000"
+        android:background="#333333"
         android:gravity="center"
         android:orientation="horizontal"
         android:padding="3dp">
