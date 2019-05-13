@@ -1297,8 +1297,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     displayType += "\u25B6";
                 }
 
-                notificationText = service.getString(R.string.file_notify_text, displayType);
-
+                notificationText = service.getString(R.string.file_notify_text, displayType, nickname);
 
             }
 
