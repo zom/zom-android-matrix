@@ -6,14 +6,13 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.media.AudioFormat;
 import android.media.MediaCodec;
+import android.media.MediaDataSource;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -21,14 +20,13 @@ import android.view.View;
 
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 
+import info.guardianproject.keanu.core.util.HttpMediaStreamer;
 import info.guardianproject.keanuapp.R;
 
 import static android.media.MediaFormat.KEY_CHANNEL_COUNT;
@@ -226,7 +224,7 @@ public class VisualizerView extends View {
             singleBytes.subList(0, singleBytes.size() - 10000).clear();
         }
         mBytes = new byte[singleBytes.size()];
-        for(int i = 0; i < singleBytes.size(); i++) {
+        for (int i = 0; i < singleBytes.size(); i++) {
             mBytes[i] = singleBytes.get(i);
         }
         invalidate();
@@ -242,8 +240,9 @@ public class VisualizerView extends View {
         audioLoader.execute(fileUri);
     }
 
-    private static class AudioFileLoader extends AsyncTask <Uri, Void, byte[]> {
+    private static class AudioFileLoader extends AsyncTask<Uri, Void, byte[]> {
         WeakReference<VisualizerView> _owner;
+        HttpMediaStreamer streamer = null;
 
         AudioFileLoader(VisualizerView owner) {
             _owner = new WeakReference<VisualizerView>(owner);
@@ -253,11 +252,66 @@ public class VisualizerView extends View {
         protected byte[] doInBackground(Uri... uris) {
             AudioFileLoader thisLoader = this;
 
+            VisualizerView owner = _owner.get();
+            if (owner == null) {
+                return null;
+            }
+
             Uri fileUri = uris[0];
             MediaCodec decoder = null;
             try {
                 MediaExtractor extractor = new MediaExtractor();
-                extractor.setDataSource(fileUri.getPath());
+
+                if (fileUri.getScheme() != null) {
+                    if (fileUri.getScheme().equals("vfs")) {
+
+                        final info.guardianproject.iocipher.File fileMediaEncrypted
+                                = new info.guardianproject.iocipher.File(fileUri.getPath());
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            extractor.setDataSource(new MediaDataSource() {
+
+                                final info.guardianproject.iocipher.RandomAccessFile fis
+                                        = new info.guardianproject.iocipher.RandomAccessFile(fileMediaEncrypted, "r");
+
+                                @Override
+                                public int readAt(long position, byte[] buffer, int offset, int size) throws IOException {
+
+                                    if (position > getSize())
+                                        return -1;
+
+                                    fis.seek(position);
+                                    byte[] outBuffer = new byte[size];
+                                    int readSize = fis.read(outBuffer, 0, size);
+                                    System.arraycopy(outBuffer, 0, buffer, offset, size);
+                                    return readSize;
+                                }
+
+                                @Override
+                                public long getSize() throws IOException {
+                                    return fis.length();
+                                }
+
+                                @Override
+                                public void close() throws IOException {
+                                    if (fis != null)
+                                        fis.close();
+                                }
+                            });
+                        } else {
+                            streamer = new HttpMediaStreamer(fileMediaEncrypted, "audio/mp4");
+                            Uri uri = streamer.getUri();
+                            extractor.setDataSource(owner.getContext(), uri, null);
+                        }
+                    } else if (fileUri.getScheme().equals("content")) {
+                        extractor.setDataSource(fileUri.getPath());
+                    } else if (fileUri.getScheme().equals("file")) {
+                        extractor.setDataSource(fileUri.getPath());
+                    }
+                } else {
+                    extractor.setDataSource(fileUri.getPath());
+                }
+
                 int numTracks = extractor.getTrackCount();
                 for (int i = 0; i < numTracks; ++i) {
                     MediaFormat format = extractor.getTrackFormat(i);
@@ -294,7 +348,7 @@ public class VisualizerView extends View {
 
                 while (true) {
                     // Cancel?
-                    VisualizerView owner = _owner.get();
+                    owner = _owner.get();
                     if (owner == null || owner.audioLoader != this) {
                         return null; // Abort
                     }
@@ -378,7 +432,7 @@ public class VisualizerView extends View {
                 int idx = 0;
                 float maxValue = outputMax; // 32768.0f;
                 for (Integer value : output) {
-                    byte converted = (byte)(255.0f * (float)value / maxValue - Math.abs(Byte.MIN_VALUE));
+                    byte converted = (byte) (255.0f * (float) value / maxValue - Math.abs(Byte.MIN_VALUE));
                     Log.d("TAG", "Value " + value + " now " + converted);
                     result[idx++] = converted;
                 }
@@ -391,8 +445,21 @@ public class VisualizerView extends View {
         }
 
         @Override
+        protected void onCancelled(byte[] bytes) {
+            super.onCancelled(bytes);
+            if (streamer != null) {
+                streamer.destroy();
+                streamer = null;
+            }
+        }
+
+        @Override
         protected void onPostExecute(byte[] result) {
             super.onPostExecute(result);
+            if (streamer != null) {
+                streamer.destroy();
+                streamer = null;
+            }
             VisualizerView owner = _owner.get();
             if (owner != null) {
                 if (owner.audioLoader == this) {
