@@ -496,11 +496,11 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     }
 
     private void showVideoPreview(MediaInfo mediaInfo) {
-        StoryExoPlayerManager.play(mediaInfo, previewVideo);
+        StoryExoPlayerManager.load(mediaInfo, previewVideo, true);
     }
 
     private void showAudioPreview(MediaInfo mediaInfo) {
-        StoryExoPlayerManager.play(mediaInfo, previewVideo);
+        StoryExoPlayerManager.load(mediaInfo, previewVideo, true);
     }
 
     private void showPdfPreview(MediaInfo mediaInfo) {

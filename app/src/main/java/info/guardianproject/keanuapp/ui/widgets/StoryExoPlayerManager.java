@@ -40,7 +40,7 @@ public class StoryExoPlayerManager {
         }
     }
 
-    public static void play(MediaInfo mediaInfo, SimpleExoPlayerView view) {
+    public static void load(MediaInfo mediaInfo, SimpleExoPlayerView view, boolean play) {
         VisualizerView visualizerView = view.findViewById(R.id.exo_visualizer_view);
         visualizerView.reset();
 
@@ -88,6 +88,8 @@ public class StoryExoPlayerManager {
 
         //LoopingMediaSource loopingSource = new LoopingMediaSource(mediaSource);
         ((SimpleExoPlayer)view.getPlayer()).prepare(mediaSource);
-        view.getPlayer().setPlayWhenReady(true); //run file/link when ready to play.
+        if (play) {
+            view.getPlayer().setPlayWhenReady(true); //run file/link when ready to play.
+        }
     }
 }

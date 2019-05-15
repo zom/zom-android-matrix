@@ -16,7 +16,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -132,6 +134,24 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
         });
         previewAudio = activity.findViewById(R.id.previewAudio);
         previewAudio.setVisibility(View.GONE);
+
+        mComposeMessage.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                autoAdvance = false;
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        activity.findViewById(R.id.composeMessage).clearFocus();
    }
 
 
@@ -257,7 +277,7 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
     @Override
     public void onAudioRecorded(Uri uri) {
         setRecordedAudio(new MediaInfo(uri, "audio/mp4"));
-        StoryExoPlayerManager.play(recordedAudio, previewAudio);
+        StoryExoPlayerManager.load(recordedAudio, previewAudio, true);
     }
 
     class StoryRecyclerViewAdapter extends ConversationRecyclerViewAdapter implements PZSImageView.PSZImageViewImageMatrixListener {
@@ -307,7 +327,7 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
                     mediaView = new PDFView(context, null);
                     break;
                 case 1:
-                    SimpleExoPlayerView playerView = new SimpleExoPlayerView(context);
+                    SimpleExoPlayerView playerView = (SimpleExoPlayerView) LayoutInflater.from(context).inflate(R.layout.story_viewer_exo_player, parent, false);
                     mediaView = playerView;
                     mediaView.setBackgroundColor(0xff333333);
                     break;
@@ -378,15 +398,9 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
                         break;
                     case 1:
                         SimpleExoPlayerView playerView = (SimpleExoPlayerView)viewHolder.itemView;
-                        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter(); //test
-
-                        TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
-                        TrackSelector trackSelector =
-                                new DefaultTrackSelector(videoTrackSelectionFactory);
-
-                        // 2. Create the player
-                        SimpleExoPlayer exoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
-                        exoPlayer.addListener(new Player.EventListener() {
+                        MediaInfo mediaInfo = new MediaInfo(uri, mime);
+                        StoryExoPlayerManager.load(mediaInfo, playerView, false);
+                        playerView.getPlayer().addListener(new Player.EventListener() {
                             @Override
                             public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
                                 if (playbackState == Player.STATE_ENDED) {
@@ -394,33 +408,6 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
                                 }
                             }
                         });
-
-                        ////Set media controller
-                        playerView.setUseController(true);//set to true or false to see controllers
-                        playerView.requestFocus();
-                        // Bind the player to the view.
-                        playerView.setPlayer(exoPlayer);
-
-                        DataSpec dataSpec = new DataSpec(uri);
-                        final VideoViewActivity.InputStreamDataSource inputStreamDataSource = new VideoViewActivity.InputStreamDataSource(context, dataSpec);
-                        try {
-                            inputStreamDataSource.open(dataSpec);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-                        DataSource.Factory factory = new DataSource.Factory() {
-
-                            @Override
-                            public DataSource createDataSource() {
-                                return inputStreamDataSource;
-                            }
-                        };
-                        MediaSource audioSource = new ExtractorMediaSource(inputStreamDataSource.getUri(),
-                                factory, new DefaultExtractorsFactory(), null, null);
-
-                        exoPlayer.prepare(audioSource);
-                        //exoPlayer.setPlayWhenReady(true); //run file/link when ready to play.
                         break;
                     case 0:
                     default:
