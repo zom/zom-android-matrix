@@ -13,7 +13,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.LinearSnapHelper;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SnapHelper;
@@ -31,6 +30,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -58,7 +58,6 @@ import info.guardianproject.keanuapp.ui.widgets.MessageViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.PZSImageView;
 import info.guardianproject.keanuapp.ui.widgets.StoryExoPlayerManager;
 import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
-import info.guardianproject.keanuapp.ui.widgets.VisualizerView;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
@@ -70,6 +69,15 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
     private final SnapHelper snapHelper;
     private final SimpleExoPlayerView previewAudio;
     private AudioRecorder audioRecorder;
+    private int currentPage = -1;
+
+    private static final int AUTO_ADVANCE_TIMEOUT_IMAGE = 5000; // Milliseconds
+    private static final int AUTO_ADVANCE_TIMEOUT_PDF = 5000; // Milliseconds
+
+    /**
+     * Set to true to automatically advance to next media item. For images this is after a set time, for video and audio when they are played.
+     */
+    private boolean autoAdvance = true;
 
     // If this is set, we are in "preview audio" mode.
     private MediaInfo recordedAudio;
@@ -88,7 +96,15 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                    updateProgressCurrentPage();
+                    if (currentPage != getCurrentPagePosition()) {
+                        // Only react on change
+                        setCurrentPage();
+                        updateProgressCurrentPage();
+                        autoAdvance = true;
+                    }
+                } else if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {
+                    getHistoryView().removeCallbacks(advanceToNextRunnable);
+                    autoAdvance = false;
                 }
             }
 
@@ -141,12 +157,34 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
 
     }
 
-    private void updateProgressCurrentPage() {
+    private int getCurrentPagePosition() {
         View snapView = snapHelper.findSnapView(mHistory.getLayoutManager());
         if (snapView != null) {
-            int pos = mHistory.getLayoutManager().getPosition(snapView);
-            if (pos >= 0) {
-                progressBar.setProgress(pos + 1);
+            return mHistory.getLayoutManager().getPosition(snapView);
+        }
+        return RecyclerView.NO_POSITION;
+    }
+
+    private void updateProgressCurrentPage() {
+        if (currentPage >= 0) {
+            progressBar.setProgress(currentPage + 1);
+        }
+    }
+
+    private void setCurrentPage() {
+        currentPage = getCurrentPagePosition();
+
+        RecyclerView.ViewHolder holder = (currentPage >= 0) ? getHistoryView().findViewHolderForAdapterPosition(currentPage) : null;
+        if (holder != null) {
+            if (holder.itemView instanceof SimpleExoPlayerView) {
+                SimpleExoPlayerView playerView = (SimpleExoPlayerView) holder.itemView;
+                playerView.getPlayer().setPlayWhenReady(true);
+            } else if (holder.itemView instanceof PZSImageView) {
+                getHistoryView().removeCallbacks(advanceToNextRunnable);
+                getHistoryView().postDelayed(advanceToNextRunnable, AUTO_ADVANCE_TIMEOUT_IMAGE);
+            } else if (holder.itemView instanceof PDFView) {
+                getHistoryView().removeCallbacks(advanceToNextRunnable);
+                getHistoryView().postDelayed(advanceToNextRunnable, AUTO_ADVANCE_TIMEOUT_PDF);
             }
         }
     }
@@ -348,6 +386,14 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
 
                         // 2. Create the player
                         SimpleExoPlayer exoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
+                        exoPlayer.addListener(new Player.EventListener() {
+                            @Override
+                            public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+                                if (playbackState == Player.STATE_ENDED) {
+                                    advanceToNext();
+                                }
+                            }
+                        });
 
                         ////Set media controller
                         playerView.setUseController(true);//set to true or false to see controllers
@@ -415,6 +461,15 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            if (currentPage == -1) {
+                currentPage = 0;
+                getHistoryView().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        setCurrentPage();
+                    }
+                });
+            }
         }
 
         @Override
@@ -434,6 +489,24 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
         @Override
         public void onImageMatrixSet(PZSImageView view, int imageWidth, int imageHeight, Matrix imageMatrix) {
             //TODO
+        }
+    }
+
+    private Runnable advanceToNextRunnable = new Runnable() {
+        @Override
+        public void run() {
+            advanceToNext();
+        }
+    };
+
+    private void advanceToNext() {
+        if (autoAdvance) {
+            if (currentPage >= 0) {
+                // At end of data?
+                if ((currentPage + 1) < getHistoryView().getAdapter().getItemCount()) {
+                    getHistoryView().smoothScrollToPosition(currentPage + 1);
+                }
+            }
         }
     }
 }
