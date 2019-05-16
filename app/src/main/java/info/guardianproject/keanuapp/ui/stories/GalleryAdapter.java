@@ -14,6 +14,7 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -79,14 +80,28 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
             int uriColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
             int typeColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE);
             int mimeTypeColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE);
+            int titleColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.TITLE);
+            int displayColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
+
+
             if (uriColumn >= 0 && typeColumn >= 0) {
                 String data = cursor.getString(uriColumn);
 
                 // We know it's a file uri here, it's from MediaStore.Files
-                Uri uri = Uri.fromFile(new File(data));
+                File fileData = new File(data);
+                Uri uri = Uri.fromFile(fileData);
                 int mediaType = cursor.getInt(typeColumn);
                 String mimeType = (mimeTypeColumn >= 0) ? cursor.getString(mimeTypeColumn) : "";
+                String displayName = cursor.getString(titleColumn);
+
+                if (TextUtils.isEmpty(displayName))
+                    displayName = cursor.getString(displayColumn);
+
+                if (TextUtils.isEmpty(displayName))
+                    displayName = fileData.getName();
+                
                 long id = getItemId(cursor.getPosition());
+
                 if (mimeType.equalsIgnoreCase("application/pdf")) {
                     holder.imageView.setImageResource(R.drawable.ic_pdf_24dp);
                     new ThumbnailLoader(context, holder, MediaStore.Files.FileColumns.MEDIA_TYPE_NONE, uri, id).execute();
@@ -106,6 +121,12 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                     }
                 }
 
+                holder.titleView.setText(displayName);
+
+                if (this.mediaType == GalleryAdapter.MediaType.Pdf || this.mediaType == MediaType.Audio)
+                    holder.titleView.setVisibility(View.VISIBLE);
+                else
+                    holder.titleView.setVisibility(View.GONE);
 
                 holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -167,7 +188,9 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                         MediaStore.Files.FileColumns._ID,
                         MediaStore.Files.FileColumns.DATA,
                         MediaStore.Files.FileColumns.MEDIA_TYPE,
-                        MediaStore.Files.FileColumns.MIME_TYPE
+                        MediaStore.Files.FileColumns.MIME_TYPE,
+                        MediaStore.Files.FileColumns.DISPLAY_NAME,
+                        MediaStore.Files.FileColumns.TITLE
                 };
 
                 String sortOrder = MediaStore.Files.FileColumns.DATE_ADDED + " DESC";

@@ -15,6 +15,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -159,15 +160,14 @@ public class StoryGalleryActivity extends AppCompatActivity implements GalleryAd
             Context context = StoryGalleryActivity.this;
             RecyclerView rv = new RecyclerView(context);
             int spanCount = 5;
-            GridLayoutManager llm = new GridLayoutManager(context, spanCount, GridLayoutManager.VERTICAL, false);
-            rv.setLayoutManager(llm);
-            int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.story_contrib_gallery_padding);
-            rv.addItemDecoration(new GalleryItemDecoration(spanCount, spacingInPixels, false));
+
             GalleryAdapter adapter = new GalleryAdapter(context, StoryGalleryActivity.this);
+            RecyclerView.LayoutManager llm = new GridLayoutManager(context, spanCount, GridLayoutManager.VERTICAL, false);
 
             switch (position) {
                 case 1:
                     adapter.setMediaType(GalleryAdapter.MediaType.Pdf);
+                    llm = new LinearLayoutManager(context);
                     break;
                 case 2:
                     adapter.setMediaType(GalleryAdapter.MediaType.Image);
@@ -177,11 +177,16 @@ public class StoryGalleryActivity extends AppCompatActivity implements GalleryAd
                     break;
                 case 4:
                     adapter.setMediaType(GalleryAdapter.MediaType.Audio);
+                    llm = new LinearLayoutManager(context);
                     break;
                 default:
                     adapter.setMediaType(GalleryAdapter.MediaType.All);
                     break;
             }
+
+            rv.setLayoutManager(llm);
+            int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.story_contrib_gallery_padding);
+            rv.addItemDecoration(new GalleryItemDecoration(spanCount, spacingInPixels, false));
             rv.setAdapter(adapter);
 
             container.addView(rv);

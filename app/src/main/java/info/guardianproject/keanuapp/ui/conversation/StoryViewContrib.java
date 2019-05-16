@@ -66,7 +66,7 @@ public class StoryViewContrib extends StoryView {
                 activity.startActivityForResult(intent,REQUEST_ADD_MEDIA);
             }
         });
-        mMicButton.setImageDrawable(R.drawable.ic_action_new);
+        mMicButton.setImageResource(R.drawable.ic_action_new);
     }
 
 
