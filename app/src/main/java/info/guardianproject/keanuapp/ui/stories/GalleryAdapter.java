@@ -99,7 +99,7 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
 
                 if (TextUtils.isEmpty(displayName))
                     displayName = fileData.getName();
-                
+
                 long id = getItemId(cursor.getPosition());
 
                 if (mimeType.equalsIgnoreCase("application/pdf")) {
