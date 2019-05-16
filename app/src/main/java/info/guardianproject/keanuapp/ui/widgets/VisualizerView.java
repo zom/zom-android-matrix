@@ -404,7 +404,6 @@ public class VisualizerView extends View {
                                     int ssum = 0;
                                     for (int channel = 0; channel < channels; channel++) {
                                         int sample = Math.abs(buffer.getShort());
-                                        Log.d("TAG", "SAMPLE " + sample);
                                         ssum += sample; // + Math.abs(Short.MIN_VALUE);
                                     }
                                     ssum /= channels;
@@ -433,7 +432,6 @@ public class VisualizerView extends View {
                 float maxValue = outputMax; // 32768.0f;
                 for (Integer value : output) {
                     byte converted = (byte) (255.0f * (float) value / maxValue - Math.abs(Byte.MIN_VALUE));
-                    Log.d("TAG", "Value " + value + " now " + converted);
                     result[idx++] = converted;
                 }
                 return result;

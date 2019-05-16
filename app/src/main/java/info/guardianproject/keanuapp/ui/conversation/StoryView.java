@@ -72,6 +72,7 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
     private final SimpleExoPlayerView previewAudio;
     private AudioRecorder audioRecorder;
     private int currentPage = -1;
+    private RecyclerView.ViewHolder currentPageViewHolder = null;
 
     private static final int AUTO_ADVANCE_TIMEOUT_IMAGE = 5000; // Milliseconds
     private static final int AUTO_ADVANCE_TIMEOUT_PDF = 5000; // Milliseconds
@@ -80,6 +81,7 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
      * Set to true to automatically advance to next media item. For images this is after a set time, for video and audio when they are played.
      */
     private boolean autoAdvance = true;
+    private boolean waitingForMoreData = false; // Set to true if we get an auto advance event while on the last item
 
     // If this is set, we are in "preview audio" mode.
     private MediaInfo recordedAudio;
@@ -192,17 +194,23 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
     }
 
     private void setCurrentPage() {
-        currentPage = getCurrentPagePosition();
 
-        RecyclerView.ViewHolder holder = (currentPage >= 0) ? getHistoryView().findViewHolderForAdapterPosition(currentPage) : null;
-        if (holder != null) {
-            if (holder.itemView instanceof SimpleExoPlayerView) {
-                SimpleExoPlayerView playerView = (SimpleExoPlayerView) holder.itemView;
+        if (currentPageViewHolder != null) {
+            if (currentPageViewHolder.itemView instanceof SimpleExoPlayerView) {
+                ((SimpleExoPlayerView)currentPageViewHolder.itemView).getPlayer().setPlayWhenReady(false);
+            }
+        }
+
+        currentPage = getCurrentPagePosition();
+        currentPageViewHolder = (currentPage >= 0) ? getHistoryView().findViewHolderForAdapterPosition(currentPage) : null;
+        if (currentPageViewHolder != null) {
+            if (currentPageViewHolder.itemView instanceof SimpleExoPlayerView) {
+                SimpleExoPlayerView playerView = (SimpleExoPlayerView) currentPageViewHolder.itemView;
                 playerView.getPlayer().setPlayWhenReady(true);
-            } else if (holder.itemView instanceof PZSImageView) {
+            } else if (currentPageViewHolder.itemView instanceof PZSImageView) {
                 getHistoryView().removeCallbacks(advanceToNextRunnable);
                 getHistoryView().postDelayed(advanceToNextRunnable, AUTO_ADVANCE_TIMEOUT_IMAGE);
-            } else if (holder.itemView instanceof PDFView) {
+            } else if (currentPageViewHolder.itemView instanceof PDFView) {
                 getHistoryView().removeCallbacks(advanceToNextRunnable);
                 getHistoryView().postDelayed(advanceToNextRunnable, AUTO_ADVANCE_TIMEOUT_PDF);
             }
@@ -220,6 +228,18 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
     protected void loaderFinished() {
         // Dont call super, we don't want to scroll to last message
         //TODO - find last read message and scroll to that
+
+        // If we are on the previously last message, advance?
+        int n = getHistoryView().getAdapter().getItemCount();
+        if (currentPage == n - 1 - 1 && autoAdvance && waitingForMoreData) {
+            waitingForMoreData = false;
+            getHistoryView().post(new Runnable() {
+                @Override
+                public void run() {
+                    advanceToNext();
+                }
+            });
+        }
     }
 
     @Override
@@ -469,6 +489,10 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
                         pdfView.recycle();
                     }
                 });
+            } else if (holder.itemView instanceof SimpleExoPlayerView) {
+                ((SimpleExoPlayerView)holder.itemView).getPlayer().stop(true);
+                ((SimpleExoPlayerView)holder.itemView).getPlayer().release();
+                ((SimpleExoPlayerView)holder.itemView).setPlayer(null);
             }
             super.onViewRecycled(holder);
         }
@@ -491,7 +515,10 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
             if (currentPage >= 0) {
                 // At end of data?
                 if ((currentPage + 1) < getHistoryView().getAdapter().getItemCount()) {
+                    waitingForMoreData = false;
                     getHistoryView().smoothScrollToPosition(currentPage + 1);
+                } else {
+                    waitingForMoreData = true;
                 }
             }
         }
