@@ -66,6 +66,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
@@ -321,25 +322,7 @@ public class ConversationDetailActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         processIntent(getIntent());
-    //    setIntent(null);
         mConvoView.setSelected(true);
-
-        /**
-        new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] objects) {
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-
-
-
-            }
-        }.execute();*/
 
     }
 
@@ -794,7 +777,7 @@ public class ConversationDetailActivity extends BaseActivity {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
+    public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
 
         if (resultCode == RESULT_OK) {
 
@@ -887,6 +870,33 @@ public class ConversationDetailActivity extends BaseActivity {
                 boolean importContent = true; //let's import it!
 
                 handleSendDelete(uri, defaultType, deleteFile, resizeImage, importContent);
+            }
+            else if (requestCode == REQUEST_ADD_MEDIA)
+            {
+                ArrayList mediaUris = resultIntent.getParcelableArrayListExtra("result");
+
+                for (Object uri : mediaUris)
+                {
+                    Uri mediaUri = (Uri)uri;
+
+                    String mimeType = null;
+
+                    SystemServices.FileInfo info = null;
+                    try {
+                        info = SystemServices.getFileInfoFromURI(this, mediaUri);
+                        mimeType = info.type;
+                        info.stream.close();
+                    } catch (Exception e) {
+
+                    }
+
+                    boolean deleteFile = false;
+                    boolean resizeImage = false;
+                    boolean importContent = true; //let's import it!
+
+                    handleSendDelete((Uri)uri, mimeType, deleteFile, resizeImage, importContent);
+                }
+
             }
             else if (requestCode == REQUEST_TAKE_PICTURE)
             {
@@ -1123,5 +1133,7 @@ public class ConversationDetailActivity extends BaseActivity {
     public static final int REQUEST_TAKE_PICTURE_SECURE = REQUEST_SETTINGS + 1;
     public static final int REQUEST_ADD_CONTACT = REQUEST_TAKE_PICTURE_SECURE + 1;
     public static final int REQUEST_IMAGE_VIEW = REQUEST_ADD_CONTACT + 1;
+    public static final int REQUEST_ADD_MEDIA = REQUEST_IMAGE_VIEW + 1;
+
 
 }

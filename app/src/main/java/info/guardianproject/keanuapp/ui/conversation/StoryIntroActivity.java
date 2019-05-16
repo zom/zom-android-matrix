@@ -13,6 +13,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -86,40 +87,35 @@ public class StoryIntroActivity extends AppCompatActivity {
         bindQuery(mLastChatId);
     }
 
-    private void launchStoryMode () {
+    private void launchStoryMode (String mode) {
 
         final Intent intent = new Intent(this, StoryActivity.class);
         intent.putExtra("id", mLastChatId);
         intent.putExtra("address", mRemoteAddress);
         intent.putExtra("nickname", getIntent().getStringExtra("nickname"));
 
+        if (!TextUtils.isEmpty(mode))
+        {
 
-        getChatSession(new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] objects) {
+            intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE,mode.equals("contrib"));
 
-                List<Contact> admins = null;
-                try {
+            startActivity(intent);
+            finish();
+        }
+        else {
 
-                    mCurrentChatSession.refreshContactFromServer();
+            getChatSession(new AsyncTask() {
+                @Override
+                protected Object doInBackground(Object[] objects) {
 
-                    boolean isContrib = false;
+                    List<Contact> admins = null;
+                    try {
 
-                    admins = mCurrentChatSession.getGroupChatAdmins();
+                        mCurrentChatSession.refreshContactFromServer();
 
-                    if (admins != null) {
-                        for (Contact c : admins) {
-                            if (c.getAddress().getBareAddress().equals(mLocalAddress)) {
-                                isContrib = true;
-                                break;
+                        boolean isContrib = false;
 
-                            }
-                        }
-                    }
-
-                    if (!isContrib)
-                    {
-                        admins = mCurrentChatSession.getGroupChatOwners();
+                        admins = mCurrentChatSession.getGroupChatAdmins();
 
                         if (admins != null) {
                             for (Contact c : admins) {
@@ -130,20 +126,34 @@ public class StoryIntroActivity extends AppCompatActivity {
                                 }
                             }
                         }
+
+                        if (!isContrib) {
+                            admins = mCurrentChatSession.getGroupChatOwners();
+
+                            if (admins != null) {
+                                for (Contact c : admins) {
+                                    if (c.getAddress().getBareAddress().equals(mLocalAddress)) {
+                                        isContrib = true;
+                                        break;
+
+                                    }
+                                }
+                            }
+                        }
+
+                        intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE, isContrib);
+
+                        startActivity(intent);
+                        finish();
+
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
                     }
 
-                    intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE,isContrib);
-
-                    startActivity(intent);
-                    finish();
-
-                } catch (RemoteException e) {
-                    e.printStackTrace();
+                    return null;
                 }
-
-                return null;
-            }
-        });
+            });
+        }
 
     }
 
@@ -194,7 +204,8 @@ public class StoryIntroActivity extends AppCompatActivity {
             }
             else
             {
-                launchStoryMode();
+                //launchStoryMode(null);
+
             }
 
 
@@ -442,4 +453,12 @@ public class StoryIntroActivity extends AppCompatActivity {
     }
 
 
+    public void shareStory(View view) {
+        launchStoryMode("contrib");
+    }
+
+    public void viewStory(View view) {
+        launchStoryMode("viewer");
+
+    }
 }

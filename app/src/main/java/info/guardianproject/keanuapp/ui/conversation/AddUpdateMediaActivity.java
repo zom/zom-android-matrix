@@ -155,7 +155,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
             @Override
             public void onClick(View v) {
                 // Done, send!
-                //TODO Story - Do the sending here!
+                sendMedia ();
             }
         });
 
@@ -580,5 +580,13 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
                 outRect.left = spacing;
             }
         }
+    }
+
+    private void sendMedia ()
+    {
+        Intent data = new Intent();
+        data.putExtra("result",addedMedia);
+        setResult(RESULT_OK,data);
+        finish();
     }
 }

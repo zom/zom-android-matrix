@@ -2,10 +2,17 @@ package info.guardianproject.keanuapp.ui.conversation;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 
+import info.guardianproject.keanu.core.util.SystemServices;
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ui.widgets.ShareRequest;
+
+import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 /**
  * Created by N-Pex on 2019-03-29.
@@ -15,7 +22,7 @@ public class StoryActivity extends ConversationDetailActivity {
     // Use this flag as a boolean EXTRA to enable contributor mode (as opposed to viewer mode)
     public static final String ARG_CONTRIBUTOR_MODE = "contributor_mode";
 
-    public static final String TAG_STORYMODE_INDICATOR = "#session";
+    public static final String TAG_STORYMODE_INDICATOR = "!session";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,5 +61,39 @@ public class StoryActivity extends ConversationDetailActivity {
             getSupportActionBar().setTitle("");
             mToolbar.setBackgroundColor(Color.TRANSPARENT);
         }
+    }
+
+    protected void sendMedia (Uri mediaUri, String mimeType, boolean deleteFile)
+    {
+        ShareRequest request = new ShareRequest();
+        request.deleteFile = false;
+        request.resizeImage = true;
+        request.importContent = true;
+        request.media = mediaUri;
+        request.mimeType = mimeType;
+
+        if (TextUtils.isEmpty(request.mimeType)) {
+            // import
+            SystemServices.FileInfo info = null;
+            try {
+                info = SystemServices.getFileInfoFromURI(this, request.media);
+                request.mimeType = info.type;
+                info.stream.close();
+            } catch (Exception e) {
+
+            }
+
+        }
+
+        boolean resizeImage = false;
+        boolean importContent = true; //let's import it!
+
+        handleSendDelete(request.media, request.mimeType, deleteFile, resizeImage, importContent);
+
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
+            super.onActivityResult(requestCode, resultCode, resultIntent);
     }
 }

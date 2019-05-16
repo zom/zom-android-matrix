@@ -901,11 +901,11 @@ public class MainActivity extends BaseActivity {
         mLastConnGroup = conn;
 
         try {
-
+            /**
             if (TextUtils.isEmpty(roomSubject))
             {
                 roomSubject = getString(R.string.new_group_title);
-            }
+            }**/
 
             IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
 
@@ -932,6 +932,7 @@ public class MainActivity extends BaseActivity {
                     session.setLastMessage(" ");
                     Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
                     intent.putExtra("id", session.getId());
+                    intent.putExtra("firsttime",true);
 
                     boolean isEmptyGroup = invitees == null || invitees.size() == 0;
                     intent.putExtra("isNew", isEmptyGroup);

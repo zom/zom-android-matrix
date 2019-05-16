@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".ui.conversation.StoryIntroActivity"
     android:background="@color/background_dark"
+    android:gravity="center_horizontal|center_vertical"
+    android:orientation="vertical"
     >
-
+<!--
     <ProgressBar
         android:id="@+id/progressBar"
         style="@style/Widget.AppCompat.ProgressBar"
@@ -15,4 +17,22 @@
         android:layout_height="match_parent"
         android:padding="100dp"
         android:indeterminate="true"/>
-</android.support.constraint.ConstraintLayout>
+-->
+    <Button
+        android:id="@+id/btnLaunchContrib"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share Your Story"
+        android:onClick="shareStory"
+        />
+
+    <Button
+        android:id="@+id/btnLaunchViewer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Story"
+        android:onClick="viewStory"
+        />
+
+
+</LinearLayout>

@@ -162,6 +162,7 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
         // If we have recorded audio, send that!
         if (recordedAudio != null) {
             // TODO Story - Send the audio! It's in recorderAudio.uri (not in VFS). Need to delete afterwards.
+            ((StoryActivity)mActivity).sendMedia(recordedAudio.uri,"audio/m4a",true);
             setRecordedAudio(null);
             return;
         }

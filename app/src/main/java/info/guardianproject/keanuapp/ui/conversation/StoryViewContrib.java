@@ -50,20 +50,25 @@ import info.guardianproject.keanuapp.ui.widgets.PZSImageView;
 import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanuapp.ui.conversation.ConversationDetailActivity.REQUEST_ADD_MEDIA;
 
 /**
  * Created by N-Pex on 2019-04-12.
  */
 public class StoryViewContrib extends ConversationView {
 
+
     public StoryViewContrib(ConversationDetailActivity activity) {
         super(activity);
         mMicButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), AddUpdateMediaActivity.class);
-                activity.startActivity(intent);
+                Intent intent = new Intent(mActivity, AddUpdateMediaActivity.class);
+                mActivity.startActivityForResult(intent,REQUEST_ADD_MEDIA);
             }
         });
     }
+
+
+
 }

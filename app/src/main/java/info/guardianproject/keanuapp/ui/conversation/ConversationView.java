@@ -1754,6 +1754,7 @@ public class ConversationView {
                             @Override
                             public void onChatSessionCreated(IChatSession session) throws RemoteException {
                                 mCurrentChatSession = session;
+                                mCurrentChatSession.refreshContactFromServer();
                             }
 
                             @Override

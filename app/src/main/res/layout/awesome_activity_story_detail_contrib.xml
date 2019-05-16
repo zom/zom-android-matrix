@@ -68,7 +68,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-                    />
+                    /><!--
                 <android.support.v7.widget.Toolbar
                     android:id="@+id/toolbar"
                     app:theme="@style/LightToolBarStyle"
@@ -78,6 +78,14 @@
                     app:layout_collapseMode="pin"
                     app:titleTextAppearance="@style/Toolbar.TitleText"
                     app:elevation="0dp"
+                    />-->
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:layout_collapseMode="pin"
+                    app:titleTextAppearance="@style/Toolbar.TitleText"
                     />
             </LinearLayout>
         </FrameLayout>
