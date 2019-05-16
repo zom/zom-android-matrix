@@ -4,12 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.conversation.StoryIntroActivity"
+    tools:context="info.guardianproject.keanuapp.ui.conversation.StoryIntroActivity"
     android:background="@color/background_dark"
     android:gravity="center_horizontal|center_vertical"
     android:orientation="vertical"
     >
-<!--
+
     <ProgressBar
         android:id="@+id/progressBar"
         style="@style/Widget.AppCompat.ProgressBar"
@@ -17,7 +17,13 @@
         android:layout_height="match_parent"
         android:padding="100dp"
         android:indeterminate="true"/>
--->
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/groupLaunch"
+        android:visibility="gone"
+        >
     <Button
         android:id="@+id/btnLaunchContrib"
         android:layout_width="wrap_content"
@@ -33,6 +39,7 @@
         android:text="View Story"
         android:onClick="viewStory"
         />
+    </LinearLayout>
 
 
 </LinearLayout>

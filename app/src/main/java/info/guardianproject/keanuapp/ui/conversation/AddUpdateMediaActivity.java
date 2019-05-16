@@ -27,6 +27,7 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.otaliastudios.cameraview.Facing;
 
 import java.io.File;
 import java.io.InputStream;
@@ -198,6 +199,8 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
         });
         setProcessing(false);
         setViewerMode(false);
+
+        mCameraView.setFacing(Facing.FRONT);
     }
 
     void openGallery(int galleryMode) {
@@ -584,9 +587,23 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
 
     private void sendMedia ()
     {
-        Intent data = new Intent();
-        data.putExtra("result",addedMedia);
-        setResult(RESULT_OK,data);
+        Intent result = new Intent();
+        String[] resultUris = new String[addedMedia.size()];
+        String[] resultTypes = new String[addedMedia.size()];
+
+        int i = 0;
+
+        for (MediaInfo mediaInfo : addedMedia)
+        {
+            resultUris[i] = mediaInfo.uri.toString();
+            resultTypes[i] = mediaInfo.mimeType;
+
+        }
+
+        result.putExtra("resultUris",resultUris);
+        result.putExtra("resultTypes",resultTypes);
+
+        setResult(RESULT_OK,result);
         finish();
     }
 }

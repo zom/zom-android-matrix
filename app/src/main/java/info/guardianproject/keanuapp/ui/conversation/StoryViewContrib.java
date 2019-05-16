@@ -55,18 +55,18 @@ import static info.guardianproject.keanuapp.ui.conversation.ConversationDetailAc
 /**
  * Created by N-Pex on 2019-04-12.
  */
-public class StoryViewContrib extends ConversationView {
+public class StoryViewContrib extends StoryView {
 
-
-    public StoryViewContrib(ConversationDetailActivity activity) {
+    public StoryViewContrib(StoryActivity activity) {
         super(activity);
         mMicButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mActivity, AddUpdateMediaActivity.class);
-                mActivity.startActivityForResult(intent,REQUEST_ADD_MEDIA);
+                Intent intent = new Intent(activity, AddUpdateMediaActivity.class);
+                activity.startActivityForResult(intent,REQUEST_ADD_MEDIA);
             }
         });
+        mMicButton.setImageDrawable(R.drawable.ic_action_new);
     }
 
 

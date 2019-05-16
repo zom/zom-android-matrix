@@ -30,7 +30,7 @@ public class StoryActivity extends ConversationDetailActivity {
 
         if (contributorMode()) {
             Intent intent = new Intent(this, AddUpdateMediaActivity.class);
-            startActivity(intent);
+            startActivityForResult(intent,REQUEST_ADD_MEDIA);
         }
     }
 
@@ -40,9 +40,9 @@ public class StoryActivity extends ConversationDetailActivity {
 
     @Override
     protected int getLayoutFileId() {
-        if (contributorMode()) {
-            return R.layout.awesome_activity_story_detail_contrib;
-        }
+      //  if (contributorMode()) {
+        //    return R.layout.awesome_activity_story_detail_contrib;
+       // }
         return R.layout.awesome_activity_story_detail;
     }
 
@@ -93,7 +93,12 @@ public class StoryActivity extends ConversationDetailActivity {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
             super.onActivityResult(requestCode, resultCode, resultIntent);
     }
 }

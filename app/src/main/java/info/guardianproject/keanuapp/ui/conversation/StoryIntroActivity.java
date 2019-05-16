@@ -71,10 +71,16 @@ public class StoryIntroActivity extends AppCompatActivity {
     private int mViewType;
     private int mContactType;
 
+    private View mProgressBar;
+    private View mGroupLaunch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.awesome_activity_story_intro);
+
+        mProgressBar = findViewById(R.id.progressBar);
+        mGroupLaunch = findViewById(R.id.groupLaunch);
 
         getSupportActionBar().hide();
         setupStoryMode();
@@ -96,9 +102,7 @@ public class StoryIntroActivity extends AppCompatActivity {
 
         if (!TextUtils.isEmpty(mode))
         {
-
             intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE,mode.equals("contrib"));
-
             startActivity(intent);
             finish();
         }
@@ -141,10 +145,24 @@ public class StoryIntroActivity extends AppCompatActivity {
                             }
                         }
 
-                        intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE, isContrib);
+                        if (!isContrib) {
+                            intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE, isContrib);
 
-                        startActivity(intent);
-                        finish();
+                            startActivity(intent);
+                            finish();
+                        }
+                        else
+                        {
+                            mHandler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mProgressBar.setVisibility(View.GONE);
+                                    mGroupLaunch.setVisibility(View.VISIBLE);
+                                }
+                            });
+
+
+                        }
 
                     } catch (RemoteException e) {
                         e.printStackTrace();
@@ -194,20 +212,12 @@ public class StoryIntroActivity extends AppCompatActivity {
 
             if (!hasJoined())
             {
-                mHandler.post(new Runnable ()
-                {
-                    public void run ()
-                    {
-                        showJoinGroupUI();
-                    }
-                });
+                mHandler.post(() -> showJoinGroupUI());
             }
             else
             {
-                //launchStoryMode(null);
-
+                mHandler.post(() -> launchStoryMode(null));
             }
-
 
         }
 
@@ -353,8 +363,15 @@ public class StoryIntroActivity extends AppCompatActivity {
                             @Override
                             protected Object doInBackground(Object[] objects) {
 
-                                if (mCurrentChatSession != null)
+                                if (mCurrentChatSession != null) {
                                     setGroupSeen();
+                                    launchStoryMode(null);
+                                }
+                                else
+                                {
+                                    finish();
+                                }
+
 
                                 return null;
                             }

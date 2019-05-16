@@ -777,7 +777,7 @@ public class ConversationDetailActivity extends BaseActivity {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
 
         if (resultCode == RESULT_OK) {
 
@@ -873,28 +873,19 @@ public class ConversationDetailActivity extends BaseActivity {
             }
             else if (requestCode == REQUEST_ADD_MEDIA)
             {
-                ArrayList mediaUris = resultIntent.getParcelableArrayListExtra("result");
+                String[] mediaUris = resultIntent.getStringArrayExtra("resultUris");
+                String[] mediaTypes = resultIntent.getStringArrayExtra("resultTypes");
 
-                for (Object uri : mediaUris)
+                for (int i = 0; i < mediaUris.length; i++)
                 {
-                    Uri mediaUri = (Uri)uri;
-
-                    String mimeType = null;
-
-                    SystemServices.FileInfo info = null;
-                    try {
-                        info = SystemServices.getFileInfoFromURI(this, mediaUri);
-                        mimeType = info.type;
-                        info.stream.close();
-                    } catch (Exception e) {
-
-                    }
-
                     boolean deleteFile = false;
                     boolean resizeImage = false;
                     boolean importContent = true; //let's import it!
 
-                    handleSendDelete((Uri)uri, mimeType, deleteFile, resizeImage, importContent);
+                    if (mediaTypes[i].startsWith("video"))
+                        importContent = false;
+
+                    handleSendDelete(Uri.parse(mediaUris[i]), mediaTypes[i], deleteFile, resizeImage, importContent);
                 }
 
             }
