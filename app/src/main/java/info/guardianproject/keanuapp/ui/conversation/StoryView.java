@@ -2,13 +2,19 @@ package info.guardianproject.keanuapp.ui.conversation;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.graphics.drawable.DrawableCompat;
@@ -20,12 +26,14 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -41,6 +49,7 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
@@ -58,6 +67,8 @@ import info.guardianproject.keanuapp.ui.widgets.CircularPulseImageButton;
 import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
 import info.guardianproject.keanuapp.ui.widgets.MessageViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.PZSImageView;
+import info.guardianproject.keanuapp.ui.widgets.PdfViewActivity;
+import info.guardianproject.keanuapp.ui.widgets.StoryAudioPlayer;
 import info.guardianproject.keanuapp.ui.widgets.StoryExoPlayerManager;
 import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
 
@@ -70,6 +81,8 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
     private final ProgressBar progressBar;
     private final SnapHelper snapHelper;
     private final SimpleExoPlayerView previewAudio;
+    private final StoryAudioPlayer storyAudioPlayer;
+    private final PlayerControlView storyAudioPlayerView;
     private AudioRecorder audioRecorder;
     private int currentPage = -1;
     private RecyclerView.ViewHolder currentPageViewHolder = null;
@@ -85,6 +98,8 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
 
     // If this is set, we are in "preview audio" mode.
     private MediaInfo recordedAudio;
+
+    private int audioLoaderId = -1;
 
     public StoryView(ConversationDetailActivity activity) {
         super(activity);
@@ -137,6 +152,31 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
         previewAudio = activity.findViewById(R.id.previewAudio);
         previewAudio.setVisibility(View.GONE);
 
+        storyAudioPlayer = new StoryAudioPlayer(activity);
+        storyAudioPlayerView = activity.findViewById(R.id.audioPlayerView);
+        storyAudioPlayerView.setShowShuffleButton(false);
+        storyAudioPlayerView.setShowMultiWindowTimeBar(true);
+        storyAudioPlayerView.hide();
+        storyAudioPlayerView.setPlayer(storyAudioPlayer.getPlayer());
+
+        FloatingActionButton fabShowAudioPlayer = activity.findViewById(R.id.fabShowAudioPlayer);
+        fabShowAudioPlayer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) fabShowAudioPlayer.getLayoutParams();
+                if (storyAudioPlayerView.getVisibility() == View.VISIBLE) {
+                    storyAudioPlayerView.hide();
+                    lp.dodgeInsetEdges = Gravity.BOTTOM;
+                    fabShowAudioPlayer.setImageResource(R.drawable.ic_audio_24dp);
+                } else {
+                    storyAudioPlayerView.show();
+                    lp.dodgeInsetEdges = 0;
+                    fabShowAudioPlayer.setImageResource(R.drawable.ic_close_white_24dp);
+                }
+                fabShowAudioPlayer.setLayoutParams(lp);
+            }
+        });
+
         mComposeMessage.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -156,6 +196,16 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
         activity.findViewById(R.id.composeMessage).clearFocus();
    }
 
+
+    @Override
+    public boolean bindChat(long chatId, String address, String name) {
+        // Destroy old audio loader
+        if (audioLoaderId != -1) {
+            mActivity.getSupportLoaderManager().destroyLoader(audioLoaderId);
+            audioLoaderId = -1;
+        }
+        return super.bindChat(chatId, address, name);
+    }
 
     @Override
     protected void onSendButtonClicked() {
@@ -198,7 +248,10 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
 
         if (currentPageViewHolder != null) {
             if (currentPageViewHolder.itemView instanceof SimpleExoPlayerView) {
-                ((SimpleExoPlayerView)currentPageViewHolder.itemView).getPlayer().setPlayWhenReady(false);
+                Player player = ((SimpleExoPlayerView)currentPageViewHolder.itemView).getPlayer();
+                if (player != null) {
+                    player.setPlayWhenReady(false);
+                }
             }
         }
 
@@ -220,7 +273,7 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
 
     @Override
     protected Loader<Cursor> createLoader() {
-        String selection = "mime_type LIKE 'image/%' OR mime_type LIKE 'audio/%' OR mime_type LIKE 'video/%' OR mime_type LIKE 'application/pdf'";
+        String selection = "mime_type LIKE 'image/%' OR mime_type LIKE 'NOTaudio/%' OR mime_type LIKE 'video/%' OR mime_type LIKE 'application/pdf'";
         CursorLoader loader = new CursorLoader(mActivity, mUri, null, selection, null, Imps.Messages.DEFAULT_SORT_ORDER);
         return loader;
     }
@@ -241,6 +294,31 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
                 }
             });
         }
+
+        // Update audio cursor as well
+        if (audioLoaderId == -1) {
+            audioLoaderId = loaderId++;
+        }
+        mActivity.getSupportLoaderManager().restartLoader(audioLoaderId, null, new LoaderManager.LoaderCallbacks<Cursor>() {
+            @NonNull
+            @Override
+            public Loader<Cursor> onCreateLoader(int i, @Nullable Bundle bundle) {
+                String selection = "mime_type LIKE 'audio/%'";
+                return new CursorLoader(mActivity, mUri, null, selection, null, Imps.Messages.DEFAULT_SORT_ORDER);
+            }
+
+            @Override
+            public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor cursor) {
+                int uriColumn = cursor.getColumnIndexOrThrow(Imps.Messages.BODY);
+                int mimeTypeColumn = cursor.getColumnIndexOrThrow(Imps.Messages.MIME_TYPE);
+                storyAudioPlayer.updateCursor(cursor, mimeTypeColumn, uriColumn);
+            }
+
+            @Override
+            public void onLoaderReset(@NonNull Loader<Cursor> loader) {
+
+            }
+        });
     }
 
     @Override
@@ -345,7 +423,7 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
 
             switch (viewType) {
                 case 2:
-                    mediaView = new PDFView(context, null);
+                    mediaView = LayoutInflater.from(context).inflate(R.layout.story_viewer_file_info, parent, false);
                     break;
                 case 1:
                     SimpleExoPlayerView playerView = (SimpleExoPlayerView) LayoutInflater.from(context).inflate(R.layout.story_viewer_exo_player, parent, false);
@@ -381,41 +459,16 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
 
                 switch (viewType) {
                     case 2:
-                        PDFView pdfView = (PDFView) viewHolder.itemView;
-                        pdfView.post(new Runnable() {
-                                         @Override
-                                         public void run() {
-                                             pdfView.recycle();
-                                         }
-                                     });
-                        InputStream is = null;
-                        if (SecureMediaStore.isVfsUri(uri)) {
-                            try {
-                                is = (new info.guardianproject.iocipher.FileInputStream(uri.getPath()));
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
+                        TextView infoView = (TextView)viewHolder.itemView.findViewById(R.id.text);
+                        infoView.setText(uri.getLastPathSegment());
+                        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(context, PdfViewActivity.class);
+                                intent.setDataAndType(uri,mime);
+                                context.startActivity(intent);
                             }
-                        } else {
-                            try {
-                                is = (context.getContentResolver().openInputStream(uri));
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        if (is != null) {
-                            pdfView.fromStream(is)
-                                    .enableSwipe(true) // allows to block changing pages using swipe
-                                    .swipeHorizontal(false)
-                                    .enableDoubletap(true)
-                                    .defaultPage(0)
-                                    .enableAnnotationRendering(false) // render annotations (such as comments, colors or forms)
-                                    .password(null)
-                                    .scrollHandle(null)
-                                    .enableAntialiasing(true) // improve rendering a little bit on low-res screens
-                                    // spacing between pages in dp. To define spacing color, set view background
-                                    .spacing(0)
-                                    .load();
-                        }
+                        });
                         break;
                     case 1:
                         SimpleExoPlayerView playerView = (SimpleExoPlayerView)viewHolder.itemView;
