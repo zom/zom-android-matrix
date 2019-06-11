@@ -1555,7 +1555,7 @@ public class ConversationView {
 
     protected Uri mUri;
     private LoaderManager mLoaderManager;
-    private int loaderId = 100001;
+    protected int loaderId = 100001;
 
     private synchronized void startQuery(long chatId) {
 
