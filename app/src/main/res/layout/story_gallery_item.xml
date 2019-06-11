@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="80dp"
+    android:orientation="horizontal"
+    android:background="#eeeeee"
+    >
+<info.guardianproject.keanuapp.ui.widgets.SquareImageView
+    android:id="@+id/imageView"
+    android:layout_width="80dp"
+    android:layout_height="80dp"
+    android:scaleType="centerCrop" />
+<TextView
+android:id="@+id/titleView"
+android:layout_width="wrap_content"
+android:layout_height="80dp"
+    android:visibility="gone"
+    />
+</LinearLayout>

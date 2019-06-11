@@ -685,7 +685,7 @@ public class ImUrlActivity extends Activity {
         //startCrypto is not actually used anymore, as we move to OMEMO
 
         if (username != null)
-            new ChatSessionInitTask(providerId, accountId, Imps.Contacts.TYPE_NORMAL, true)
+            new ChatSessionInitTask(providerId, accountId, Imps.Contacts.TYPE_NORMAL, true, true, true)
             {
                 @Override
                 protected void onPostExecute(Long chatId) {

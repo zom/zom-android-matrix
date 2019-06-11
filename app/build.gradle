@@ -13,8 +13,8 @@ android {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 20212
-        versionName "0.0.2.12"
+        versionCode 20304
+        versionName "0.0.3.0-ALPHA-4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -35,7 +35,7 @@ android {
     }
 
     dexOptions {
-        javaMaxHeapSize "3g"
+        javaMaxHeapSize "4g"
         preDexLibraries true
     }
 
@@ -50,12 +50,9 @@ android {
     // when Gradle merges variant sources and configurations. You must assign
     // each product flavor you configure to one of the flavor dimensions.
 
-     flavorDimensions "release"
+    flavorDimensions "release"
 
-     productFlavors {
-
-         primary {// Assigns this product flavor to the "mode" flavor dimension.
-             dimension "release"}
+    productFlavors {
 
          altbrand {
              dimension "release"
@@ -63,8 +60,12 @@ android {
              versionCode 2000015
              versionName "2.0.0-RC-15"
          }
+        primary {// Assigns this product flavor to the "mode" flavor dimension.
+            dimension "release"
+        }
 
-     }
+
+    }
 
     lintOptions {
         checkReleaseBuilds false
@@ -139,6 +140,16 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.8.5'
 
+    /************* Matrix SDK management **************/
+    // use the matrix SDK as external lib
+    implementation(name: 'matrix-sdk', ext: 'aar')
+    implementation(name: 'olm-sdk-release-3.1.2', ext: 'aar')
+
+    //*********** KeanuApp components ********** /
+    implementation project(':keanuCore')
+    implementation project(':keanuMatrix')
+    //  implementation 'info.guardianproject.keanuapp:keanuCore:+'
+    // implementation 'info.guardianproject.keanuapp:keanuMatrix:+'
 
     //from here: https://github.com/guardianproject/proofmode
     implementation 'org.witness:android-libproofmode:0.0.3'
@@ -154,9 +165,8 @@ dependencies {
     implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
 
     //support for in app video playback
-    implementation 'com.google.android.exoplayer:exoplayer:2.6.0'
-    //for thumbnail extraction for videos!
-    implementation 'org.jcodec:jcodec-android:0.2.3'
+    implementation 'com.google.android.exoplayer:exoplayer:2.9.6'
+    implementation 'org.jcodec:jcodec:0.2.3'
 
     def lifecycle_version = "2.0.0"
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"

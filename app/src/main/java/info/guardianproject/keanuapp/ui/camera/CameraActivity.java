@@ -1,14 +1,14 @@
 package info.guardianproject.keanuapp.ui.camera;
 
-import android.arch.lifecycle.LifecycleOwner;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -16,38 +16,32 @@ import android.view.OrientationEventListener;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.Nullable;
+
 import com.otaliastudios.cameraview.BitmapCallback;
 import com.otaliastudios.cameraview.CameraListener;
-import com.otaliastudios.cameraview.CameraOptions;
-import com.otaliastudios.cameraview.CameraUtils;
 import com.otaliastudios.cameraview.CameraView;
 import com.otaliastudios.cameraview.Flash;
-import com.otaliastudios.cameraview.Frame;
-import com.otaliastudios.cameraview.FrameProcessor;
 import com.otaliastudios.cameraview.Mode;
 import com.otaliastudios.cameraview.PictureResult;
 import com.otaliastudios.cameraview.Size;
-import com.otaliastudios.cameraview.SizeSelector;
 import com.otaliastudios.cameraview.VideoCodec;
 import com.otaliastudios.cameraview.VideoResult;
 
 import org.apache.commons.io.IOUtils;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.keanu.core.Preferences;
@@ -55,17 +49,18 @@ import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
+import info.guardianproject.keanuapp.R;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 
 public class CameraActivity extends AppCompatActivity {
 
-    CameraView mCameraView;
+    protected CameraView mCameraView;
     OrientationEventListener mOrientationEventListener;
     int mLastOrientation = -1;
 
-    boolean mOneAndDone = true;
+    protected boolean mOneAndDone = true;
     public final static String SETTING_ONE_AND_DONE = "oad";
 
     public static final int ORIENTATION_PORTRAIT = 0;
@@ -77,7 +72,7 @@ public class CameraActivity extends AppCompatActivity {
     private final static int AUDIO_KBITRATE = 64;
 
     File fileVideoTmp;
-    boolean isRecordingVideo = false;
+    protected boolean isRecordingVideo = false;
     Bitmap thumbnail = null;
 
    // private final static int MAX_LENGTH_MS = 60 * 2 * 1000;
@@ -103,15 +98,22 @@ public class CameraActivity extends AppCompatActivity {
 
     private Executor mExec = new ThreadPoolExecutor(1,3,60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
+    protected void setupActionBar() {
+        setTitle("");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    protected void setContent() {
+        setContentView(R.layout.activity_camera);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_camera);
+        setContent();
+        setupActionBar();
 
         mOneAndDone = getIntent().getBooleanExtra(SETTING_ONE_AND_DONE,true);
-
-        setTitle("");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mCameraView = findViewById(R.id.camera_view);
 
@@ -123,15 +125,13 @@ public class CameraActivity extends AppCompatActivity {
                 super.onPictureTaken(result);
 
                 if (isRecordingVideo) {
-
+                    startVideoRecording ();
                     result.toBitmap(new BitmapCallback() {
                         @Override
                         public void onBitmapReady(@Nullable Bitmap bitmap) {
                             thumbnail = bitmap;
                         }
                     });
-
-                    startVideoRecording ();
                 }
                 else {
                     result.toBitmap(bitmap -> {
@@ -165,62 +165,56 @@ public class CameraActivity extends AppCompatActivity {
 
             }
         });
+        mCameraView.setVideoSize(source -> {
+            ArrayList<Size> result = new ArrayList<>();
 
+            for (Size size : source)
+            {
+                if (size.getWidth() < 1000)
+                    result.add(size);
+            }
+            return result;
+        });
 
-        findViewById(R.id.btnCamera).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        View btnCamera = findViewById(R.id.btnCamera);
+        if (btnCamera != null) {
+            btnCamera.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    btnCameraClicked();
+		}
+            });
+        }
 
-                if (!mCameraView.isTakingVideo())
-                {
-                    mCameraView.setMode(Mode.PICTURE);
-                    mCameraView.takePictureSnapshot();
+        View btnCameraVideo = findViewById(R.id.btnCameraVideo);
+        if (btnCameraVideo != null) {
+            btnCameraVideo.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public synchronized void onClick(View view) {
+                    btnCameraVideoClicked();
                 }
+            });
+        }
 
-
-
-            }
-
-
-        });
-
-        findViewById(R.id.btnCameraVideo).setVisibility(View.GONE);
-
-        findViewById(R.id.btnCameraVideo).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public synchronized void onClick(View view) {
-
-                if (isRecordingVideo)
-                {
-                    ((ImageView)findViewById(R.id.btnCameraVideo)).setImageResource(R.drawable.ic_video_rec);
-
-                    mCameraView.stopVideo();
-                    isRecordingVideo = false;
+        View btnToggleCamera = findViewById(R.id.toggle_camera);
+        if (btnToggleCamera != null) {
+            btnToggleCamera.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mCameraView.toggleFacing();
                 }
-                else {
-                    isRecordingVideo = true;
-                    mCameraView.takePictureSnapshot();
+            });
+        }
+
+        View btnToggleFlash = findViewById(R.id.toggle_flash);
+        if (btnToggleFlash != null) {
+            btnToggleFlash.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mCameraView.setFlash(Flash.AUTO);
                 }
-
-
-            }
-
-
-        });
-
-        findViewById(R.id.toggle_camera).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mCameraView.toggleFacing();
-            }
-        });
-
-        findViewById(R.id.toggle_flash).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mCameraView.setFlash(Flash.AUTO);
-            }
-        });
+            });
+        }
 
         mOrientationEventListener = new OrientationEventListener(this) {
             @Override
@@ -259,6 +253,25 @@ public class CameraActivity extends AppCompatActivity {
 
     }
 
+    protected void btnCameraClicked() {
+        if (!mCameraView.isTakingVideo()) {
+            mCameraView.setMode(Mode.PICTURE);
+            mCameraView.takePictureSnapshot();
+        }
+    }
+
+    protected void btnCameraVideoClicked() {
+        if (isRecordingVideo) {
+            ((ImageView) findViewById(R.id.btnCameraVideo)).setImageResource(R.drawable.ic_video_rec);
+
+            mCameraView.stopVideo();
+            isRecordingVideo = false;
+        } else {
+            isRecordingVideo = true;
+            startVideoRecording();
+        }
+    }
+
     private void startVideoRecording ()
     {
         mCameraView.setMode(Mode.VIDEO);
@@ -267,21 +280,8 @@ public class CameraActivity extends AppCompatActivity {
         mCameraView.setVideoMaxSize(MAX_FILE_SIZE);
 
         mCameraView.setVideoCodec(VideoCodec.H_264);
-
         mCameraView.setVideoBitRate(VIDEO_KBITRATE * 1000);
         mCameraView.setAudioBitRate(AUDIO_KBITRATE * 1000);
-
-        mCameraView.setVideoSize(source -> {
-            ArrayList<Size> result = new ArrayList<>();
-
-            for (Size size : source)
-            {
-                if (size.getWidth() < 1000)
-                    result.add(size);
-            }
-
-            return result;
-        });
 
         ((ImageView)findViewById(R.id.btnCameraVideo)).setImageResource(R.drawable.ic_video_stop);
 
@@ -322,7 +322,7 @@ public class CameraActivity extends AppCompatActivity {
         }
     }
 
-    private void hideSystemUI() {
+    protected void hideSystemUI() {
         // Enables regular immersive mode.
         // For "lean back" mode, remove SYSTEM_UI_FLAG_IMMERSIVE.
         // Or for "sticky immersive," replace it with SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -341,7 +341,7 @@ public class CameraActivity extends AppCompatActivity {
 
     // Shows the system bars by removing all the flags
 // except for the ones that make the content appear under the system bars.
-    private void showSystemUI() {
+    protected void showSystemUI() {
         View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -376,11 +376,18 @@ public class CameraActivity extends AppCompatActivity {
             final Uri vfsUri = SecureMediaStore.createContentPath(sessionId,"cam" + new Date().getTime() + ".mp4");
 
             OutputStream out = new info.guardianproject.iocipher.FileOutputStream(new File(vfsUri.getPath()));
+            InputStream in = new java.io.FileInputStream(fileVideo);
+            IOUtils.copyLarge(in, out);
+            in.close();
+            out.close();
 
-            IOUtils.copyLarge(new java.io.FileInputStream(fileVideo),out);
+            if (thumbnail == null) {
+                thumbnail = ThumbnailUtils.createVideoThumbnail(fileVideo.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
+            }
 
             fileVideo.delete();
             System.gc();
+
 
             if (thumbnail != null)
                 thumbnail.compress(Bitmap.CompressFormat.JPEG,
@@ -400,6 +407,8 @@ public class CameraActivity extends AppCompatActivity {
                 data.setDataAndType(vfsUri,mimeType);
                 setResult(RESULT_OK, data);
                 finish();
+            } else {
+                onVideo(vfsUri, mimeType);
             }
 
             if (Preferences.useProofMode()) {
@@ -449,6 +458,8 @@ public class CameraActivity extends AppCompatActivity {
                 data.setDataAndType(vfsUri,mimeType);
                 setResult(RESULT_OK, data);
                 finish();
+            } else {
+                onBitmap(vfsUri, mimeType);
             }
 
             if (Preferences.useProofMode()) {
@@ -482,6 +493,24 @@ public class CameraActivity extends AppCompatActivity {
                 bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix, false);
         bm.recycle();
         return resizedBitmap;
+    }
+
+    /**
+     * Called when a bitmap has been stored in virtual file system. Base class does nothing.
+     * @param vfsUri
+     * @param mimeType
+     */
+    protected void onBitmap(Uri vfsUri, String mimeType) {
+
+    }
+
+    /**
+     * Called when a video has been stored in virtual file system. Base class does nothing.
+     * @param vfsUri
+     * @param mimeType
+     */
+    protected void onVideo(Uri vfsUri, String mimeType) {
+
     }
 
 }

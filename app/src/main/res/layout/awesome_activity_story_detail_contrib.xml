@@ -1,0 +1,470 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (C) 2015 The Android Open Source Project
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+<!--
+
+    android:fitsSystemWindows="true"
+    android:clipToPadding="false"
+    android:isScrollContainer="false"
+    -->
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" >
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/history"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:stackFromBottom="true"
+                android:divider="#00000000"
+                android:dividerHeight="6dp"
+                android:transcriptMode="normal"
+                android:scrollbars="vertical"
+                app:layout_behavior="info.guardianproject.keanuapp.ui.widgets.PatchedScrollingViewBehavior"
+                android:paddingBottom="48dp"
+                android:layout_marginTop="0dp"
+                android:paddingTop="0dp"
+                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                >
+                <ProgressBar
+                    android:id="@+id/progress_horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    /><!--
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    app:theme="@style/LightToolBarStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:layout_collapseMode="pin"
+                    app:titleTextAppearance="@style/Toolbar.TitleText"
+                    app:elevation="0dp"
+                    />-->
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                    app:theme="@style/LightToolBarStyle"
+                    app:layout_collapseMode="pin"
+                    app:titleTextAppearance="@style/Toolbar.TitleText"
+                    />
+            </LinearLayout>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center|top"
+            android:layout_margin="0dp"
+            android:id="@+id/upgrade_view"
+            android:background="?colorPrimary"
+            android:visibility="gone"
+            >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="X"
+                android:layout_gravity="top|right|end"
+                android:src="@drawable/ic_close_white_24dp"
+                android:id="@+id/upgrade_close"
+                />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="120dp"
+                android:src="@drawable/image_success"
+                android:id="@+id/upgrade_view_image"
+                />
+
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:id="@+id/upgrade_view_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textColor="@android:color/white"
+                android:layout_margin="5dp"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:gravity="center"
+                />
+            <info.guardianproject.keanu.core.type.CustomTypefaceButton
+                android:layout_width="200dp"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text=""
+                android:textColor="?colorPrimary"
+                android:background="@drawable/rounded_rect_golden"
+                android:layout_margin="20dp"
+                android:id='@+id/upgrade_action'
+                />
+        </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#77000000"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:id="@+id/viewDeleteVoice"
+        android:visibility="gone"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_delete_white_48dp"
+            android:id="@+id/btnDeleteVoice"
+            />
+
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/swipe_up_delete"
+            android:textColor="@android:color/white"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="bottom"
+        >
+
+
+        <HorizontalScrollView
+            android:id="@+id/attachPanel"
+            android:layout_width="match_parent"
+            android:layout_height="96dip"
+            android:fillViewport="true"
+            android:measureAllChildren="false"
+            android:scrollbars="none"
+            android:visibility="invisible"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_vertical"
+            android:background="@color/background_light"
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_vertical|center_horizontal"
+                android:orientation="horizontal"
+                >
+
+
+                <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                    android:id="@+id/btnAttachPicture"
+                    android:src="@drawable/ic_insert_photo_white_36dp"
+                    android:layout_margin="3dp"
+                    android:padding="12dp"
+                    app:circleColor="@android:color/holo_green_light"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    />
+
+                <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                    android:id="@+id/btnTakePicture"
+                    android:src="@drawable/ic_photo_camera_white_36dp"
+                    android:layout_margin="3dp"
+                    app:circleColor="@android:color/holo_blue_light"
+                    android:padding="12dp"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+
+                    />
+
+                <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                    android:id="@+id/btnAttachSticker"
+                    android:src="@drawable/ic_insert_emoticon_white_36dp"
+                    android:layout_margin="3dp"
+                    android:padding="12dp"
+                    app:circleColor="@android:color/holo_orange_light"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    />
+                <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                    android:id="@+id/btnAttachAudio"
+                    android:src="@drawable/ic_audiotrack_white_24dp"
+                    android:layout_margin="3dp"
+                    android:padding="12dp"
+                    app:circleColor="#FF4444"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    />
+
+                <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                    android:id="@+id/btnAttachFile"
+                    android:src="@drawable/ic_insert_drive_file_white_36dp"
+                    android:layout_margin="3dp"
+                    android:padding="6dp"
+                    app:circleColor="@android:color/holo_red_light"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    />
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <RelativeLayout
+            android:id="@+id/stickerBox"
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="200dip"
+            android:visibility="gone"
+            >
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/stickerPager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#bcbcbc"
+                >
+
+                <android.support.v4.view.PagerTitleStrip
+                    android:id="@+id/stickerPagerStrip"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="#fff" />
+
+            </android.support.v4.view.ViewPager>
+
+        </RelativeLayout>
+
+        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="..."
+            android:layout_marginLeft="12dp"
+            android:layout_marginBottom="6dp"
+            android:textSize="22dp"
+            android:id="@+id/tvTyping"
+            android:layout_below="@+id/history"
+            android:background="@android:color/transparent"
+            android:textColor="?messageTextPrimary"
+            android:visibility="gone"
+            />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="left"
+            android:layout_margin="3dp"
+            android:background="#CCCCCCCC"
+            android:id="@+id/mediaPreviewContainer"
+            android:layout_weight="2"
+            android:visibility="gone"
+            >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|end"
+                android:src="@drawable/ic_menu_close"
+                android:id="@+id/mediaPreviewCancel"
+                />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="200dp"
+                android:id="@+id/mediaPreview"
+                android:src="@drawable/broken_image_large"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="3dp"
+            android:layout_alignParentBottom="true"
+            android:background="@android:color/white"
+            android:id="@+id/inputLayout"
+            android:layout_below="@+id/mediaPreviewContainer"
+            android:layout_weight="2"
+
+            >
+
+            <ImageButton
+                android:id="@+id/btnAttach"
+                android:layout_width="28dip"
+                android:layout_height="28dip"
+                android:scaleType="centerInside"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_add_circle_outline_black_36dp"
+                android:layout_margin="6dp"
+                />
+
+            <info.guardianproject.keanu.core.type.CustomTypefaceEditText
+                android:id="@+id/composeMessage"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine|textImeMultiLine"
+                android:imeOptions="actionSend|flagNoEnterAction"
+                android:hint="@string/compose_hint"
+                android:fontFamily="sans-serif-light"
+                android:background="@android:color/transparent"
+                android:padding="2dp"
+                android:textColor="?messageTextPrimary"
+
+                />
+
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/push_to_talk"
+                android:padding="2dp"
+                android:id="@+id/buttonHoldToTalk"
+                android:visibility="gone"
+                style="@android:style/Widget.Button"
+                />
+
+
+            <ImageButton
+                android:id="@+id/btnMic"
+
+                android:layout_width="28dip"
+                android:layout_height="28dip"
+                android:scaleType="centerInside"
+                android:background="@android:color/transparent"
+                android:src="@drawable/ic_mic_black_36dp"
+                android:layout_margin="6dp"
+                />
+
+            <ImageButton
+                android:id="@+id/btnSend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ad_selectable_background"
+                android:fontFamily="sans-serif-light"
+                android:paddingBottom="1sp"
+                android:paddingLeft="3sp"
+                android:paddingRight="3sp"
+                android:paddingTop="1sp"
+                android:src="@drawable/ic_send_holo_light"
+                android:visibility="gone"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+        <!-- Waiting for friend view, covers the whole container -->
+        <LinearLayout
+            android:id="@+id/waiting_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="0dp"
+            android:background="@color/holo_grey_light"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/waiting_view_image"
+                android:layout_width="wrap_content"
+                android:layout_height="120dp"
+                android:src="@drawable/image_waiting" />
+
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:id="@+id/waiting_view_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:gravity="center"
+                android:text="@string/message_waiting_for_friend"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="?messageTextSecondary" />
+
+            <LinearLayout
+                android:id="@+id/waiting_refresh_background"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_rect_primary"
+                android:padding="10dp"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/waiting_refresh"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:src="@drawable/ic_refresh_white_24dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Join group view, covers the whole container -->
+        <RelativeLayout
+            android:id="@+id/join_group_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="0dp"
+            android:background="@color/app_primary"
+            android:visibility="gone">
+            <Button android:id="@+id/btnJoinDecline" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerInParent="true"
+                android:text="@string/room_dont_join" android:textColor="@android:color/white" android:background="@null" android:textAllCaps="false"/>
+            <Button android:id="@+id/btnJoinAccept" android:layout_width="wrap_content" android:layout_height="50dp" android:layout_above="@id/btnJoinDecline" android:layout_centerHorizontal="true"
+                android:text="@string/room_join"
+                android:paddingLeft="40dp"
+                android:paddingStart="40dp"
+                android:paddingRight="40dp"
+                android:paddingEnd="40dp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium" android:textColor="@color/app_primary" android:background="@drawable/rounded_white_button_background" android:textAllCaps="false" />
+            <TextView
+                android:id="@+id/room_join_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_above="@id/btnJoinAccept"
+                android:layout_margin="40dp"
+                android:gravity="center"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                android:textColor="@android:color/white"
+                tools:text="@string/room_invited"
+                />
+        </RelativeLayout>
+    </FrameLayout>
+</LinearLayout>

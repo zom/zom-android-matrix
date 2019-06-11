@@ -57,6 +57,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.ocpsoft.prettytime.PrettyTime;
@@ -65,6 +66,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.ArrayList;
@@ -96,7 +98,7 @@ public class ConversationDetailActivity extends BaseActivity {
     private String mAddress = null;
     private String mNickname = null;
 
-    private ConversationView mConvoView = null;
+    protected ConversationView mConvoView = null;
 
     MediaRecorder mMediaRecorder = null;
     File mAudioFilePath = null;
@@ -105,9 +107,12 @@ public class ConversationDetailActivity extends BaseActivity {
 
     //private AppBarLayout appBarLayout;
     private View mRootLayout;
-    private Toolbar mToolbar;
+    protected Toolbar mToolbar;
 
     private PrettyTime mPrettyTime;
+    private View.OnClickListener backButtonHandler;
+
+    private boolean mIsContributor = false;
 
     private Handler mHandler = new Handler()
     {
@@ -142,19 +147,30 @@ public class ConversationDetailActivity extends BaseActivity {
         }
     };
 
+    /**
+     * Override to use another layout
+     * @return Returns a layout file id.
+     */
+    protected int getLayoutFileId() {
+        return R.layout.awesome_activity_detail;
+    }
+
+    protected ConversationView createConvoView() {
+        return new ConversationView(this);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
        // getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-        setContentView(R.layout.awesome_activity_detail);
-
+        setContentView(getLayoutFileId());
         mApp = (ImApp)getApplication();
-
-        mConvoView = new ConversationView(this);
-
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        mConvoView = createConvoView();
+
       //  appBarLayout = (AppBarLayout)findViewById(R.id.appbar);
         mRootLayout = findViewById(R.id.main_content);
 
@@ -275,11 +291,14 @@ public class ConversationDetailActivity extends BaseActivity {
                         public void run() {
                             applyStyleForToolbar();
 
-                            if (intent.getBooleanExtra("isNew", false))
-                                mConvoView.showGroupInfo();
+                            if (intent.getBooleanExtra("isNew", false)) {
+                                mConvoView.showGroupInfo(intent.getStringExtra("subject"));
+                                intent.putExtra("isNew", false);
+
+                            }
+
                         }
                     });
-
 
                 } else
                     finish();
@@ -304,25 +323,7 @@ public class ConversationDetailActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         processIntent(getIntent());
-        setIntent(null);
         mConvoView.setSelected(true);
-
-        /**
-        new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] objects) {
-
-                return null;
-            }
-
-            @Override
-            protected void onPostExecute(Object o) {
-                super.onPostExecute(o);
-
-
-
-            }
-        }.execute();*/
 
     }
 
@@ -370,9 +371,22 @@ public class ConversationDetailActivity extends BaseActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (getBackButtonHandler() != null) {
+            backButtonHandler.onClick(null);
+            return;
+        }
+        super.onBackPressed();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
+                if (getBackButtonHandler() != null) {
+                    backButtonHandler.onClick(null);
+                    return true;
+                }
                 finish();
                 return true;
             case R.id.menu_end_conversation:
@@ -380,7 +394,7 @@ public class ConversationDetailActivity extends BaseActivity {
                 finish();
                 return true;
             case R.id.menu_group_info:
-                mConvoView.showGroupInfo();
+                mConvoView.showGroupInfo(null);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -858,6 +872,24 @@ public class ConversationDetailActivity extends BaseActivity {
 
                 handleSendDelete(uri, defaultType, deleteFile, resizeImage, importContent);
             }
+            else if (requestCode == REQUEST_ADD_MEDIA)
+            {
+                String[] mediaUris = resultIntent.getStringArrayExtra("resultUris");
+                String[] mediaTypes = resultIntent.getStringArrayExtra("resultTypes");
+
+                for (int i = 0; i < mediaUris.length; i++)
+                {
+                    boolean deleteFile = false;
+                    boolean resizeImage = false;
+                    boolean importContent = true; //let's import it!
+
+                    if ((TextUtils.isEmpty(mediaTypes[i])) && mediaTypes[i].startsWith("video"))
+                        importContent = false;
+
+                    handleSendDelete(Uri.parse(mediaUris[i]), mediaTypes[i], deleteFile, resizeImage, importContent);
+                }
+
+            }
             else if (requestCode == REQUEST_TAKE_PICTURE)
             {
                 ShareRequest request = new ShareRequest();
@@ -1076,6 +1108,13 @@ public class ConversationDetailActivity extends BaseActivity {
         }
     }
 
+    public View.OnClickListener getBackButtonHandler() {
+        return backButtonHandler;
+    }
+
+    public void setBackButtonHandler(View.OnClickListener backButtonHandler) {
+        this.backButtonHandler = backButtonHandler;
+    }
 
     public static final int REQUEST_PICK_CONTACTS = RESULT_FIRST_USER + 1;
     public static final int REQUEST_SEND_IMAGE = REQUEST_PICK_CONTACTS + 1;
@@ -1086,5 +1125,7 @@ public class ConversationDetailActivity extends BaseActivity {
     public static final int REQUEST_TAKE_PICTURE_SECURE = REQUEST_SETTINGS + 1;
     public static final int REQUEST_ADD_CONTACT = REQUEST_TAKE_PICTURE_SECURE + 1;
     public static final int REQUEST_IMAGE_VIEW = REQUEST_ADD_CONTACT + 1;
+    public static final int REQUEST_ADD_MEDIA = REQUEST_IMAGE_VIEW + 1;
+
 
 }

@@ -101,8 +101,6 @@ public class ConversationListItem extends FrameLayout {
     public static final int COLUMN_USE_ENCRYPTION = 14;
 
 
-
-
     static Drawable AVATAR_DEFAULT_GROUP = null;
     private PrettyTime sPrettyTime = null;
 
@@ -198,6 +196,7 @@ public class ConversationListItem extends FrameLayout {
 
             if (holder.mLine2 != null)
             {
+                holder.mLine2.setText("");
                 String vPath = message.split(" ")[0];
 
                 if (SecureMediaStore.isVfsUri(vPath)||SecureMediaStore.isContentUri(vPath))
@@ -328,7 +327,10 @@ public class ConversationListItem extends FrameLayout {
                         holder.mMediaThumb.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
                     } catch (Exception e) {
-
+                        try {
+                            holder.mLine2.setText(android.text.Html.fromHtml(message).toString());
+                        }
+                        catch (RuntimeException re){}
                     }
                 }
                 else
@@ -337,7 +339,6 @@ public class ConversationListItem extends FrameLayout {
                         holder.mMediaThumb.setVisibility(View.GONE);
                     
                     holder.mLine2.setVisibility(View.VISIBLE);
-
 
 
                     try {

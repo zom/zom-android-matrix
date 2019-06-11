@@ -55,6 +55,7 @@ import android.widget.TextView;
 
 import info.guardianproject.keanu.core.provider.Imps;
 
+import info.guardianproject.keanuapp.BuildConfig;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.R;
@@ -62,6 +63,8 @@ import info.guardianproject.keanuapp.tasks.MigrateAccountTask;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingAccount;
 import info.guardianproject.keanuapp.ui.widgets.ConversationViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
+
+import static info.guardianproject.keanuapp.ui.conversation.StoryActivity.TAG_STORYMODE_INDICATOR;
 
 public class ConversationListFragment extends Fragment {
 
@@ -459,10 +462,14 @@ public class ConversationListFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         Context context = v.getContext();
-                        Intent intent = new Intent(context, ConversationDetailActivity.class);
+
+                        //TODO Story - Determine when to open story mode
+                        boolean isStory = nickname.contains(TAG_STORYMODE_INDICATOR);
+                        Intent intent = new Intent(context, isStory ? StoryIntroActivity.class : ConversationDetailActivity.class);
                         intent.putExtra("id", chatId);
                         intent.putExtra("address", address);
                         intent.putExtra("nickname", nickname);
+
                         context.startActivity(intent);
                     }
                 });

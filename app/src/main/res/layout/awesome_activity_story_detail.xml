@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_weight="1">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/story_contrib_controls_height">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/history"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="0dp"
+            android:divider="#00000000"
+            android:dividerHeight="6dp"
+            android:paddingTop="0dp"
+            android:paddingBottom="0dp"
+            android:scrollbars="vertical"
+            android:stackFromBottom="true"
+            android:transcriptMode="normal"
+            app:layout_behavior="info.guardianproject.keanuapp.ui.widgets.PatchedScrollingViewBehavior" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ProgressBar
+                android:id="@+id/progress_horizontal"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:elevation="0dp"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:theme="@style/LightToolBarStyle"
+                app:titleTextAppearance="@style/Toolbar.TitleText" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+        android:id="@+id/previewAudio"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:paddingBottom="@dimen/story_contrib_controls_height"
+        android:fitsSystemWindows="true"
+        app:controller_layout_id="@layout/story_contrib_media_controller"
+        app:player_layout_id="@layout/story_contrib_exo_player"
+        app:resize_mode="fill"
+        app:use_controller="true" />
+
+    <LinearLayout
+        android:id="@+id/inputLayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/story_contrib_controls_height"
+        android:layout_gravity="bottom"
+        android:background="#888888"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_insetEdge="bottom"
+        android:padding="3dp">
+
+        <info.guardianproject.keanu.core.type.CustomTypefaceEditText
+            android:id="@+id/composeMessage"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:fontFamily="sans-serif-light"
+            android:hint="@string/compose_hint_story"
+            android:imeOptions="actionSend|flagNoEnterAction"
+            android:inputType="textShortMessage|textAutoCorrect|textCapSentences|textMultiLine|textImeMultiLine"
+            android:padding="2dp"
+            android:textColor="@android:color/white"
+            android:tint="@android:color/white"
+
+            />
+
+        <info.guardianproject.keanuapp.ui.widgets.CircularPulseImageButton
+            android:id="@+id/btnMic"
+            android:layout_width="@dimen/story_contrib_controls_height"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="0"
+            android:background="@null"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_mic_black_36dp"
+            android:tint="@android:color/white"
+            app:color="@android:color/white"
+            app:durationExpand="930"
+            app:durationGap="330"
+            app:lineWidth="4dp" />
+
+        <ImageButton
+            android:id="@+id/btnSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ad_selectable_background"
+            android:fontFamily="sans-serif-light"
+            android:paddingLeft="3sp"
+            android:paddingTop="1sp"
+            android:paddingRight="3sp"
+            android:paddingBottom="1sp"
+            android:src="@drawable/ic_send_holo_light"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <com.google.android.exoplayer2.ui.PlayerControlView
+        android:id="@+id/audioPlayerView"
+        android:background="@android:color/black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:layout_dodgeInsetEdges="bottom"
+        android:fitsSystemWindows="true"
+        app:show_shuffle_button="false"
+        app:use_controller="true" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabShowAudioPlayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_audio_24dp"
+        android:layout_margin="@dimen/fab_margin"
+        app:layout_anchor="@id/inputLayout"
+        app:layout_dodgeInsetEdges="bottom"
+        app:layout_anchorGravity="end|bottom"
+        />
+</android.support.design.widget.CoordinatorLayout>

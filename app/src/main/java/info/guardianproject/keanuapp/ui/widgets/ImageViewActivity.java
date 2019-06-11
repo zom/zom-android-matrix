@@ -32,16 +32,31 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.github.barteksc.pdfviewer.PDFView;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DataSpec;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
-import info.guardianproject.keanu.core.provider.Imps;
-import info.guardianproject.keanu.core.util.SecureMediaStore;
-
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.ImUrlActivity;
+import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.nearby.NearbyShareActivity;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
@@ -109,7 +124,13 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
                     messagePacketIds = getIntent().getStringArrayListExtra(MESSAGE_IDS);
 
                     if (uris != null && mimeTypes != null && uris.size() > 0 && uris.size() == mimeTypes.size()) {
-                        viewPagerPhotos.setAdapter(new PhotosPagerAdapter(ImageViewActivity.this, uris));
+
+                        ArrayList<MediaInfo> info = new ArrayList<>(uris.size());
+                        for (int i = 0; i < uris.size(); i++) {
+                            info.add(new MediaInfo(uris.get(i), mimeTypes.get(i)));
+                        }
+
+                        viewPagerPhotos.setAdapter(new MediaPagerAdapter(ImageViewActivity.this, info));
                         int currentIndex = getIntent().getIntExtra(CURRENT_INDEX, 0);
                         viewPagerPhotos.setCurrentItem(currentIndex);
                         updateTitle();
@@ -140,7 +161,7 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
 
     private void updateTitle() {
         if (viewPagerPhotos.getAdapter() != null && viewPagerPhotos.getAdapter().getCount() > 0) {
-            String title = getString(R.string.photo_x_of_y, viewPagerPhotos.getCurrentItem() + 1, viewPagerPhotos.getAdapter().getCount());
+            String title = getString(R.string.item_x_of_y, viewPagerPhotos.getCurrentItem() + 1, viewPagerPhotos.getAdapter().getCount());
             setTitle(title);
         } else {
             setTitle("");
@@ -298,67 +319,146 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
         }
     }
 
-    public class PhotosPagerAdapter extends PagerAdapter {
+    public class MediaPagerAdapter extends PagerAdapter {
         private final RequestOptions imageRequestOptions;
 
         Context context;
-        List<Uri> photos;
+        List<MediaInfo> listMedia;
 
-        public PhotosPagerAdapter(Context context, List<Uri> photos)
+        public MediaPagerAdapter(Context context, List<MediaInfo> listMedia)
         {
             super();
             this.context = context;
-            this.photos = photos;
+            this.listMedia = listMedia;
             imageRequestOptions = new RequestOptions().centerInside().diskCacheStrategy(DiskCacheStrategy.NONE).error(R.drawable.broken_image_large);
         }
 
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            PZSImageView imageView = new PZSImageView(context);
-            imageView.setBackgroundColor(0xff333333);
-            imageView.setId(position);
-            container.addView(imageView);
+            MediaInfo mediaInfo = listMedia.get(position);
+            View mediaView = null;
 
-            Uri mediaUri = photos.get(position);
+            if (mediaInfo.isPDF()) {
+                PDFView pdfView = new PDFView(context, null);
+                mediaView = pdfView;
+                pdfView.setId(position);
+                container.addView(mediaView);
 
-            try {
-                imageView.setMatrixListener(ImageViewActivity.this);
-                if (SecureMediaStore.isVfsUri(mediaUri)) {
-
-                    info.guardianproject.iocipher.File fileMedia = new info.guardianproject.iocipher.File(mediaUri.getPath());
-
-                    if (fileMedia.exists()) {
-                        Glide.with(context)
-                                .asBitmap()
-                                .apply(imageRequestOptions)
-                                .load(new info.guardianproject.iocipher.FileInputStream(fileMedia))
-                                .into(imageView);
-                    }
-                    else
-                    {
-                        Glide.with(context)
-                                .asBitmap()
-                                .apply(imageRequestOptions)
-                                .load(R.drawable.broken_image_large)
-                                .into(imageView);
+                InputStream is = null;
+                if (SecureMediaStore.isVfsUri(mediaInfo.uri)) {
+                    try {
+                        is = (new info.guardianproject.iocipher.FileInputStream(mediaInfo.uri.getPath()));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
                     }
                 } else {
-                    Glide.with(context)
-                            .asBitmap()
-                            .apply(imageRequestOptions)
-                            .load(mediaUri)
-                            .into(imageView);
+                    try {
+                        is = (getContentResolver().openInputStream(mediaInfo.uri));
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (is != null) {
+                    pdfView.fromStream(is)
+                            .enableSwipe(true) // allows to block changing pages using swipe
+                            .swipeHorizontal(false)
+                            .enableDoubletap(true)
+                            .defaultPage(0)
+                            .enableAnnotationRendering(false) // render annotations (such as comments, colors or forms)
+                            .password(null)
+                            .scrollHandle(null)
+                            .enableAntialiasing(true) // improve rendering a little bit on low-res screens
+                            // spacing between pages in dp. To define spacing color, set view background
+                            .spacing(0)
+                            .load();
+                }
+            } else if (mediaInfo.isAudio() || mediaInfo.isVideo()) {
+                SimpleExoPlayerView playerView = new SimpleExoPlayerView(context);
+                mediaView = playerView;
+                mediaView.setBackgroundColor(0xff333333);
+                mediaView.setId(position);
+                container.addView(mediaView);
+
+                DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter(); //test
+
+                TrackSelection.Factory videoTrackSelectionFactory = new AdaptiveTrackSelection.Factory(bandwidthMeter);
+                TrackSelector trackSelector =
+                        new DefaultTrackSelector(videoTrackSelectionFactory);
+
+                // 2. Create the player
+                SimpleExoPlayer exoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector);
+
+                ////Set media controller
+                playerView.setUseController(true);//set to true or false to see controllers
+                playerView.requestFocus();
+                // Bind the player to the view.
+                playerView.setPlayer(exoPlayer);
+
+                DataSpec dataSpec = new DataSpec(mediaInfo.uri);
+                final VideoViewActivity.InputStreamDataSource inputStreamDataSource = new VideoViewActivity.InputStreamDataSource(context, dataSpec);
+                try {
+                    inputStreamDataSource.open(dataSpec);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                DataSource.Factory factory = new DataSource.Factory() {
+
+                    @Override
+                    public DataSource createDataSource() {
+                        return inputStreamDataSource;
+                    }
+                };
+                MediaSource audioSource = new ExtractorMediaSource(inputStreamDataSource.getUri(),
+                        factory, new DefaultExtractorsFactory(), null, null);
+
+                exoPlayer.prepare(audioSource);
+                exoPlayer.setPlayWhenReady(true); //run file/link when ready to play.
+
+            } else {
+                PZSImageView imageView = new PZSImageView(context);
+                mediaView = imageView;
+
+                imageView.setBackgroundColor(0xff333333);
+                imageView.setId(position);
+                container.addView(imageView);
+
+                try {
+                    imageView.setMatrixListener(ImageViewActivity.this);
+                    if (SecureMediaStore.isVfsUri(mediaInfo.uri)) {
+
+                        info.guardianproject.iocipher.File fileMedia = new info.guardianproject.iocipher.File(mediaInfo.uri.getPath());
+
+                        if (fileMedia.exists()) {
+                            Glide.with(context)
+                                    .asBitmap()
+                                    .apply(imageRequestOptions)
+                                    .load(new info.guardianproject.iocipher.FileInputStream(fileMedia))
+                                    .into(imageView);
+                        } else {
+                            Glide.with(context)
+                                    .asBitmap()
+                                    .apply(imageRequestOptions)
+                                    .load(R.drawable.broken_image_large)
+                                    .into(imageView);
+                        }
+                    } else {
+                        Glide.with(context)
+                                .asBitmap()
+                                .apply(imageRequestOptions)
+                                .load(mediaInfo.uri)
+                                .into(imageView);
+                    }
+                } catch (Throwable t) { // may run Out Of Memory
+                    Log.w(LOG_TAG, "unable to load thumbnail: " + t);
                 }
             }
-            catch (Throwable t) { // may run Out Of Memory
-                Log.w(LOG_TAG, "unable to load thumbnail: " + t);
-            }
-            return imageView;
+            return mediaView;
         }
 
         @Override
         public int getCount() {
-            return photos.size();
+            return listMedia.size();
         }
 
         @Override
