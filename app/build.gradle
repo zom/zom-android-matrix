@@ -57,8 +57,8 @@ android {
          altbrand {
              dimension "release"
 	         applicationId "im.zom.messenger"
-             versionCode 2000015
-             versionName "2.0.0-RC-15"
+             versionCode 2100000
+             versionName "2.1.0-ALPHA-1"
          }
         primary {// Assigns this product flavor to the "mode" flavor dimension.
             dimension "release"
@@ -96,11 +96,11 @@ dependencies {
     /************* Matrix SDK management **************/
     // use the matrix SDK as external lib
     implementation(name: 'matrix-sdk', ext: 'aar')
-    implementation(name: 'olm-sdk', ext: 'aar')
+    implementation(name: 'olm-sdk-release-3.1.2', ext: 'aar')
 
     /*********** KeanuApp components **********/
-    implementation(name: 'keanucore-0.0.1.31', ext: 'aar')
-    implementation(name: 'keanumatrix-0.0.1.31', ext: 'aar')
+     implementation(name: 'keanucore-0.0.1.32', ext: 'aar')
+     implementation(name: 'keanumatrix-0.0.1.32', ext: 'aar')
    // implementation project(':keanuCore')
    // implementation project(':keanuMatrix')
 
@@ -139,17 +139,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.8.5'
-
-    /************* Matrix SDK management **************/
-    // use the matrix SDK as external lib
-    implementation(name: 'matrix-sdk', ext: 'aar')
-    implementation(name: 'olm-sdk-release-3.1.2', ext: 'aar')
-
-    //*********** KeanuApp components ********** /
-    implementation project(':keanuCore')
-    implementation project(':keanuMatrix')
-    //  implementation 'info.guardianproject.keanuapp:keanuCore:+'
-    // implementation 'info.guardianproject.keanuapp:keanuMatrix:+'
 
     //from here: https://github.com/guardianproject/proofmode
     implementation 'org.witness:android-libproofmode:0.0.3'
