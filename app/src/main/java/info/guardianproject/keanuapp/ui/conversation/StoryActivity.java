@@ -24,6 +24,8 @@ public class StoryActivity extends ConversationDetailActivity {
 
     public static final String TAG_STORYMODE_INDICATOR = "!session";
 
+    private StoryView storyView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,9 +51,9 @@ public class StoryActivity extends ConversationDetailActivity {
     @Override
     protected ConversationView createConvoView() {
         if (contributorMode()) {
-            return new StoryViewContrib(this);
+            return (storyView = new StoryViewContrib(this));
         }
-        return new StoryView(this);
+        return (storyView = new StoryView(this));
     }
 
     @Override
@@ -100,5 +102,12 @@ public class StoryActivity extends ConversationDetailActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
             super.onActivityResult(requestCode, resultCode, resultIntent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        storyView.pause();
     }
 }

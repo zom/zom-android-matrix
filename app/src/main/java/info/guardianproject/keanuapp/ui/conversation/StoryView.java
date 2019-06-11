@@ -577,4 +577,9 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
             }
         }
     }
+
+    public void pause ()
+    {
+        storyAudioPlayer.getPlayer().stop();
+    }
 }
