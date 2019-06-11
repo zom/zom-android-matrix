@@ -1691,14 +1691,23 @@ public class ConversationView {
     }
 
 
-    public void showGroupInfo () {
+    public void showGroupInfo (String setSubject) {
 
         Intent intent = new Intent(mContext, GroupDisplayActivity.class);
-        intent.putExtra("nickname", mRemoteNickname);
         intent.putExtra("address", mRemoteAddress);
         intent.putExtra("provider", mProviderId);
         intent.putExtra("account", mAccountId);
         intent.putExtra("chat", mLastChatId);
+
+        if (!TextUtils.isEmpty(setSubject)) {
+            intent.putExtra("subject", setSubject);
+            intent.putExtra("nickname", setSubject);
+
+        }
+        else {
+            intent.putExtra("nickname", mRemoteNickname);
+
+        }
 
         mContext.startActivity(intent);
     }
@@ -3081,7 +3090,7 @@ public class ConversationView {
 
         if (username != null) {
 
-            new ChatSessionInitTask(mProviderId, mAccountId, Imps.Contacts.TYPE_NORMAL, true) {
+            new ChatSessionInitTask(mProviderId, mAccountId, Imps.Contacts.TYPE_NORMAL, true, true, true) {
                 @Override
                 protected void onPostExecute(Long chatId) {
 

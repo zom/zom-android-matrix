@@ -21,13 +21,17 @@ public class ChatSessionInitTask extends AsyncTask<Contact, Long, Long> {
     long mAccountId;
     int mContactType;
     boolean mIsNewSession;
+    boolean mIsEncrypted;
+    boolean mIsPrivate;
 
-    public ChatSessionInitTask (long providerId, long accountId, int contactType, boolean isNewSession)
+    public ChatSessionInitTask (long providerId, long accountId, int contactType, boolean isNewSession, boolean isEncrypted, boolean isPrivate)
     {
         mProviderId = providerId;
         mAccountId = accountId;
         mContactType = contactType;
         mIsNewSession = isNewSession;
+        mIsEncrypted = isEncrypted;
+        mIsPrivate = isPrivate;
     }
 
     public Long doInBackground (Contact... contacts)
@@ -48,7 +52,7 @@ public class ChatSessionInitTask extends AsyncTask<Contact, Long, Long> {
                     if (session == null)
                     {
                         if ((mContactType & Imps.Contacts.TYPE_MASK) == Imps.Contacts.TYPE_GROUP)
-                            conn.getChatSessionManager().createMultiUserChatSession(contact.getAddress().getAddress(), contact.getName(), null, mIsNewSession, null, new IChatSessionListener() {
+                            conn.getChatSessionManager().createMultiUserChatSession(contact.getAddress().getAddress(), contact.getName(), null, mIsNewSession, null, mIsEncrypted, mIsPrivate, new IChatSessionListener() {
                                 @Override
                                 public void onChatSessionCreated(IChatSession session) throws RemoteException {
 

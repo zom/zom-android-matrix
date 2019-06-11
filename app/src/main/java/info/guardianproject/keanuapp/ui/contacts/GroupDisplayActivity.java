@@ -82,6 +82,8 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     private String mLocalAddress = null;
     private ImApp mApp = null;
 
+    private String mSubject = null;
+
     private IImConnection mConn;
     private IChatSession mSession;
     private GroupMemberDisplay mYou;
@@ -121,6 +123,10 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
         mProviderId = getIntent().getLongExtra("provider", mApp.getDefaultProviderId());
         mAccountId = getIntent().getLongExtra("account", mApp.getDefaultAccountId());
         mLastChatId = getIntent().getLongExtra("chat", -1);
+        mSubject = getIntent().getStringExtra("subject");
+
+        if (!TextUtils.isEmpty(mSubject))
+            changeGroupSubject(mSubject);
 
         mHandler = new Handler();
     }
@@ -562,7 +568,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
     }
 
-    private void updateMembers() {
+    private synchronized void updateMembers() {
 
             new Thread ()
             {
@@ -864,9 +870,6 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 String newSubject = input.getText().toString();
                 changeGroupSubject(newSubject);
 
-                // Update the UI
-                mName = newSubject;
-                mRecyclerView.getAdapter().notifyItemChanged(0);
             }
         });
 
@@ -883,6 +886,10 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
         try {
             IChatSession session = mConn.getChatSessionManager().getChatSession(mAddress);
             session.setGroupChatSubject(subject);
+
+            // Update the UI
+            mName = subject;
+            mRecyclerView.getAdapter().notifyItemChanged(0);
         }
         catch (Exception e) {}
     }

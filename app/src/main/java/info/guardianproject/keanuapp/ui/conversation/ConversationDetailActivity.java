@@ -292,8 +292,9 @@ public class ConversationDetailActivity extends BaseActivity {
                             applyStyleForToolbar();
 
                             if (intent.getBooleanExtra("isNew", false)) {
-                                mConvoView.showGroupInfo();
+                                mConvoView.showGroupInfo(intent.getStringExtra("subject"));
                                 intent.putExtra("isNew", false);
+
                             }
 
                         }
@@ -393,7 +394,7 @@ public class ConversationDetailActivity extends BaseActivity {
                 finish();
                 return true;
             case R.id.menu_group_info:
-                mConvoView.showGroupInfo();
+                mConvoView.showGroupInfo(null);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -882,7 +883,7 @@ public class ConversationDetailActivity extends BaseActivity {
                     boolean resizeImage = false;
                     boolean importContent = true; //let's import it!
 
-                    if (mediaTypes[i].startsWith("video"))
+                    if ((TextUtils.isEmpty(mediaTypes[i])) && mediaTypes[i].startsWith("video"))
                         importContent = false;
 
                     handleSendDelete(Uri.parse(mediaUris[i]), mediaTypes[i], deleteFile, resizeImage, importContent);

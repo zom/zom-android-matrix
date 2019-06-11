@@ -597,7 +597,6 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
         {
             resultUris[i] = mediaInfo.uri.toString();
             resultTypes[i] = mediaInfo.mimeType;
-
         }
 
         result.putExtra("resultUris",resultUris);

@@ -2207,7 +2207,7 @@ public class MatrixConnection extends ImConnection {
 
             ChatGroup participant = mChatGroupManager.getChatGroup(addrRoom);
             if (TextUtils.isEmpty(participant.getName()))
-                participant.setName(room.getRoomDisplayName(mContext));
+                participant.setName(room.getRoomDisplayName(mContext,mContext.getString(R.string.room_displayname_empty_room)));
 
             participant.setJoined(false);
             ChatSession session = mChatSessionManager.getSession(room.getRoomId());

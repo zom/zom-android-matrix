@@ -90,7 +90,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     }
 
     @Override
-    public synchronized void createChatGroupAsync(final String subject, final boolean isDirect, final IChatSessionListener listener) throws Exception {
+    public synchronized void createChatGroupAsync(final String subject, final boolean isDirect, final boolean isEncrypted, final boolean isPrivate, final IChatSessionListener listener) throws Exception {
 
         if (isDirect)
         {
@@ -109,7 +109,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                                       super.onSuccess(o);
 
 
-                                      setupRoom(room, listener);
+                                      setupRoom(room, listener, isEncrypted, isPrivate);
 
 
                                   }
@@ -119,7 +119,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                 else
                 {
 
-                    setupRoom(room, listener);
+                    setupRoom(room, listener, isEncrypted, isPrivate);
                 }
 
 
@@ -174,7 +174,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                                           super.onSuccess(o);
 
 
-                                          setupRoom(room, listener);
+                                          setupRoom(room, listener, isEncrypted, isPrivate);
 
 
                                       }
@@ -184,7 +184,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                     else
                     {
 
-                        setupRoom(room, listener);
+                        setupRoom(room, listener, isEncrypted, isPrivate);
 
                     }
 
@@ -234,8 +234,10 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                 public void onSuccess(String roomId) {
                     Room room = mDataHandler.getRoom(roomId);
 
-                    if (!TextUtils.isEmpty(subject))
-                        room.updateName(subject, new BasicApiCallback("RoomUpdate"));
+                    if (!TextUtils.isEmpty(subject)) {
+                        room.updateName(subject, new BasicApiCallback("RoomSubjectUpdate"));
+                        room.updateTopic(subject, new BasicApiCallback("RoomTopicUpdate"));
+                    }
 
                     if (!room.isMember()) {
                         room.join(new BasicApiCallback("join room") {
@@ -243,7 +245,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                                       public void onSuccess(Object o) {
                                           super.onSuccess(o);
 
-                                          setupRoom(room, listener);
+                                          setupRoom(room, listener, isEncrypted, isPrivate);
 
 
                                       }
@@ -254,7 +256,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                     {
 
 
-                        setupRoom(room, listener);
+                        setupRoom(room, listener, isEncrypted, isPrivate);
                     }
 
 
@@ -264,11 +266,8 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
     }
 
-    private void setupRoom (Room room, IChatSessionListener listener)
+    private void setupRoom (Room room, IChatSessionListener listener, boolean isEncrypted, boolean isPrivate)
     {
-
-        boolean isEncrypted = true;
-        boolean isPrivate = true;
 
         setRoomDefaults(room, isEncrypted, isPrivate);
 
@@ -493,8 +492,10 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
         if (room != null)
         {
-            if (!subject.equals(room.getRoomDisplayName(mContext)))
-                room.updateName(subject,new BasicApiCallback("setGroupSubject"));
+            if (!subject.equals(room.getRoomDisplayName(mContext))) {
+                room.updateName(subject, new BasicApiCallback("setGroupSubject"));
+                room.updateTopic(subject, new BasicApiCallback("setGroupSubject"));
+            }
         }
     }
 

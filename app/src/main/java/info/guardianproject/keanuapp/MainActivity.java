@@ -102,6 +102,8 @@ import info.guardianproject.keanuapp.ui.contacts.ContactsListFragment;
 import info.guardianproject.keanuapp.ui.contacts.ContactsPickerActivity;
 import info.guardianproject.keanuapp.ui.conversation.ConversationDetailActivity;
 import info.guardianproject.keanuapp.ui.conversation.ConversationListFragment;
+import info.guardianproject.keanuapp.ui.conversation.StoryActivity;
+import info.guardianproject.keanuapp.ui.conversation.StoryIntroActivity;
 import info.guardianproject.keanuapp.ui.legacy.SettingActivity;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
 
@@ -609,7 +611,7 @@ public class MainActivity extends BaseActivity {
     {
 
         IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(),mApp.getDefaultAccountId());
-        startGroupChat(null, invitees, conn);
+        startGroupChat(null, invitees, conn, true, true, false);
 
 
     }
@@ -884,19 +886,25 @@ public class MainActivity extends BaseActivity {
         IImConnection conn = RemoteImService.getConnection(providerId, accountId);
 
         if (conn != null)
-            startGroupChat(null, invitees, conn);
+            startGroupChat(null, invitees, conn, true, true, false);
     }
 
     public void startGroupChat ()
     {
         IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
-        startGroupChat(null, null, conn);
+        startGroupChat(null, null, conn, true, true, false);
+    }
+
+    public void startSession ()
+    {
+        IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
+        startGroupChat("!session My New Story", null, conn, false, false, true);
     }
 
     private IImConnection mLastConnGroup = null;
     private long mRequestedChatId = -1;
 
-    public void startGroupChat (String roomSubject, final ArrayList<String> invitees, IImConnection conn)
+    public void startGroupChat (String roomSubject, final ArrayList<String> invitees, IImConnection conn, boolean isEncrypted, boolean isPrivate, boolean isSession)
     {
         mLastConnGroup = conn;
 
@@ -917,7 +925,7 @@ public class MainActivity extends BaseActivity {
             mSbStatus = Snackbar.make(mViewPager, R.string.connecting_to_group_chat_, Snackbar.LENGTH_INDEFINITE);
             mSbStatus.show();
 
-            manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, new IChatSessionListener() {
+            manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, isEncrypted, isPrivate, new IChatSessionListener() {
 
                 @Override
                 public IBinder asBinder() {
@@ -930,12 +938,18 @@ public class MainActivity extends BaseActivity {
                     mSbStatus.dismiss();
 
                     session.setLastMessage(" ");
-                    Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
+                    Intent intent = new Intent(MainActivity.this,  isSession ? StoryActivity.class : ConversationDetailActivity.class);
                     intent.putExtra("id", session.getId());
                     intent.putExtra("firsttime",true);
 
                     boolean isEmptyGroup = invitees == null || invitees.size() == 0;
                     intent.putExtra("isNew", isEmptyGroup);
+                    intent.putExtra("subject", roomSubject);
+                    intent.putExtra("nickname", roomSubject);
+
+                    if (isSession)
+                        intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE,true);
+
                     startActivity(intent);
                 }
 

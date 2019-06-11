@@ -38,7 +38,7 @@ interface IChatSessionManager {
      *
      * @param contactAddress the address of the contact.
      */
-    void createMultiUserChatSession(String roomAddress, String subject, String nickname, boolean isNewSession, in String[] invitees, IChatSessionListener listener);
+    void createMultiUserChatSession(String roomAddress, String subject, String nickname, boolean isNewSession, in String[] invitees, boolean isEncrypted, boolean isPrivate, IChatSessionListener listener);
 
 
     /**

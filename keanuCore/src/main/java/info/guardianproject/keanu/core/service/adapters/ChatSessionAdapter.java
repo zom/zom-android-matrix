@@ -1603,7 +1603,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             mGroupName = "G" + System.currentTimeMillis();
             try
             {
-                mGroupMgr.createChatGroupAsync(mGroupName, false, new IChatSessionListener() {
+                mGroupMgr.createChatGroupAsync(mGroupName, false, true, true, new IChatSessionListener() {
                     @Override
                     public void onChatSessionCreated(IChatSession session) throws RemoteException {
 

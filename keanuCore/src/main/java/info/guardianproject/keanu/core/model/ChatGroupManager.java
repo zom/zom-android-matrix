@@ -81,7 +81,7 @@ public abstract class ChatGroupManager {
      *
      * @throws Exception
      */
-    public abstract void createChatGroupAsync(String subject, boolean isDirect, IChatSessionListener listener) throws Exception;
+    public abstract void createChatGroupAsync(String subject, boolean isDirect, boolean isEncrypted, boolean isPrivate, IChatSessionListener listener) throws Exception;
 
     /**
      * Deletes a certain {@link ChatGroup}. This method returns immediately and the

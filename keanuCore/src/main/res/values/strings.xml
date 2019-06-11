@@ -443,7 +443,7 @@
     <string name="recording_release">Recording… Release to send</string>
     <string name="recording_delete">Recording… Release to delete</string>
     <string name="swipe_up_delete">Swipe up to delete</string>
-    <string name="create_group">Create a Group</string>
+    <string name="create_group">Create Group (Room)</string>
     <string name="members">Members</string>
     <string name="group_name">Group Name</string>
     <string name="search_history">Search History</string>
@@ -626,4 +626,12 @@
     <string name="new_group_title">New Group</string>
 
     <string name="default_group_title">Empty room</string>
+
+    <string name="pref_clear_data">Make Some Space</string>
+    <string name="status_invited">(invited)</string>
+
+    <string name="story_mic_tap_to_upload">Tap to upload audio, hold to record</string>
+    <string name="story_gallery_all">All</string>
+
+    <string name="create_session">Create Session</string>
 </resources>

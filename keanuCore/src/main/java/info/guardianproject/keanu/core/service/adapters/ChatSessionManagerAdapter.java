@@ -101,7 +101,7 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
     }
 
-    public void createMultiUserChatSession(String roomAddress, String subject, String nickname, boolean isNewChat, String[] invitees, final IChatSessionListener listener)
+    public void createMultiUserChatSession(String roomAddress, String subject, String nickname, boolean isNewChat, String[] invitees, boolean isEncrypted, boolean isPrivate, final IChatSessionListener listener)
     {
 
         try
@@ -116,7 +116,7 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
             }
 
-            groupMan.createChatGroupAsync(subject, isDirect, new IChatSessionListener() {
+            groupMan.createChatGroupAsync(subject, isDirect, isEncrypted, isPrivate, new IChatSessionListener() {
                 @Override
                 public void onChatSessionCreated(final IChatSession session) throws RemoteException {
 
