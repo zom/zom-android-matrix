@@ -699,6 +699,12 @@ public class MatrixConnection extends ImConnection {
 
         if (mDataHandler != null && mDataHandler.getCrypto() != null) {
             List<MXDeviceInfo> devices = mDataHandler.getCrypto().getUserDevices(address);
+
+            HashMap<String,List<MXDeviceInfo>> user = new HashMap<>();
+            user.put(address,devices);
+
+            mDataHandler.getCrypto().ensureOlmSessionsForDevices(user,new BasicApiCallback("ensureOlmSessions"));
+
             if (devices != null && devices.size() > 0) {
                 result = new ArrayList<>();
 
@@ -1205,12 +1211,11 @@ public class MatrixConnection extends ImConnection {
                     }
                 });
             }
-            /**
             else if (!TextUtils.isEmpty(event.type)) {
                 if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
                     mSession.getCrypto().reRequestRoomKeyForEvent(event);
                 }
-            }**/
+            }
 
         //    Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
 
