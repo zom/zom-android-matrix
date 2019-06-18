@@ -343,93 +343,98 @@ public class StoryIntroActivity extends AppCompatActivity {
     {
         final View joinGroupView = findViewById(R.id.join_group_view);
 
-        joinGroupView.setVisibility(View.VISIBLE);
+        if (joinGroupView != null) {
+            joinGroupView.setVisibility(View.VISIBLE);
 
-        final View btnJoinAccept = joinGroupView.findViewById(R.id.btnJoinAccept);
-        final View btnJoinDecline = joinGroupView.findViewById(R.id.btnJoinDecline);
-        final TextView title = joinGroupView.findViewById(R.id.room_join_title);
+            mProgressBar.setVisibility(View.GONE);
 
-        title.setText(title.getContext().getString(R.string.room_invited, mRemoteNickname));
+            final View btnJoinAccept = joinGroupView.findViewById(R.id.btnJoinAccept);
+            final View btnJoinDecline = joinGroupView.findViewById(R.id.btnJoinDecline);
+            final TextView title = joinGroupView.findViewById(R.id.room_join_title);
 
-        btnJoinAccept.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            title.setText(title.getContext().getString(R.string.room_invited, mRemoteNickname));
 
-                getChatSession(new AsyncTask() {
-                    @Override
-                    protected Object doInBackground(Object[] objects) {
+            btnJoinAccept.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                        getChatSession(new AsyncTask() {
-                            @Override
-                            protected Object doInBackground(Object[] objects) {
+                    getChatSession(new AsyncTask() {
+                        @Override
+                        protected Object doInBackground(Object[] objects) {
 
-                                if (mCurrentChatSession != null) {
-                                    setGroupSeen();
-                                    launchStoryMode(null);
+                            getChatSession(new AsyncTask() {
+                                @Override
+                                protected Object doInBackground(Object[] objects) {
+
+                                    if (mCurrentChatSession != null) {
+                                        setGroupSeen();
+                                        launchStoryMode(null);
+                                    } else {
+                                        finish();
+                                    }
+
+
+                                    return null;
                                 }
-                                else
-                                {
-                                    finish();
+
+                                @Override
+                                protected void onPostExecute(Object o) {
+                                    super.onPostExecute(o);
+
                                 }
+                            });
 
 
-                                return null;
-                            }
-
-                            @Override
-                            protected void onPostExecute(Object o) {
-                                super.onPostExecute(o);
-
-                            }
-                        });
-
-
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Object o) {
-                        super.onPostExecute(o);
-
-                        joinGroupView.setVisibility(View.GONE);
-                    }
-                });
-            }
-        });
-        btnJoinDecline.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                getChatSession(new AsyncTask() {
-                    @Override
-                    protected Object doInBackground(Object[] objects) {
-
-                        if (mCurrentChatSession != null) {
-                            try {
-                                mCurrentChatSession.leave();
-
-                            }
-                            catch (RemoteException re){}
+                            return null;
                         }
 
-                        return null;
-                    }
+                        @Override
+                        protected void onPostExecute(Object o) {
+                            super.onPostExecute(o);
 
-                    @Override
-                    protected void onPostExecute(Object o) {
-                        super.onPostExecute(o);
+                            joinGroupView.setVisibility(View.GONE);
+                        }
+                    });
+                }
+            });
+            btnJoinDecline.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
-                        //clear the stack and go back to the main activity
-                        Intent intent = new Intent(v.getContext(), MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        v.getContext().startActivity(intent);
-                    }
-                });
+                    getChatSession(new AsyncTask() {
+                        @Override
+                        protected Object doInBackground(Object[] objects) {
+
+                            if (mCurrentChatSession != null) {
+                                try {
+                                    mCurrentChatSession.leave();
+
+                                } catch (RemoteException re) {
+                                }
+                            }
+
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Object o) {
+                            super.onPostExecute(o);
+
+                            //clear the stack and go back to the main activity
+                            Intent intent = new Intent(v.getContext(), MainActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            v.getContext().startActivity(intent);
+                        }
+                    });
 
 
-            }
-        });
+                }
+            });
+        }
+        else
+        {
 
+        }
 
     }
 
