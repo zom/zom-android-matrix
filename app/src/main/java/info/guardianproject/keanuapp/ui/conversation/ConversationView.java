@@ -529,7 +529,14 @@ public class ConversationView {
         public void onGroupSubjectChanged(IChatSession ses) throws RemoteException {
             super.onGroupSubjectChanged(ses);
             if (getChatSession().getId() == ses.getId()) {
-                updateGroupTitle();
+
+                mHandler.post(new Runnable ()
+                {
+                    public void run ()
+                    {
+                        updateGroupTitle();
+                    }
+                });
             }
         }
     };
