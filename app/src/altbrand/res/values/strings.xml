@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="default_server">dev.keanu.im</string>
+    <string name="default_server">neo.keanu.im</string>
     <!-- General: Names -->
     <string name="ic_launcher_name">DanceTalk</string>
     <string name="app_name">DanceTalk</string>
