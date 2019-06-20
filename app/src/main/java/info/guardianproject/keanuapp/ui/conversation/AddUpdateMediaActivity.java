@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
@@ -604,5 +605,25 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
 
         setResult(RESULT_OK,result);
         finish();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (previewVideo != null)
+        {
+            previewVideo.getPlayer().stop();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (previewVideo != null)
+        {
+            previewVideo.getPlayer().release();
+        }
     }
 }
