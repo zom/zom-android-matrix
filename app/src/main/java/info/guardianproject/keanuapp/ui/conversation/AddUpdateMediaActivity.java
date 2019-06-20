@@ -611,7 +611,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     protected void onPause() {
         super.onPause();
 
-        if (previewVideo != null)
+        if (previewVideo != null && previewVideo.getPlayer() != null)
         {
             previewVideo.getPlayer().stop();
         }
@@ -621,7 +621,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     protected void onDestroy() {
         super.onDestroy();
 
-        if (previewVideo != null)
+        if (previewVideo != null && previewVideo.getPlayer() != null)
         {
             previewVideo.getPlayer().release();
         }
