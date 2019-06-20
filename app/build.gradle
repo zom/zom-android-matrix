@@ -14,7 +14,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 28
         versionCode 20311
-        versionName "0.0.3.0-BETA-1"
+        versionName "0.0.3.0-BETA-1A"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
