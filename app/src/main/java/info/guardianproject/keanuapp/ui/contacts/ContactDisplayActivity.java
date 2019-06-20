@@ -81,6 +81,7 @@ public class ContactDisplayActivity extends BaseActivity {
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeActionContentDescription(R.string.action_done);
 
         mContactId = getIntent().getLongExtra("contactId", -1);
 

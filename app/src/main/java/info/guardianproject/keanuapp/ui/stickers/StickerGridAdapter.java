@@ -64,8 +64,7 @@ public class StickerGridAdapter extends BaseAdapter
           i.setLayoutParams(new GridView.LayoutParams(256,256));
           i.setScaleType(ImageView.ScaleType.FIT_CENTER);
           i.setImageBitmap(bmp);
-
-
+          i.setContentDescription(mEmoji.get(position).name);
   	  }
   	  catch (Exception e)
   	  {
