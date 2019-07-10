@@ -87,7 +87,14 @@ public class StatusBarNotifier {
             return;
         }
 
-        //msg = html2text(msg); // strip tags for html client inbound msgs
+        if (Preferences.hasNotificationFilters())
+        {
+            if (Preferences.getNotificationFilters().contains(msg))
+            {
+                return;
+            }
+        }
+
         Bitmap avatar = null;
 
 
@@ -107,6 +114,14 @@ public class StatusBarNotifier {
 
     public void notifyGroupChat(long providerId, long accountId, long chatId, String remoteAddress, String groupname,
             String nickname, String msg, boolean lightWeightNotify) {
+
+        if (Preferences.hasNotificationFilters())
+        {
+            if (Preferences.getNotificationFilters().contains(msg))
+            {
+                return;
+            }
+        }
 
         Bitmap avatar = null;
 
