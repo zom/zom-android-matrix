@@ -53,6 +53,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.service.RemoteImService;
@@ -129,6 +130,17 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             changeGroupSubject(mSubject);
 
         mHandler = new Handler();
+        if (Debug.DEBUG_ENABLED) {
+
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .penaltyLog()
+                    .penaltyFlashScreen()
+                    .penaltyDeath()
+                    .detectCustomSlowCalls()
+                    .detectNetwork()
+                    .build());
+        }
+
     }
 
     private void initData () {
@@ -525,7 +537,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     protected void onResume() {
         super.onResume();
 
-        initData();
+
         try {
             mConn.getChatSessionManager().registerChatSessionListener(GroupDisplayActivity.this);
         } catch (Exception e) {
