@@ -109,7 +109,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                                       super.onSuccess(o);
 
 
-                                      setupRoom(room, listener, isEncrypted, isPrivate);
+                                      setupRoom(room,  subject, listener, isEncrypted, isPrivate);
 
 
                                   }
@@ -119,7 +119,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                 else
                 {
 
-                    setupRoom(room, listener, isEncrypted, isPrivate);
+                    setupRoom(room, subject,  listener, isEncrypted, isPrivate);
                 }
 
 
@@ -174,7 +174,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                                           super.onSuccess(o);
 
 
-                                          setupRoom(room, listener, isEncrypted, isPrivate);
+                                          setupRoom(room,  subject, listener, isEncrypted, isPrivate);
 
 
                                       }
@@ -184,7 +184,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                     else
                     {
 
-                        setupRoom(room, listener, isEncrypted, isPrivate);
+                        setupRoom(room,  subject, listener, isEncrypted, isPrivate);
 
                     }
 
@@ -237,6 +237,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                     if (!TextUtils.isEmpty(subject)) {
                         room.updateName(subject, new BasicApiCallback("RoomSubjectUpdate"));
                         room.updateTopic(subject, new BasicApiCallback("RoomTopicUpdate"));
+                        room.getRoomDisplayName(mContext);
                     }
 
                     if (!room.isMember()) {
@@ -245,7 +246,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                                       public void onSuccess(Object o) {
                                           super.onSuccess(o);
 
-                                          setupRoom(room, listener, isEncrypted, isPrivate);
+                                          setupRoom(room,  subject, listener, isEncrypted, isPrivate);
 
 
                                       }
@@ -256,7 +257,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
                     {
 
 
-                        setupRoom(room, listener, isEncrypted, isPrivate);
+                        setupRoom(room, subject, listener, isEncrypted, isPrivate);
                     }
 
 
@@ -266,12 +267,12 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
     }
 
-    private void setupRoom (Room room, IChatSessionListener listener, boolean isEncrypted, boolean isPrivate)
+    private void setupRoom (Room room, String subject, IChatSessionListener listener, boolean isEncrypted, boolean isPrivate)
     {
 
         setRoomDefaults(room, isEncrypted, isPrivate);
 
-        ChatGroup chatGroup = mConn.addRoomContact(room);
+        ChatGroup chatGroup = mConn.addRoomContact(room, subject);
         ChatSession session = mChatSessionMgr.getSession(room.getRoomId());
         if (session == null)
             session = mConn.getChatSessionManager().createChatSession(chatGroup, true);
