@@ -163,12 +163,8 @@ public class ImConnectionAdapter extends IImConnection.Stub {
 
     @Override
     public void login(final String passwordTemp, final boolean autoLoadContacts, final boolean retry) {
-        Debug.wrapExceptions(new Runnable() {
-            @Override
-            public void run() {
-                do_login(passwordTemp, autoLoadContacts, retry);
-            }
-        });
+        do_login(passwordTemp, autoLoadContacts, retry);
+
     }
 
     public void do_login(String passwordTemp, boolean autoLoadContacts, boolean retry) {

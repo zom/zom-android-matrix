@@ -101,7 +101,7 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
     }
 
-    public void createMultiUserChatSession(String roomAddress, String subject, String nickname, boolean isNewChat, String[] invitees, boolean isEncrypted, boolean isPrivate, final IChatSessionListener listener)
+    public void createMultiUserChatSession(String roomAddress, String subject, String usernick, boolean isNewChat, String[] invitees, boolean isEncrypted, boolean isPrivate, final IChatSessionListener listener)
     {
 
         try
