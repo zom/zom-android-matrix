@@ -40,9 +40,14 @@ public class OnboardingManager {
     public final static int REQUEST_SCAN = 1111;
     public final static int REQUEST_CHOOSE_AVATAR = REQUEST_SCAN+1;
 
-    public final static String BASE_INVITE_URL = "https://zom.im/i/#";
+    public static String BASE_INVITE_URL = "https://keanu.im/i/#";
 
     public final static String DEFAULT_SCHEME = "matrix";
+
+    public static void setBaseInviteUrl (String baseInvite)
+    {
+        BASE_INVITE_URL = baseInvite;
+    }
 
     public static void inviteSMSContact (Activity context, String phoneNumber, String message)
     {
