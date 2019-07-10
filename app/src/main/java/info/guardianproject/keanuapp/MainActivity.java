@@ -144,10 +144,19 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
+
         if (Debug.DEBUG_ENABLED) {
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
                     .detectAll()
                     .penaltyLog()
+                    .build());
+
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .penaltyLog()
+                    .penaltyFlashScreen()
+                    .penaltyDeath()
+                    .detectCustomSlowCalls()
+                    .detectNetwork()
                     .build());
         }
 
