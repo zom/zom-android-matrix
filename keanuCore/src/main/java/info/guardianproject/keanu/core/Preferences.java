@@ -68,7 +68,6 @@ public class Preferences {
     private static final String LOCK_APP = "lock_app";
     private static final String CLEAR_APP_DATA = "clear_app_data";
     private static final String UNINSTALL_APP = "uninstall_app";
-    private static final String USE_TIBETAN_DICTIONARY = "prefEnableTibetanDictionary";
     private static final String ADVANCED_NETWORKING = "prefAdvancedNetworking";
 
     private final static String PROXY_SERVER_HOST = "pref_proxy_server_host";
@@ -77,6 +76,10 @@ public class Preferences {
     private final static String BLOCK_SCREENSHOTS = "prefBlockScreenshots";
 
     private final static String USE_PROOF_MODE = "prefProofMode";
+
+    private final static String NOTIFICATION_FILTERS = "pref_notification_filters";
+
+
 
     private static Context context;
     private static SharedPreferences preferences;
@@ -253,6 +256,19 @@ public class Preferences {
 
     public static String getValue (String key) {return preferences.getString(key, null);}
 
+    public static boolean hasNotificationFilters ()
+    {
+        return getNotificationFilters() != null;
+    }
 
+    public static String getNotificationFilters () {
+        return preferences.getString(NOTIFICATION_FILTERS,null);
+    }
+
+    public static void setNotificationFilters (String filter)
+    {
+        preferences.edit().putString(NOTIFICATION_FILTERS, filter).apply();
+
+    }
 
 }
