@@ -430,12 +430,14 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             @Override
             public int getItemCount() {
 
-                if (mMembers.size() == 0)
-                {
-                    return 3;
+                if (mMembers != null) {
+                    if (mMembers.size() == 0) {
+                        return 3;
+                    } else
+                        return 2 + mMembers.size();
                 }
                 else
-                    return 2 + mMembers.size();
+                    return 3;
             }
 
             @Override
@@ -537,25 +539,31 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     protected void onResume() {
         super.onResume();
 
-
-        try {
-            mConn.getChatSessionManager().registerChatSessionListener(GroupDisplayActivity.this);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (mConn == null)
+        {
+            initData();
         }
 
-        if (mSession != null && !mChatListenerRegistered) {
+        if (mConn != null) {
             try {
-                mSession.registerChatListener(mChatListener);
-                mChatListenerRegistered = true;
-            } catch (RemoteException e) {
+                mConn.getChatSessionManager().registerChatSessionListener(GroupDisplayActivity.this);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            if (mSession != null && !mChatListenerRegistered) {
+                try {
+                    mSession.registerChatListener(mChatListener);
+                    mChatListenerRegistered = true;
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            initRecyclerView();
+
+            updateSession();
         }
-
-        initRecyclerView();
-
-        updateSession();
     }
 
     @Override
