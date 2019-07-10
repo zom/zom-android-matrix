@@ -46,6 +46,7 @@ dependencies {
     implementation project(':keanuCore')
 
     implementation 'info.guardianproject.iocipher:IOCipher:0.4'
+
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support:support-compat:28.0.0'
     implementation 'com.android.support:preference-v7:28.0.0'
@@ -65,10 +66,10 @@ dependencies {
     //for thumbnail extraction for videos!
     implementation 'com.android.support:exifinterface:28.0.0'
 
-    implementation 'commons-io:commons-io:2.5'
+    implementation 'commons-io:commons-io:2.6'
 
     implementation 'commons-codec:commons-codec:1.10'
-    implementation 'commons-io:commons-io:2.5'
+    implementation 'commons-io:commons-io:2.6'
 }
 
 apply plugin: 'maven'
