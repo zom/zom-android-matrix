@@ -88,7 +88,10 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import info.guardianproject.keanu.core.Preferences;
@@ -1456,6 +1459,9 @@ public class ConversationView {
         setViewType(VIEW_TYPE_CHAT);
         bindQuery();
 
+        if (userToNick.isEmpty())
+            updateMembers();
+
         return true;
     }
 
@@ -2646,8 +2652,12 @@ public class ConversationView {
 
             int messageType = cursor.getInt(mTypeColumn);
 
-            String address = isGroupChat() ? cursor.getString(mNicknameColumn)  : mRemoteAddress;
-            String nickname = isGroupChat() ? cursor.getString(mNicknameColumn) : mRemoteNickname;
+            String roomAddress = isGroupChat() ? cursor.getString(mNicknameColumn)  : mRemoteAddress;
+            String userAddress = isGroupChat() ? cursor.getString(mNicknameColumn) : mRemoteNickname;
+
+            String nick = userToNick.get(userAddress);
+            if (TextUtils.isEmpty(nick))
+                nick = userAddress;
 
             String mimeType = cursor.getString(mMimeTypeColumn);
             int id = cursor.getInt(mIdColumn);
@@ -2709,7 +2719,7 @@ public class ConversationView {
 
             switch (messageType) {
             case Imps.MessageType.INCOMING:
-                messageView.bindIncomingMessage(viewHolder,id, messageType, address, nickname, mimeType, body, date, mMarkup, false, encState, showContactName, mPresenceStatus, mCurrentChatSession, packetId, replyId);
+                messageView.bindIncomingMessage(viewHolder,id, messageType, roomAddress, nick, mimeType, body, date, mMarkup, false, encState, showContactName, mPresenceStatus, mCurrentChatSession, packetId, replyId);
 
                 break;
 
@@ -2729,7 +2739,7 @@ public class ConversationView {
                 break;
 
             default:
-                messageView.bindPresenceMessage(viewHolder, nickname, messageType, date, isGroupChat(), false);
+                messageView.bindPresenceMessage(viewHolder, userAddress, messageType, date, isGroupChat(), false);
             }
 
             sendMessageRead(packetId);
@@ -3116,7 +3126,41 @@ public class ConversationView {
         }
     }
 
+    private HashMap<String, String> userToNick = new HashMap<>();
+
+    private synchronized void updateMembers() {
+
+        new Thread ()
+        {
+            public void run ()
+            {
+
+                final HashMap<String, String> members = new HashMap<>();
+
+                String[] projection = {Imps.GroupMembers.USERNAME,Imps.GroupMembers.NICKNAME};
+                Uri memberUri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, mLastChatId);
+                ContentResolver cr = mActivity.getContentResolver();
+
+                StringBuilder buf = new StringBuilder();
+                buf.append(Imps.Messages.NICKNAME).append(" IS NOT NULL ");
+
+                Cursor c = cr.query(memberUri, projection, buf.toString(), null, Imps.GroupMembers.ROLE+","+Imps.GroupMembers.AFFILIATION);
+                if (c != null) {
+                    int colUsername = c.getColumnIndex(Imps.GroupMembers.USERNAME);
+                    int colNickname = c.getColumnIndex(Imps.GroupMembers.NICKNAME);
+
+                    while (c.moveToNext()) {
+                        String user = c.getString(colUsername);
+                        String nick = c.getString(colNickname);
+                        userToNick.put(user,nick);
+                    }
+                    c.close();
+                }
+
+            }
+        }.start();
 
 
+    }
 
 }
