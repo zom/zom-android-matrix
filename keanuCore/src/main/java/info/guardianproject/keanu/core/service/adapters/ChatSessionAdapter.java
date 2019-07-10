@@ -1305,10 +1305,16 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             //if it wasn't a media file or we had an issue downloading, then it is chat
             Uri messageUri = null;
 
+            /**
             if (msg.getID() == null)
                 messageUri = insertMessageInDb(nickname + '|' + bareUsername, body, time, msg.getType(), msg.getContentType(), msg.getReplyId());
             else
                 messageUri = insertMessageInDb(nickname + '|' + bareUsername, body, time, msg.getType(), 0, msg.getID(), msg.getContentType(), msg.getReplyId());
+            **/
+            if (msg.getID() == null)
+                messageUri = insertMessageInDb(bareUsername, body, time, msg.getType(), msg.getContentType(), msg.getReplyId());
+            else
+                messageUri = insertMessageInDb(bareUsername, body, time, msg.getType(), 0, msg.getID(), msg.getContentType(), msg.getReplyId());
 
             setLastMessage(body, time);
 
