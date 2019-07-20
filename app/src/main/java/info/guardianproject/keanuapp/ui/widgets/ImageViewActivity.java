@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -260,9 +261,11 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
         try {
 
             SecureMediaStore.exportContent(mimeType, mediaUri, exportPath);
+            Uri uriFileShare = FileProvider.getUriForFile(this,getPackageName() + ".provider",exportPath);
+
             Intent shareIntent = new Intent();
             shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(exportPath));
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uriFileShare);
             shareIntent.setType(mimeType);
             startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.export_media)));
         } catch (IOException e) {
