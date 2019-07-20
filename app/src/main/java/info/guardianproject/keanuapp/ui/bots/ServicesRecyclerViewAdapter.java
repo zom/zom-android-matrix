@@ -42,7 +42,6 @@ public class ServicesRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         this.listener = listener;
         mValues = new ArrayList<>();
 
-        /**
         TypedArray ta = context.getResources().obtainTypedArray(R.array.bots);
         for (int i = 0; i < ta.length(); i++) {
             int resIdBot = ta.getResourceId(i, -1);
@@ -61,7 +60,7 @@ public class ServicesRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
 
          ta.recycle();
-         **/
+
 
     }
 
