@@ -22,19 +22,35 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 
 
+import java.util.ArrayList;
+
+import info.guardianproject.keanu.core.model.ImErrorInfo;
+import info.guardianproject.keanu.core.service.IChatSession;
+import info.guardianproject.keanu.core.service.IChatSessionListener;
+import info.guardianproject.keanu.core.service.IChatSessionManager;
+import info.guardianproject.keanu.core.service.IImConnection;
+import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
 import info.guardianproject.keanuapp.ui.bots.ServicesRecyclerViewAdapter;
+import info.guardianproject.keanuapp.ui.conversation.ConversationDetailActivity;
+import info.guardianproject.keanuapp.ui.conversation.StoryActivity;
 
 public class ServicesActivity extends BaseActivity implements ServicesRecyclerViewAdapter.ServiceItemCallback {
+
+    private Snackbar mSbStatus;
+    private RecyclerView mView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,9 +62,9 @@ public class ServicesActivity extends BaseActivity implements ServicesRecyclerVi
 
         applyStyleForToolbar();
 
-        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recyclerServices);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        recyclerView.setAdapter(new ServicesRecyclerViewAdapter(this, this));
+        mView = (RecyclerView)findViewById(R.id.recyclerServices);
+        mView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+        mView.setAdapter(new ServicesRecyclerViewAdapter(this, this));
     }
 
 
@@ -84,33 +100,85 @@ public class ServicesActivity extends BaseActivity implements ServicesRecyclerVi
     @Override
     public void onBotClicked(final String jid, final String nickname) {
         ImApp app = (ImApp)getApplication();
+        IImConnection conn = RemoteImService.getConnection(app.getDefaultProviderId(),app.getDefaultAccountId());
 
-        final ProgressDialog dialog;
-        dialog = new ProgressDialog(this);
-        dialog.setMessage(getString(R.string.upgrade_progress_action));
-        dialog.setCancelable(true);
-        dialog.show();
+        ArrayList<String> invites = new ArrayList<>();
+        invites.add(jid);
+        startGroupChat(nickname,invites,conn,false,true,false);
 
-        new AddContactAsyncTask(app.getDefaultProviderId(), app.getDefaultAccountId()){
-            @Override
-            protected void onPostExecute(Integer response) {
-                super.onPostExecute(response);
 
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
+    }
+
+    private IImConnection mLastConnGroup = null;
+    private long mRequestedChatId = -1;
+
+    public void startGroupChat (String roomSubject, final ArrayList<String> invitees, IImConnection conn, boolean isEncrypted, boolean isPrivate, boolean isSession)
+    {
+        mLastConnGroup = conn;
+
+        try {
+            /**
+             if (TextUtils.isEmpty(roomSubject))
+             {
+             roomSubject = getString(R.string.new_group_title);
+             }**/
+
+            IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
+
+            String[] aInvitees = null;
+
+            if (invitees != null)
+                aInvitees = invitees.toArray(new String[invitees.size()]);
+
+            mSbStatus = Snackbar.make(mView, R.string.connecting_to_group_chat_, Snackbar.LENGTH_INDEFINITE);
+            mSbStatus.show();
+
+            manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, isEncrypted, isPrivate, new IChatSessionListener() {
+
+                @Override
+                public IBinder asBinder() {
+                    return null;
                 }
 
-                Intent intent = new Intent(ServicesActivity.this, MainActivity.class);
-                intent.putExtra("username", jid);
-                startActivity(intent);
-                finish();
+                @Override
+                public void onChatSessionCreated(final IChatSession session) throws RemoteException {
 
-            }
+                    mSbStatus.dismiss();
 
-        }.execute(jid, null, nickname);
+                    session.setLastMessage(" ");
+                    Intent intent = new Intent(ServicesActivity.this,  isSession ? StoryActivity.class : ConversationDetailActivity.class);
+                    intent.putExtra("id", session.getId());
+                    intent.putExtra("firsttime",true);
+
+                    boolean isEmptyGroup = invitees == null || invitees.size() == 0;
+                    intent.putExtra("isNew", isEmptyGroup);
+                    intent.putExtra("subject", roomSubject);
+                    intent.putExtra("nickname", roomSubject);
+
+                    if (isSession)
+                        intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE,true);
+
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                    mSbStatus.dismiss();
+
+                    String errorMessage = getString(R.string.error);
+                    if (error != null)
+                        errorMessage = error.getDescription();
+
+                    mSbStatus = Snackbar.make(mView, errorMessage, Snackbar.LENGTH_LONG);
+                    mSbStatus.show();
+                }
+            });
 
 
-
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
 }
