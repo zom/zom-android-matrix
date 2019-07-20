@@ -144,10 +144,19 @@ public class MainActivity extends BaseActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
+
         if (Debug.DEBUG_ENABLED) {
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
                     .detectAll()
                     .penaltyLog()
+                    .build());
+
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .penaltyLog()
+                    .penaltyFlashScreen()
+                    .penaltyDeath()
+                    .detectCustomSlowCalls()
+                    .detectNetwork()
                     .build());
         }
 
@@ -188,18 +197,29 @@ public class MainActivity extends BaseActivity {
 
         TabLayout.Tab tab = mTabLayout.newTab();
         tab.setIcon(R.drawable.ic_discuss);
+        tab.setTag(getString(R.string.chats));
+        tab.setContentDescription(R.string.chats);
         mTabLayout.addTab(tab);
 
         tab = mTabLayout.newTab();
         tab.setIcon(R.drawable.ic_people_white_36dp);
+        tab.setTag(getString(R.string.contacts));
+        tab.setContentDescription(R.string.contacts);
+
         mTabLayout.addTab(tab);
 
         tab = mTabLayout.newTab();
         tab.setIcon(R.drawable.ic_explore_white_24dp);
+        tab.setTag(getString(R.string.title_more));
+        tab.setContentDescription(R.string.title_more);
+
         mTabLayout.addTab(tab);
 
         tab = mTabLayout.newTab();
         tab.setIcon(R.drawable.ic_face_white_24dp);
+        tab.setTag(getString(R.string.title_me));
+        tab.setContentDescription(R.string.title_me);
+
         mTabLayout.addTab(tab);
 
         mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {

@@ -1,7 +1,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:id="@+id/menu_main"
+    >
 
     <item
         android:id="@+id/menu_search"
@@ -13,10 +15,13 @@
     <item
         android:icon="@drawable/ic_sort_white_24dp"
         app:showAsAction="always|collapseActionView"
+        android:id="@+id/menu_sort"
+        android:title="Sort"
         >
 
 
-        <menu>
+        <menu android:id="@+id/menu_sub"
+            >
             <item
                 android:id="@+id/menu_list_normal"
                 android:icon="@drawable/ic_clear_all_black_24dp"
@@ -32,7 +37,7 @@
 
         </menu>
 
-        </item>
+    </item>
 
     <item
         android:id="@+id/menu_new_account"

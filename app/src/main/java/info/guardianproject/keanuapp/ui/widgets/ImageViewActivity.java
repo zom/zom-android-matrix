@@ -416,7 +416,7 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
                         factory, new DefaultExtractorsFactory(), null, null);
 
                 exoPlayer.prepare(audioSource);
-                exoPlayer.setPlayWhenReady(true); //run file/link when ready to play.
+                exoPlayer.setPlayWhenReady(false); //run file/link when ready to play.
 
             } else {
                 PZSImageView imageView = new PZSImageView(context);

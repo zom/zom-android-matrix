@@ -163,7 +163,7 @@
         android:key="prefBlockScreenshots"
         android:title="@string/pref_block_screenshots_title"
         android:summary="@string/pref_block_screenshots_summary"
-        android:defaultValue="true"
+        android:defaultValue="false"
         />
 
     <CheckBoxPreference

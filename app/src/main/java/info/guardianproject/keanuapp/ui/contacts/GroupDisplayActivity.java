@@ -53,6 +53,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.service.RemoteImService;
@@ -129,6 +130,17 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             changeGroupSubject(mSubject);
 
         mHandler = new Handler();
+        if (Debug.DEBUG_ENABLED) {
+
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .penaltyLog()
+                    .penaltyFlashScreen()
+                    .penaltyDeath()
+                    .detectCustomSlowCalls()
+                    .detectNetwork()
+                    .build());
+        }
+
     }
 
     private void initData () {
@@ -418,12 +430,14 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             @Override
             public int getItemCount() {
 
-                if (mMembers.size() == 0)
-                {
-                    return 3;
+                if (mMembers != null) {
+                    if (mMembers.size() == 0) {
+                        return 3;
+                    } else
+                        return 2 + mMembers.size();
                 }
                 else
-                    return 2 + mMembers.size();
+                    return 3;
             }
 
             @Override
@@ -525,25 +539,31 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     protected void onResume() {
         super.onResume();
 
-        initData();
-        try {
-            mConn.getChatSessionManager().registerChatSessionListener(GroupDisplayActivity.this);
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (mConn == null)
+        {
+            initData();
         }
 
-        if (mSession != null && !mChatListenerRegistered) {
+        if (mConn != null) {
             try {
-                mSession.registerChatListener(mChatListener);
-                mChatListenerRegistered = true;
-            } catch (RemoteException e) {
+                mConn.getChatSessionManager().registerChatSessionListener(GroupDisplayActivity.this);
+            } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            if (mSession != null && !mChatListenerRegistered) {
+                try {
+                    mSession.registerChatListener(mChatListener);
+                    mChatListenerRegistered = true;
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            initRecyclerView();
+
+            updateSession();
         }
-
-        initRecyclerView();
-
-        updateSession();
     }
 
     @Override
