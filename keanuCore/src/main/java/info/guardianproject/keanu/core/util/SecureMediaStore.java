@@ -281,13 +281,13 @@ public class SecureMediaStore {
      */
     public static Uri importContent(String sessionId, java.io.File sourceFile) throws IOException {
         //list("/");
-        String targetPath = "/" + sessionId + "/upload/" + UUID.randomUUID().toString() + "/" + sourceFile.getName().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+        String targetPath = "/" + sessionId + "/upload/" + UUID.randomUUID().toString() + "/" + sourceFile.getName();
         targetPath = createUniqueFilename(targetPath);
         copyToVfs( sourceFile, targetPath );
         //list("/");
         return vfsUri(targetPath);
     }
-    
+
     /**
      * Copy device content into vfs.
      * All imported content is stored under /SESSION_NAME/
@@ -299,7 +299,7 @@ public class SecureMediaStore {
      */
     public static Uri importContent(String sessionId, String fileName, InputStream sourceStream) throws IOException {
         //list("/");
-        String targetPath = "/" + sessionId + "/upload/" + UUID.randomUUID().toString() + '/' + fileName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+        String targetPath = "/" + sessionId + "/upload/" + UUID.randomUUID().toString() + '/' + fileName;
         targetPath = createUniqueFilename(targetPath);
         copyToVfs( sourceStream, targetPath );
         //list("/");
@@ -317,7 +317,7 @@ public class SecureMediaStore {
      */
     public static Uri createContentPath(String sessionId, String fileName) throws IOException {
         //list("/");
-        String targetPath = "/" + sessionId + "/upload/" + UUID.randomUUID().toString() + '/' + fileName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+        String targetPath = "/" + sessionId + "/upload/" + UUID.randomUUID().toString() + '/' + fileName;
         targetPath = createUniqueFilename(targetPath);
         mkdirs( targetPath );
 
