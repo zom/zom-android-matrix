@@ -152,3 +152,12 @@ dependencies {
 
 
 }
+
+testdroid {
+    username '$bbusername'
+    password '$bbpassword'
+    deviceGroup 'gpdevices'
+    mode "FULL_RUN"
+    projectName "KeanuAndroid"
+}
+
