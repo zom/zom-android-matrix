@@ -563,7 +563,7 @@ public class OnboardingActivity extends BaseActivity {
 
         if (TextUtils.isEmpty(username)) {
             //if there are no alphanum then just use a series of numbers with the app name
-            username = getString(R.string.app_name) + (int)(Math.random()*1000000f);
+            username = (int)(Math.random()*1000000f)+"";
         }
 
         if (mCurrentFindServerTask != null)

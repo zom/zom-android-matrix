@@ -2,19 +2,22 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'realm-android'
+apply plugin: 'testdroid'
+
 
 android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     compileSdkVersion 28
     defaultConfig {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 30400
-        versionName "0.0.3.0-BETA-4"
+        versionCode 30500
+        versionName "0.0.3.0-BETA-5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -206,3 +209,12 @@ dependencies {
 
 
 }
+
+testdroid {
+    username '$bbusername'
+    password '$bbpassword'
+    deviceGroup 'gpdevices'
+    mode "FULL_RUN"
+    projectName "KeanuAndroid"
+}
+
