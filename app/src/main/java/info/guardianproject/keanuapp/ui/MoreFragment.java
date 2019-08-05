@@ -86,7 +86,6 @@ public class MoreFragment extends Fragment {
             }
         });
 
-        /**
         btn = view.findViewById(R.id.btnCreateSession);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -95,7 +94,7 @@ public class MoreFragment extends Fragment {
                 ((MainActivity)getActivity()).startSession();
 
             }
-        });**/
+        });
 
         btn = view.findViewById(R.id.btnOpenStickers);
         btn.setOnClickListener(new View.OnClickListener() {
