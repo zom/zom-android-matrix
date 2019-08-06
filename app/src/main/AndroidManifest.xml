@@ -266,9 +266,11 @@
             android:theme="@style/AppTheme.Transparent" />
         <activity
             android:name=".ui.widgets.PdfViewActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:exported="false" />
         <activity
             android:name=".ui.widgets.VideoViewActivity"
+            android:theme="@style/AppTheme.Transparent"
             android:exported="false" />
         <activity android:name=".ui.widgets.SecureCameraActivity" />
         <activity
