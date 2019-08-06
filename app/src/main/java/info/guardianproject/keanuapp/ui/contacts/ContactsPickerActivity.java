@@ -58,6 +58,8 @@ public class ContactsPickerActivity extends BaseActivity {
 
     public final static String EXTRA_EXCLUDED_CONTACTS = "excludes";
     public final static String EXTRA_SHOW_GROUPS = "show_groups";
+    public final static String EXTRA_SHOW_ADD_OPTIONS = "show_add_options";
+
 
     public final static String EXTRA_RESULT_USERNAME = "result";
     public final static String EXTRA_RESULT_USERNAMES = "results";
@@ -142,9 +144,12 @@ public class ContactsPickerActivity extends BaseActivity {
             }
         });
 
-        boolean isGroupOnlyMode = isGroupOnlyMode();
         excludedContacts = getIntent().getStringArrayListExtra(EXTRA_EXCLUDED_CONTACTS);
         mShowGroups = getIntent().getBooleanExtra(EXTRA_SHOW_GROUPS,false);
+
+        boolean isGroupOnlyMode = isGroupOnlyMode();
+
+        boolean showAddOptions =getIntent().getBooleanExtra(EXTRA_SHOW_ADD_OPTIONS,true);
 
         View btnCreateGroup = findViewById(R.id.btnCreateGroup);
         btnCreateGroup.setOnClickListener(new View.OnClickListener() {
@@ -164,7 +169,8 @@ public class ContactsPickerActivity extends BaseActivity {
                 startActivityForResult(i, REQUEST_CODE_ADD_CONTACT);
             }
         });
-        btnAddContact.setVisibility(View.VISIBLE);
+
+        btnAddContact.setVisibility(showAddOptions ? View.VISIBLE : View.GONE);
 
         // Make sure the tag view can not be more than a third of the screen
         View root = findViewById(R.id.llRoot);
@@ -249,7 +255,7 @@ public class ContactsPickerActivity extends BaseActivity {
     }
 
     private boolean isGroupOnlyMode() {
-        return getIntent().hasExtra(EXTRA_EXCLUDED_CONTACTS);
+        return getIntent().hasExtra(EXTRA_EXCLUDED_CONTACTS) || mShowGroups;
     }
 
     private boolean isGroupMode() {
@@ -595,10 +601,9 @@ public class ContactsPickerActivity extends BaseActivity {
             }
 
             buf.append('(');
-            buf.append(Imps.Contacts.TYPE).append('=').append(Imps.Contacts.TYPE_NORMAL);
 
             if (mShowGroups) {
-                buf.append(" OR (")
+                buf.append("(")
                         // Mask out TYPE_FLAG_UNSEEN, we want unseen groups as well!
                 .append(Imps.Contacts.TYPE)
                 .append(" & (~")
@@ -606,6 +611,11 @@ public class ContactsPickerActivity extends BaseActivity {
                 .append("))")
                 .append('=').append(Imps.Contacts.TYPE_GROUP);
             }
+            else
+            {
+                buf.append(Imps.Contacts.TYPE).append('=').append(Imps.Contacts.TYPE_NORMAL);
+            }
+
           //  buf.append(") ");
 
             buf.append(")) GROUP BY (" + Imps.Contacts.USERNAME);
