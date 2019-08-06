@@ -43,6 +43,7 @@ public class SecureMediaStore {
     public static final int DEFAULT_IMAGE_WIDTH = 1080;
     private final static String LOG_TAG = "SecureMediaStore";
 
+    private static final String ReservedChars = "[|\\?*<\":>+[]/']";
 
     public static void unmount() {
         VirtualFileSystem.get().unmount();
@@ -556,7 +557,7 @@ public class SecureMediaStore {
     }
 
     public static String getDownloadFilename(String sessionId, String filenameFromUrl) {
-        String filename = "/" + sessionId + "/download/" + filenameFromUrl.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+        String filename = "/" + sessionId + "/download/" + filenameFromUrl.replaceAll(ReservedChars, "_");
         String uniqueFilename = createUniqueFilename(filename);
         return uniqueFilename;
     }
