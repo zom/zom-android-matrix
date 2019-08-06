@@ -806,6 +806,7 @@ public class ImUrlActivity extends Activity {
 
         Intent i = new Intent(this, ContactsPickerActivity.class);
         i.putExtra(ContactsPickerActivity.EXTRA_SHOW_GROUPS,true);
+        i.putExtra(ContactsPickerActivity.EXTRA_SHOW_ADD_OPTIONS,false);
         startActivityForResult(i, REQUEST_PICK_CONTACTS);
 
         /**

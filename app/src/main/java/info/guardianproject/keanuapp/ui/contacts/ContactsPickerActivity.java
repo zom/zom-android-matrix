@@ -58,6 +58,8 @@ public class ContactsPickerActivity extends BaseActivity {
 
     public final static String EXTRA_EXCLUDED_CONTACTS = "excludes";
     public final static String EXTRA_SHOW_GROUPS = "show_groups";
+    public final static String EXTRA_SHOW_ADD_OPTIONS = "show_add_options";
+
 
     public final static String EXTRA_RESULT_USERNAME = "result";
     public final static String EXTRA_RESULT_USERNAMES = "results";
@@ -146,8 +148,8 @@ public class ContactsPickerActivity extends BaseActivity {
         mShowGroups = getIntent().getBooleanExtra(EXTRA_SHOW_GROUPS,false);
 
         boolean isGroupOnlyMode = isGroupOnlyMode();
-        if (isGroupOnlyMode)
-            setTitle(R.string.action_forward);
+
+        boolean showAddOptions =getIntent().getBooleanExtra(EXTRA_SHOW_ADD_OPTIONS,true);
 
         View btnCreateGroup = findViewById(R.id.btnCreateGroup);
         btnCreateGroup.setOnClickListener(new View.OnClickListener() {
@@ -167,8 +169,8 @@ public class ContactsPickerActivity extends BaseActivity {
                 startActivityForResult(i, REQUEST_CODE_ADD_CONTACT);
             }
         });
-        btnAddContact.setVisibility(isGroupOnlyMode ? View.GONE : View.VISIBLE);
 
+        btnAddContact.setVisibility(showAddOptions ? View.VISIBLE : View.GONE);
 
         // Make sure the tag view can not be more than a third of the screen
         View root = findViewById(R.id.llRoot);
