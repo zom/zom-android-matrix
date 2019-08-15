@@ -64,8 +64,6 @@ import info.guardianproject.keanuapp.ui.onboarding.OnboardingAccount;
 import info.guardianproject.keanuapp.ui.widgets.ConversationViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
 
-import static info.guardianproject.keanuapp.ui.conversation.StoryActivity.TAG_STORYMODE_INDICATOR;
-
 public class ConversationListFragment extends Fragment {
 
     private ConversationListRecyclerViewAdapter mAdapter = null;
@@ -458,20 +456,15 @@ public class ConversationListFragment extends Fragment {
                     viewHolder.mMarkerUnread.setVisibility(View.GONE);
                 }
 
-                clItem.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Context context = v.getContext();
+                clItem.setOnClickListener(v -> {
+                    Context context = v.getContext();
 
-                        //TODO Story - Determine when to open story mode
-                        boolean isStory = nickname.contains(TAG_STORYMODE_INDICATOR);
-                        Intent intent = new Intent(context, isStory ? StoryIntroActivity.class : ConversationDetailActivity.class);
-                        intent.putExtra("id", chatId);
-                        intent.putExtra("address", address);
-                        intent.putExtra("nickname", nickname);
+                    Intent intent = new Intent(context, ConversationDetailActivity.class);
+                    intent.putExtra("id", chatId);
+                    intent.putExtra("address", address);
+                    intent.putExtra("nickname", nickname);
 
-                        context.startActivity(intent);
-                    }
+                    context.startActivity(intent);
                 });
             }
             else

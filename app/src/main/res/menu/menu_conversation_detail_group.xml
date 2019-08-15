@@ -28,6 +28,27 @@
          app:showAsAction="always"
          />
 -->
+
+    <item
+        android:title="Live Mode"
+        android:icon="@drawable/exo_icon_play"
+        app:showAsAction="always"
+        >
+        <menu>
+
+            <item android:id="@+id/menu_start_live_view"
+                android:title="Viewer"
+                android:icon="@drawable/exo_icon_play"
+                app:showAsAction="always|withText"
+                />
+            <item android:id="@+id/menu_start_live_present"
+                android:title="Presenter"
+                android:icon="@drawable/exo_icon_play"
+                app:showAsAction="always|withText"
+                />
+        </menu>
+    </item>
+
     <item android:id="@+id/menu_group_info"
         android:title="@string/menu_view_groups"
         android:icon="@drawable/ic_info_outline_white_24dp"

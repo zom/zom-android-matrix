@@ -91,6 +91,7 @@ import info.guardianproject.keanuapp.ui.contacts.ContactsPickerActivity;
 import info.guardianproject.keanuapp.ui.widgets.ShareRequest;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanuapp.ui.conversation.StoryActivity.ARG_CONTRIBUTOR_MODE;
 
 public class ConversationDetailActivity extends BaseActivity {
 
@@ -396,6 +397,12 @@ public class ConversationDetailActivity extends BaseActivity {
             case R.id.menu_group_info:
                 mConvoView.showGroupInfo(null);
                 return true;
+            case R.id.menu_start_live_present:
+                startLiveMode(true);
+                return true;
+            case R.id.menu_start_live_view:
+                startLiveMode(false);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -406,6 +413,17 @@ public class ConversationDetailActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.menu_conversation_detail_group, menu);
         return true;
     }
+
+    void startLiveMode (boolean isContrib)
+    {
+        Intent intent = new Intent(this, StoryActivity.class);
+        intent.putExtra("id", mChatId);
+        intent.putExtra("address", mAddress);
+        intent.putExtra(ARG_CONTRIBUTOR_MODE, isContrib);
+
+        startActivity(intent);
+    }
+
 
     void showAddContact ()
     {
@@ -883,7 +901,8 @@ public class ConversationDetailActivity extends BaseActivity {
                     boolean resizeImage = false;
                     boolean importContent = true; //let's import it!
 
-                    if ((TextUtils.isEmpty(mediaTypes[i])) && mediaTypes[i].startsWith("video"))
+                    if ((!TextUtils.isEmpty(mediaTypes[i]))
+                            && mediaTypes[i].startsWith("video"))
                         importContent = false;
 
                     handleSendDelete(Uri.parse(mediaUris[i]), mediaTypes[i], deleteFile, resizeImage, importContent);

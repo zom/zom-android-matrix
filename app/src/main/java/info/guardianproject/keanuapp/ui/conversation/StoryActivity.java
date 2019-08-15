@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 
 import info.guardianproject.keanu.core.util.SystemServices;
 import info.guardianproject.keanuapp.R;
@@ -21,8 +22,6 @@ public class StoryActivity extends ConversationDetailActivity {
 
     // Use this flag as a boolean EXTRA to enable contributor mode (as opposed to viewer mode)
     public static final String ARG_CONTRIBUTOR_MODE = "contributor_mode";
-
-    public static final String TAG_STORYMODE_INDICATOR = "!session";
 
     private StoryView storyView;
 
@@ -102,6 +101,12 @@ public class StoryActivity extends ConversationDetailActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
             super.onActivityResult(requestCode, resultCode, resultIntent);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_conversation_detail_live, menu);
+        return true;
     }
 
     @Override
