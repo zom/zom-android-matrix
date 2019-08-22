@@ -72,6 +72,22 @@
         app:layout_insetEdge="bottom"
         android:padding="3dp">
 
+
+        <info.guardianproject.keanuapp.ui.widgets.CircularPulseImageButton
+            android:id="@+id/btnAddNew"
+            android:layout_width="@dimen/story_contrib_controls_height"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="0"
+            android:background="@null"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_action_new"
+            android:tint="@android:color/white"
+            app:color="@android:color/white"
+            app:durationExpand="930"
+            app:durationGap="330"
+            app:lineWidth="4dp" />
+
         <info.guardianproject.keanu.core.type.CustomTypefaceEditText
             android:id="@+id/composeMessage"
             android:layout_width="0dip"
@@ -102,6 +118,7 @@
             app:durationExpand="930"
             app:durationGap="330"
             app:lineWidth="4dp" />
+
 
         <ImageButton
             android:id="@+id/btnSend"

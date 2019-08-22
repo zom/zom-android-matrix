@@ -18,6 +18,8 @@ import org.apache.commons.io.IOUtils;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Date;
 import java.util.UUID;
 
@@ -127,8 +129,9 @@ public class SecureMediaStore {
 
     private static final String VFS_SCHEME = "vfs";
     private static final String CONTENT_SCHEME = "content";
+    private static final String ENCODING = "UTF-8";
 
-    public static Uri vfsUri(String filename) {
+    public static Uri vfsUri(String filename) throws UnsupportedEncodingException {
         return Uri.parse(VFS_SCHEME + ":" + filename);
     }
 

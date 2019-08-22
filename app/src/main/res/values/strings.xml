@@ -5,5 +5,6 @@
     <string name="ic_launcher_name">Keanu</string>
     <string name="app_name">Keanu</string>
     <string name="im_label">Keanu</string>
+    <string name="menu_live_mode">Live Mode</string>
 
 </resources>

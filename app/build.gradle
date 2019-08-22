@@ -152,7 +152,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
     implementation "androidx.exifinterface:exifinterface:1.0.0"
 
-
+    //html wysiwyg editor
+    implementation 'jp.wasabeef:richeditor-android:1.2.2'
 }
 
 testdroid {

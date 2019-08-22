@@ -59,14 +59,14 @@ public class StoryViewContrib extends StoryView {
 
     public StoryViewContrib(StoryActivity activity) {
         super(activity);
-        mMicButton.setOnClickListener(new View.OnClickListener() {
+        View btnAdd = activity.findViewById(R.id.btnAddNew);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(activity, AddUpdateMediaActivity.class);
                 activity.startActivityForResult(intent,REQUEST_ADD_MEDIA);
             }
         });
-        mMicButton.setImageResource(R.drawable.ic_action_new);
     }
 
 

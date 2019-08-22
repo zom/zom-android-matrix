@@ -29,10 +29,11 @@ public class StoryActivity extends ConversationDetailActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /**
         if (contributorMode()) {
             Intent intent = new Intent(this, AddUpdateMediaActivity.class);
             startActivityForResult(intent,REQUEST_ADD_MEDIA);
-        }
+        }**/
     }
 
     private boolean contributorMode() {

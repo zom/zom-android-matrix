@@ -18,6 +18,7 @@
 package info.guardianproject.keanuapp.ui.conversation;
 
 import info.guardianproject.iocipher.File;
+import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.ui.RoundedAvatarDrawable;
@@ -38,15 +39,23 @@ import info.guardianproject.keanuapp.ui.widgets.LetterAvatar;
 import info.guardianproject.keanuapp.ui.widgets.MessageViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.PdfViewActivity;
 import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
+import info.guardianproject.keanuapp.ui.widgets.WebViewActivity;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -251,7 +260,7 @@ public class MessageListItem extends FrameLayout {
                 } else {
                     mHolder.mTextViewForMessages.setVisibility(View.GONE);
                     mHolder.mMediaContainer.setVisibility(View.VISIBLE);
-                    boolean centerCrop = mimeType.contains("jpg")||mimeType.contains("jpeg")||mimeType.contains("video");
+                    boolean centerCrop = mimeType.contains("jpg")||mimeType.contains("jpeg")||mimeType.contains("video")|| mimeType.contains("html");
                     cmdSuccess = showMediaThumbnail(mediaUri.getLastPathSegment(),mimeType, mediaUri, id, mHolder, centerCrop);
 
                 }
@@ -464,6 +473,37 @@ public class MessageListItem extends FrameLayout {
           //  holder.mTextViewForMessages.setText(mediaUri.getLastPathSegment() + " (" + mimeType + ")");
            // holder.mTextViewForMessages.setVisibility(View.VISIBLE);
         }
+        else if (mimeType.contains("html")) {
+
+
+            holder.mAvatar.setVisibility(View.VISIBLE);
+            holder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
+            holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
+
+            String thumbUri = getImageFromContent(context,mediaUri);
+
+            if (!TextUtils.isEmpty(thumbUri))
+                setImageThumbnail( getContext().getContentResolver(), id, holder, Uri.parse(thumbUri) );
+            else
+                holder.mMediaThumbnail.setImageResource(R.drawable.file_unknown);
+
+            holder.mMediaThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
+            holder.mMediaThumbnail.setBackgroundResource(android.R.color.transparent);
+            holder.mMediaPlay.setVisibility(View.VISIBLE);
+
+            try {
+
+                displayName = URLDecoder.decode(displayName, "UTF-8");
+                displayName = displayName.replace('_', ' ');
+                displayName = displayName.split("\\.")[0];
+            }
+            catch (Exception e){}
+
+            holder.mTextViewForMessages.setText(displayName);
+            holder.mTextViewForMessages.setVisibility(View.VISIBLE);
+
+        }
         else if (mimeType.equals("text/csv") && mediaUri.getLastPathSegment().contains("proof.csv"))
         {
             holder.mAvatar.setVisibility(View.GONE);
@@ -490,6 +530,16 @@ public class MessageListItem extends FrameLayout {
                 holder.mMediaThumbnail.setImageResource(R.drawable.file_doc); // generic file icon
             else if (mimeType.contains("zip"))
                 holder.mMediaThumbnail.setImageResource(R.drawable.file_zip); // generic file icon
+            else
+                holder.mMediaThumbnail.setImageResource(R.drawable.file_unknown); // generic file icon
+
+            try {
+
+                displayName = URLDecoder.decode(displayName, "UTF-8");
+                displayName = displayName.replace('_', ' ');
+                displayName = displayName.split("\\.")[0];
+            }
+            catch (Exception e){}
 
             holder.mTextViewForMessages.setText(displayName);
             holder.mTextViewForMessages.setVisibility(View.VISIBLE);
@@ -576,6 +626,11 @@ public class MessageListItem extends FrameLayout {
         }
         else if (mimeType.contains("pdf")) {
             Intent intent = new Intent(context, PdfViewActivity.class);
+            intent.setDataAndType(mediaUri,mimeType);
+            context.startActivity(intent);
+        }
+        else if (mimeType.contains("html")||mimeType.contains("text/plain")) {
+            Intent intent = new Intent(context, WebViewActivity.class);
             intent.setDataAndType(mediaUri,mimeType);
             context.startActivity(intent);
         }
@@ -667,6 +722,81 @@ public class MessageListItem extends FrameLayout {
         })
         .create().show();
     }*/
+
+    private String getImageFromContent (Context context, Uri mediaUri)
+    {
+        InputStream is;
+
+        if ((mediaUri.getScheme() == null || mediaUri.getScheme().equals("vfs"))&&mediaUri.getPath() != null)
+        {
+            try {
+                is = (new FileInputStream(mediaUri.getPath()));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        else
+        {
+            try {
+                is = (context.getContentResolver().openInputStream(mediaUri));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        if (is != null)
+        {
+            try
+            {
+
+                byte[] buffer = new byte[is.available()];
+                is.read(buffer);
+                is.close();
+                String html = new String(buffer);
+
+                List<String> urls = extractUrls(html);
+
+                for (String url : urls)
+                {
+                    if (url.endsWith("jpg")||url.endsWith("gif"))
+                        return url;
+
+                }
+
+
+            }
+            catch (IOException ioe)
+            {
+                ioe.printStackTrace();
+                return null;
+            }
+
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns a list with all links contained in the input
+     */
+    public static List<String> extractUrls(String text)
+    {
+        List<String> containedUrls = new ArrayList<String>();
+        String urlRegex = "((https?|ftp|gopher|telnet|file):((//)|(\\\\))+[\\w\\d:#@%/;$()~_?\\+-=\\\\\\.&]*)";
+        Pattern pattern = Pattern.compile(urlRegex, Pattern.CASE_INSENSITIVE);
+        Matcher urlMatcher = pattern.matcher(text);
+
+        while (urlMatcher.find())
+        {
+            containedUrls.add(text.substring(urlMatcher.start(0),
+                    urlMatcher.end(0)));
+        }
+
+        return containedUrls;
+    }
 
     private void forwardMediaFile (String mimeType, Uri mediaUri)
     {
@@ -864,7 +994,7 @@ public class MessageListItem extends FrameLayout {
                 mHolder.mTextViewForMessages.setVisibility(View.GONE);
                 mHolder.mMediaContainer.setVisibility(View.VISIBLE);
                 String displayName = mediaUri.getLastPathSegment();
-                boolean centerCrop = mimeType.contains("jpg")||mimeType.contains("jpeg")||mimeType.contains("video");
+                boolean centerCrop = mimeType.contains("jpg")||mimeType.contains("jpeg")||mimeType.contains("video")|| mimeType.contains("html");
                 showMediaThumbnail(displayName,mimeType, mediaUri, id, mHolder, centerCrop);
 
             }

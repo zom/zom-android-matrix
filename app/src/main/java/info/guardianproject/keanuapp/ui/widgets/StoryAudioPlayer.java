@@ -88,6 +88,10 @@ public class StoryAudioPlayer {
             }
             currentPosition = this.cursor.getCount() - 1;
         }
+
+        player.setPlayWhenReady(true);
+        player.prepare(concatenatingMediaSource);
+
     }
 
     private SimpleExoPlayer getOrCreatePlayer() {
@@ -99,6 +103,7 @@ public class StoryAudioPlayer {
 
             concatenatingMediaSource = new ConcatenatingMediaSource();
             player.prepare(concatenatingMediaSource);
+
         }
         return player;
     }

@@ -65,6 +65,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -772,6 +773,42 @@ public class MatrixConnection extends ImConnection {
             e.printStackTrace();
         }
 
+    }
+
+    public void downloadContent (String mxUrl) {
+
+     //   String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(mxUrl, DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+
+        String downloadUrl = mSession.getContentManager().getDownloadableUrl(mxUrl, false);
+
+    }
+
+    public void uploadContent (InputStream is, String contentTitle, String mimeType, Handler handler)
+    {
+        mDataHandler.getMediaCache().uploadContent(is, contentTitle, mimeType, null,
+                new MXMediaUploadListener() {
+                    @Override
+                    public void onUploadStart(final String uploadId) {
+
+                    }
+
+                    @Override
+                    public void onUploadCancel(final String uploadId) {
+
+                    }
+
+                    @Override
+                    public void onUploadError(final String uploadId, final int serverResponseCode, final String serverErrorMessage) {
+
+                    }
+
+                    @Override
+                    public void onUploadComplete(final String uploadId, final String contentUri) {
+
+                        //mDataHandler.getMyUser().updateAvatarUrl(contentUri, new BasicApiCallback("avatarloader"));
+
+                    }
+                });
     }
 
     private void loadStateAsync ()
@@ -1808,7 +1845,7 @@ public class MatrixConnection extends ImConnection {
 
     }
 
-    private Message downloadMedia (Event event, String localFileName, MatrixAddress addrSender)
+    private Message downloadMedia (Event event, String downloadFileName, MatrixAddress addrSender)
     {
         String messageType = event.getContent().getAsJsonObject().get("msgtype").getAsString();
         String messageMimeType = null;
@@ -1870,10 +1907,12 @@ public class MatrixConnection extends ImConnection {
 
                 String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, isEncrypted);
 
+                String localFileNameEsc = URLEncoder.encode(downloadFileName,"UTF-8");
+
                 if (isEncrypted)
-                    fileDownload = dl.openSecureStorageFile(localFolder, localFileName + ".encrypted");
+                    fileDownload = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".encrypted");
                 else
-                    fileDownload = dl.openSecureStorageFile(localFolder, localFileName);
+                    fileDownload = dl.openSecureStorageFile(localFolder, localFileNameEsc);
 
                 OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
                 boolean downloaded = dl.get(downloadableUrl, storageStream);
@@ -1881,7 +1920,7 @@ public class MatrixConnection extends ImConnection {
                 if (downloaded) {
 
                     if (isEncrypted) {
-                        info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileName);
+                        info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileNameEsc);
                         storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadDecrypted);
                         boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo, storageStream);
                         fileDownload.delete();
@@ -1901,9 +1940,9 @@ public class MatrixConnection extends ImConnection {
                         info.guardianproject.iocipher.File fileDownloadThumb;
 
                         if (isEncrypted)
-                            fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileName + ".thumb.encrypted");
+                            fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".thumb.encrypted");
                         else
-                            fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileName + ".thumb.jpg");
+                            fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".thumb.jpg");
 
                         storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadThumb);
                         downloaded = dl.get(downloadableUrl, storageStream);

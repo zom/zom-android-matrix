@@ -417,10 +417,6 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     }
 
     private void captureAudioStart() {
-        if (!hasShownMicPopup) {
-            showMicPopup();
-            return;
-        }
 
         // Start recording!
         if (audioRecorder == null) {

@@ -818,8 +818,18 @@ public class ConversationView {
             btnAttachSticker.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    toggleAttachMenu();
-                    showStickers();
+                    toggleStickers();
+                }
+            });
+        }
+
+        View btnCreateStory = mActivity.findViewById(R.id.btnCreateStory);
+        if (btnCreateStory != null) {
+            btnCreateStory.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mViewAttach.setVisibility(View.INVISIBLE);
+                    mActivity.startStoryEditor();
                 }
             });
         }
@@ -2988,7 +2998,7 @@ public class ConversationView {
     private ViewPager mStickerPager = null;
     private View mStickerBox = null;
 
-    private void showStickers ()
+    private void toggleStickers ()
     {
         if (mStickerPager == null)
         {
@@ -2996,6 +3006,7 @@ public class ConversationView {
             initStickers();
             mStickerBox = mActivity.findViewById(R.id.stickerBox);
         }
+
 
         mStickerBox.setVisibility(mStickerBox.getVisibility() == View.GONE ? View.VISIBLE : View.GONE);
     }
@@ -3016,8 +3027,9 @@ public class ConversationView {
 
                             sendStickerCode(s.assetUri);
 
-                            mViewAttach.setVisibility(View.INVISIBLE);
-                            showStickers();
+                            //mViewAttach.setVisibility(View.INVISIBLE);
+
+                            toggleStickers();
                         }
                     });
 
