@@ -576,7 +576,7 @@ public class StoryEditorActivity extends AppCompatActivity {
                 Log.d("upload",url);
 
                 if (type.startsWith("image"))
-                    insertImage(url,"image");
+                    insertImage(url+"?jpg","image");
                 else if (type.startsWith("audio"))
                     insertAudio(url);
                 else if (type.startsWith("video"))
