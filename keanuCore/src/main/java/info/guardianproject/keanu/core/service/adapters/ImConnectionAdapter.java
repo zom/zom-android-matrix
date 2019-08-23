@@ -24,8 +24,10 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
+import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import info.guardianproject.iocipher.File;
+import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.ConnectionListener;
 import info.guardianproject.keanu.core.model.Contact;
@@ -546,6 +550,12 @@ public class ImConnectionAdapter extends IImConnection.Stub {
             }
             mRemoteConnListeners.finishBroadcast();
         }
+
+        @Override
+        public void uploadComplete(String url) {
+
+        }
+
     }
 
     final class InvitationListenerAdapter implements InvitationListener {
@@ -581,6 +591,66 @@ public class ImConnectionAdapter extends IImConnection.Stub {
             mService.getStatusBarNotifier().notifyGroupInvitation(mProviderId, mAccountId, id,
                     invitation);
         }
+    }
+
+
+
+    public void uploadContent (String mediaPath, String contentTitle, String mimeType, final IConnectionListener listener)
+    {
+        if (mConnection != null)
+        {
+
+            InputStream is = null;
+            try {
+
+                Uri uriMedia = Uri.parse(mediaPath);
+                if (TextUtils.isEmpty(uriMedia.getScheme())||uriMedia.getScheme().equals("vfs"))
+                {
+                    is = new FileInputStream(new File(uriMedia.getPath()));
+                }
+                else
+                    is = getContext().getContentResolver().openInputStream(uriMedia);
+
+                mConnection.uploadContent(is, contentTitle, mimeType, new ConnectionListener() {
+                    @Override
+                    public void onStateChanged(int state, ImErrorInfo error) {
+
+                    }
+
+                    @Override
+                    public void onUserPresenceUpdated() {
+
+                    }
+
+                    @Override
+                    public void onUpdatePresenceError(ImErrorInfo error) {
+
+                    }
+
+                    @Override
+                    public void uploadComplete(String url) {
+                        try {
+                            listener.uploadComplete(url);
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+    }
+
+    public String getDownloadUrl (String identifier)
+    {
+        if (mConnection != null)
+            return mConnection.getDownloadUrl(identifier);
+
+        return null;
     }
 
     public void changeNickname (String nickname)

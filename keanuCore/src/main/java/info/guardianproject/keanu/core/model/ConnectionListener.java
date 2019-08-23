@@ -27,11 +27,13 @@ public interface ConnectionListener {
      *
      * @param state the new state of the connection.
      * @param error the error which caused the state change or <code>null</code>
-     *            it's a normal state change.
+     *              it's a normal state change.
      */
     public void onStateChanged(int state, ImErrorInfo error);
 
     public void onUserPresenceUpdated();
 
     public void onUpdatePresenceError(ImErrorInfo error);
+
+    public void uploadComplete(String url);
 }

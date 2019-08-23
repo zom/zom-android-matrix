@@ -19,6 +19,7 @@ package info.guardianproject.keanu.core.model;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Handler;
 
 import java.io.InputStream;
 import java.util.List;
@@ -281,4 +282,7 @@ public abstract class ImConnection {
 
     public abstract void searchForUser (String searchString, IContactListListener listener);
 
+    public abstract void uploadContent (InputStream is, String contentTitle, String mimeType, ConnectionListener listener);
+
+    public abstract String getDownloadUrl (String identifier);
 }

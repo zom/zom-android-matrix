@@ -622,7 +622,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
             ImConnectionAdapter imConnectionAdapter =
                     new ImConnectionAdapter(providerId, accountId, conn, this);
 
-
+            /**
             conn.addConnectionListener(new ConnectionListener() {
                 @Override
                 public void onStateChanged(int state, ImErrorInfo error) {
@@ -638,7 +638,8 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
                 public void onUpdatePresenceError(ImErrorInfo error) {
 
                 }
-            });
+            });**/
+
             ContentResolver contentResolver = getContentResolver();
             Cursor cursor = contentResolver.query(Imps.ProviderSettings.CONTENT_URI,new String[] {Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE},Imps.ProviderSettings.PROVIDER + "=?",new String[] { Long.toString(providerId)},null);
 

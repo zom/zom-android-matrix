@@ -93,6 +93,7 @@ import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.ChatSession;
 import info.guardianproject.keanu.core.model.ChatSessionManager;
+import info.guardianproject.keanu.core.model.ConnectionListener;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ContactListManager;
 import info.guardianproject.keanu.core.model.ImConnection;
@@ -775,15 +776,14 @@ public class MatrixConnection extends ImConnection {
 
     }
 
-    public void downloadContent (String mxUrl) {
-
-     //   String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(mxUrl, DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
-
+    @Override
+    public String getDownloadUrl (String mxUrl) {
         String downloadUrl = mSession.getContentManager().getDownloadableUrl(mxUrl, false);
-
+        return downloadUrl;
     }
 
-    public void uploadContent (InputStream is, String contentTitle, String mimeType, Handler handler)
+    @Override
+    public void uploadContent (InputStream is, String contentTitle, String mimeType, final ConnectionListener listener)
     {
         mDataHandler.getMediaCache().uploadContent(is, contentTitle, mimeType, null,
                 new MXMediaUploadListener() {
@@ -805,7 +805,10 @@ public class MatrixConnection extends ImConnection {
                     @Override
                     public void onUploadComplete(final String uploadId, final String contentUri) {
 
-                        //mDataHandler.getMyUser().updateAvatarUrl(contentUri, new BasicApiCallback("avatarloader"));
+                        String downloadUrl = mSession.getContentManager().getDownloadableUrl(contentUri, false);
+
+                        if (listener != null)
+                            listener.uploadComplete(downloadUrl);
 
                     }
                 });

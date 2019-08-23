@@ -23,6 +23,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             >
+
+            <ImageButton
+                android:id="@+id/action_add_media"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_add_circle_outline_black_36dp"
+                android:tint="@android:color/white"
+                />
             <ImageButton
                 android:id="@+id/action_insert_image"
                 android:layout_width="48dp"

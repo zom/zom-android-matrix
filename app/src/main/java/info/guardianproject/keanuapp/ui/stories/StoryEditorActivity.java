@@ -6,10 +6,14 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.ValueCallback;
@@ -26,13 +30,20 @@ import java.util.UUID;
 
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileOutputStream;
+import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.service.IConnectionListener;
+import info.guardianproject.keanu.core.service.IImConnection;
+import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
+import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.ui.conversation.AddUpdateMediaActivity;
 import jp.wasabeef.richeditor.RichEditor;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanuapp.ui.conversation.ConversationDetailActivity.REQUEST_ADD_MEDIA;
 
 public class StoryEditorActivity extends AppCompatActivity {
 
@@ -214,6 +225,14 @@ public class StoryEditorActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.action_add_media).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(StoryEditorActivity.this, AddUpdateMediaActivity.class);
+                startActivityForResult(intent,REQUEST_ADD_MEDIA);
+            }
+        });
+
         findViewById(R.id.action_insert_audio).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
 
@@ -259,7 +278,13 @@ public class StoryEditorActivity extends AppCompatActivity {
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // Continue with delete operation
-                                insertImage(input.getText().toString(), "image");
+
+                                String url = input.getText().toString();
+
+                                if (url.endsWith("mp4"))
+                                    insertVideo(input.getText().toString());
+                                else
+                                    insertImage(input.getText().toString(), "image");
                             }
                         })
 
@@ -342,6 +367,33 @@ public class StoryEditorActivity extends AppCompatActivity {
 
     }
 
+    private void insertVideo (String linkAudio) {
+
+        /**
+         String jsInsert = "(function() {" +
+         "var audioNode = document.createElement('audio');" +
+         "audioNode.setAttribute('controls','');" +
+         "var audioSourceNode = document.createElement('source');" +
+         "audioNode.setAttribute('src', '" + linkAudio + "');" +
+         "audioNode.setAttribute('type', '" + linkType + "');" +
+         "audioNode.appendChild(audioSourceNode);" +
+         "document.body.appendChild(audioNode);" +
+         "}) ();";
+         **/
+
+        String html = ("<video width=\"320\" height=\"240\" controls src=\"" + linkAudio + "\"></video>");
+        String jsInsert = "(function (){     document.execCommand('insertHTML', false, '" + html + "');})();";
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            mEditor.evaluateJavascript("javascript:" + jsInsert + "",null);
+        } else {
+            mEditor.loadUrl("javascript:" + jsInsert + "");
+        }
+
+
+
+    }
+
     private void insertAudio (String linkAudio) {
 
         /**
@@ -385,13 +437,43 @@ public class StoryEditorActivity extends AppCompatActivity {
 
     }
 
+    private void saveDraft ()
+    {
+
+    }
+
+    private void saveStory ()
+    {
+        if (mEditor != null) {
+
+            String html = mEditor.getHtml();
+
+            if (!TextUtils.isEmpty(html)) {
+                storeHTML(html);
+                finish();
+            }
+        }
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_story_editor, menu);
+        return true;
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            storeHTML(mEditor.getHtml());
+
+            saveDraft();
             finish();
             return true;
         }
+        else if (item.getItemId() == R.id.menu_send)
+        {
+            saveStory();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -438,5 +520,77 @@ public class StoryEditorActivity extends AppCompatActivity {
         {
             Log.e(LOG_TAG,"error importing photo",ioe);
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_ADD_MEDIA)
+        {
+            if (data.hasExtra("resultUris")) {
+                String[] mediaUris = data.getStringArrayExtra("resultUris");
+                String[] mediaTypes = data.getStringArrayExtra("resultTypes");
+
+                for (int i = 0; i < mediaUris.length; i++) {
+                    Uri mediaUri = Uri.parse(mediaUris[i]);
+                    try {
+                        uploadMedia(mediaUri, mediaUri.getLastPathSegment(), mediaTypes[i]);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    private void uploadMedia (Uri mediaPath, String title,  final String type) throws RemoteException {
+
+        ImApp app = (ImApp)getApplication();
+        long providerId = app.getDefaultProviderId();
+        long accountId = app.getDefaultAccountId();
+
+        IImConnection conn = RemoteImService.getConnection(providerId, accountId);
+
+        conn.uploadContent(mediaPath.toString(), title, type, new IConnectionListener() {
+            @Override
+            public void onStateChanged(IImConnection connection, int state, ImErrorInfo error) throws RemoteException {
+
+            }
+
+            @Override
+            public void onUserPresenceUpdated(IImConnection connection) throws RemoteException {
+
+            }
+
+            @Override
+            public void onUpdatePresenceError(IImConnection connection, ImErrorInfo error) throws RemoteException {
+
+            }
+
+            @Override
+            public void uploadComplete(String url) throws RemoteException {
+
+                Log.d("upload",url);
+
+                if (type.startsWith("image"))
+                    insertImage(url,"image");
+                else if (type.startsWith("audio"))
+                    insertAudio(url);
+                else if (type.startsWith("video"))
+                    insertVideo(url);
+                else
+                    mEditor.insertLink(url, url);
+
+            }
+
+            @Override
+            public IBinder asBinder() {
+                return null;
+            }
+        });
+
     }
 }

@@ -29,4 +29,8 @@ oneway interface IConnectionListener {
 
     void onUpdatePresenceError(in IImConnection connection,
             in ImErrorInfo error);
+
+    void uploadComplete(String url);
+
 }
+

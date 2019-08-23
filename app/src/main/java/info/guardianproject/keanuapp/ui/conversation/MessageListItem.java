@@ -468,6 +468,7 @@ public class MessageListItem extends FrameLayout {
             holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
             setVideoThumbnail( getContext().getContentResolver(), id, holder, mediaUri );
             holder.mMediaThumbnail.setBackgroundResource(android.R.color.transparent);
+            holder.mMediaPlay.setImageResource(R.drawable.media_audio_play);
             holder.mMediaPlay.setVisibility(View.VISIBLE);
 
           //  holder.mTextViewForMessages.setText(mediaUri.getLastPathSegment() + " (" + mimeType + ")");
@@ -475,22 +476,25 @@ public class MessageListItem extends FrameLayout {
         }
         else if (mimeType.contains("html")) {
 
-
             holder.mAvatar.setVisibility(View.VISIBLE);
             holder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
+            holder.mMediaThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
             holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
-
+       //
             String thumbUri = getImageFromContent(context,mediaUri);
 
-            if (!TextUtils.isEmpty(thumbUri))
-                setImageThumbnail( getContext().getContentResolver(), id, holder, Uri.parse(thumbUri) );
-            else
+            if (!TextUtils.isEmpty(thumbUri)) {
+                setImageThumbnail(getContext().getContentResolver(), id, holder, Uri.parse(thumbUri));
+                holder.mMediaPlay.setImageResource(R.drawable.ic_cloud_download_black_48dp);
+                holder.mMediaPlay.setVisibility(View.VISIBLE);
+            }
+            else {
+                holder.mMediaPlay.setVisibility(View.GONE);
                 holder.mMediaThumbnail.setImageResource(R.drawable.file_unknown);
-
-            holder.mMediaThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            }
 
             holder.mMediaThumbnail.setBackgroundResource(android.R.color.transparent);
-            holder.mMediaPlay.setVisibility(View.VISIBLE);
+
 
             try {
 

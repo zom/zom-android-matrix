@@ -19,6 +19,7 @@ package info.guardianproject.keanu.core.service.adapters;
 
 
 import android.os.Handler;
+import android.os.RemoteException;
 import android.util.Log;
 
 import info.guardianproject.keanu.core.model.ImErrorInfo;
@@ -68,6 +69,11 @@ public class ConnectionListenerAdapter extends IConnectionListener.Stub {
                 onUpdateSelfPresenceError(conn, error);
             }
         });
+    }
+
+    @Override
+    public void uploadComplete(String url) throws RemoteException {
+
     }
 
     final public void onUserPresenceUpdated(final IImConnection conn) {

@@ -90,4 +90,9 @@ interface IImConnection {
     void changeNickname (String name);
 
     void searchForUser (String searchString, IContactListListener listener);
+
+    String getDownloadUrl (String identifier);
+
+    void uploadContent (String mediaPath, String contentTitle, String mimeType, IConnectionListener listener);
+
 }
