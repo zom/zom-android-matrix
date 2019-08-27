@@ -3,6 +3,7 @@ package info.guardianproject.keanu.matrix.plugin;
 import android.app.backup.BackupDataInputStream;
 import android.content.Context;
 import android.opengl.Matrix;
+import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
@@ -76,7 +77,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         return getChatGroup(new MatrixAddress(addr));
     }
 
-    public synchronized ChatGroup getChatGroup (MatrixAddress addr)
+    public ChatGroup getChatGroup (MatrixAddress addr)
     {
         ChatGroup result = super.getChatGroup(addr);
 
@@ -90,7 +91,19 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     }
 
     @Override
-    public synchronized void createChatGroupAsync(final String subject, final boolean isDirect, final boolean isEncrypted, final boolean isPrivate, final IChatSessionListener listener) throws Exception {
+    public void createChatGroupAsync(final String subject, final boolean isDirect, final boolean isEncrypted, final boolean isPrivate, final IChatSessionListener listener) throws Exception {
+
+        new Thread ()
+        {
+            public void run ()
+            {
+                createChatGroup(subject, isDirect, isEncrypted, isPrivate, listener);
+            }
+        }.start();
+
+    }
+
+    private void createChatGroup(final String subject, final boolean isDirect, final boolean isEncrypted, final boolean isPrivate, final IChatSessionListener listener) {
 
         if (isDirect)
         {
