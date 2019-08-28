@@ -329,17 +329,23 @@ public class SecureMediaStore {
         return vfsUri(targetPath);
     }
 
-    /**
-     * Resize an image to an efficient size for sending via OTRDATA, then copy
-     * that resized version into vfs. All imported content is stored under
-     * /SESSION_NAME/ The original full path is retained to facilitate browsing
-     * The session content can be deleted when the session is over
-     *
-     * @param sessionId
-     * @return vfs uri
-     * @throws IOException
-     */
     public static Uri resizeAndImportImage(Context context, String sessionId, Uri uri, String mimeType)
+            throws IOException {
+
+        return resizeAndImportImage(context, sessionId, uri, mimeType, DEFAULT_IMAGE_WIDTH);
+    }
+
+        /**
+         * Resize an image to an efficient size for sending via OTRDATA, then copy
+         * that resized version into vfs. All imported content is stored under
+         * /SESSION_NAME/ The original full path is retained to facilitate browsing
+         * The session content can be deleted when the session is over
+         *
+         * @param sessionId
+         * @return vfs uri
+         * @throws IOException
+         */
+    public static Uri resizeAndImportImage(Context context, String sessionId, Uri uri, String mimeType, int maxImageSize)
             throws IOException {
 
         String originalImagePath = uri.getPath();
@@ -360,7 +366,7 @@ public class SecureMediaStore {
         }
 
         //load lower-res bitmap
-        Bitmap bmp = getThumbnailFile(context, uri, DEFAULT_IMAGE_WIDTH);
+        Bitmap bmp = getThumbnailFile(context, uri, maxImageSize);
 
         File file = new File(targetPath);
         file.getParentFile().mkdirs();

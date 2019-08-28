@@ -4,9 +4,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -535,8 +538,8 @@ public class StoryEditorActivity extends AppCompatActivity {
                 for (int i = 0; i < mediaUris.length; i++) {
                     Uri mediaUri = Uri.parse(mediaUris[i]);
                     try {
-                        uploadMedia(mediaUri, mediaUri.getLastPathSegment(), mediaTypes[i]);
-                    } catch (RemoteException e) {
+                        uploadMediaAsync(mediaUri, mediaUri.getLastPathSegment(), mediaTypes[i]);
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
@@ -546,15 +549,74 @@ public class StoryEditorActivity extends AppCompatActivity {
 
     }
 
-    private void uploadMedia (Uri mediaPath, String title,  final String type) throws RemoteException {
+    private void uploadMediaAsync (final Uri mediaPath, final String title, final String type) throws RemoteException, IOException {
+
+        new AsyncTask<Object, Object, Object>()
+        {
+
+            @Override
+            protected Object doInBackground(Object[] objects) {
+
+                try {
+                    uploadMedia (mediaPath, title, type);
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+        }.execute();
+    }
+
+    private Handler mHandler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            if (msg.what == 1)
+            {
+                insertMedia(msg.getData().getString("url"),msg.getData().getString("type"));
+            }
+        }
+    };
+
+    private void insertMedia (String url, String type)
+    {
+        Log.d("upload",url);
+
+        if (!mEditor.hasFocus())
+            mEditor.focusEditor();
+
+        if (type.startsWith("image"))
+            insertImage(url+"?jpg","image");
+        else if (type.startsWith("audio"))
+            insertAudio(url);
+        else if (type.startsWith("video"))
+            insertVideo(url);
+        else
+            mEditor.insertLink(url, url);
+
+    }
+
+    private void uploadMedia (Uri mediaPath, String title,  final String type) throws RemoteException, IOException {
 
         ImApp app = (ImApp)getApplication();
         long providerId = app.getDefaultProviderId();
         long accountId = app.getDefaultAccountId();
 
+        String sessionId = "self";
+
+        Uri sendUri = mediaPath;
+
+        if (type.startsWith("image"))
+            sendUri = SecureMediaStore.resizeAndImportImage(this, sessionId, mediaPath, type, 480);
+
         IImConnection conn = RemoteImService.getConnection(providerId, accountId);
 
-        conn.uploadContent(mediaPath.toString(), title, type, new IConnectionListener() {
+        conn.uploadContent(sendUri.toString(), title, type, new IConnectionListener() {
             @Override
             public void onStateChanged(IImConnection connection, int state, ImErrorInfo error) throws RemoteException {
 
@@ -573,17 +635,12 @@ public class StoryEditorActivity extends AppCompatActivity {
             @Override
             public void uploadComplete(String url) throws RemoteException {
 
-                Log.d("upload",url);
+                Message msg = new Message();
+                msg.what = 1;
+                msg.getData().putString("url",url);
+                msg.getData().putString("type",type);
 
-                if (type.startsWith("image"))
-                    insertImage(url+"?jpg","image");
-                else if (type.startsWith("audio"))
-                    insertAudio(url);
-                else if (type.startsWith("video"))
-                    insertVideo(url);
-                else
-                    mEditor.insertLink(url, url);
-
+                mHandler.sendMessage(msg);
             }
 
             @Override

@@ -1910,7 +1910,7 @@ public class MatrixConnection extends ImConnection {
 
                 String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, isEncrypted);
 
-                String localFileNameEsc = URLEncoder.encode(downloadFileName,"UTF-8");
+                String localFileNameEsc = downloadFileName;//should check this with regex
 
                 if (isEncrypted)
                     fileDownload = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".encrypted");

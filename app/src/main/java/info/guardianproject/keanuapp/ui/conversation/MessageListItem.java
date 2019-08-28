@@ -258,6 +258,7 @@ public class MessageListItem extends FrameLayout {
                     }
 
                 } else {
+
                     mHolder.mTextViewForMessages.setVisibility(View.GONE);
                     mHolder.mMediaContainer.setVisibility(View.VISIBLE);
                     boolean centerCrop = mimeType.contains("jpg")||mimeType.contains("jpeg")||mimeType.contains("video")|| mimeType.contains("html");
