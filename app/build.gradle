@@ -164,7 +164,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
     implementation "androidx.exifinterface:exifinterface:1.0.0"
 
-<<<<<<< HEAD
 
     implementation 'commons-codec:commons-codec:1.10'
     implementation 'commons-io:commons-io:2.5'
