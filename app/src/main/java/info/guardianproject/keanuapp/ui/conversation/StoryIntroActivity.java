@@ -48,7 +48,6 @@ import static info.guardianproject.keanuapp.ui.conversation.ConversationView.SUB
 import static info.guardianproject.keanuapp.ui.conversation.ConversationView.SUBSCRIPTION_TYPE_COLUMN;
 import static info.guardianproject.keanuapp.ui.conversation.ConversationView.TYPE_COLUMN;
 import static info.guardianproject.keanuapp.ui.conversation.ConversationView.USERNAME_COLUMN;
-import static info.guardianproject.keanuapp.ui.conversation.StoryActivity.TAG_STORYMODE_INDICATOR;
 
 public class StoryIntroActivity extends AppCompatActivity {
 
@@ -145,24 +144,10 @@ public class StoryIntroActivity extends AppCompatActivity {
                             }
                         }
 
-                        if (!isContrib) {
-                            intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE, isContrib);
+                        intent.putExtra(StoryActivity.ARG_CONTRIBUTOR_MODE, isContrib);
+                        startActivity(intent);
+                        finish();
 
-                            startActivity(intent);
-                            finish();
-                        }
-                        else
-                        {
-                            mHandler.post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mProgressBar.setVisibility(View.GONE);
-                                    mGroupLaunch.setVisibility(View.VISIBLE);
-                                }
-                            });
-
-
-                        }
 
                     } catch (RemoteException e) {
                         e.printStackTrace();

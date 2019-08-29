@@ -183,8 +183,8 @@
                     android:layout_margin="3dp"
                     android:padding="12dp"
                     app:circleColor="@android:color/holo_green_light"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     />
 
                 <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
@@ -193,28 +193,20 @@
                     android:layout_margin="3dp"
                     app:circleColor="@android:color/holo_blue_light"
                     android:padding="12dp"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
 
                     />
 
-                <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
-                    android:id="@+id/btnAttachSticker"
-                    android:src="@drawable/ic_insert_emoticon_white_36dp"
-                    android:layout_margin="3dp"
-                    android:padding="12dp"
-                    app:circleColor="@android:color/holo_orange_light"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    />
+
                 <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
                     android:id="@+id/btnAttachAudio"
                     android:src="@drawable/ic_audiotrack_white_24dp"
                     android:layout_margin="3dp"
                     android:padding="12dp"
                     app:circleColor="#FF4444"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     />
 
                 <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
@@ -223,8 +215,19 @@
                     android:layout_margin="3dp"
                     android:padding="6dp"
                     app:circleColor="@android:color/holo_red_light"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    />
+
+                <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                    android:id="@+id/btnCreateStory"
+                    android:src="@drawable/ic_mode_edit_black_18dp"
+                    android:tint="@android:color/white"
+                    android:layout_margin="3dp"
+                    android:padding="6dp"
+                    app:circleColor="@android:color/holo_purple"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     />
 
             </LinearLayout>
@@ -343,7 +346,17 @@
                 android:visibility="gone"
                 style="@android:style/Widget.Button"
                 />
+            <ImageButton
+                android:id="@+id/btnAttachSticker"
+                android:src="@drawable/ic_insert_emoticon_white_36dp"
+                android:layout_margin="6dp"
+                android:tint="@color/black_or_gray_selector"
+                android:layout_width="28dip"
+                android:layout_height="28dip"
+                android:scaleType="centerInside"
+                android:background="@android:color/transparent"
 
+                />
 
             <ImageButton
                 android:id="@+id/btnMic"

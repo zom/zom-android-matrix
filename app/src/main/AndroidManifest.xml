@@ -83,6 +83,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/ic_launcher_name"
         android:largeHeap="true"
+        android:hardwareAccelerated="true"
         android:theme="@style/AppTheme"
         tools:replace="android:icon,android:allowBackup,android:label">
         <activity android:name=".ui.conversation.StoryIntroActivity"></activity>
@@ -269,6 +270,10 @@
             android:theme="@style/AppTheme.Transparent"
             android:exported="false" />
         <activity
+            android:name=".ui.widgets.WebViewActivity"
+            android:theme="@style/AppTheme.Transparent"
+            android:exported="false" />
+        <activity
             android:name=".ui.widgets.VideoViewActivity"
             android:theme="@style/AppTheme.Transparent"
             android:exported="false" />
@@ -293,7 +298,11 @@
         <activity
             android:name=".ui.stories.StoryGalleryActivity"
             android:exported="false"
-            android:theme="@style/AppThemeNoAction" />
+            android:theme="@style/AppThemeNoAction"
+            />
+        <activity
+            android:name=".ui.stories.StoryEditorActivity"
+            android:exported="false" />
         <activity
             android:name=".ui.contacts.ContactListActivity"
             android:exported="false" />

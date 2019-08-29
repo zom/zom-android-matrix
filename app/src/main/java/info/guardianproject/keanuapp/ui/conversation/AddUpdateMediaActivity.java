@@ -417,10 +417,6 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     }
 
     private void captureAudioStart() {
-        if (!hasShownMicPopup) {
-            showMicPopup();
-            return;
-        }
 
         // Start recording!
         if (audioRecorder == null) {
@@ -594,10 +590,10 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
 
         int i = 0;
 
-        for (MediaInfo mediaInfo : addedMedia)
+        for (i = 0; i < addedMedia.size(); i++)
         {
-            resultUris[i] = mediaInfo.uri.toString();
-            resultTypes[i] = mediaInfo.mimeType;
+            resultUris[i] = addedMedia.get(i).uri.toString();
+            resultTypes[i] = addedMedia.get(i).mimeType;
         }
 
         result.putExtra("resultUris",resultUris);

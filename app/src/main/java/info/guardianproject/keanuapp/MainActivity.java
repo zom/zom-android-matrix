@@ -918,12 +918,6 @@ public class MainActivity extends BaseActivity {
         startGroupChat(null, null, conn, true, true, false);
     }
 
-    public void startSession ()
-    {
-        IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
-        startGroupChat("!session My New Story", null, conn, false, false, true);
-    }
-
     private IImConnection mLastConnGroup = null;
     private long mRequestedChatId = -1;
 

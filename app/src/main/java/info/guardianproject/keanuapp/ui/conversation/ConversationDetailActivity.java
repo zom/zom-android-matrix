@@ -88,9 +88,11 @@ import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.ui.BaseActivity;
 import info.guardianproject.keanuapp.ui.camera.CameraActivity;
 import info.guardianproject.keanuapp.ui.contacts.ContactsPickerActivity;
+import info.guardianproject.keanuapp.ui.stories.StoryEditorActivity;
 import info.guardianproject.keanuapp.ui.widgets.ShareRequest;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanuapp.ui.conversation.StoryActivity.ARG_CONTRIBUTOR_MODE;
 
 public class ConversationDetailActivity extends BaseActivity {
 
@@ -396,6 +398,13 @@ public class ConversationDetailActivity extends BaseActivity {
             case R.id.menu_group_info:
                 mConvoView.showGroupInfo(null);
                 return true;
+            case R.id.menu_live_mode:
+                startLiveMode(true);
+                return true;
+                /**
+            case R.id.menu_start_live_view:
+                startLiveMode(false);
+                return true;**/
         }
         return super.onOptionsItemSelected(item);
     }
@@ -406,6 +415,17 @@ public class ConversationDetailActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.menu_conversation_detail_group, menu);
         return true;
     }
+
+    void startLiveMode (boolean isContrib)
+    {
+        Intent intent = new Intent(this, StoryActivity.class);
+        intent.putExtra("id", mChatId);
+        intent.putExtra("address", mAddress);
+        intent.putExtra(ARG_CONTRIBUTOR_MODE, isContrib);
+
+        startActivity(intent);
+    }
+
 
     void showAddContact ()
     {
@@ -630,6 +650,12 @@ public class ConversationDetailActivity extends BaseActivity {
 
             startActivityForResult(Intent.createChooser(intent, getString(R.string.invite_share)), REQUEST_SEND_FILE);
         }
+    }
+
+    void startStoryEditor ()
+    {
+
+        startActivityForResult(new Intent(this, StoryEditorActivity.class), REQUEST_CREATE_STORY);
     }
 
     private boolean isCallable(Intent intent) {
@@ -883,7 +909,8 @@ public class ConversationDetailActivity extends BaseActivity {
                     boolean resizeImage = false;
                     boolean importContent = true; //let's import it!
 
-                    if ((TextUtils.isEmpty(mediaTypes[i])) && mediaTypes[i].startsWith("video"))
+                    if ((!TextUtils.isEmpty(mediaTypes[i]))
+                            && mediaTypes[i].startsWith("video"))
                         importContent = false;
 
                     handleSendDelete(Uri.parse(mediaUris[i]), mediaTypes[i], deleteFile, resizeImage, importContent);
@@ -910,6 +937,17 @@ public class ConversationDetailActivity extends BaseActivity {
                 else {
                     sendShareRequest(request);
                 }
+
+            }
+            else if (requestCode == REQUEST_CREATE_STORY)
+            {
+                ShareRequest request = new ShareRequest();
+                request.deleteFile = false;
+                request.resizeImage = false;
+                request.importContent = false;
+                request.media = resultIntent.getData();
+                request.mimeType = resultIntent.getType();
+                sendShareRequest(request);
 
             }
             else if (requestCode == REQUEST_IMAGE_VIEW)
@@ -1126,6 +1164,6 @@ public class ConversationDetailActivity extends BaseActivity {
     public static final int REQUEST_ADD_CONTACT = REQUEST_TAKE_PICTURE_SECURE + 1;
     public static final int REQUEST_IMAGE_VIEW = REQUEST_ADD_CONTACT + 1;
     public static final int REQUEST_ADD_MEDIA = REQUEST_IMAGE_VIEW + 1;
-
+    public static final int REQUEST_CREATE_STORY = REQUEST_ADD_MEDIA + 1;
 
 }

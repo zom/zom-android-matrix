@@ -21,20 +21,6 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
    xmlns:app="http://schemas.android.com/apk/res-auto">
-<!--
-             <item android:id="@+id/menu_verify_or_view"
-        android:title="@string/menu_verify"
-        android:icon="@drawable/ic_verified_user_white_48dp"
-         app:showAsAction="always"
-         />
--->
-
-    <item
-        android:id="@+id/menu_live_mode"
-        android:title="@string/menu_live_mode"
-        android:icon="@drawable/exo_icon_play"
-        app:showAsAction="always"
-        />
 
     <item android:id="@+id/menu_group_info"
         android:title="@string/menu_view_groups"
@@ -42,20 +28,6 @@
         app:showAsAction="always"
         />
 
-<!--
-    <item android:id="@+id/menu_add_person"
-        android:title="@string/members"
-        android:icon="@drawable/ic_person_add_white_36dp"
-        app:showAsAction="always"
-        />
-
-    <item android:id="@+id/menu_end_conversation"
-        android:title="@string/menu_end_conversation" 
-        android:icon="@drawable/ic_menu_close"
-         app:showAsAction="never"
-        
-         />
-         -->
 
 
 </menu>

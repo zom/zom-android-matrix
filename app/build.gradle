@@ -16,8 +16,8 @@ android {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 16
         targetSdkVersion 28
-        versionCode 30600
-        versionName "0.0.3.0-RC-1"
+        versionCode 40013
+        versionName "0.0.4.0-ALPHA-3"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -164,6 +164,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
     implementation "androidx.exifinterface:exifinterface:1.0.0"
 
+<<<<<<< HEAD
 
     implementation 'commons-codec:commons-codec:1.10'
     implementation 'commons-io:commons-io:2.5'
@@ -207,7 +208,8 @@ dependencies {
 
 
 
-
+    //html wysiwyg editor
+    implementation 'jp.wasabeef:richeditor-android:1.2.2'
 }
 
 testdroid {

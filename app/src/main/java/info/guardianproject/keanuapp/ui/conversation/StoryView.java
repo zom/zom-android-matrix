@@ -149,6 +149,8 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
                 return false;
             }
         });
+
+
         previewAudio = activity.findViewById(R.id.previewAudio);
         previewAudio.setVisibility(View.GONE);
 
@@ -172,6 +174,8 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
                     storyAudioPlayerView.show();
                     lp.dodgeInsetEdges = 0;
                     fabShowAudioPlayer.setImageResource(R.drawable.ic_close_white_24dp);
+                    storyAudioPlayerView.getPlayer();
+
                 }
                 fabShowAudioPlayer.setLayoutParams(lp);
             }

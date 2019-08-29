@@ -11,5 +11,6 @@
     <string name="zom_yak">Zom Yak</string>
     <string name="zom_dranyen">Zom Dranyen</string>
     <string name="status_invited">(invited)</string>
+    <string name="menu_live_mode">Live Mode</string>
 
 </resources>
