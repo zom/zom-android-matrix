@@ -60,8 +60,8 @@ android {
          altbrand {
              dimension "release"
 	         applicationId "im.zom.messenger"
-             versionCode 2100002
-             versionName "2.1.0-BETA-2"
+             versionCode 2100003
+             versionName "2.1.0-BETA-3"
          }
         primary {// Assigns this product flavor to the "mode" flavor dimension.
             dimension "release"
