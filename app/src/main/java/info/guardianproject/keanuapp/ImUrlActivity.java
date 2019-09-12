@@ -414,16 +414,18 @@ public class ImUrlActivity extends Activity {
                 ImApp app = (ImApp)getApplication();
                 app.initAccountInfo();
 
-                //new AddContactAsyncTask(app.getDefaultProviderId(), app.getDefaultAccountId()).executeOnExecutor(ImApp.sThreadPoolExecutor,diLink.username,diLink.fingerprint,diLink.nickname);
-                Intent intentAdd = new Intent(this, AddContactActivity.class);
-                intentAdd.putExtra("username", diLink.username);
-                startActivity(intentAdd);
-
-//                Intent resultIntent = new Intent();
-  //              resultIntent.putExtra("newcontact",diLink.username);
-    //            setResult(RESULT_OK,resultIntent);
-
-                //if they are for a group chat, then add the group
+                if (diLink.username.startsWith("@")) {
+                    Intent intentAdd = new Intent(this, AddContactActivity.class);
+                    intentAdd.putExtra("username", diLink.username);
+                    startActivity(intentAdd);
+                }
+                else if (diLink.username.startsWith("!")) {
+                    Intent intentAdd = new Intent(this, MainActivity.class);
+                    intentAdd.setAction("join");
+                    intentAdd.putExtra("group", diLink.username);
+                    startActivity(intentAdd);
+                }
+                 //if they are for a group chat, then add the group
                 return false; //the work is done so we will finish!
             }
             catch (Exception e)

@@ -85,7 +85,7 @@
         android:largeHeap="true"
         android:hardwareAccelerated="true"
         android:theme="@style/AppTheme"
-        tools:replace="android:icon,android:allowBackup,android:label">
+        tools:replace="android:allowBackup,android:label">
         <activity android:name=".ui.conversation.StoryIntroActivity"></activity>
         <activity
             android:name=".RouterActivity"

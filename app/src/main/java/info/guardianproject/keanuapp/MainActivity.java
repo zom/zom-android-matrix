@@ -326,16 +326,16 @@ public class MainActivity extends BaseActivity {
         mToolbar.setTitle(sb.toString());
 
         if (mFab != null) {
-            mFab.setVisibility(View.VISIBLE);
+           // mFab.setVisibility(View.VISIBLE);
 
             if (tabPosition == 1) {
                 mFab.setImageResource(R.drawable.ic_person_add_white_36dp);
             } else if (tabPosition == 2) {
-                //                    mFab.setImageResource(R.drawable.ic_photo_camera_white_36dp);
-                mFab.setVisibility(View.GONE);
+            //    mFab.setImageResource(R.drawable.ic_photo_camera_white_36dp);
+             //   mFab.setVisibility(View.GONE);
 
             } else if (tabPosition == 3) {
-                mFab.setVisibility(View.GONE);
+               // mFab.setVisibility(View.GONE);
             } else {
                 mFab.setImageResource(R.drawable.ic_add_white_24dp);
             }
@@ -509,6 +509,11 @@ public class MainActivity extends BaseActivity {
                 //launch a new chat based on the intent value
                 startChat(mApp.getDefaultProviderId(), mApp.getDefaultAccountId(), intent.getStringExtra("username"),  true);
             }
+          else if (intent.hasExtra("group"))
+          {
+              IImConnection conn = RemoteImService.getConnection(mApp.getDefaultProviderId(), mApp.getDefaultAccountId());
+              joinGroupChat(intent.getStringExtra("group"),conn);
+          }
             else if (intent.hasExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME))
           {
               String username = intent.getStringExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME);
@@ -939,7 +944,7 @@ public class MainActivity extends BaseActivity {
             mSbStatus = Snackbar.make(mViewPager, R.string.connecting_to_group_chat_, Snackbar.LENGTH_INDEFINITE);
             mSbStatus.show();
 
-            manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, isEncrypted, isPrivate, new IChatSessionListener() {
+            manager.createMultiUserChatSession(roomSubject, null, true, aInvitees, isEncrypted, isPrivate, new IChatSessionListener() {
 
                 @Override
                 public IBinder asBinder() {
@@ -984,6 +989,59 @@ public class MainActivity extends BaseActivity {
 
         } catch (RemoteException e) {
            e.printStackTrace();
+        }
+    }
+
+    public void joinGroupChat (String roomAddress, IImConnection conn)
+    {
+        mLastConnGroup = conn;
+
+        try {
+
+
+            IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
+
+            mSbStatus = Snackbar.make(mViewPager, R.string.connecting_to_group_chat_, Snackbar.LENGTH_INDEFINITE);
+            mSbStatus.show();
+
+            manager.joinMultiUserChatSession(roomAddress, new IChatSessionListener() {
+
+                @Override
+                public IBinder asBinder() {
+                    return null;
+                }
+
+                @Override
+                public void onChatSessionCreated(final IChatSession session) throws RemoteException {
+
+                    mSbStatus.dismiss();
+
+                    session.setLastMessage(" ");
+                    Intent intent = new Intent(MainActivity.this,  ConversationDetailActivity.class);
+                    intent.putExtra("id", session.getId());
+                    intent.putExtra("firsttime",true);
+                    intent.putExtra("isNew", false);
+
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                    mSbStatus.dismiss();
+
+                    String errorMessage = getString(R.string.error);
+                    if (error != null)
+                        errorMessage = error.getDescription();
+
+                    mSbStatus = Snackbar.make(mViewPager, errorMessage, Snackbar.LENGTH_LONG);
+                    mSbStatus.show();
+                }
+            });
+
+
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
     }
 

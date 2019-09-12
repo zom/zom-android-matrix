@@ -103,6 +103,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     private RecyclerView mRecyclerView;
     private ArrayList<GroupMemberDisplay> mMembers;
     private View mActionAddFriends = null;
+    private View mActionShare = null;
 
     private final static int REQUEST_PICK_CONTACTS = 100;
 
@@ -250,10 +251,17 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                     h.groupName.setText(mName);
                     h.groupAddress.setText(mAddress);
 
+                    mActionShare = h.actionShare;
                     h.actionShare.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             try {
+                                try {
+                                    if (mSession != null) {
+                                        mSession.setPublic(true);
+                                    }
+                                }
+                                catch (Exception ignored){}
                                 String inviteLink = OnboardingManager.generateInviteLink(GroupDisplayActivity.this, mAddress, "", mName);
                                 new QrShareAsyncTask(GroupDisplayActivity.this).execute(inviteLink, mName);
                             } catch (Exception e) {
@@ -1073,8 +1081,10 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     private void showAddFriends ()
     {
         if (mActionAddFriends != null) {
-            if (!canInviteOthers(mYou))
+            if (!canInviteOthers(mYou)) {
                 mActionAddFriends.setVisibility(View.GONE);
+                mActionShare.setVisibility(View.GONE);
+            }
             else {
                 mActionAddFriends.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -1088,6 +1098,8 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                         startActivityForResult(intent, REQUEST_PICK_CONTACTS);
                     }
                 });
+                mActionShare.setVisibility(View.VISIBLE);
+
                 mActionAddFriends.setVisibility(View.VISIBLE);
                 mActionAddFriends.setEnabled(mSession != null);
             }

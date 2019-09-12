@@ -87,8 +87,8 @@
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/ic_share_black_24dp"
         android:drawableStart="@drawable/ic_share_black_24dp"
-        android:text="@string/invite_share"
-        android:visibility="gone"
+        android:text="@string/invite_action"
+        android:visibility="visible"
         />
 
     <info.guardianproject.keanu.core.type.CustomTypefaceTextView xmlns:android="http://schemas.android.com/apk/res/android"
