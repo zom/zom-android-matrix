@@ -80,11 +80,12 @@ public class StoryEditorActivity extends AppCompatActivity {
             }
         });
 
+        /**
         findViewById(R.id.action_redo).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mEditor.redo();
             }
-        });
+        });**/
 
         findViewById(R.id.action_bold).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
@@ -180,6 +181,7 @@ public class StoryEditorActivity extends AppCompatActivity {
             }
         });**/
 
+        /**
         findViewById(R.id.action_indent).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
                 mEditor.setIndent();
@@ -190,7 +192,7 @@ public class StoryEditorActivity extends AppCompatActivity {
             @Override public void onClick(View v) {
                 mEditor.setOutdent();
             }
-        });
+        });**/
 
         findViewById(R.id.action_align_left).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
@@ -236,6 +238,7 @@ public class StoryEditorActivity extends AppCompatActivity {
             }
         });
 
+        /**
         findViewById(R.id.action_insert_audio).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
 
@@ -296,7 +299,7 @@ public class StoryEditorActivity extends AppCompatActivity {
                         .setIcon(R.drawable.insert_image)
                         .show();
             }
-        });
+        });**/
 
         findViewById(R.id.action_insert_link).setOnClickListener(new View.OnClickListener() {
             @Override public void onClick(View v) {
@@ -307,7 +310,7 @@ public class StoryEditorActivity extends AppCompatActivity {
                         LinearLayout.LayoutParams.MATCH_PARENT);
                 input.setLayoutParams(lp);
                 new AlertDialog.Builder(StoryEditorActivity.this)
-                        .setTitle("Add Link (https://)")
+                        .setTitle(getString(R.string.add_link_info))
                         .setView(input)
 
                         // Specifying a listener allows you to take an action before dismissing the dialog.
