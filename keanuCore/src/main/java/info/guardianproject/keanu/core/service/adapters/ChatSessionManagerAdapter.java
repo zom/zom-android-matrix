@@ -101,7 +101,71 @@ public class ChatSessionManagerAdapter extends IChatSessionManager.Stub {
 
     }
 
-    public void createMultiUserChatSession(String roomAddress, String subject, String usernick, boolean isNewChat, String[] invitees, boolean isEncrypted, boolean isPrivate, final IChatSessionListener listener)
+    public void joinMultiUserChatSession (String roomAddress, final IChatSessionListener listener)
+    {
+        try
+        {
+            ChatGroupManager groupMan = mConnection.getAdaptee().getChatGroupManager();
+
+            groupMan.joinChatGroupAsync(new BaseAddress(roomAddress),new IChatSessionListener() {
+                @Override
+                public void onChatSessionCreated(final IChatSession session) throws RemoteException {
+
+                    if (listener != null)
+                        listener.onChatSessionCreated(session);
+
+                }
+
+                @Override
+                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                    if (listener != null)
+                        listener.onChatSessionCreateError(name, error);
+                }
+
+                @Override
+                public IBinder asBinder() {
+                    return null;
+                }
+            });
+
+            /**
+            groupMan.createChatGroupAsync(subject, isDirect, isEncrypted, isPrivate, new IChatSessionListener() {
+                @Override
+                public void onChatSessionCreated(final IChatSession session) throws RemoteException {
+
+                    if (listener != null)
+                        listener.onChatSessionCreated(session);
+
+                    if (invitees != null)
+                        for (String invitee : invitees)
+                            session.inviteContact(invitee);
+
+                }
+
+                @Override
+                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+
+                    if (listener != null)
+                        listener.onChatSessionCreateError(name, error);
+                }
+
+                @Override
+                public IBinder asBinder() {
+                    return null;
+                }
+            });
+            **/
+
+        }
+        catch (Exception e)
+        {
+            Log.e("Keanu","unable to join group chat" + e.getMessage());
+
+        }
+    }
+
+    public void createMultiUserChatSession(String subject, String usernick, boolean isNewChat, String[] invitees, boolean isEncrypted, boolean isPrivate, final IChatSessionListener listener)
     {
 
         try

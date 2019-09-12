@@ -49,6 +49,11 @@ public class ChatSession {
 
     }
 
+    public void setPublic (boolean isPublic)
+    {
+        mManager.setPublic(this, isPublic);
+    }
+
     public void setUseEncryption (boolean useEncryption)
     {
         mManager.enableEncryption(this, useEncryption);

@@ -16,6 +16,7 @@ import org.matrix.androidsdk.crypto.data.MXDeviceInfo;
 import org.matrix.androidsdk.crypto.data.MXUsersDevicesMap;
 import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.data.RoomMediaMessage;
+import org.matrix.androidsdk.data.RoomState;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.model.Event;
 import org.matrix.androidsdk.rest.model.MatrixError;
@@ -455,5 +456,21 @@ public class MatrixChatSessionManager extends ChatSessionManager {
         if ((!room.isEncrypted()) && enableEncryption)
             room.enableEncryptionWithAlgorithm(MXCRYPTO_ALGORITHM_MEGOLM,new BasicApiCallback("CreateRoomEncryption"));
 
+    }
+
+    public void setPublic (ChatSession session, boolean isPublic)
+    {
+        Room room = getRoom(session);
+
+        if (isPublic)
+        {
+            room.updateJoinRules(RoomState.JOIN_RULE_PUBLIC, new BasicApiCallback("updateJoinRules"));
+            room.updateGuestAccess(RoomState.GUEST_ACCESS_FORBIDDEN, new BasicApiCallback("updateGuestAccess"));
+        }
+        else
+        {
+            room.updateJoinRules(RoomState.JOIN_RULE_INVITE, new BasicApiCallback("updateJoinRules"));
+            room.updateGuestAccess(RoomState.GUEST_ACCESS_FORBIDDEN, new BasicApiCallback("updateGuestAccess"));
+        }
     }
 }

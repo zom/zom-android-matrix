@@ -178,6 +178,11 @@ interface IChatSession {
      **/
      void grantAdmin(String contact);
 
+/**
+     * Make a contact admin in a group chat
+     **/
+     void setPublic(boolean isPublic);
+
      /**
       * Mark this chat session as seen.
       */

@@ -1930,6 +1930,12 @@ public class ChatSessionAdapter extends IChatSession.Stub {
        // mConnection.sendTypingStatus("fpp", isTyping);
     }
 
+
+    public void setPublic (boolean isPublic)
+    {
+        mChatSession.setPublic(isPublic);
+    }
+
     public boolean useEncryption (boolean useEncryption)
     {
         updateEncryptionState(useEncryption);

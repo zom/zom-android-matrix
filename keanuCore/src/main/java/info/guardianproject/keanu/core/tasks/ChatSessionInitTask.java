@@ -49,9 +49,10 @@ public class ChatSessionInitTask extends AsyncTask<Contact, Long, Long> {
 
                     IChatSession session = conn.getChatSessionManager().getChatSession(contact.getAddress().getAddress());
 
-                    if (session == null)
-                    {
+                    if (session == null) {
                         if ((mContactType & Imps.Contacts.TYPE_MASK) == Imps.Contacts.TYPE_GROUP)
+                        {
+                            /**
                             conn.getChatSessionManager().createMultiUserChatSession(contact.getAddress().getAddress(), contact.getName(), null, mIsNewSession, null, mIsEncrypted, mIsPrivate, new IChatSessionListener() {
                                 @Override
                                 public void onChatSessionCreated(IChatSession session) throws RemoteException {
@@ -67,7 +68,8 @@ public class ChatSessionInitTask extends AsyncTask<Contact, Long, Long> {
                                 public IBinder asBinder() {
                                     return null;
                                 }
-                            });
+                            });**/
+                    }
                         else {
                             session = conn.getChatSessionManager().createChatSession(contact.getAddress().getAddress(), mIsNewSession, new IChatSessionListener() {
                                 @Override
