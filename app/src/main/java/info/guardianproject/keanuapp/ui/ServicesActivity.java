@@ -133,7 +133,7 @@ public class ServicesActivity extends BaseActivity implements ServicesRecyclerVi
             mSbStatus = Snackbar.make(mView, R.string.connecting_to_group_chat_, Snackbar.LENGTH_INDEFINITE);
             mSbStatus.show();
 
-            manager.createMultiUserChatSession(null, roomSubject, null, true, aInvitees, isEncrypted, isPrivate, new IChatSessionListener() {
+            manager.createMultiUserChatSession(roomSubject, null, true, aInvitees, isEncrypted, isPrivate, new IChatSessionListener() {
 
                 @Override
                 public IBinder asBinder() {
