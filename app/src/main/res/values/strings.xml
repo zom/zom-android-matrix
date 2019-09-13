@@ -12,5 +12,6 @@
     <string name="zom_dranyen">Zom Dranyen</string>
     <string name="status_invited">(invited)</string>
     <string name="menu_live_mode">Live Mode</string>
+    <string name="add_link_info">https://...</string>
 
 </resources>

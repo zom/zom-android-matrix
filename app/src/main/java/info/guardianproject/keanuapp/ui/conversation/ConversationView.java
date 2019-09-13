@@ -2749,7 +2749,7 @@ public class ConversationView {
                 break;
 
             default:
-                messageView.bindPresenceMessage(viewHolder, userAddress, messageType, date, isGroupChat(), false);
+                messageView.bindPresenceMessage(viewHolder, userAddress, nick, messageType, date, isGroupChat(), false);
             }
 
             sendMessageRead(packetId);

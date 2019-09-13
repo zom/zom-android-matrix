@@ -144,17 +144,30 @@ public class OnboardingManager {
             //this is an invite link
 
             //this is an invite link like this: https://zom.im/i/#@earthmouse:matrix.org
-            try {
-                String matrixContact = link.substring(link.lastIndexOf("@"));
 
-                diLink = new DecodedInviteLink();
-                diLink.username = matrixContact;
+            if (link.indexOf("@")!=-1) {
+                try {
+                    String matrixContact = link.substring(link.lastIndexOf("@"));
 
+                    diLink = new DecodedInviteLink();
+                    diLink.username = matrixContact;
+
+                } catch (IllegalArgumentException iae) {
+                    Log.e(LOG_TAG, "bad link decode", iae);
+                }
             }
-            catch (IllegalArgumentException iae)
-            {
-                Log.e(LOG_TAG,"bad link decode",iae);
+            if (link.indexOf("!")!=-1) {
+                try {
+                    String matrixContact = link.substring(link.lastIndexOf("!"));
+
+                    diLink = new DecodedInviteLink();
+                    diLink.username = matrixContact;
+
+                } catch (IllegalArgumentException iae) {
+                    Log.e(LOG_TAG, "bad link decode", iae);
+                }
             }
+
 
             /**
             try {
