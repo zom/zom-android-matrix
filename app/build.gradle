@@ -55,13 +55,7 @@ android {
 
     productFlavors {
 
-         altbrand {
-             dimension "release"
-	         applicationId "im.zom.messenger"
-             versionCode 2100004
-             versionName "2.1.0-BETA-4"
-             archivesBaseName = "Zom-$versionName"
-         }
+
 
 
         primary {// Assigns this product flavor to the "mode" flavor dimension.
@@ -71,7 +65,13 @@ android {
             archivesBaseName = "Keanu-$versionName"
         }
 
-
+        altbrand {
+            dimension "release"
+            applicationId "im.zom.messenger"
+            versionCode 2110001
+            versionName "2.1.1-RC-1"
+            archivesBaseName = "Zom-$versionName"
+        }
 
 
     }
