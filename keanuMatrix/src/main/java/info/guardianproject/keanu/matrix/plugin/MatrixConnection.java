@@ -1577,10 +1577,14 @@ public class MatrixConnection extends ImConnection {
                 boolean currentlyActive = false;
                 int lastActiveAgo = -1;
 
-                if (event.getContentAsJsonObject().has("currently_active"))
+                if (event.getContentAsJsonObject().has("currently_active")
+                        && (!(event.getContentAsJsonObject().get("currently_active") instanceof JsonNull))
+                )
                     currentlyActive = event.getContentAsJsonObject().get("currently_active").getAsBoolean();
 
-                if (event.getContentAsJsonObject().has("last_active_ago"))
+                if (event.getContentAsJsonObject().has("last_active_ago")
+                && (!(event.getContentAsJsonObject().get("last_active_ago") instanceof JsonNull))
+                )
                     lastActiveAgo = event.getContentAsJsonObject().get("last_active_ago").getAsInt();
 
                 if (currentlyActive)
@@ -1591,10 +1595,11 @@ public class MatrixConnection extends ImConnection {
                 Contact[] contacts = {contact};
                 mContactListManager.notifyContactsPresenceUpdated(contacts);
 
-                ChatGroup group = mChatGroupManager.getChatGroup(event.roomId);
-                if (group != null && group.getMember(event.getSender())==null)
-                {
-                    group.notifyMemberJoined(contact);
+                if (!TextUtils.isEmpty(event.roomId)) {
+                    ChatGroup group = mChatGroupManager.getChatGroup(event.roomId);
+                    if (group != null && group.getMember(event.getSender()) == null) {
+                        group.notifyMemberJoined(contact);
+                    }
                 }
             }
 
