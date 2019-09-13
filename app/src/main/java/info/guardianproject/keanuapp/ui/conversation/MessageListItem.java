@@ -1156,16 +1156,22 @@ public class MessageListItem extends FrameLayout {
         return Color.TRANSPARENT;
     }**/
 
-    public void bindPresenceMessage(MessageViewHolder holder, String contact, int type, Date date, boolean isGroupChat, boolean scrolling) {
+    public void bindPresenceMessage(MessageViewHolder holder, String userAddress, String nickname, int type, Date date, boolean isGroupChat, boolean scrolling) {
 
         mHolder = holder;
         mHolder.mContainer.setBackgroundResource(android.R.color.transparent);
         mHolder.mTextViewForMessages.setVisibility(View.GONE);
         mHolder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
 
-        CharSequence message = formatPresenceUpdates(contact, type, date, isGroupChat, scrolling);
-        mHolder.mTextViewForTimestamp.setText(message);
+        if (TextUtils.isEmpty(nickname)) {
+            nickname = userAddress.split("\\|")[0];
 
+            if (nickname.startsWith("@"))
+                nickname = new MatrixAddress(userAddress).getUser();
+        }
+
+        CharSequence message = formatPresenceUpdates(nickname, type, date, isGroupChat, scrolling);
+        mHolder.mTextViewForTimestamp.setText(message);
 
     }
 

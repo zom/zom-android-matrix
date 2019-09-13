@@ -156,13 +156,7 @@ public class RemoteImService extends Service implements ImService, ICacheWordSub
 
         mHandler = new Handler();
 
-        new Thread ()
-        {
-            public void run ()
-            {
-                initService();
-            }
-        }.start();
+        initService();
     }
 
     private void initService ()

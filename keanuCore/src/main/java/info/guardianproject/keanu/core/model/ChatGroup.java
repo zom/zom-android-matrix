@@ -151,6 +151,16 @@ public class ChatGroup extends ImEntity {
      *
      * @param newContact the {@link Contact} who has joined into the group.
      */
+    public void notifyMemberJoined(Contact newContact) {
+
+        notifyMemberJoined(getAddress().getAddress(),newContact);
+    }
+
+    /**
+     * Notifies that a contact has joined into this group.
+     *
+     * @param newContact the {@link Contact} who has joined into the group.
+     */
     public void notifyMemberJoined(String groupAddress, Contact newContact) {
 
         // Clear the DB on first join
@@ -170,6 +180,8 @@ public class ChatGroup extends ImEntity {
             for (GroupMemberListener listener : mMemberListeners) {
                 listener.onMemberJoined(this, newContact);
             }
+
+
         } else {
             if (groupAddress != null)
                 mGroupAddressToContactMap.put(groupAddress, contact);

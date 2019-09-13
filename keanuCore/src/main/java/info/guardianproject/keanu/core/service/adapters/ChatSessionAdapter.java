@@ -1030,13 +1030,13 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         return id;
     }
 
-    void insertGroupMemberInDb(Contact member) {
+    boolean insertGroupMemberInDb(Contact member) {
         String username = member.getAddress().getAddress();
         String nickname = member.getName();
-        insertOrUpdateGroupMemberInDb(username, nickname, member);
+        return insertOrUpdateGroupMemberInDb(username, nickname, member);
     }
 
-    void insertOrUpdateGroupMemberInDb(String oldUsername, String oldNickname, Contact member) {
+    boolean insertOrUpdateGroupMemberInDb(String oldUsername, String oldNickname, Contact member) {
 
         if (mChatURI != null) {
             String username = member.getAddress().getAddress();
@@ -1063,12 +1063,16 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             }
             if (databaseId > 0) {
                 mContentResolver.update(uri, values, "_id=?", new String[] { String.valueOf(databaseId) });
+                return false;
             } else {
                 values.put(Imps.GroupMembers.ROLE, "none");
                 values.put(Imps.GroupMembers.AFFILIATION, "none");
                 mContentResolver.insert(uri, values);
+                return true;
             }
         }
+
+        return false;
     }
 
     void updateGroupMemberRoleAndAffiliationInDb(Contact member, String role, String affiliation) {
@@ -1441,22 +1445,28 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         }
 
         public void onMemberJoined(ChatGroup group, final Contact contact) {
-            insertGroupMemberInDb(contact);
+            boolean isNew = insertGroupMemberInDb(contact);
 
-            try {
-             //   final int N = mRemoteListeners.beginBroadcast();
-                for (int i = 0; i < mRemoteListeners.size(); i++) {
-                    IChatListener listener = mRemoteListeners.get(i);
-                    try {
-                        listener.onContactJoined(ChatSessionAdapter.this, contact);
-                    } catch (RemoteException e) {
-                        // The RemoteCallbackList will take care of removing the
-                        // dead listeners.
+            if (isNew) {
+                //add presence joined
+                Presence p = new Presence(Presence.AVAILABLE);
+                insertPresenceUpdatesMsg(contact.getAddress().getAddress(), p);
+
+                try {
+                    //   final int N = mRemoteListeners.beginBroadcast();
+                    for (int i = 0; i < mRemoteListeners.size(); i++) {
+                        IChatListener listener = mRemoteListeners.get(i);
+                        try {
+                            listener.onContactJoined(ChatSessionAdapter.this, contact);
+                        } catch (RemoteException e) {
+                            // The RemoteCallbackList will take care of removing the
+                            // dead listeners.
+                        }
                     }
+                    //   mRemoteListeners.finishBroadcast();
+                } catch (Exception e) {
                 }
-             //   mRemoteListeners.finishBroadcast();
             }
-            catch (Exception e){}
         }
 
         @Override

@@ -15,6 +15,7 @@ import android.util.Pair;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -103,6 +104,7 @@ import info.guardianproject.keanu.core.model.ImException;
 import info.guardianproject.keanu.core.model.Invitation;
 import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.model.Presence;
+import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IContactListListener;
@@ -1010,7 +1012,8 @@ public class MatrixConnection extends ImConnection {
                     }
                 }
 
-                group.notifyMemberJoined(member.getUserId(), contact);
+                if (group.getMember(member.getUserId())==null)
+                    group.notifyMemberJoined(member.getUserId(), contact);
 
                 if (powerLevels != null) {
                     if (powerLevels.getUserPowerLevel(member.getUserId()) >= powerLevels.ban)
@@ -1092,9 +1095,9 @@ public class MatrixConnection extends ImConnection {
 
         @Override
         public void onPresenceUpdate(Event event, User user) {
-             debug ("onPresenceUpdate : " + user.user_id + ": event=" + event.toString());
 
-             handlePresence(event);
+            debug ("PRESENCE: from=" + event.getSender() + ": " + event.getContent());
+            mExecutor.execute(() -> handlePresence(event));
 
         }
 
@@ -1123,9 +1126,16 @@ public class MatrixConnection extends ImConnection {
             {
                 mExecutor.execute(() -> handleIncomingMessage(event));
             }
-            else if (event.getType().equals(Event.EVENT_TYPE_PRESENCE))
+            else if (event.getType().equals(Event.EVENT_TYPE_STATE_ROOM_MEMBER))
             {
 
+                mExecutor.execute(() -> handleRoomMemberEvent(event));
+
+
+
+            }
+            else if (event.getType().equals(Event.EVENT_TYPE_PRESENCE))
+            {
                 debug ("PRESENCE: from=" + event.getSender() + ": " + event.getContent());
                 mExecutor.execute(() -> handlePresence(event));
 
@@ -1133,21 +1143,6 @@ public class MatrixConnection extends ImConnection {
             else if (event.getType().equals(Event.EVENT_TYPE_READ_MARKER))
             {
                 debug ("READ MARKER: from=" + event.getSender() + ": " + event.getContent());
-
-                /**
-                 * {
-                 * "age" : null,
-                 * "content": {
-                 * "$155369867390511tYryz:matrix.org": {"m.read":{"@earthmouse:matrix.org":{"ts":1553698822615}}},
-                 * },
-                 * "eventId": "null",
-                 * "originServerTs": 0,
-                 * "roomId": "!gvfFCZAYqQKjvlnWcn:matrix.org",
-                 * "type": "m.receipt",
-                 * "userId": "null",
-                 * "sender": "null",
-                 * }
-                 */
 
                 if (event.getContent().getAsJsonObject() != null) {
                     Iterator<String> it = event.getContent().getAsJsonObject().keySet().iterator();
@@ -1595,6 +1590,12 @@ public class MatrixConnection extends ImConnection {
 
                 Contact[] contacts = {contact};
                 mContactListManager.notifyContactsPresenceUpdated(contacts);
+
+                ChatGroup group = mChatGroupManager.getChatGroup(event.roomId);
+                if (group != null && group.getMember(event.getSender())==null)
+                {
+                    group.notifyMemberJoined(contact);
+                }
             }
 
             String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(user.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
@@ -1604,6 +1605,69 @@ public class MatrixConnection extends ImConnection {
                 }
             }
         }
+
+    }
+
+    private void handleRoomMemberEvent (Event event)
+    {
+
+
+        /**
+         * {
+         *     "content": {
+         *         "avatar_url": "mxc://example.org/SEsfnsuifSDFSSEF",
+         *         "displayname": "Alice Margatroid",
+         *         "membership": "join"
+         *     },
+         *     "event_id": "$143273582443PhrSn:example.org",
+         *     "origin_server_ts": 1432735824653,
+         *     "room_id": "!jEsUZKDJdhlrceRyVU:example.org",
+         *     "sender": "@example:example.org",
+         *     "state_key": "@alice:example.org",
+         *     "type": "m.room.member",
+         *     "unsigned": {
+         *         "age": 1234
+         *     }
+         * }
+         */
+
+
+        String membership = null;
+        if (event.getContentAsJsonObject().has("membership"))
+            membership = event.getContentAsJsonObject().get("membership").getAsString();
+
+        String member = event.stateKey;
+
+        if ((!TextUtils.isEmpty(membership)) && (!TextUtils.isEmpty(member)))
+        {
+            if (membership.equals("join")) {
+                String displayname = null;
+                if (event.getContentAsJsonObject().has("displayname") && event.getContentAsJsonObject().get("displayname") != null
+                        && (!(event.getContentAsJsonObject().get("displayname") instanceof JsonNull)))
+                    displayname = event.getContentAsJsonObject().get("displayname").getAsString();
+
+                String avatar_url = null;
+                if (event.getContentAsJsonObject().has("avatar_url") && event.getContentAsJsonObject().get("avatar_url") != null
+                        && (!(event.getContentAsJsonObject().get("avatar_url") instanceof JsonNull)))
+                    avatar_url = event.getContentAsJsonObject().get("avatar_url").getAsString();
+
+                Contact contact = mContactListManager.getContact(member);
+
+                if (contact == null)
+                    contact = new Contact(new BaseAddress(member));
+
+                contact.setName(displayname);
+                contact.setPresence(new Presence(Presence.AVAILABLE));
+                Contact[] contacts = {contact};
+                mContactListManager.notifyContactsPresenceUpdated(contacts);
+
+                ChatGroup group = mChatGroupManager.getChatGroup(event.roomId);
+                if (group != null && group.getMember(event.getSender()) == null) {
+                    group.notifyMemberJoined(contact);
+                }
+            }
+        }
+
 
     }
 
