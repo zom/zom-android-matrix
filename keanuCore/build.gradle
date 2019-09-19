@@ -37,8 +37,9 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    implementation 'info.guardianproject.iocipher:IOCipher:0.4'
-    implementation 'net.zetetic:android-database-sqlcipher:3.5.4@aar'
+    implementation 'info.guardianproject.iocipher:IOCipher:0.5'
+    implementation 'net.zetetic:android-database-sqlcipher:4.2.0@aar'
+    implementation "androidx.sqlite:sqlite:2.0.1"
 
     implementation 'commons-codec:commons-codec:1.10'
     implementation 'commons-io:commons-io:2.6'

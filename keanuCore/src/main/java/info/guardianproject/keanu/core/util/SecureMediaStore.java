@@ -4,14 +4,21 @@
 package info.guardianproject.keanu.core.util;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.support.media.ExifInterface;
 import android.text.TextUtils;
 import android.util.Log;
+
+import net.sqlcipher.Cursor;
+import net.sqlcipher.DatabaseErrorHandler;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteDatabaseHook;
 
 import org.apache.commons.io.IOUtils;
 
@@ -27,6 +34,7 @@ import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.iocipher.VirtualFileSystem;
+import info.guardianproject.keanu.core.Preferences;
 
 
 /**
@@ -232,6 +240,10 @@ public class SecureMediaStore {
 
         dbFilePath = getInternalDbFilePath(context);
 
+        //TODO check if moving from v3 to v4 and if so 'migrate cipher'
+        checkUpgrade(context, key, dbFilePath);
+
+
         if (!new java.io.File(dbFilePath).exists()) {
             vfs.createNewContainer(dbFilePath, key);
         }
@@ -247,6 +259,58 @@ public class SecureMediaStore {
 
         deleteLegacy (context);
 
+    }
+
+    public static void checkUpgrade (Context context, byte[] key, String dbFilePath)
+    {
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (prefs.getString("iocipher.v","v3").equals("v3"))
+        {
+
+            final boolean[] status = {false,false};
+
+            final SQLiteDatabase db= SQLiteDatabase.openDatabase(dbFilePath, key, null, SQLiteDatabase.OPEN_READWRITE,
+                    new SQLiteDatabaseHook() {
+                        @Override
+                        public void preKey(SQLiteDatabase database) {
+
+                        }
+
+                        @Override
+                        public void postKey(SQLiteDatabase database) {
+
+                            Cursor cursor = database.rawQuery("PRAGMA cipher_migrate", new String[]{});
+                            String value = "";
+                            if(cursor != null){
+                                cursor.moveToFirst();
+                                value = cursor.getString(0);
+                                cursor.close();
+                            }
+                            status[0] = Integer.valueOf(value) == 0;
+
+                            prefs.edit().putString("iocipher.v","v4").commit();
+
+                            status[1] = true;
+
+                        }
+                    }, new DatabaseErrorHandler() {
+                        @Override
+                        public void onCorruption(SQLiteDatabase dbObj) {
+
+                            Log.e(TAG,"database corrupted: v" + dbObj.getVersion());
+                        }
+                    });
+
+            while (!status[1])
+            {
+                try { Thread.sleep(1000);}
+                catch (Exception e){}
+            }
+
+            if (db != null)
+                db.close();
+        }
     }
 
     public static void deleteLegacy (Context context)
@@ -637,4 +701,6 @@ public class SecureMediaStore {
 
         return inSampleSize;
     }
+
+
 }

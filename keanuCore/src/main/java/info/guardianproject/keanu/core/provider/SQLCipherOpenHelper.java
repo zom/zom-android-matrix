@@ -36,7 +36,7 @@ public abstract class SQLCipherOpenHelper extends SQLiteOpenHelper {
 
     public SQLCipherOpenHelper(CacheWordHandler cacheWord, Context context, String name,
             CursorFactory factory, int version) {
-        super(context, name, factory, version, new SQLCipherV3MigrationHook(context));
+        super(context, name, factory, version, new SQLCipherV4MigrationHook(context));
         if (cacheWord == null)
             throw new IllegalArgumentException("CacheWordHandler is null");
         mHandler = cacheWord;

@@ -139,8 +139,8 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.8.5'
 
-    implementation 'info.guardianproject.iocipher:IOCipher:0.4'
-    implementation 'net.zetetic:android-database-sqlcipher:3.5.4@aar'
+    implementation 'info.guardianproject.iocipher:IOCipher:0.5'
+    implementation 'net.zetetic:android-database-sqlcipher:4.2.0@aar'
 
     /************* Matrix SDK management **************/
     // use the matrix SDK as external lib
