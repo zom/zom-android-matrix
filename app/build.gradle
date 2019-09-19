@@ -56,8 +56,6 @@ android {
     productFlavors {
 
 
-
-
         primary {// Assigns this product flavor to the "mode" flavor dimension.
             dimension "release"
             versionCode 40021
@@ -122,8 +120,8 @@ dependencies {
     implementation(name: 'olm-sdk-release-3.1.2', ext: 'aar')
 
     /*********** KeanuApp components **********/
-    implementation(name: 'keanucore-0.0.1.41', ext: 'aar')
-    implementation(name: 'keanumatrix-0.0.1.41', ext: 'aar')
+    implementation(name: 'keanucore-0.0.1.42', ext: 'aar')
+    implementation(name: 'keanumatrix-0.0.1.42', ext: 'aar')
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'

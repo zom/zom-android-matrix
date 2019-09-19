@@ -180,7 +180,9 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
     private void initRecyclerView () {
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.rvRoot);
+        if (mRecyclerView == null)
+            mRecyclerView = (RecyclerView) findViewById(R.id.rvRoot);
+
         mRecyclerView.setAdapter(new RecyclerView.Adapter() {
 
             private static final int VIEW_TYPE_MEMBER = 0;
@@ -425,12 +427,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
                         h.avatar.setImageDrawable(member.avatar);
                         h.avatar.setVisibility(View.VISIBLE);
-                        h.itemView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                showMemberInfo(member);
-                            }
-                        });
+                        h.itemView.setOnClickListener(v -> showMemberInfo(member));
                     }
                 }
             }
