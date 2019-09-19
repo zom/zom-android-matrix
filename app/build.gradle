@@ -159,11 +159,12 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation 'com.google.code.gson:gson:2.8.5'
 
+    implementation 'info.guardianproject.iocipher:IOCipher:0.5'
+    implementation 'net.zetetic:android-database-sqlcipher:4.2.0@aar'
+
     //from here: https://github.com/guardianproject/proofmode
     implementation 'org.witness:android-libproofmode:0.0.3'
     implementation 'com.eternitywall:opentimestamps:0.1.14.1'
-    implementation 'net.zetetic:android-database-sqlcipher:3.5.4@aar'
-    implementation 'info.guardianproject.iocipher:IOCipher:0.4'
     implementation 'info.guardianproject.panic:panic:0.5'
     implementation 'org.thoughtcrime.ssl.pinning:AndroidPinning:1.0.0'
     implementation 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'

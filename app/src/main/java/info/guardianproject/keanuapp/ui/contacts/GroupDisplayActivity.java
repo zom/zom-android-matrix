@@ -632,25 +632,28 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                     }
 
                     mMembers = new ArrayList<>(members.values());
-                    // Sort members by name, but keep owners at the top
-                    Collections.sort(mMembers, new Comparator<GroupMemberDisplay>() {
-                        @Override
-                        public int compare(GroupMemberDisplay member1, GroupMemberDisplay member2) {
-                            if (member1.affiliation == null || member2.affiliation == null)
-                                return 1;
-                            boolean member1isImportant = (member1.affiliation.contentEquals("owner") || member1.affiliation.contentEquals("admin"));
-                            boolean member2isImportant = (member2.affiliation.contentEquals("owner") || member2.affiliation.contentEquals("admin"));
-                            if (member1isImportant != member2isImportant) {
-                                if (member1isImportant) {
-                                    return -1;
-                                } else {
-                                    return 1;
-                                }
-                            }
-                            return member1.nickname.compareTo(member2.nickname);
-                        }
-                    });
 
+                    synchronized (mMembers) {
+                        // Sort members by name, but keep owners at the top
+                        Collections.sort(mMembers, new Comparator<GroupMemberDisplay>() {
+                            @Override
+                            public int compare(GroupMemberDisplay member1, GroupMemberDisplay member2) {
+                                if (member1.affiliation == null || member2.affiliation == null)
+                                    return 1;
+                                boolean member1isImportant = (member1.affiliation.contentEquals("owner") || member1.affiliation.contentEquals("admin"));
+                                boolean member2isImportant = (member2.affiliation.contentEquals("owner") || member2.affiliation.contentEquals("admin"));
+                                if (member1isImportant != member2isImportant) {
+                                    if (member1isImportant) {
+                                        return -1;
+                                    } else {
+                                        return 1;
+                                    }
+                                }
+                                return member1.nickname.compareTo(member2.nickname);
+                            }
+                        });
+                    }
+                    
                     runOnUiThread(() -> {
                         if (mRecyclerView != null && mRecyclerView.getAdapter() != null)
                             mRecyclerView.getAdapter().notifyDataSetChanged();
@@ -704,9 +707,9 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
         final boolean canGrantAdmin = canGrantAdmin(mYou, member);
         final boolean canKickout = canRevokeMembership(mYou, member);
-        final boolean isModerator = TextUtils.equals(mYou.role, "moderator");
+     //   final boolean isModerator = TextUtils.equals(mYou.role, "moderator")||TextUtils.equals(mYou.role, "admin");
 
-        if (isModerator && (canGrantAdmin || canKickout)) {
+        if ((canGrantAdmin || canKickout)) {
             AlertDialog.Builder alert = new AlertDialog.Builder(this);
             View content = LayoutInflater.from(this).inflate(R.layout.group_member_operations, null);
 
@@ -1125,6 +1128,9 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             return true;
         }
         if (TextUtils.equals(revoker.affiliation, "admin") && !TextUtils.equals(revokee.affiliation, "admin")) {
+            return true;
+        }
+        if (TextUtils.equals(revoker.role, "moderator")) {
             return true;
         }
         return false;
