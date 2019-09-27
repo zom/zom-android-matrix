@@ -67,7 +67,7 @@ android {
             dimension "release"
             applicationId "im.zom.messenger"
             versionCode 2110001
-            versionName "2.1.1-RC-1"
+            versionName "2.1.1-RC-2"
             archivesBaseName = "Zom-$versionName"
         }
 
