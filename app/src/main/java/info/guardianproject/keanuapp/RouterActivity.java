@@ -36,10 +36,17 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import net.sqlcipher.DatabaseErrorHandler;
+import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteDatabaseHook;
+
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.cacheword.CacheWordHandler;
 import info.guardianproject.keanu.core.cacheword.ICacheWordSubscriber;
 import info.guardianproject.keanu.core.provider.Imps;
+//import info.guardianproject.keanu.core.provider.SQLCipherOpenHelper;
+
+import info.guardianproject.keanu.core.provider.SQLCipherOpenHelper;
 import info.guardianproject.keanu.core.util.ImPluginHelper;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.tasks.SignInHelper;
@@ -50,6 +57,7 @@ import info.guardianproject.keanuapp.ui.onboarding.OnboardingActivity;
 import info.guardianproject.panic.Panic;
 import info.guardianproject.panic.PanicResponder;
 
+import java.io.File;
 import java.security.GeneralSecurityException;
 import java.util.UUID;
 
@@ -514,6 +522,7 @@ public class RouterActivity extends AppCompatActivity implements ICacheWordSubsc
             return false;
         }
     }
+
 
 
 
