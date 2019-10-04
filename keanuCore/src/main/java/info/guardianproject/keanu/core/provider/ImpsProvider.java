@@ -29,9 +29,11 @@ import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
+import android.util.Log;
 
 import net.sqlcipher.database.SQLiteConstraintException;
 import net.sqlcipher.database.SQLiteDatabase;
+import net.sqlcipher.database.SQLiteDatabaseHook;
 import net.sqlcipher.database.SQLiteOpenHelper;
 import net.sqlcipher.database.SQLiteQueryBuilder;
 
@@ -339,16 +341,16 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
     }
 
 
-    private class DatabaseHelper extends SQLiteOpenHelper {
+    private class DatabaseHelper extends SQLCipherOpenHelper {
 
         private SQLiteDatabase dbRead;
         private SQLiteDatabase dbWrite;
 
-        String mKey;
+        char[] mKey;
 
-        DatabaseHelper(Context context, byte[] key) throws Exception {
-            super(context, mDatabaseName, null, mDatabaseVersion);
-            mKey = SQLCipherOpenHelper.encodeRawKeyToStr(key);
+        DatabaseHelper(Context context, char[] key) throws Exception {
+            super(context, mDatabaseName, null, mDatabaseVersion, key);
+            mKey = key;
         }
 
         public SQLiteDatabase getReadableDatabase() {
@@ -1407,7 +1409,8 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                     if (fileLegacyDb.exists())
                         fileLegacyDb.delete();
 
-                    mDbHelper = new DatabaseHelper(ctx, pkey);
+                    char[] keyString = SQLCipherOpenHelper.encodeRawKey(pkey,true);
+                    mDbHelper = new DatabaseHelper(ctx, keyString);
                     LogCleaner.debug(LOG_TAG, "Opened DB with key");
                     mDbHelperLock.notify();
 

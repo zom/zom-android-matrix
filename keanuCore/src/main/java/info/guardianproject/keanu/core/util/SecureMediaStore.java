@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.media.ExifInterface;
@@ -19,6 +20,7 @@ import net.sqlcipher.Cursor;
 import net.sqlcipher.DatabaseErrorHandler;
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteDatabaseHook;
+import net.sqlcipher.database.SQLiteOpenHelper;
 
 import org.apache.commons.io.IOUtils;
 
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.channels.FileChannel;
 import java.util.Date;
 import java.util.UUID;
 
@@ -35,6 +38,7 @@ import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.iocipher.VirtualFileSystem;
 import info.guardianproject.keanu.core.Preferences;
+import info.guardianproject.keanu.core.provider.SQLCipherOpenHelper;
 
 
 /**
@@ -48,7 +52,6 @@ public class SecureMediaStore {
     public static final String TAG = SecureMediaStore.class.getName();
     private static String dbFilePath;
     private static final String BLOB_NAME = "keanumedia.db";
-    private static final String LEGACY_BLOB_NAME = "media.db";
 
     public static final int DEFAULT_IMAGE_WIDTH = 1080;
     private final static String LOG_TAG = "SecureMediaStore";
@@ -220,7 +223,7 @@ public class SecureMediaStore {
      * @param key
      * @throws IllegalArgumentException
      */
-    public static void init(Context context, byte[] key) throws IllegalArgumentException {
+    public synchronized static void init(Context context, byte[] key) throws IllegalArgumentException {
         // there is only one VFS, so if its already mounted, nothing to do
         VirtualFileSystem vfs = VirtualFileSystem.get();
 
@@ -241,8 +244,7 @@ public class SecureMediaStore {
         dbFilePath = getInternalDbFilePath(context);
 
         //TODO check if moving from v3 to v4 and if so 'migrate cipher'
-        checkUpgrade(context, key, dbFilePath);
-
+        checkUpgrade(context, key);
 
         if (!new java.io.File(dbFilePath).exists()) {
             vfs.createNewContainer(dbFilePath, key);
@@ -257,20 +259,34 @@ public class SecureMediaStore {
             Log.w(TAG, "VFS " + vfs.getContainerPath() + " issues with mounting: " + e.getMessage());
         }
 
-        deleteLegacy (context);
+      //  deleteLegacy (context);
 
     }
 
-    public static void checkUpgrade (Context context, byte[] key, String dbFilePath)
+    public static void checkUpgrade (Context context, byte[] key)
     {
 
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        if (prefs.getString("iocipher.v","v3").equals("v3"))
+     //   java.io.File fileDbLegacy = new java.io.File(getLegacyDbFilePath(context));
+        java.io.File fileDb= new java.io.File(getInternalDbFilePath(context));
+        Log.d(TAG,"legacy db: " + fileDb.getAbsolutePath() + " size=" + fileDb.length());
+
+        /**
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                copyFile(fileLegacy,new File(context.getExternalFilesDir(null),fileLegacy.getName()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }**/
+
+
+        if (fileDb.exists())
         {
-
+            /**
             final boolean[] status = {false,false};
+            char[] keyString = SQLCipherOpenHelper.encodeRawKey(key,true);
 
-            final SQLiteDatabase db= SQLiteDatabase.openDatabase(dbFilePath, key, null, SQLiteDatabase.OPEN_READWRITE,
+            final SQLiteDatabase db= SQLiteDatabase.openDatabase(fileDb.getAbsolutePath(), keyString, null,SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.CREATE_IF_NECESSARY,
                     new SQLiteDatabaseHook() {
                         @Override
                         public void preKey(SQLiteDatabase database) {
@@ -279,17 +295,49 @@ public class SecureMediaStore {
 
                         @Override
                         public void postKey(SQLiteDatabase database) {
+                            Boolean migrationOccurred = false;
 
-                            Cursor cursor = database.rawQuery("PRAGMA cipher_migrate", new String[]{});
-                            String value = "";
-                            if(cursor != null){
-                                cursor.moveToFirst();
-                                value = cursor.getString(0);
-                                cursor.close();
+
+                            database.rawQuery("PRAGMA cipher_page_size = 8192;", new String[]{});
+
+                            Cursor c = database.rawQuery("PRAGMA cipher_migrate", null);
+
+
+                            if (c.getCount() == 1) {
+                                c.moveToFirst();
+                                String selection = c.getString(0);
+
+                                migrationOccurred = selection.equals("0");
+
+                                Log.d(TAG,"selection: " + selection);
                             }
-                            status[0] = Integer.valueOf(value) == 0;
 
-                            prefs.edit().putString("iocipher.v","v4").commit();
+                            c.close();
+
+                            Log.d(TAG,"migrationOccurred: " + migrationOccurred);
+
+                            //database.rawQuery("PRAGMA journal_mode = WAL;", new String[]{});
+                            //database.rawQuery("PRAGMA synchronous = NORMAL;", new String[]{});
+
+                            /**
+                            if (database.isOpen()) {
+
+
+                                database.rawQuery("ATTACH DATABASE \""
+                                        + fileDbNew.getAbsolutePath() + "\" AS sqlcipher4 KEY \"" + keyString + "\";", new String[]{});
+                                database.rawQuery("SELECT sqlcipher_export('sqlcipher4');", new String[]{});
+                                database.rawQuery("DETACH DATABASE sqlcipher4;", new String[]{});
+
+                                if (fileDbNew.exists())
+                                {
+                                  //  fileLegacy.delete();
+                                    Log.d(TAG,"new db: " + fileDbNew.getAbsolutePath() + " size=" + fileDbNew.length());
+
+                                }
+
+
+                            }
+
 
                             status[1] = true;
 
@@ -299,6 +347,80 @@ public class SecureMediaStore {
                         public void onCorruption(SQLiteDatabase dbObj) {
 
                             Log.e(TAG,"database corrupted: v" + dbObj.getVersion());
+                            //set upgrade as done
+                            status[1] = true;
+                            Runtime.getRuntime().exit(-4242); //db is corrupted
+                        }
+                    });
+
+            while (!status[1])
+            {
+                try { Thread.sleep(1000);}
+                catch (Exception e){}
+            }
+
+            if (db != null && db.isOpen())
+                db.close();
+            **/
+        }
+
+
+    }
+    /**
+    public static void checkUpgrade (Context context, byte[] key, String dbFilePath)
+    {
+
+        final String IOCIPHER_VERSION_KEY = "ioc.vers";
+
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (prefs.getString(IOCIPHER_VERSION_KEY,"v3").equals("v3"))
+        {
+
+            final boolean[] status = {false,false};
+
+                final SQLiteDatabase db= SQLiteDatabase.openDatabase(dbFilePath, "", null, SQLiteDatabase.OPEN_READWRITE,
+                    new SQLiteDatabaseHook() {
+                        @Override
+                        public void preKey(SQLiteDatabase database) {
+
+                        }
+
+                        @Override
+                        public void postKey(SQLiteDatabase database) {
+
+                            String keyString = SQLCipherOpenHelper.encodeRawKeyToStr(key);
+                            database.rawQuery("PRAGMA key = '" + keyString + "';", new String[]{});
+                        //    database.execSQL("PRAGMA cipher_compatibility = 3");
+                            database.rawQuery("PRAGMA cipher_page_size = 8192;", new String[]{});
+                            database.rawQuery("PRAGMA journal_mode = WAL;", new String[]{});
+                            database.rawQuery("PRAGMA synchronous = NORMAL;", new String[]{});
+
+                            if (database.isOpen()) {
+                                Cursor cursor = database.rawQuery("PRAGMA cipher_migrate", new String[]{});
+                                String value = "";
+                                if (cursor != null) {
+                                    cursor.moveToFirst();
+                                    value = cursor.getString(0);
+                                    cursor.close();
+                                }
+                                status[0] = Integer.valueOf(value) == 0;
+
+                                if (status[0]) {
+                                    prefs.edit().putString(IOCIPHER_VERSION_KEY, "v4").commit();
+                                }
+
+                                //set upgrade as done
+                                status[1] = true;
+                            }
+                        }
+                    }, new DatabaseErrorHandler() {
+                        @Override
+                        public void onCorruption(SQLiteDatabase dbObj) {
+
+                            Log.e(TAG,"database corrupted: v" + dbObj.getVersion());
+                            //set upgrade as done
+                            status[1] = true;
+                            Runtime.getRuntime().exit(-4242); //db is corrupted
                         }
                     });
 
@@ -311,15 +433,16 @@ public class SecureMediaStore {
             if (db != null)
                 db.close();
         }
-    }
+    }**/
 
+    /**
     public static void deleteLegacy (Context context)
     {
         File fileLegacy = new File(getLegacyDbFilePath(context));
         if (fileLegacy.exists())
             fileLegacy.delete();
 
-    }
+    }**/
 
     public static boolean isMounted ()
     {
@@ -334,9 +457,10 @@ public class SecureMediaStore {
         return c.getFilesDir() + "/" + BLOB_NAME;
     }
 
+    /**
     public static String getLegacyDbFilePath(Context c) {
         return c.getFilesDir() + "/" + LEGACY_BLOB_NAME;
-    }
+    }**/
 
     /**
      * Copy device content into vfs.
@@ -702,5 +826,26 @@ public class SecureMediaStore {
         return inSampleSize;
     }
 
+    private static void copyFile(java.io.File src, java.io.File dst) throws IOException {
+
+        FileChannel inChannel = null;
+        FileChannel outChannel = null;
+
+        try {
+            inChannel = new java.io.FileInputStream(src).getChannel();
+            outChannel = new java.io.FileOutputStream(dst).getChannel();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            inChannel.transferTo(0, inChannel.size(), outChannel);
+        } finally {
+            if (inChannel != null)
+                inChannel.close();
+            if (outChannel != null)
+                outChannel.close();
+        }
+    }
 
 }

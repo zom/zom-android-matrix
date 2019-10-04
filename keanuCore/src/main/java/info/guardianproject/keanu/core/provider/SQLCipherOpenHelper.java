@@ -10,6 +10,8 @@ import net.sqlcipher.database.SQLiteDatabase.CursorFactory;
 import net.sqlcipher.database.SQLiteException;
 import net.sqlcipher.database.SQLiteOpenHelper;
 
+import org.apache.commons.codec.binary.Hex;
+
 import java.lang.reflect.Method;
 import java.nio.CharBuffer;
 
@@ -32,14 +34,13 @@ public abstract class SQLCipherOpenHelper extends SQLiteOpenHelper {
     private static final String TAG = "SQLCipherOpenHelper";
 
     protected Context mContext; // shame we have to duplicate this here
-    private CacheWordHandler mHandler;
+    private char[] mKey;
 
-    public SQLCipherOpenHelper(CacheWordHandler cacheWord, Context context, String name,
-            CursorFactory factory, int version) {
+    public SQLCipherOpenHelper(Context context, String name,
+            CursorFactory factory, int version, char[] key) {
         super(context, name, factory, version, new SQLCipherV4MigrationHook(context));
-        if (cacheWord == null)
-            throw new IllegalArgumentException("CacheWordHandler is null");
-        mHandler = cacheWord;
+
+        mKey = key;
     }
 
     /**
@@ -56,10 +57,8 @@ public abstract class SQLCipherOpenHelper extends SQLiteOpenHelper {
      * @return a read/write database object valid until {@link #close} is called
      */
     public synchronized SQLiteDatabase getWritableDatabase() {
-        if (mHandler.isLocked())
-            throw new SQLiteException("Database locked. Decryption key unavailable.");
 
-        return super.getWritableDatabase(encodeRawKey(mHandler.getEncryptionKey()));
+        return super.getWritableDatabase(mKey);
     }
 
     /**
@@ -76,10 +75,8 @@ public abstract class SQLCipherOpenHelper extends SQLiteOpenHelper {
      *         {@link #close} is called.
      */
     public synchronized SQLiteDatabase getReadableDatabase() {
-        if (mHandler.isLocked())
-            throw new SQLiteException("Database locked. Decryption key unavailable.");
 
-        return super.getReadableDatabase(encodeRawKey(mHandler.getEncryptionKey()));
+        return super.getReadableDatabase(mKey);
     }
 
     /**
@@ -93,14 +90,14 @@ public abstract class SQLCipherOpenHelper extends SQLiteOpenHelper {
      * @param raw_key a 32 byte array
      * @return the encoded key
      */
-    public static char[] encodeRawKey(byte[] raw_key) {
+    public static char[] encodeRawKey(byte[] raw_key, boolean useNativeMethod) {
         if (raw_key.length != 32)
             throw new IllegalArgumentException("provided key not 32 bytes (256 bits) wide");
 
         final String kPrefix;
         final String kSuffix;
 
-        if (sqlcipher_uses_native_key) {
+        if (useNativeMethod) {
             Log.d(TAG, "sqlcipher uses native method to set key");
             kPrefix = "x'";
             kSuffix = "'";
@@ -109,9 +106,14 @@ public abstract class SQLCipherOpenHelper extends SQLiteOpenHelper {
             kPrefix = "x''";
             kSuffix = "''";
         }
-        final char[] key_chars = encodeHex(raw_key, HEX_DIGITS_LOWER);
+
+        char[] key_chars = Hex.encodeHex(raw_key);
+
+        /**
+        final char[] key_chars = encodeHex(raw_key, HEX_DIGITS_UPPER);
         if (key_chars.length != 64)
             throw new IllegalStateException("encoded key is not 64 bytes wide");
+            **/
 
         char[] kPrefix_c = kPrefix.toCharArray();
         char[] kSuffix_c = kSuffix.toCharArray();
@@ -123,12 +125,21 @@ public abstract class SQLCipherOpenHelper extends SQLiteOpenHelper {
         return cb.array();
     }
 
-    /**
-     * @see #encodeRawKey(byte[])
-     */
+    public static char[] encodeRawKey(byte[] raw_key) {
+        return encodeRawKey(raw_key,sqlcipher_uses_native_key);
+    }
+
+        /**
+         * @see #encodeRawKey(byte[])
+         */
     public static String encodeRawKeyToStr(byte[] raw_key) {
         return new String(encodeRawKey(raw_key));
     }
+
+    public static String encodeRawKeyToStr(byte[] raw_key, boolean useNativeMethod) {
+        return new String(encodeRawKey(raw_key,useNativeMethod));
+    }
+
 
     /*
      * Special hack for detecting whether or not we're using a new SQLCipher for
@@ -152,6 +163,11 @@ public abstract class SQLCipherOpenHelper extends SQLiteOpenHelper {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
     };
 
+
+    private static final char[] HEX_DIGITS_UPPER = {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+    };
+
     private static char[] encodeHex(final byte[] data, final char[] toDigits) {
         final int l = data.length;
         final char[] out = new char[l << 1];
@@ -160,6 +176,7 @@ public abstract class SQLCipherOpenHelper extends SQLiteOpenHelper {
             out[j++] = toDigits[(0xF0 & data[i]) >>> 4];
             out[j++] = toDigits[0x0F & data[i]];
         }
+
         return out;
     }
 }
