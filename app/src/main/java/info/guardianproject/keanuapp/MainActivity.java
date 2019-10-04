@@ -1001,46 +1001,49 @@ public class MainActivity extends BaseActivity {
 
         try {
 
-
             IChatSessionManager manager = mLastConnGroup.getChatSessionManager();
 
-            mSbStatus = Snackbar.make(mViewPager, R.string.connecting_to_group_chat_, Snackbar.LENGTH_INDEFINITE);
-            mSbStatus.show();
+            //if we aren't already in a chat, then join it
+            if (manager.getChatSession(roomAddress)==null) {
 
-            manager.joinMultiUserChatSession(roomAddress, new IChatSessionListener() {
+                mSbStatus = Snackbar.make(mViewPager, R.string.connecting_to_group_chat_, Snackbar.LENGTH_INDEFINITE);
+                mSbStatus.show();
 
-                @Override
-                public IBinder asBinder() {
-                    return null;
-                }
+                manager.joinMultiUserChatSession(roomAddress, new IChatSessionListener() {
 
-                @Override
-                public void onChatSessionCreated(final IChatSession session) throws RemoteException {
+                    @Override
+                    public IBinder asBinder() {
+                        return null;
+                    }
 
-                    mSbStatus.dismiss();
+                    @Override
+                    public void onChatSessionCreated(final IChatSession session) throws RemoteException {
 
-                    session.setLastMessage(" ");
-                    Intent intent = new Intent(MainActivity.this,  ConversationDetailActivity.class);
-                    intent.putExtra("id", session.getId());
-                    intent.putExtra("firsttime",true);
-                    intent.putExtra("isNew", false);
+                        mSbStatus.dismiss();
 
-                    startActivity(intent);
-                }
+                        session.setLastMessage(" ");
+                        Intent intent = new Intent(MainActivity.this, ConversationDetailActivity.class);
+                        intent.putExtra("id", session.getId());
+                        intent.putExtra("firsttime", true);
+                        intent.putExtra("isNew", false);
 
-                @Override
-                public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
+                        startActivity(intent);
+                    }
 
-                    mSbStatus.dismiss();
+                    @Override
+                    public void onChatSessionCreateError(String name, ImErrorInfo error) throws RemoteException {
 
-                    String errorMessage = getString(R.string.error);
-                    if (error != null)
-                        errorMessage = error.getDescription();
+                        mSbStatus.dismiss();
 
-                    mSbStatus = Snackbar.make(mViewPager, errorMessage, Snackbar.LENGTH_LONG);
-                    mSbStatus.show();
-                }
-            });
+                        String errorMessage = getString(R.string.error);
+                        if (error != null)
+                            errorMessage = error.getDescription();
+
+                        mSbStatus = Snackbar.make(mViewPager, errorMessage, Snackbar.LENGTH_LONG);
+                        mSbStatus.show();
+                    }
+                });
+            }
 
 
         } catch (RemoteException e) {

@@ -76,6 +76,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
 import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
+import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
@@ -622,7 +623,7 @@ public class AddContactActivity extends BaseActivity {
                 {
 
                     try {
-                        if (resultScan.startsWith("keanu://"))
+                        if (resultScan.startsWith("zom://"))
                         {
                             List<String> params = Uri.parse(resultScan).getQueryParameters("id");
 
@@ -644,15 +645,26 @@ public class AddContactActivity extends BaseActivity {
                             //parse each string and if they are for a new user then add the user
                             OnboardingManager.DecodedInviteLink diLink = OnboardingManager.decodeInviteLink(resultScan);
 
-                            if (mAddLocalContact)
-                                new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(diLink.username, diLink.fingerprint, diLink.nickname);
+                            if (diLink.username.startsWith("@")) {
+                                if (mAddLocalContact)
+                                    new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(diLink.username, diLink.fingerprint, diLink.nickname);
 
-                            Intent intent=new Intent();
-                            intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, diLink.username);
-                            intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER, mApp.getDefaultProviderId());
-                            intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT, mApp.getDefaultAccountId());
+                                Intent intent=new Intent();
+                                intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, diLink.username);
+                                intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER, mApp.getDefaultProviderId());
+                                intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT, mApp.getDefaultAccountId());
 
-                            setResult(RESULT_OK, intent);
+                                setResult(RESULT_OK, intent);
+                            }
+                            else if (diLink.username.startsWith("!")||diLink.username.startsWith("#")) {
+                                Intent intentAdd = new Intent(this, MainActivity.class);
+                                intentAdd.setAction("join");
+                                intentAdd.putExtra("group", diLink.username);
+                                startActivity(intentAdd);
+                                finish();
+                            }
+
+
                         }
 
                         //if they are for a group chat, then add the group

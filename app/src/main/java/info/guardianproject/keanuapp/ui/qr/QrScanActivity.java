@@ -38,6 +38,7 @@ import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 @SuppressWarnings("deprecation")
@@ -193,21 +194,27 @@ implements QrCodeDecoder.ResultCallback {
                     resultStrings.add(resultString);
                     dataResult.putStringArrayListExtra("result", resultStrings);
 
-                    OnboardingManager.DecodedInviteLink diLink = OnboardingManager.decodeInviteLink(resultString);
+					OnboardingManager.DecodedInviteLink diLink = null;
+					try {
+						diLink = OnboardingManager.decodeInviteLink(resultString);
+						String message = null;
 
-					String message = null;
+						if (diLink != null) {
 
-                    if (diLink != null) {
+							message = getString(R.string.add_contact_success,diLink.username);
+						}
 
-						message = getString(R.string.add_contact_success,diLink.username);
-                    }
+						if (message != null)
+						{
+							Snackbar.make(layoutMain, message, Snackbar.LENGTH_LONG).show();
+						}
 
-					if (message != null)
-					{
-						Snackbar.make(layoutMain, message, Snackbar.LENGTH_LONG).show();
+						setResult(RESULT_OK, dataResult);
+					} catch (UnsupportedEncodingException e) {
+						e.printStackTrace();
 					}
 
-                    setResult(RESULT_OK, dataResult);
+
                 }
 
 			}

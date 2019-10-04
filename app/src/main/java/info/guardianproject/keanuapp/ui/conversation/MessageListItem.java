@@ -46,6 +46,7 @@ import org.ocpsoft.prettytime.PrettyTime;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -153,28 +154,34 @@ public class MessageListItem extends FrameLayout {
         @Override
         public void onClick(View widget) {
 
-            OnboardingManager.DecodedInviteLink diLink = OnboardingManager.decodeInviteLink(urlString);
+            OnboardingManager.DecodedInviteLink diLink = null;
+            try {
+                diLink = OnboardingManager.decodeInviteLink(urlString);
+                //not an invite link, so just send it out
+                if (diLink == null) {
+                    Uri uri = Uri.parse(urlString);
+                    Context context = widget.getContext();
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    intent.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                }
+                else
+                {
+                    //it is an invite link, so target it back at us!
+                    Uri uri = Uri.parse(urlString);
+                    Context context = widget.getContext();
+                    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                    intent.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
+                    intent.setPackage(context.getPackageName()); //The package name of the app to which intent is to be sent
+                    // intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                }
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
 
-            //not an invite link, so just send it out
-            if (diLink == null) {
-                Uri uri = Uri.parse(urlString);
-                Context context = widget.getContext();
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                intent.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
-            }
-            else
-            {
-                //it is an invite link, so target it back at us!
-                Uri uri = Uri.parse(urlString);
-                Context context = widget.getContext();
-                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                intent.putExtra(Browser.EXTRA_APPLICATION_ID, context.getPackageName());
-                intent.setPackage(context.getPackageName()); //The package name of the app to which intent is to be sent
-               // intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
-            }
+
         }
     }
 

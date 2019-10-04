@@ -13,6 +13,8 @@ import info.guardianproject.keanuapp.nearby.NearbyAddContactActivity;
 import info.guardianproject.keanuapp.ui.qr.QrScanActivity;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.UUID;
@@ -135,8 +137,7 @@ public class OnboardingManager {
         }
     }
 
-    public static DecodedInviteLink decodeInviteLink (String link)
-    {
+    public static DecodedInviteLink decodeInviteLink (String link) throws UnsupportedEncodingException {
         DecodedInviteLink diLink = null;
 
         if (link.contains("/i/#")){
@@ -147,7 +148,7 @@ public class OnboardingManager {
 
             if (link.indexOf("@")!=-1) {
                 try {
-                    String matrixContact = link.substring(link.lastIndexOf("@"));
+                    String matrixContact = URLDecoder.decode(link.substring(link.lastIndexOf("@")),"UTF-8");
 
                     diLink = new DecodedInviteLink();
                     diLink.username = matrixContact;
@@ -156,9 +157,23 @@ public class OnboardingManager {
                     Log.e(LOG_TAG, "bad link decode", iae);
                 }
             }
-            if (link.indexOf("!")!=-1) {
+            else if (link.indexOf("!")!=-1) {
                 try {
-                    String matrixContact = link.substring(link.lastIndexOf("!"));
+                    String matrixContact = URLDecoder.decode(link.substring(link.lastIndexOf("!")),"UTF-8");
+
+                    diLink = new DecodedInviteLink();
+                    diLink.username = matrixContact;
+
+                } catch (IllegalArgumentException iae) {
+                    Log.e(LOG_TAG, "bad link decode", iae);
+                }
+            }
+            else if (link.indexOf("#")!=-1) {
+                try {
+                    String matrixContact = URLDecoder.decode(link.substring(link.lastIndexOf("#")),"UTF-8");
+
+                    if (matrixContact.startsWith("##"))
+                        matrixContact = matrixContact.substring(1);
 
                     diLink = new DecodedInviteLink();
                     diLink.username = matrixContact;

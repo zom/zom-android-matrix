@@ -419,7 +419,7 @@ public class ImUrlActivity extends Activity {
                     intentAdd.putExtra("username", diLink.username);
                     startActivity(intentAdd);
                 }
-                else if (diLink.username.startsWith("!")) {
+                else if (diLink.username.startsWith("!")||diLink.username.startsWith("#")) {
                     Intent intentAdd = new Intent(this, MainActivity.class);
                     intentAdd.setAction("join");
                     intentAdd.putExtra("group", diLink.username);

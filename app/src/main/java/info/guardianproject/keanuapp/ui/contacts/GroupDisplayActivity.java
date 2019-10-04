@@ -47,6 +47,7 @@ import info.guardianproject.keanu.core.service.IConnectionListener;
 import info.guardianproject.keanu.core.service.IContactListManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -63,6 +64,7 @@ import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.ui.BaseActivity;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
+import info.guardianproject.keanuapp.ui.qr.QrDisplayActivity;
 import info.guardianproject.keanuapp.ui.qr.QrShareAsyncTask;
 import info.guardianproject.keanuapp.ui.widgets.GroupAvatar;
 import info.guardianproject.keanuapp.ui.widgets.LetterAvatar;
@@ -103,7 +105,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     private RecyclerView mRecyclerView;
     private ArrayList<GroupMemberDisplay> mMembers;
     private View mActionAddFriends = null;
-    private View mActionShare = null;
+    private View mActionShare = null, mActionQR;
 
     private final static int REQUEST_PICK_CONTACTS = 100;
 
@@ -237,15 +239,26 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                         h.avatar.setImageDrawable(avatar);
                     }
 
+                    mActionQR = h.qr;
                     h.qr.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            String inviteString;
                             try {
-                                inviteString = OnboardingManager.generateInviteLink(GroupDisplayActivity.this, mAddress, "", mName);
-                                OnboardingManager.inviteScan(GroupDisplayActivity.this, inviteString);
+                                try {
+                                    if (mSession != null) {
+                                        mSession.setPublic(true);
+                                    }
+                                } catch (Exception ignored) {
+                                }
+                                String publicAddress = URLEncoder.encode(mSession.getPublicAddress(), "UTF-8");
+                                String inviteLink = OnboardingManager.generateInviteLink(GroupDisplayActivity.this, publicAddress, "", mName);
+
+                                Intent intent = new Intent(GroupDisplayActivity.this, QrDisplayActivity.class);
+                                intent.putExtra(Intent.EXTRA_TEXT, inviteLink);
+                                startActivity(intent);
+
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                Log.e(LOG_TAG, "couldn't generate QR code", e);
                             }
                         }
                     });
@@ -262,9 +275,10 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                                     if (mSession != null) {
                                         mSession.setPublic(true);
                                     }
+                                } catch (Exception ignored) {
                                 }
-                                catch (Exception ignored){}
-                                String inviteLink = OnboardingManager.generateInviteLink(GroupDisplayActivity.this, mAddress, "", mName);
+                                String publicAddress = URLEncoder.encode(mSession.getPublicAddress(), "UTF-8");
+                                String inviteLink = OnboardingManager.generateInviteLink(GroupDisplayActivity.this, publicAddress, "", mName);
                                 new QrShareAsyncTask(GroupDisplayActivity.this).execute(inviteLink, mName);
                             } catch (Exception e) {
                                 Log.e(LOG_TAG, "couldn't generate QR code", e);
@@ -1084,6 +1098,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             if (!canInviteOthers(mYou)) {
                 mActionAddFriends.setVisibility(View.GONE);
                 mActionShare.setVisibility(View.GONE);
+                mActionQR.setVisibility(View.GONE);
             }
             else {
                 mActionAddFriends.setOnClickListener(new View.OnClickListener() {
@@ -1099,7 +1114,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                     }
                 });
                 mActionShare.setVisibility(View.VISIBLE);
-
+                mActionQR.setVisibility(View.VISIBLE);
                 mActionAddFriends.setVisibility(View.VISIBLE);
                 mActionAddFriends.setEnabled(mSession != null);
             }
