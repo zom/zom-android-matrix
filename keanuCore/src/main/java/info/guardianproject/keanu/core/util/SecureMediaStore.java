@@ -227,8 +227,10 @@ public class SecureMediaStore {
         // there is only one VFS, so if its already mounted, nothing to do
         VirtualFileSystem vfs = VirtualFileSystem.get();
 
+
         if (vfs.isMounted()) {
             Log.w(TAG, "VFS " + vfs.getContainerPath() + " is already mounted, so unmount()");
+            /**
             try
             {
                 vfs.unmount();
@@ -236,7 +238,8 @@ public class SecureMediaStore {
             catch (Exception e)
             {
                 Log.w(TAG, "VFS " + vfs.getContainerPath() + " issues with unmounting: " + e.getMessage());
-            }
+            }**/
+            return;
         }
 
         Log.w(TAG,"Mounting VFS: " + vfs.getContainerPath());

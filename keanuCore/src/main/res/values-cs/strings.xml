@@ -1,0 +1,295 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Zom</string>
+  <string name="app_name">Zom</string>
+  <string name="im_label">Zom</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">číst rychlé zprávy</string>
+  <string name="ro_perm_desc">Umožňuje aplikacím číst data od IM poskytovatele obsahu.</string>
+  <string name="wo_perm_label">psát rychlé zprávy</string>
+  <string name="wo_perm_desc">Umožňuje aplikacím psát data na IM poskytovatele obsahu.</string>
+  <string name="perm_label">spustit službu Chat</string>
+  <string name="perm_desc">Povoluje aplikacím spustit Chat přes službu intent.</string>
+  <!--General: Actions-->
+  <string name="confirm">Potvrdit</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Zrušit</string>
+  <string name="yes">OK</string>
+  <string name="no">Zrušit</string>
+  <string name="connect">Připojit</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Nastavit heslo</string>
+  <string name="lock_screen_confirm_passphrase">Potvrdit heslo</string>
+  <string name="lock_screen_passphrase_hint">Heslo</string>
+  <string name="lock_screen_passphrase_not_set_enter">Můžete volitelně nastavit hlavní heslo pro Zom, aby se zabránilo přístupu k vašim kontaktům a zprávám bez hesla.</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Potvrdit nové heslo</string>
+  <string name="lock_screen_passphrases_not_matching">Hesla se neshodují, prosím zkuste to znovu</string>
+  <string name="lock_screen_skip">Přeskočit &gt;&gt;</string>
+  <!--Views: Setup-->
+  <string name="add_account">Přidat účet <xliff:g id="ACCOUNT">%1$s</xliff:g></string>
+  <string name="menu_about">O</string>
+  <string name="signed_out_prompt_with_error">Byli jste odhlášeni z <xliff:g id="account">%1$s</xliff:g>, protože <xliff:g id="reason">%2$s</xliff:g></string>
+  <string name="pass_err_length">Váše ověřovací heslo není dostatečně dlouhé</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Přihlásit se</string>
+  <string name="account_setup_example_email_address">user@domain.com</string>
+  <string name="account_setup_new_username">Nové uživatelské jméno</string>
+  <string name="account_setup_password">heslo</string>
+  <string name="account_setup_password_confirm">potvrdit heslo</string>
+  <string name="btn_create_new_account">Zaregistrovat účet</string>
+  <string name="account_setup_pers_now_title">Přihlásit se nyní</string>
+  <string name="select_domain_new_account">Doména chat služby</string>
+  <string name="registering_new_account_">Registruji nový učet…</string>
+  <string name="signing_in_wait">Přihlašování…</string>
+  <string name="signing_out_wait">Odhlašování…</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">Provést SRV vyhledání</string>
+  <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">Pomocí DNS SRV najít aktuální XMPP server z názvu domény</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Povolte uživatelské jméno a heslo, které bude odesláno jako prostý text při použití nešifrované komunikace</string>
+  <string name="allow_plain_text_auth">Povolit autorizaci v plain textu</string>
+  <string name="require_tls_ssl_connection">TLS připojení vyžadováno</string>
+  <string name="transport_encryption">Šifrovat přenos</string>
+  <string name="how_encrypted_chats_are_started">jaké šifrované chaty jsou spuštěny</string>
+  <string name="the_server_to_connect_to_if_needed">Server se připojí v případě potřeby</string>
+  <string name="connect_server">Připojit server</string>
+  <string name="tcp_port_for_xmpp_server">TCP Port pro XMPP Server</string>
+  <string name="server_port">Port Serveru</string>
+  <string name="xmpp_resource">Zdroj XMPP </string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">rozlišovat toto připojení z jiných klientů, které jsou také zaznamenány v</string>
+  <string name="xmpp_resource_prio_title">Priority XMPP zdroje</string>
+  <string name="xmpp_resource_prio_summary">Zprávy pro klienty s více aktivními zdroji budou zaslány na zdroj s nejvyšší prioritou.</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">Konverzece</string>
+  <string name="empty_account_message">Nemáte žádné \nnastavené účty.\n\nKleknutím sem jeden přidejte!</string>
+  <string name="menu_remove_contact">Smazat kontakt</string>
+  <string name="menu_contact_nickname">Kontaktní přezdívka</string>
+  <string name="menu_view_blocked">Blokovaní uživatelé</string>
+  <string name="nickname">Přezdívka</string>
+  <string name="confirm_delete_contact">Kontakt <xliff:g id="USER">%1$s</xliff:g> bude smazán.</string>
+  <string name="confirm_block_contact">Kontakt <xliff:g id="USER">%1$s</xliff:g> bude blokován.</string>
+  <string name="add_contact_success">Kontakt <xliff:g id="USER">%1$s</xliff:g> byl přidán.</string>
+  <string name="delete_contact_success">Kontakt <xliff:g id="USER">%1$s</xliff:g> byl smazán.</string>
+  <string name="block_contact_success">Kontakt <xliff:g id="USER">%1$s</xliff:g> je blokován.</string>
+  <string name="unblock_contact_success">Kontakt <xliff:g id="USER">%1$s</xliff:g> je odblokován.</string>
+  <string name="menu_verify">Ověřit klíč</string>
+  <string name="empty_conversation_group">Skupina je prázdná</string>
+  <string name="search_label">Kontakt</string>
+  <string name="search_hint">zadejte jméno kontaktu pro chatování</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online">uživatel <xliff:g id="USER">%1$s</xliff:g> je online</string>
+  <string name="contact_away">uživatel <xliff:g id="USER">%1$s</xliff:g> je pryč</string>
+  <string name="contact_busy"><xliff:g id="USER">%1$s</xliff:g> je zaneprázdněn</string>
+  <string name="contact_offline">uživatel <xliff:g id="USER">%1$s</xliff:g> je offline</string>
+  <string name="contact_joined">Uživatel <xliff:g id="USER">%1$s</xliff:g> se připojil</string>
+  <string name="contact_left">uživatel <xliff:g id="USER">%1$s</xliff:g> odešel</string>
+  <string name="file_transfer">Přenos souborů</string>
+  <string name="accept_transfer_">Potvrdit přenos?</string>
+  <string name="wants_to_send_you_the_file">chce Vám poslat soubor</string>
+  <string name="no_connection_for_sending">Žádné připojení není dostupné pro odesílání vašich sdílení!</string>
+  <string name="compose_hint">Poslat zprávu</string>
+  <string name="compose_hint_secure">Poslat bezpečnostní zprávu</string>
+  <string name="menu_end_conversation">Ukončit chat</string>
+  <string name="select_link_title">Zvolit odkaz</string>
+  <string name="delete">Smazat</string>
+  <string name="export_media">Exportovat média soubor?</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt">Uživatel <xliff:g id="USER">%1$s</xliff:g> vás pozval k hromadnému chatu.</string>
+  <string name="accept_invitation">Přijmout</string>
+  <string name="decline_invitation">Odmítnout</string>
+  <string name="connecting_to_group_chat_">Připojování ke skupinovému chatu…</string>
+  <string name="empty_contact_list">Žádné kontakty nenalezeny
+
+Klikněte pro pozvání.</string>
+  <string name="approve_subscription_error">Přihlášení k odběru uživatele. Zkuste to prosím znovu později.</string>
+  <string name="decline_subscription_error">Odmítnutí odběru uživatele. Zkuste to prosím znovu později.</string>
+  <!--Security: OTR-->
+  <string name="otr_session_status_finished">Váš kontakt zastavil šifrovný chat.</string>
+  <!--Security: OTR: Keyring-->
+  <string name="detected_Otr_keystore_import">Nalezli jsme úložiště OTR klíčů k importu. Chcete teď naskenovat QR heslo?</string>
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Ověření</string>
+  <string name="smp_question_summary">Zadejte takovou otázku, kterou když zašlete kontaktu, tak budete očekávat předem danou odpověď, abyste ověřili, že je to opravdu ten, kdo tvrdí, že je.</string>
+  <string name="smp_question_hint">položit otázku</string>
+  <string name="qmp_answer_hint">očekávaná odpověď</string>
+  <string name="remote_verified_us">Váš kontakt si vás úspěšně ověřil. Nyní si ověřte svůj kontakt tím, že zadáte svou vlastní otázku.</string>
+  <string name="otr_qa_title">OTR Q&amp;Ověření</string>
+  <string name="chat_encryption_title">Šifrování chatu</string>
+  <string name="otr_qa_send">Odeslat</string>
+  <string name="otr_qa_cancel">Zrušit</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">Bezpečnost a soukromí</string>
+  <string name="encryption_and_anonymity_title">Šifrování a anonymita</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">Jazyk</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Jazyky</string>
+  <string name="use_system_default">Použít systémově výchozí</string>
+  <string name="button_yes_accept_all">Ano, příjmout vše</string>
+  <string name="pref_delete_unsecured_media_title">Smazat nezabezpečené média</string>
+  <string name="pref_delete_unsecured_media_summary">Po nasdílení fotek a souboru, automaticky smazat originál z nezabezpečeného úložiště.</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">Ostatní nastavení</string>
+  <string name="start_on_boot_summary">Vždy při startu automaticky přihlásit do posledně přihlášených účtů</string>
+  <string name="hide_offline_contacts">Skrýt kontakty offline</string>
+  <string name="foreground_service_title">Použít prioritu popředí</string>
+  <string name="foreground_service_summary">Sníží pravděpodobnost, že Android bude restartovávat připojení naši služby. Umístí oznámení do oznamovací oblasti.</string>
+  <string name="heartbeat_interval_title">Heartbeat interval</string>
+  <string name="heartbeat_interval_summary">Použíjte vyšší hodnoty (v minutách) pro menší spotřebu baterie. Vyšší hodnoty ale můžou způsobit, že poskytovatel ukončí spojení z důvodu nečinnosti. </string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Nastavení oznámení</string>
+  <string name="notification_enabled_title">Oznamování chatových zpráv</string>
+  <string name="notification_enabled_summary">Příchod chatové zprávy oznamovat na stavovém panelu.</string>
+  <string name="notification_vibrate_title">Vibrace</string>
+  <string name="notification_vibrate_summary">Oznámit příchozí chatovou zprávu také vibracemi</string>
+  <string name="notification_sound_title">Zvuk</string>
+  <string name="notification_sound_summary">Oznámit příchozí chatovou zprávu také vyzváněním</string>
+  <string name="notification_ringtone_title">Vybrat vlastní zvonění</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">Zapnout ladící logy</string>
+  <string name="pref_debug_summary">Výstupní log dat aplikace na standardní odchozí / logcat pro ladění</string>
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message">Poskytovatel vyžaduje povolení přenosu dat na pozadí.</string>
+  <string name="prompt_create_new_account_">Vytvořit nový učet?</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">Vytvořit nový účet pro přezdívku \'%1$s\'?</string>
+  <!--Alerts: Notifications-->
+  <string name="subscription_notify_text">Nové přátelské pozvání od <xliff:g id="user">%s</xliff:g></string>
+  <string name="file_notify_text">Nový soubor <xliff:g id="filename">%1$s</xliff:g> od <xliff:g id="user">%2$s</xliff:g></string>
+  <string name="notify_groupchat_label">Pozvánka k hromadnému chatu</string>
+  <string name="group_chat_invite_notify_text">Nová pozvánka do skupinového chatu od<xliff:g id="user">%s</xliff:g></string>
+  <string name="new_messages_notify">Nová zpráva(y) od</string>
+  <string name="app_unlocked">Aktivováno &amp; odemknuto</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">Upozornění</string>
+  <string name="error_prefix">Chyba:</string>
+  <string name="general_error">Kód chyby: <xliff:g id="CODE">%1$d</xliff:g></string>
+  <string name="login_service_failed">Nepodařilo se přihlásit ke službě <xliff:g id="SERVICE">%1$s</xliff:g>. Zkuste to prosím znovu později."\n"(Podrobnosti: <xliff:g id="DESCRIPTION">%2$s</xliff:g>)</string>
+  <string name="add_list_failed">Seznam se nepodařilo přidat.</string>
+  <string name="block_contact_failed">Blokování kontaktu se nezdařilo.</string>
+  <string name="unblock_contact_failed">Odblokování kontaktu se nezdařilo.</string>
+  <string name="load_contact_list_failed">Seznam kontaktů se nepodařilo načíst.</string>
+  <string name="cant_connect_to_server">K serveru se nelze připojit. Zkontrolujte své připojení.</string>
+  <string name="contact_already_exist"><xliff:g id="USER">%1$s</xliff:g> již je ve vašem seznamu kontaktů.</string>
+  <string name="contact_blocked">Kontakt <xliff:g id="USER">%1$s</xliff:g> byl zablokován.</string>
+  <string name="contact_not_loaded">Počkejte, než se seznam kontaktů načte.</string>
+  <string name="network_error">Došlo k chybě sítě.</string>
+  <string name="wifi_not_connected_error">Pro toto připojení je nutné WiFi.</string>
+  <string name="service_not_support">Server tuto funkci nepodporuje.</string>
+  <string name="invalid_password">Zadané heslo není platné.</string>
+  <string name="internal_server_error">Na serveru došlo k chybě.</string>
+  <string name="not_implemented">Server tuto funkci nepodporuje.</string>
+  <string name="service_unavaiable">Server je momentálně nedostupný.</string>
+  <string name="timeout">Vypršel časový limit serveru.</string>
+  <string name="version_not_supported">Server nepodporuje aktuální verzi.</string>
+  <string name="message_queue_full">Fronta zpráv je plná.</string>
+  <string name="domain_not_supported">Server nepodporuje předávání této doméně.</string>
+  <string name="unknown_user">Zadané uživatelské jméno nebylo rozpoznáno.</string>
+  <string name="recipient_blocked_the_user">Tento uživatel vás blokuje.</string>
+  <string name="session_expired">Této relaci již vypršela platnost, přihlaste se znovu.</string>
+  <string name="forced_logout">jste přihlášeni z jiného klienta.</string>
+  <string name="already_logged_in">již jste přihlášeni z jiného klienta.</string>
+  <string name="msisdn_error">Z karty SIM nelze číst vaše telefonní číslo. Požádejte o pomoc operátora.</string>
+  <string name="not_signed_in">Momentálně nejste přihlášeni.</string>
+  <string name="account_setup_error_server">U Zom došlo k chybě při připojování k serveru - prosím zkontrolujte nastavení a zkuste to znovu.</string>
+  <string name="error_suspended_connection">Síť je nedostupná</string>
+  <string name="unable_to_create_or_join_group_chat">Nelze vytvořit skupinový chat nebo se k němu nelze připojit</string>
+  <string name="unsupported_incoming_data">Nepodporované příchozí data, nelze sdílet!</string>
+  <string name="there_is_no_viewer_available_for_this_file_format">Pro tento formát souborů není k dispozici žádný prohlížeč</string>
+  <string name="otr_keysync_warning_message">Prosím, zkopírujte soubor \'otr_keystore.ofcaes\' z počítače OtrFileConverter nástroje do kořenového adresáře vašeho paměťovém zařízení</string>
+  <string name="msg_sent_failed">Zprávu nelze odeslat.</string>
+  <string name="disconnected_warning">Zprávy budou odeslány při opětovném připojení</string>
+  <string name="error_account_password_mismatch">Vaše hesla se neshodují</string>
+  <string name="error_account_settings_priority">Priorita musí být číslo v rozmezí [0 .. 127]</string>
+  <string name="error_account_settings_port">Číslo portu musí být číslo</string>
+  <string name="error_welcome_database">Kritická chyba: Nelze odemknout nebo načíst databázy aplikace. Nainstalujte prosím znovu aplikaci nebo vyčistěte data.</string>
+  <string name="account_settings_title">Nastavení účtu</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Skupiny</string>
+  <string name="buddies">Přátelé</string>
+  <string name="contacts">Kontakty</string>
+  <string name="mtm_accept_cert">Přijmout certifikát serveru?</string>
+  <string name="loading">načítání…</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Nastavení</string>
+  <string name="menu_sign_out">Odhlásit se</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber/XMPP</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">Online</string>
+  <string name="presence_busy">Zaneprázdněn</string>
+  <string name="presence_away">Pryč</string>
+  <string name="presence_idle">Nečinný</string>
+  <string name="presence_offline">Offline</string>
+  <string name="presence_invisible">Zobrazit jako offline</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Happy</item>
+    <item>Smutný</item>
+    <item>Mrkající</item>
+    <item>Vypláznutý jazyk</item>
+    <item>Překvapený</item>
+    <item>Pusa</item>
+    <item>Hej!</item>
+    <item>Cool</item>
+    <item>Cinkání zlaťáků</item>
+    <item>Šlápota v úsměvu</item>
+    <item>V rozpacích</item>
+    <item>Andílek</item>
+    <item>Nerozhodný</item>
+    <item>Rozplakaný</item>
+    <item>Ani muk</item>
+    <item>Smějící se</item>
+    <item>Zmatený</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Happy</item>
+    <item>Smutný</item>
+    <item>Mrkající</item>
+    <item>Vypláznutý jazyk</item>
+    <item>Překvapený</item>
+    <item>Pusa</item>
+    <item>Hej!</item>
+    <item>Cool</item>
+    <item>Cinkání zlaťáků</item>
+    <item>Šlápota v úsměvu</item>
+    <item>V rozpacích</item>
+    <item>Andílek</item>
+    <item>Nerozhodný</item>
+    <item>Rozplakaný</item>
+    <item>Ani muk</item>
+    <item>Smějící se</item>
+    <item>Zmatený</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="this_is_a_group_chat">Toto je skupinový chat</string>
+  <string name="unable_to_securely_share_this_file">Tento soubor nelze sdílet zabezpečeně</string>
+  <string name="swipe_hint">&lt; přejeďte do leva a do prava pro více možností &gt;</string>
+  <string name="title_me">Já</string>
+</resources>

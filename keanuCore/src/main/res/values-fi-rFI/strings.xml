@@ -1,0 +1,256 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Zom</string>
+  <string name="app_name">Zom</string>
+  <string name="im_label">Zom</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">lue pikaviestejä</string>
+  <string name="ro_perm_desc">
+Sallii tietojen lukemisen pikaviestisovelluksista.</string>
+  <string name="wo_perm_label">kirjoita pikaviestejä</string>
+  <string name="wo_perm_desc">
+Sallii tietojen kirjoittamisen pikaviestisovelluksiin.</string>
+  <string name="perm_label">käynnistä pikaviestinpalvelu</string>
+  <string name="perm_desc">Sallii sovellusten käynnistää pikaviestinpalvelu.</string>
+  <!--General: Actions-->
+  <string name="confirm">Vahvista</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Peruuta</string>
+  <string name="yes">OK</string>
+  <string name="no">Peruuta</string>
+  <string name="connect">Liity</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Aseta salasana</string>
+  <string name="lock_screen_confirm_passphrase">Vahvista salasana</string>
+  <string name="lock_screen_passphrase_hint">Salasana</string>
+  <string name="lock_screen_passphrase_not_set_enter">Uusi salasana</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Vahvista uusi salasana</string>
+  <string name="lock_screen_passphrases_not_matching">Salasanat eivät täsmänneet, yritä uudelleen</string>
+  <string name="lock_screen_skip">Olen laiska (Ei salasanaa)</string>
+  <!--Views: Setup-->
+  <string name="add_account">Lisää <xliff:g id="account">%1$s</xliff:g> tili</string>
+  <string name="menu_about">Tietoa</string>
+  <string name="signed_out_prompt_with_error">Olet kirjautunut ulos palvelusta <xliff:g id="account">%1$s</xliff:g>, koska <xliff:g id="reason">%2$s</xliff:g></string>
+  <string name="pass_err_length">Tunnuslauseesi ei ollut riittävän pitkä</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Kirjaudu sisään</string>
+  <string name="account_setup_example_email_address">käyttäjä@verkkotunnus</string>
+  <string name="account_setup_new_username">uusi käyttäjänimi</string>
+  <string name="account_setup_password">salasana</string>
+  <string name="account_setup_password_confirm">vahvista salasana</string>
+  <string name="btn_create_new_account">Rekisteröi tili</string>
+  <string name="account_setup_pers_now_title">Kirjaudu sisään nyt</string>
+  <string name="select_domain_new_account">Valitse domain</string>
+  <string name="registering_new_account_">Rekisteröidään uutta tiliä…</string>
+  <string name="signing_in_wait">Kirjaudutaan sisään\u2026</string>
+  <string name="signing_out_wait">Kirjautuu ulos\u2026</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">Tee SRV-haku</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Salli käyttäjänimen ja salasanan lähettäminen paljaana tekstinä, kun salaamaton yhteys on käytössä</string>
+  <string name="server_port">Palvelimen portti</string>
+  <string name="xmpp_resource_prio_title">XMPP-resurssin prioriteetti</string>
+  <!--Views: Contact list-->
+  <string name="menu_remove_contact">Poista yhteystieto</string>
+  <string name="menu_contact_nickname">Kontaktin lempinimi</string>
+  <string name="menu_view_blocked">Estetty</string>
+  <string name="confirm_delete_contact">Yhteystieto "<xliff:g id="user">%1$s</xliff:g>" poistetaan.</string>
+  <string name="confirm_block_contact">Yhteystieto "<xliff:g id="user">%1$s</xliff:g>" estetään.</string>
+  <string name="add_contact_success">Yhteystieto "<xliff:g id="user">%1$s</xliff:g>" lisätty.</string>
+  <string name="delete_contact_success">Yhteystieto "<xliff:g id="user">%1$s</xliff:g>" poistettu.</string>
+  <string name="block_contact_success">Contact "<xliff:g id="user">%1$s</xliff:g>" estetty.</string>
+  <string name="unblock_contact_success">Contact "<xliff:g id="user">%1$s</xliff:g>" poistettu estolistalta.</string>
+  <string name="menu_verify">Varmista avain</string>
+  <string name="empty_conversation_group">Ei keskusteluita</string>
+  <string name="search_label">Yhteystieto</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online"><xliff:g id="user">%1$s</xliff:g> on online</string>
+  <string name="contact_away"><xliff:g id="user">%1$s</xliff:g> on poissa</string>
+  <string name="contact_busy"><xliff:g id="user">%1$s</xliff:g> on kiireinen</string>
+  <string name="contact_offline"><xliff:g id="user">%1$s</xliff:g> on offline</string>
+  <string name="contact_joined"><xliff:g id="user">%1$s</xliff:g> on liittynyt</string>
+  <string name="contact_left"><xliff:g id="user">%1$s</xliff:g> on poistunut</string>
+  <string name="file_transfer">Tiedostojen siirto</string>
+  <string name="accept_transfer_">Hyväksy tiedostonsiirto?</string>
+  <string name="wants_to_send_you_the_file">haluaa lähettää sinulle tiedoston</string>
+  <string name="compose_hint_secure">Lähetä turvallinen viesti</string>
+  <string name="menu_end_conversation">Lopeta keskustelu</string>
+  <string name="select_link_title">Valitse linkki</string>
+  <string name="delete">Poista</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt"><xliff:g id="user">%1$s</xliff:g> on kutsunut sinut ryhmäkeskusteluun.</string>
+  <string name="accept_invitation">Hyväksy</string>
+  <string name="decline_invitation">Hylkää</string>
+  <string name="connecting_to_group_chat_">Yhdistetään ryhmäkeskusteluun…</string>
+  <string name="empty_contact_list">Kontakteja ei löytynyt.
+
+Klikkaa kutsuaksesi.</string>
+  <!--Security: OTR-->
+  <!--Security: OTR: Keyring-->
+  <string name="detected_Otr_keystore_import">OTR-avaintalletuksen tuonti havaittu. Haluatko skannata QR-salasanan nyt?</string>
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="otr_qa_send">Lähetä</string>
+  <string name="otr_qa_cancel">Peruuta</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">Turvallisuus ja yksityisyys</string>
+  <string name="encryption_and_anonymity_title">Salaus ja anonymiteetti</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">Kieli</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Kielet</string>
+  <string name="button_yes_accept_all">Kyllä, hyväksy kaikki</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">Muita hienosäätöjä</string>
+  <string name="start_on_boot_summary">Aina käynnistä ja kirjaudu automaattisesti viimeksi sisäänkirjattuihin tileihin</string>
+  <string name="hide_offline_contacts">Piilota poissaolevat käyttäjät</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Ilmoitusasetukset</string>
+  <string name="notification_enabled_title">Pikaviesti-ilmoitukset</string>
+  <string name="notification_enabled_summary">Ilmoita tilapalkissa kun pikaviesti saapuu</string>
+  <string name="notification_vibrate_title">Värinähälytys</string>
+  <string name="notification_vibrate_summary">Värise pikaviestin saapuessa</string>
+  <string name="notification_sound_title">Ääni</string>
+  <string name="notification_sound_summary">Soita viestiääni pikaviestin saapuessa</string>
+  <string name="notification_ringtone_title">Käytä muokattua soittoääntä Zomlle</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">Laita Debug-log päälle</string>
+  <string name="pref_debug_summary">Tulosta ohjelman logitiedot oletuskohteeseen/logcatiin debuggausta varten</string>
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message">
+         Kirjautumiseen tarvitaan verkkoyhteys (sisältäen taustadatan).
+    </string>
+  <string name="prompt_create_new_account_">Luo uusi tili?</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">Luo uusi keskustelutili käyttäjänimellä \'%1$s\'?</string>
+  <!--Alerts: Notifications-->
+  <string name="subscription_notify_text">Uusi ystäväpyyntö henkilöltä <xliff:g id="user">%s</xliff:g></string>
+  <string name="file_notify_text">Uusi tiedosto <xliff:g id="filename">%1$s</xliff:g> henkilöltä <xliff:g id="user">%2$s</xliff:g></string>
+  <string name="notify_groupchat_label">Ryhmächatkutsu</string>
+  <string name="group_chat_invite_notify_text">Uusi ryhmächatkutsu henkilöltä <xliff:g id="user">%s</xliff:g></string>
+  <string name="new_messages_notify">Uusia viestejä henkilöltä</string>
+  <string name="app_unlocked">Aktivoitu &amp; lukitsematon</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">Huomio</string>
+  <string name="error_prefix">Virhe:</string>
+  <string name="general_error">Virhekoodi <xliff:g id="code">%1$d</xliff:g></string>
+  <string name="login_service_failed">Palveluun <xliff:g id="service">%1$s</xliff:g> ei voitu kirjautua. Yritä uudelleen myöhemmin.\n(Lisätietoja: <xliff:g id="description">%2$s</xliff:g>)</string>
+  <string name="add_list_failed">Listaa ei lisätty.</string>
+  <string name="block_contact_failed">Kontaktia ei estetty.</string>
+  <string name="unblock_contact_failed">Kontaktia ei poistettu estolistalta.</string>
+  <string name="load_contact_list_failed">Kontaktilistaa ei ladattu.</string>
+  <string name="cant_connect_to_server">Palvelimeen ei voitu yhdistää. Tarkista yhteytesi.</string>
+  <string name="contact_already_exist">"<xliff:g id="user">%1$s</xliff:g>" on jo kontaktilistallasi.</string>
+  <string name="contact_blocked">"<xliff:g id="user">%1$s</xliff:g>" on estetty.</string>
+  <string name="contact_not_loaded">Odota, kontaktilistaasi ladataan.</string>
+  <string name="network_error">Verkkovirhe.</string>
+  <string name="wifi_not_connected_error">WiFi-yhteyttä vaaditaan tähän.</string>
+  <string name="service_not_support">Palvelin ei tue tätä toimintoa.</string>
+  <string name="invalid_password">Antamasi salasana ei kelvannut.</string>
+  <string name="internal_server_error">Palvelimella tapahtui virhe.</string>
+  <string name="not_implemented">Palvelin ei tue tätä toimintoa.</string>
+  <string name="service_unavaiable">Palvelimeen ei saatu yhteyttä.</string>
+  <string name="timeout">Palvelinyhteys aikakatkaistiin.</string>
+  <string name="version_not_supported">Palvelin ei tue tätä versiota.</string>
+  <string name="message_queue_full">Viestijono on täynnä.</string>
+  <string name="domain_not_supported">Palvelin ei tue edelleenlähettämistä tähän osoitteeseen.</string>
+  <string name="unknown_user">Antamaasi käyttäjänimeä ei tunnistettu.</string>
+  <string name="recipient_blocked_the_user">Pahoittelut, käyttäjä on estänyt sinut.</string>
+  <string name="session_expired">Istunto on vanhennut, kirjaudu uudelleen.</string>
+  <string name="forced_logout">olet kirjautunut sisään toisella ohjelmalla.</string>
+  <string name="already_logged_in">olet kirjautunut sisään toisella ohjelmalla.</string>
+  <string name="msisdn_error">Pahoittelut, puhelinnumeroa ei voitu lukea SIM-kortiltasi. Ota yhteyttä operaattoriisi avun saamiseksi.</string>
+  <string name="not_signed_in">Et ole kirjautunut sisään tällä hetkellä.</string>
+  <string name="unable_to_create_or_join_group_chat">Ryhmäkeskustelua ei voitu luoda tai siihen ei voitu liittyä</string>
+  <string name="there_is_no_viewer_available_for_this_file_format">Kyseiselle tiedostotyypille ei ole katseluohjelmaa</string>
+  <string name="otr_keysync_warning_message">Kopioi \'otr_keystore.ofcaes\' tiedosto työpöydän OtrFileConverter-työkalusta laitteesi muistin juureen.</string>
+  <string name="msg_sent_failed">Viestiä ei voitu lähettää.</string>
+  <string name="disconnected_warning">Viestit lähetetään kun yhteys palautuu</string>
+  <string name="error_account_password_mismatch">Salasanasi eivät täsmää</string>
+  <string name="error_account_settings_port">Porttinumeron täytyy olla luku</string>
+  <string name="account_settings_title">Tiliasetukset</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Ryhmät</string>
+  <string name="buddies">Kaverit</string>
+  <string name="contacts">Kontaktit</string>
+  <string name="mtm_accept_cert">Hyväksy palvelinsertifikaatti?</string>
+  <string name="loading">ladataan…</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Asetukset</string>
+  <string name="menu_sign_out">Kirjaudu ulos</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">Paikalla</string>
+  <string name="presence_busy">Varattu</string>
+  <string name="presence_away">Poissa</string>
+  <string name="presence_idle">Tyhjäkäynti</string>
+  <string name="presence_offline">Poissa linjoilta</string>
+  <string name="presence_invisible">Esitä poissaolevaa</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Iloinen</item>
+    <item>Surullinen</item>
+    <item>Silmänisku</item>
+    <item>Kieli ulkona</item>
+    <item>Yllättynyt</item>
+    <item>Suudelma</item>
+    <item>Huutaa</item>
+    <item>Viileä</item>
+    <item>Rahasuu</item>
+    <item>Jalka suussa</item>
+    <item>Nolostunut</item>
+    <item>Enkeli</item>
+    <item>Epävarma</item>
+    <item>Itkee</item>
+    <item>Suu supussa</item>
+    <item>Nauraa</item>
+    <item>Hämmentynyt</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Iloinen</item>
+    <item>Surullinen</item>
+    <item>Silmänisku</item>
+    <item>Kieli ulkona</item>
+    <item>Yllättynyt</item>
+    <item>Suudelma</item>
+    <item>Huutaa</item>
+    <item>Viileä</item>
+    <item>Rahasuu</item>
+    <item>Jalka suussa</item>
+    <item>Nolostunut</item>
+    <item>Enkeli</item>
+    <item>Epävarma</item>
+    <item>Itkee</item>
+    <item>Suu supussa</item>
+    <item>Nauraa</item>
+    <item>Hämmentynyt</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="title_me">Minä</string>
+</resources>

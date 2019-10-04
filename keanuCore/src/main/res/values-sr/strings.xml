@@ -1,0 +1,298 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Сигурно ћаскање</string>
+  <string name="app_name">Сигурно ћаскање</string>
+  <string name="im_label">Сигурно ћаскање</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">читање брзих порука</string>
+  <string name="ro_perm_desc">Дозвољава апликацијама да читају податке са брзогласничког даваоца садржаја.</string>
+  <string name="wo_perm_label">писање брзих порука</string>
+  <string name="wo_perm_desc">Дозвољава апликацијама да уписују податке у брзогласнички давалац садржаја.</string>
+  <string name="perm_label">покретање брзогласничког сервиса</string>
+  <string name="perm_desc">Дозвољава апликацијама да покрену брзогласнички сервис преко интента.</string>
+  <!--General: Actions-->
+  <string name="confirm">Потврда</string>
+  <string name="ok">У реду</string>
+  <string name="cancel">Одустани</string>
+  <string name="yes">У реду</string>
+  <string name="no">Одустани</string>
+  <string name="connect">Повежи</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Постави лозинку</string>
+  <string name="lock_screen_confirm_passphrase">Потврди лозинку</string>
+  <string name="lock_screen_passphrase_hint">Лозинка</string>
+  <string name="lock_screen_passphrase_not_set_enter">Можете по избору да поставите главну лозинку за Сигурно ћаскање да бисте онемогућили приступ вашим контактима и порукама без лозинке:</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Потврда нове лозинке</string>
+  <string name="lock_screen_passphrases_not_matching">Лозинке се не поклапају, покушајте поново</string>
+  <string name="lock_screen_skip">Прескочи &gt;&gt;</string>
+  <!--Views: Setup-->
+  <string name="add_account">Додај <xliff:g id="account">%1$s</xliff:g> налог</string>
+  <string name="menu_about">О програму</string>
+  <string name="signed_out_prompt_with_error">Одјављени сте са <xliff:g id="account">%1$s</xliff:g> због <xliff:g id="reason">%2$s</xliff:g></string>
+  <string name="pass_err_length">Ваша лозинка није довољно дугачка</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Пријава</string>
+  <string name="account_setup_example_email_address">korisnik@domaćin</string>
+  <string name="account_setup_new_username">ново корисничко име</string>
+  <string name="account_setup_password">лозинка</string>
+  <string name="account_setup_password_confirm">потврда лозинке</string>
+  <string name="btn_create_new_account">Региструј налог</string>
+  <string name="account_setup_pers_now_title">Пријави се сада</string>
+  <string name="select_domain_new_account">Домен сервиса ћаскања</string>
+  <string name="registering_new_account_">Региструјем нови налог…</string>
+  <string name="signing_in_wait">Пријављујем се\u2026</string>
+  <string name="signing_out_wait">Одјављујем се\u2026</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">СРВ потрага</string>
+  <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">Користи ДНС СРВ за налажење стварног ИксМПП сервера из домена</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Дозволи слање корисничког имена и лозинке као обичног текста при коришћењу нешифрованог преноса</string>
+  <string name="allow_plain_text_auth">Дозволи аутентификацију обичним текстом</string>
+  <string name="require_tls_ssl_connection">Захтевај ТЛС везу</string>
+  <string name="transport_encryption">Шифровање преноса</string>
+  <string name="how_encrypted_chats_are_started">Како почињу шифрована ћаскања</string>
+  <string name="the_server_to_connect_to_if_needed">Сервер за повезивање, ако је потребно</string>
+  <string name="connect_server">Сервер за повезивање</string>
+  <string name="tcp_port_for_xmpp_server">ТЦП порт ИксМПП сервера</string>
+  <string name="server_port">Порт сервера</string>
+  <string name="xmpp_resource">ИксМПП ресурс</string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">да би се распознала ова веза од осталих клијената који су такође пријављени</string>
+  <string name="xmpp_resource_prio_title">Приоритет ИксМПП ресурса</string>
+  <string name="xmpp_resource_prio_summary">Поруке клијентима са више активних ресурса биће послате ресурсу највишег приоритета</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">Преписке</string>
+  <string name="empty_account_message">Немате\nподешених налога.\n\nДодирните овде да додате један!</string>
+  <string name="menu_remove_contact">Обриши контакт</string>
+  <string name="menu_contact_nickname">Надимак контакта</string>
+  <string name="menu_view_blocked">Блокиран</string>
+  <string name="nickname">Надимак</string>
+  <string name="confirm_delete_contact">Контакт „<xliff:g id="user">%1$s</xliff:g>“ ће бити обрисан.</string>
+  <string name="confirm_block_contact">Контакт „<xliff:g id="user">%1$s</xliff:g>“ ће бити блокиран.</string>
+  <string name="add_contact_success">Контакт „<xliff:g id="user">%1$s</xliff:g>“ је додат.</string>
+  <string name="delete_contact_success">Контакт „<xliff:g id="user">%1$s</xliff:g>“ је обрисан.</string>
+  <string name="block_contact_success">Контакт „<xliff:g id="user">%1$s</xliff:g>“ је блокиран.</string>
+  <string name="unblock_contact_success">Контакт „<xliff:g id="user">%1$s</xliff:g>“ је деблокиран.</string>
+  <string name="menu_verify">Овери контакт</string>
+  <string name="empty_conversation_group">Нема преписки\n\nДодирните да почнете ћаскати!</string>
+  <string name="search_label">Контакт</string>
+  <string name="search_hint">укуцајте име контакта за ћаскање</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online"><xliff:g id="user">%1$s</xliff:g> је на вези</string>
+  <string name="contact_away"><xliff:g id="user">%1$s</xliff:g> је одсутан/а</string>
+  <string name="contact_busy"><xliff:g id="user">%1$s</xliff:g> је заузет(а)</string>
+  <string name="contact_offline"><xliff:g id="user">%1$s</xliff:g> је ван везе</string>
+  <string name="contact_joined"><xliff:g id="user">%1$s</xliff:g> се придружи</string>
+  <string name="contact_left"><xliff:g id="user">%1$s</xliff:g> оде</string>
+  <string name="file_transfer">Пренос фајла</string>
+  <string name="accept_transfer_">Да прихватим пренос?</string>
+  <string name="wants_to_send_you_the_file">жели да вам пошаље фајл</string>
+  <string name="no_connection_for_sending">Нема доступне везе за слање вашег дељења!</string>
+  <string name="compose_hint">Пошаљи поруку</string>
+  <string name="compose_hint_secure">Пошаљи сигурну поруку</string>
+  <string name="menu_end_conversation">Окончај ћаскање</string>
+  <string name="select_link_title">Изаберите везу</string>
+  <string name="delete">Обриши</string>
+  <string name="export_media">Да извезем медија фајл?</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt"><xliff:g id="user">%1$s</xliff:g> вас позва да се придружите групном ћаскању.</string>
+  <string name="accept_invitation">Прихвати</string>
+  <string name="decline_invitation">Одбиј</string>
+  <string name="connecting_to_group_chat_">Повезујем се на групно ћаскање…</string>
+  <string name="empty_contact_list">Нема контаката.\n\nДодирните да позовете.</string>
+  <string name="subscription_prompt">Да додам контакт?</string>
+  <string name="approve_subscription">Да</string>
+  <string name="decline_subscription">Не</string>
+  <string name="approve_subscription_error">Не могу да одобрим претплату од <xliff:g id="user">%1$s</xliff:g>. Покушајте поново касније.</string>
+  <string name="decline_subscription_error">Не могу да одбијем претплату од <xliff:g id="user">%1$s</xliff:g>. Покушајте поново касније.</string>
+  <!--Security: OTR-->
+  <string name="otr_session_status_finished">Ваш контакт је зауставио шифровану сесију ћаскања.</string>
+  <!--Security: OTR: Keyring-->
+  <string name="detected_Otr_keystore_import">Откривено је ОТР складиште кључева за увоз. Желите ли одмах да очитате бар-код лозинку?</string>
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Аутентификација</string>
+  <string name="smp_question_summary">Укуцајте питајте које ће бити послато вашем контакту, и очекивани одговор, да бисте потврдили да су они за које се издају.</string>
+  <string name="smp_question_hint">питање</string>
+  <string name="qmp_answer_hint">очекивани одговор</string>
+  <string name="remote_verified_us">Ваш контакт вас је успешно аутентификовао.  Сада аутентификујте ваш контакт постављајући му сопствено питање.</string>
+  <string name="otr_qa_title">ОТР оверавање</string>
+  <string name="chat_encryption_title">Шифровање ћаскања</string>
+  <string name="otr_qa_send">Пошаљи</string>
+  <string name="otr_qa_cancel">Одустани</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">Сигурност и приватност</string>
+  <string name="encryption_and_anonymity_title">Шифровање и анонимност</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="pref_linkify_on_tor_title">Кликабилне везе на Тору</string>
+  <string name="pref_linkify_on_tor_summary">За налоге које користе Тор, учини везе у ћаскањима кликабилним (ПАЖЊА, могуће цурење приватних података!)</string>
+  <string name="menu_locale">Језик</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Језици</string>
+  <string name="use_system_default">Системски подразумевано</string>
+  <string name="button_yes_accept_all">Да, прихвати све</string>
+  <string name="pref_delete_unsecured_media_title">Обриши небезбедни медиј</string>
+  <string name="pref_delete_unsecured_media_summary">Након дељења слике или фајла, аутоматски их обриши са изворног, небезбедног складишта након увоза</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">Остала подешавања</string>
+  <string name="start_on_boot_summary">Увек покрени и аутоматски пријави претходно пријављене налоге</string>
+  <string name="hide_offline_contacts">Сакриј контакте ван везе</string>
+  <string name="foreground_service_title">Користи приоритет првог плана</string>
+  <string name="foreground_service_summary">Смањује шансу да Андроид рестартује везу нашег сервиса.  Ово ће да смести обавештење у траци стања.</string>
+  <string name="heartbeat_interval_title">Интервал откуцаја</string>
+  <string name="heartbeat_interval_summary">Користите већу вредност (у минутама) да поштедите батерију.  Већа вредност може да узрокује да провајдер затвори вашу везу услед неактивности.</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Поставке обавештења</string>
+  <string name="notification_enabled_title">Брзогласничка обавештења</string>
+  <string name="notification_enabled_summary">Обавештење у траци стања по доласку брзе поруке</string>
+  <string name="notification_vibrate_title">Вибрирај</string>
+  <string name="notification_vibrate_summary">Вибрирај по доласку брзе поруке</string>
+  <string name="notification_sound_title">Звук</string>
+  <string name="notification_sound_summary">Пусти звук по доласку брзе поруке</string>
+  <string name="notification_ringtone_title">Изаберите посебни звук</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">Дневник исправљања грешака</string>
+  <string name="pref_debug_summary">Испиши дневник апликације у стандардни излаз/логкат за исправљање грешака</string>
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message">Потребна је веза на интернет мобилне мрежне (укључујући позадинске податке) да би се апликација пријавила.</string>
+  <string name="prompt_create_new_account_">Да направим нови налог?</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">Да направим нови налог за корисничко име „%1$s“?</string>
+  <!--Alerts: Notifications-->
+  <string name="subscription_notify_text">Нова позивница за пријатељство од <xliff:g id="user">%s</xliff:g></string>
+  <string name="file_notify_text">Нови фајл <xliff:g id="filename">%1$s</xliff:g> од <xliff:g id="user">%2$s</xliff:g></string>
+  <string name="notify_groupchat_label">Позивница за групно ћаскање</string>
+  <string name="group_chat_invite_notify_text">Нова позивница за групно ћаскање од <xliff:g id="user">%s</xliff:g></string>
+  <string name="new_messages_notify">Нове поруке од</string>
+  <string name="app_unlocked">Активирано и откључано</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">Пажња</string>
+  <string name="error_prefix">Грешка: </string>
+  <string name="general_error">Код грешке <xliff:g id="code">%1$d</xliff:g></string>
+  <string name="login_service_failed">Не могу да се пријавим на <xliff:g id="service">%1$s</xliff:g> сервис. Покушајте поново касније.\n(Детаљи: <xliff:g id="description">%2$s</xliff:g>)</string>
+  <string name="add_list_failed">Списак није додат.</string>
+  <string name="block_contact_failed">Контакт није блокиран.</string>
+  <string name="unblock_contact_failed">Контакт није деблокиран.</string>
+  <string name="load_contact_list_failed">Списак контаката се није учитао.</string>
+  <string name="cant_connect_to_server">Не могу да се повежем на сервер. Проверите вашу везу.</string>
+  <string name="contact_already_exist">"<xliff:g id="user">%1$s</xliff:g>" већ постоји на вашем списку контаката.</string>
+  <string name="contact_blocked">Контакт „<xliff:g id="user">%1$s</xliff:g>“ је блокиран.</string>
+  <string name="contact_not_loaded">Сачекајте док се ваш списак контаката учита.</string>
+  <string name="network_error">Дошло је до грешке на мрежи.</string>
+  <string name="wifi_not_connected_error">Бежични је потребан за ову везу.</string>
+  <string name="service_not_support">Сервер не подржава ову функционалност.</string>
+  <string name="invalid_password">Лозинку коју сте унели није исправна.</string>
+  <string name="internal_server_error">Сервер је наишао на грешку.</string>
+  <string name="not_implemented">Сервер не подржава ову функционалност.</string>
+  <string name="service_unavaiable">Сервер је тренутно недоступан.</string>
+  <string name="timeout">Истекло прековреме сервера.</string>
+  <string name="version_not_supported">Сервер не подржава текуће издање.</string>
+  <string name="message_queue_full">Ред чекања порука је пун.</string>
+  <string name="domain_not_supported">Сервер не подржава прослеђивање на домен.</string>
+  <string name="unknown_user">Унето корисничко име није препознато.</string>
+  <string name="recipient_blocked_the_user">Нажалост, корисник вас је блокирао.</string>
+  <string name="session_expired">Сесија је истекла, пријавите се поново.</string>
+  <string name="forced_logout">пријавили сте се са другог клијента.</string>
+  <string name="already_logged_in">пријавили сте се са другог клијента.</string>
+  <string name="msisdn_error">Не могу да очитам број телефона са ваше СИМ картице. Контактирајте вашег оператера за помоћ.</string>
+  <string name="not_signed_in">Тренутно нисте пријављени.</string>
+  <string name="account_setup_error_server">Сигурно ћаскање је наишло на грешку приликом повезивања на сервер ћаскања — проверите ваше поставке и покушајте поново.</string>
+  <string name="error_suspended_connection">Мрежа је ван везе</string>
+  <string name="unable_to_create_or_join_group_chat">Не могу да направим или се придружим групном ћаскању</string>
+  <string name="unsupported_incoming_data">Неподржани долазни подаци, не могу да делим!</string>
+  <string name="there_is_no_viewer_available_for_this_file_format">Нема доступног прегледача за овај формат фајлова</string>
+  <string name="otr_keysync_warning_message">Копирајте фајл „otr_keystore.ofcaes“ са радне површи OtrFileConverter алатке у корени директоријум складишта вашег уређаја</string>
+  <string name="msg_sent_failed">Порука није могла бити послата.</string>
+  <string name="disconnected_warning">Нисте повезани. Поруке ће бити послате када се поново повежете.</string>
+  <string name="error_account_password_mismatch">Лозинке се не поклапају</string>
+  <string name="error_account_settings_priority">Приоритет мора бити број у распону [0 .. 127]</string>
+  <string name="error_account_settings_port">Порт мора бити број</string>
+  <string name="error_welcome_database">Кобна грешка: Не могу да откључам или учитам базу података апликације. Инсталирајте поново апликацију или очистите податке.</string>
+  <string name="account_settings_title">Поставке налога</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Групе</string>
+  <string name="buddies">Другари</string>
+  <string name="contacts">Контакти</string>
+  <string name="mtm_accept_cert">Да прихватим сертификат сервера?</string>
+  <string name="loading">учитавам…</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Поставке</string>
+  <string name="menu_sign_out">Одјави се</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Џабер (ИксМПП)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">На вези</string>
+  <string name="presence_busy">Заузет(а)</string>
+  <string name="presence_away">Одсутан/а</string>
+  <string name="presence_idle">Мирује</string>
+  <string name="presence_offline">Ван везе</string>
+  <string name="presence_invisible">Невидљив(а)</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Срећа</item>
+    <item>Туга</item>
+    <item>Намигивање</item>
+    <item>Језик</item>
+    <item>Изненађење</item>
+    <item>Пољубац</item>
+    <item>Галама</item>
+    <item>Опуштено</item>
+    <item>Новац</item>
+    <item>Стопало</item>
+    <item>Срамота</item>
+    <item>Анђео</item>
+    <item>Неодлучност</item>
+    <item>Плач</item>
+    <item>Уста затворена</item>
+    <item>Смех</item>
+    <item>Збуњеност</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Срећа</item>
+    <item>Туга</item>
+    <item>Намигивање</item>
+    <item>Језик</item>
+    <item>Изненађење</item>
+    <item>Пољубац</item>
+    <item>Галама</item>
+    <item>Опуштено</item>
+    <item>Новац</item>
+    <item>Стопало</item>
+    <item>Срамота</item>
+    <item>Анђео</item>
+    <item>Неодлучност</item>
+    <item>Плач</item>
+    <item>Уста затворена</item>
+    <item>Смех</item>
+    <item>Збуњеност</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="this_is_a_group_chat">Ово је групно ћаскање</string>
+  <string name="unable_to_securely_share_this_file">Не могу да безбедно делим овај фајл</string>
+  <string name="swipe_hint">&lt; превуците прстом лево и десно за још опција &gt;</string>
+  <string name="title_me">Ја</string>
+</resources>

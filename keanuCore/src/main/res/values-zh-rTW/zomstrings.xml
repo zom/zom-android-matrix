@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources>
+  <string name="app_name_zom">安全聊天</string>
+  <string name="me_title">我</string>
+  <string name="add_account_action">編輯帳戶</string>
+</resources>

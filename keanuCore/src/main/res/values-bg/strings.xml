@@ -1,0 +1,303 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Zom</string>
+  <string name="app_name">Zom</string>
+  <string name="im_label">Zom</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">прочети съобщенията</string>
+  <string name="ro_perm_desc">
+Разреши приложения да четат информация от компанията предоставяща чат услугата.</string>
+  <string name="wo_perm_label">напиши съобщения</string>
+  <string name="wo_perm_desc">
+Разреши приложения да предоставят информация за записване на компанията предоставяща чат услугата.</string>
+  <string name="perm_label">стартирай чат услуга</string>
+  <string name="perm_desc">Разреши други програми да стартират чатове.</string>
+  <!--General: Actions-->
+  <string name="confirm">Потвърди</string>
+  <string name="ok">ОК</string>
+  <string name="cancel">Откажи</string>
+  <string name="yes">ОК</string>
+  <string name="no">Откажи</string>
+  <string name="connect">Свържи се</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Сложи Парола</string>
+  <string name="lock_screen_confirm_passphrase">Потвърди Паролата</string>
+  <string name="lock_screen_passphrase_hint">Парола</string>
+  <string name="lock_screen_passphrase_not_set_enter">Нова Парола</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Потвърди Новата Паролата</string>
+  <string name="lock_screen_passphrases_not_matching">Паролите не съвпадат, моля, опитай отново</string>
+  <string name="lock_screen_skip">Мързи ме (Без Парола!)</string>
+  <!--Views: Setup-->
+  <string name="add_account">Добави <xliff:g id="account">%1$s</xliff:g> профил</string>
+  <string name="menu_about">За програмата</string>
+  <string name="signed_out_prompt_with_error">Отписан си от <xliff:g id="account">%1$s</xliff:g>, защото <xliff:g id="reason">%2$s</xliff:g></string>
+  <string name="pass_err_length">Паролата не е достатъчно дълга</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Впиши ме</string>
+  <string name="account_setup_example_email_address">user@domain.com</string>
+  <string name="account_setup_new_username">ново потребителско име</string>
+  <string name="account_setup_password">парола</string>
+  <string name="account_setup_password_confirm">потвърди паролата</string>
+  <string name="btn_create_new_account">Регистрирай Профил</string>
+  <string name="account_setup_pers_now_title">Впиши се Сега</string>
+  <string name="select_domain_new_account">Избери доставчик</string>
+  <string name="registering_new_account_">Регистрирване на нов профил…</string>
+  <string name="signing_in_wait">Вписване\u2026</string>
+  <string name="signing_out_wait">Отписване\u2026</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">Търси с SRV</string>
+  <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">Използвай DNS SRV, за да откриеш реалните XMPP сървър и домейн.</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Разреши изпращането на потребителското име и парола като видим от всекиго текст, когато използваш не шифрован транспорт</string>
+  <string name="allow_plain_text_auth">Разреши оторизиране с видим от всекиго текст</string>
+  <string name="require_tls_ssl_connection">Изисква TLS връзка</string>
+  <string name="transport_encryption">Шифроване на Транспорта</string>
+  <string name="how_encrypted_chats_are_started">как да започнеш шифрован чат</string>
+  <string name="the_server_to_connect_to_if_needed">Сървър за свързване, в случай на нужда</string>
+  <string name="connect_server">Свържи се със Сървъра</string>
+  <string name="tcp_port_for_xmpp_server">TCP Порт за XMPP Сървър</string>
+  <string name="server_port">Порт на Сървъра</string>
+  <string name="xmpp_resource">XMPP Ресурс</string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">да разграничиш това свързване от други програми, с които си вписан</string>
+  <string name="xmpp_resource_prio_title">Приоритет на XMPP Ресурса</string>
+  <string name="xmpp_resource_prio_summary">Съобщения до клиенти с множество активни ресурса ще бъдат изпратени до ресурса с най-висок приоритет</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">Дискусии</string>
+  <string name="empty_account_message">Нямаш⏎
+настроени профили.⏎
+⏎
+Чукни тук, за да добавиш!</string>
+  <string name="menu_remove_contact">Изтрий контакта</string>
+  <string name="menu_contact_nickname">Прякор на контакта</string>
+  <string name="menu_view_blocked">Блокиран</string>
+  <string name="nickname">Прякор</string>
+  <string name="confirm_delete_contact">Контактът "<xliff:g id="user">%1$s</xliff:g>" ще бъде премахнат.</string>
+  <string name="confirm_block_contact">Контактът "<xliff:g id="user">%1$s</xliff:g>" ще бъде блокиран.</string>
+  <string name="add_contact_success">Контактът "<xliff:g id="user">%1$s</xliff:g>" добавен.</string>
+  <string name="delete_contact_success">Контактът "<xliff:g id="user">%1$s</xliff:g>" изтрит.</string>
+  <string name="block_contact_success">Контактът "<xliff:g id="user">%1$s</xliff:g>" блокиран.</string>
+  <string name="unblock_contact_success">Контактът "<xliff:g id="user">%1$s</xliff:g>" разблокиран.</string>
+  <string name="menu_verify">Потвърди Ключа</string>
+  <string name="empty_conversation_group">Дискусията е празна</string>
+  <string name="search_label">Контакт</string>
+  <string name="search_hint">въведи името на контакта, с когото искаш да си пишеш</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online"><xliff:g id="user">%1$s</xliff:g> е на линия</string>
+  <string name="contact_away"><xliff:g id="user">%1$s</xliff:g> отсъства</string>
+  <string name="contact_busy"><xliff:g id="user">%1$s</xliff:g> е зает</string>
+  <string name="contact_offline"><xliff:g id="user">%1$s</xliff:g> не е вписан</string>
+  <string name="contact_joined"><xliff:g id="user">%1$s</xliff:g> се присъедини</string>
+  <string name="contact_left"><xliff:g id="user">%1$s</xliff:g> напусна</string>
+  <string name="file_transfer">Прехвърляне на Файл</string>
+  <string name="accept_transfer_">Приеми прехвърляне?</string>
+  <string name="wants_to_send_you_the_file">иска да ти изпрати файл</string>
+  <string name="no_connection_for_sending">Няма активна връзка за споделяне!</string>
+  <string name="compose_hint">Прати съобщение</string>
+  <string name="compose_hint_secure">Прати поверително съобщение </string>
+  <string name="menu_end_conversation">Прекрати чата</string>
+  <string name="select_link_title">Избери препратка</string>
+  <string name="delete">Изтрий</string>
+  <string name="export_media">Експортирай медийния файл?</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt"><xliff:g id="user">%1$s</xliff:g> те кани да се присъединиш към групов чат.</string>
+  <string name="accept_invitation">Приеми</string>
+  <string name="decline_invitation">Откажи</string>
+  <string name="connecting_to_group_chat_">Свързване към групов чат…</string>
+  <string name="empty_contact_list">Не са намерени контакти.
+
+Чукни, за да поканиш.</string>
+  <string name="approve_subscription_error">Неуспешен опит да потвърдиш познанство с <xliff:g id="user">%1$s</xliff:g>. Моля, опитай отново по-късно.</string>
+  <string name="decline_subscription_error">Неуспешен опит да откажеш познанство с <xliff:g id="user">%1$s</xliff:g>. Моля, опитай отново по-късно.</string>
+  <!--Security: OTR-->
+  <string name="otr_session_status_finished">Твоят контакт прекрати шифрованият чат.</string>
+  <!--Security: OTR: Keyring-->
+  <string name="detected_Otr_keystore_import">Открихме OTR ключов архив, който може да бъде добавен. Искаш ли да сканираш QR паролата сега?</string>
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Проверка на Самоличостта</string>
+  <string name="smp_question_summary">Въведи въпрос, който да бъде изпратен на контакта и отговорът, който очакваш да получиш от него. Това е с цел да провериш, че контактът е този, за който се представя.</string>
+  <string name="smp_question_hint">въпроса ти</string>
+  <string name="qmp_answer_hint">очакваният отговор</string>
+  <string name="remote_verified_us">Твоят контакт потвърди самоличността ти. Сега ти потвърди неговата  като му зададеш въпрос.</string>
+  <string name="otr_qa_title">OTR Q&amp;A проверка</string>
+  <string name="chat_encryption_title">Чат криптиране</string>
+  <string name="otr_qa_send">Изпрати</string>
+  <string name="otr_qa_cancel">Откажи</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">Сигурност и Неприкосновеност</string>
+  <string name="encryption_and_anonymity_title">Шифроване и Анонимност</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="pref_linkify_on_tor_title">Аквитни препратки към Tor</string>
+  <string name="pref_linkify_on_tor_summary">За профили, използващи Тор, направи препратките активни(ПРЕДУПРЕЖДЕНИЕ, потенциален теч на информация за самоличноста)</string>
+  <string name="menu_locale">Език</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Езици</string>
+  <string name="use_system_default">Използвай системата по подразбиране</string>
+  <string name="button_yes_accept_all">Да, Приеми Всички</string>
+  <string name="pref_delete_unsecured_media_title">Изтрий неподсигурения файл</string>
+  <string name="pref_delete_unsecured_media_summary">След споделяне на снимка или файл, автоматично го изтрий от оригиналното, неподсигурено място на диска</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">Други Настройки</string>
+  <string name="start_on_boot_summary">Винаги стартирай и ме вписвай автоматично във всички профили, в които съм бил вписан преди</string>
+  <string name="hide_offline_contacts">Скрий отписани абонати</string>
+  <string name="foreground_service_title">Задай висок приоритет</string>
+  <string name="foreground_service_summary">Намалява шанса Android да преустанови връзката. Това ще добави известие в лентата за известия.</string>
+  <string name="heartbeat_interval_title">Интервал на сърцебиене</string>
+  <string name="heartbeat_interval_summary">Задай по-високо стойност (в минути), за да пестиш батерията. Твърде високо число може да обърка собственика на услугата и да прекрати връзката поради липса на активност.</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Настройки за известията</string>
+  <string name="notification_enabled_title">Известия при съобщения</string>
+  <string name="notification_enabled_summary">Уведоми в статус лентата, когато пристигне ново чат съобщение</string>
+  <string name="notification_vibrate_title">Вибрирай</string>
+  <string name="notification_vibrate_summary">Също вибрирай, когато пристигне чат съобщение</string>
+  <string name="notification_sound_title">Звук</string>
+  <string name="notification_sound_summary">Също прозвъни, когато пристигне съобщение</string>
+  <string name="notification_ringtone_title">Използвай специален Zom звуков сигнал</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">Разреши Дебъг Докладите</string>
+  <string name="pref_debug_summary">Препращай информацията от логът към стандартния изход / логкат при дебъгване</string>
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message">
+Програмата се нуждае от връзка с интернет(включително и на заден фон), за да може да те вписва.</string>
+  <string name="prompt_create_new_account_">Създай нов профил?</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">Създай нов чат профил за потребител \'%1$s\'?</string>
+  <!--Alerts: Notifications-->
+  <string name="subscription_notify_text">Нова покана за приятелство от <xliff:g id="user">%s</xliff:g></string>
+  <string name="file_notify_text">Нов файл <xliff:g id="filename">%1$s</xliff:g> от <xliff:g id="user">%2$s</xliff:g></string>
+  <string name="notify_groupchat_label">Покана за групов чат</string>
+  <string name="group_chat_invite_notify_text">Нова покана за групов чат от <xliff:g id="user">%s</xliff:g></string>
+  <string name="new_messages_notify">Ново съобщение от</string>
+  <string name="app_unlocked">Активиран &amp; отключен</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">Внимание</string>
+  <string name="error_prefix">Грешка:</string>
+  <string name="general_error">Грешка с код <xliff:g id="code">%1$d</xliff:g></string>
+  <string name="login_service_failed">Неуспешен опит за вписване в <xliff:g id="service">%1$s</xliff:g>. Моля, опитайте отново по-късно\n(Информация: <xliff:g id="description">%2$s</xliff:g>)</string>
+  <string name="add_list_failed">Списъкът не е добавен.</string>
+  <string name="block_contact_failed">Контактът не е блокиран.</string>
+  <string name="unblock_contact_failed">Контактът не е разблокиран.</string>
+  <string name="load_contact_list_failed">Списъкът с контакти не е зареден.</string>
+  <string name="cant_connect_to_server">Неуспешен опит за връзка със сървъра. Моля, провери интернет връзката си.</string>
+  <string name="contact_already_exist">"<xliff:g id="user">%1$s</xliff:g>" е в списъка ти с Контакти.</string>
+  <string name="contact_blocked">Контактът "<xliff:g id="user">%1$s</xliff:g>" е блокиран.</string>
+  <string name="contact_not_loaded">Моля, изчакай докато списъка ти с Контакти се зарежда.</string>
+  <string name="network_error">Настъпи проблем с интернет връзката.</string>
+  <string name="wifi_not_connected_error">WiFi е нужно за тази връзка.</string>
+  <string name="service_not_support">Сървърът не подържа тази функция.</string>
+  <string name="invalid_password">Въведената парола е невалидна.</string>
+  <string name="internal_server_error">Възника вътрешен проблем със сървърът.</string>
+  <string name="not_implemented">Сървърът не подържа тази функция.</string>
+  <string name="service_unavaiable">Сървърът е временно недостъпен.</string>
+  <string name="timeout">Връзка със сървърът отнема твърде дълго.</string>
+  <string name="version_not_supported">Сървърът не подържа тази версия.</string>
+  <string name="message_queue_full">Прекалено много съобщения чакат на опашка да бъдат изпратени от сървъра.</string>
+  <string name="domain_not_supported">Сървърът не подържа препращане към този домейн.</string>
+  <string name="unknown_user">Въвденото потребителско име не е разпознато.</string>
+  <string name="recipient_blocked_the_user">Съжалявам, но си блокиран от потребителя.</string>
+  <string name="session_expired">Сесията изтече, впиши се отново.</string>
+  <string name="forced_logout">вписа се от друга програма.</string>
+  <string name="already_logged_in">вписа се от друга програма.</string>
+  <string name="msisdn_error">Съжалявам, но телфонният ти номер не може да бъде прочетен от SIM картата. Моля, свържи се с оператора си.</string>
+  <string name="not_signed_in">В момента не си вписан.</string>
+  <string name="account_setup_error_server">Zom се натъкна на проблем при свързването със сървъра - моля провери настройките и опитай отново.</string>
+  <string name="error_suspended_connection">Zom загуби връзка с мрежата</string>
+  <string name="unable_to_create_or_join_group_chat">Неуспешен опит за създаване или присъединяване към групов чат</string>
+  <string name="unsupported_incoming_data">Неподържан поток от информация, споделянето невъзможно!</string>
+  <string name="there_is_no_viewer_available_for_this_file_format">Липсва подходяща програма за възпроизвеждане на файл в този формат</string>
+  <string name="otr_keysync_warning_message">Моля копирай \'otr_keystore.ofcaes\' от компютърната програма OtrFileConverter до root директрията на твоето мобилно устройство</string>
+  <string name="msg_sent_failed">Това съобщение не може да бъде пратено.</string>
+  <string name="disconnected_warning">Съобщенията ще бъдат пратени, когато се свържеш</string>
+  <string name="error_account_password_mismatch">Паролите не съвпадат</string>
+  <string name="error_account_settings_priority">Приоритетът трябва да е число в диапозона [0..127]</string>
+  <string name="error_account_settings_port">Портът трябва да е число</string>
+  <string name="error_welcome_database">Голям проблем: Неуспешно отключванеи зареждане на базата данни. Моля, преинсталирайте програмата или изтрийте информацията.</string>
+  <string name="account_settings_title">Account Settings</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Групи</string>
+  <string name="buddies">Приятели</string>
+  <string name="contacts">Контакти</string>
+  <string name="mtm_accept_cert">Приеми Сертификата на Сървъра?</string>
+  <string name="loading">зареждане…</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Настройки</string>
+  <string name="menu_sign_out">Отпиши се</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">На линия</string>
+  <string name="presence_busy">Зает</string>
+  <string name="presence_away">Отсъства</string>
+  <string name="presence_idle">Бездейства</string>
+  <string name="presence_offline">Отписан</string>
+  <string name="presence_invisible">Невидим</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Щастлив</item>
+    <item>Тъжен</item>
+    <item>Намигващ</item>
+    <item>Изплезен език</item>
+    <item>Изненадан</item>
+    <item>Целуващ</item>
+    <item>Крещящ</item>
+    <item>Спокоен</item>
+    <item>Пари в устата</item>
+    <item>Изтървал се</item>
+    <item>Засрамен</item>
+    <item>Ангел</item>
+    <item>Нерешен</item>
+    <item>Плачещ</item>
+    <item>Пазещ тайна</item>
+    <item>Смеещ се</item>
+    <item>Объркан</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Щастлив</item>
+    <item>Тъжен</item>
+    <item>Намигващ</item>
+    <item>Изплезен език</item>
+    <item>Изненадан</item>
+    <item>Целуващ</item>
+    <item>Крещящ</item>
+    <item>Спокоен</item>
+    <item>Пари в устата</item>
+    <item>Изтървал се</item>
+    <item>Засрамен</item>
+    <item>Ангел</item>
+    <item>Нерешен</item>
+    <item>Плачещ</item>
+    <item>Пазещ тайна</item>
+    <item>Смеещ се</item>
+    <item>Объркан</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="this_is_a_group_chat">Това е групов чат</string>
+  <string name="unable_to_securely_share_this_file">Не е възможно сигурно споделяне на този файл</string>
+  <string name="swipe_hint">&lt; плъзнете наляво и надясно за допълнителни опции &gt;</string>
+  <string name="title_me">Аз</string>
+</resources>

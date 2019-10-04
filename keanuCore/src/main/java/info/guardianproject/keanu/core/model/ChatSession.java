@@ -49,6 +49,11 @@ public class ChatSession {
 
     }
 
+    public String getPublicAddress ()
+    {
+        return mManager.getPublicAddress(this);
+    }
+
     public void setPublic (boolean isPublic)
     {
         mManager.setPublic(this, isPublic);

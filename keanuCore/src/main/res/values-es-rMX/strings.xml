@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <!--General: Permissions-->
+  <string name="ro_perm_label">leer mensajes instantáneas</string>
+  <string name="ro_perm_desc">⏎
+Deja que las aplicaciones lean datos de proveedor de contenido MI.⏎</string>
+  <string name="wo_perm_label">escribe mensajes instantáneas
+escribir mensajes instantáneas
+escriba mensajes instantáneas</string>
+  <string name="wo_perm_desc">
+Deja que las aplicaciones escriban datos al proveedor de contenido MI. </string>
+  <string name="perm_label">iniciar servicio de mensajería instantánea</string>
+  <string name="perm_desc">Permite a las aplicaciones iniciar el servicio de mensajería instantánea por medio de intent.</string>
+  <!--General: Actions-->
+  <string name="confirm">Confirmar</string>
+  <string name="ok">Aceptar</string>
+  <string name="cancel">Cancelar</string>
+  <string name="yes">Aceptar</string>
+  <string name="no">Cancelar</string>
+  <!--Views-->
+  <!--Views: Setup-->
+  <string name="add_account">Agregar cuenta <xliff:g id="ACCOUNT">%1$s</xliff:g></string>
+  <string name="menu_about">Sobre</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Inicia sesión</string>
+  <string name="signing_in_wait">Iniciando sesión…</string>
+  <!--Views: Settings: Account-->
+  <string name="xmpp_resource_prio_summary">Mensajes a clientes con multiples recursos activos irán al recurso con alta prioridad. </string>
+  <!--Views: Contact list-->
+  <string name="title_chats">Conversaciones</string>
+  <string name="menu_remove_contact">Eliminar contacto</string>
+  <string name="menu_view_blocked">Bloqueado</string>
+  <string name="confirm_delete_contact">El contacto "<xliff:g id="USER">%1$s</xliff:g>" se eliminará.</string>
+  <string name="confirm_block_contact">El contacto "<xliff:g id="USER">%1$s</xliff:g>" se bloqueará.</string>
+  <string name="add_contact_success">Contacto "<xliff:g id="USER">%1$s</xliff:g>" agregado.</string>
+  <string name="delete_contact_success">Contacto "<xliff:g id="USER">%1$s</xliff:g>" eliminado.</string>
+  <string name="block_contact_success">Contacto "<xliff:g id="USER">%1$s</xliff:g>" bloqueado.</string>
+  <string name="unblock_contact_success">Contacto "<xliff:g id="USER">%1$s</xliff:g>" desbloqueado.</string>
+  <string name="empty_conversation_group">No hay conversaciones</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online"><xliff:g id="USER">%1$s</xliff:g> está en línea</string>
+  <string name="contact_away"><xliff:g id="USER">%1$s</xliff:g> está ausente</string>
+  <string name="contact_busy"><xliff:g id="USER">%1$s</xliff:g> está ocupado</string>
+  <string name="contact_offline"><xliff:g id="USER">%1$s</xliff:g> está desconectado</string>
+  <string name="contact_joined"><xliff:g id="USER">%1$s</xliff:g> se ha unido</string>
+  <string name="contact_left"><xliff:g id="USER">%1$s</xliff:g> se ha ido</string>
+  <string name="menu_end_conversation">Finalizar chat</string>
+  <string name="select_link_title">Seleccionar vínculo</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt"><xliff:g id="USER">%1$s</xliff:g> te ha invitado a unirte a un grupo de chat.</string>
+  <string name="accept_invitation">Aceptar</string>
+  <string name="decline_invitation">Rechazar</string>
+  <string name="approve_subscription_error">No se ha podido aprobar la suscripción de <xliff:g id="USER">%1$s</xliff:g>. Vuelve a intentarlo más tarde.</string>
+  <string name="decline_subscription_error">No se ha podido declinar la suscripción de <xliff:g id="USER">%1$s</xliff:g>. Vuelve a intentarlo más tarde.</string>
+  <!--Security: OTR-->
+  <!--Security: OTR: Keyring-->
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Autenticación</string>
+  <string name="smp_question_summary">Introducir una pregunta para mandar a tu contacto, y la respuesta que esperes que te diera, para poder verificar que es realmente quién te declara quien es. </string>
+  <string name="smp_question_hint">la pregunta para preguntar</string>
+  <string name="qmp_answer_hint">la respuesta que esperes</string>
+  <string name="otr_qa_send">Enviar</string>
+  <string name="otr_qa_cancel">Cancelar</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="encryption_and_anonymity_title">Encripción y Anonimidad</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">Idioma</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Idiomas</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="hide_offline_contacts">Ocultar contactos desconectados</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Configuración de notificación</string>
+  <string name="notification_enabled_title">Notific. de mensaj. instantánea</string>
+  <string name="notification_enabled_summary">Notificar en la barra de estado cuando llega mensajería instantánea</string>
+  <string name="notification_vibrate_title">Vibrar</string>
+  <string name="notification_vibrate_summary">Vibrar también cuando llega mensajería instantánea</string>
+  <string name="notification_sound_title">Sonido</string>
+  <string name="notification_sound_summary">Reproducir también tono de timbre cuando llega mensajería instantánea</string>
+  <!--Actions: Settings: General: Developer-->
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message"><xliff:g id="PROVIDER">%1$s</xliff:g> necesita que se habiliten datos de fondo.</string>
+  <!--Alerts: Notifications-->
+  <string name="notify_groupchat_label">Invitación para chat en grupo</string>
+  <string name="new_messages_notify">Nuevo(s) mensaje(s) de</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">Atención</string>
+  <string name="general_error">Código de error <xliff:g id="CODE">%1$d</xliff:g></string>
+  <string name="login_service_failed">No es posible iniciar sesión en el servicio <xliff:g id="SERVICE">%1$s</xliff:g>. Vuelve a intentarlo más tarde."\n"(Detalle:<xliff:g id="DESCRIPTION">%2$s</xliff:g>)</string>
+  <string name="add_list_failed">La lista no se agregó.</string>
+  <string name="block_contact_failed">El contacto no se bloqueó.</string>
+  <string name="unblock_contact_failed">El contacto no se desbloqueó.</string>
+  <string name="load_contact_list_failed">La lista de contactos no se cargó.</string>
+  <string name="cant_connect_to_server">No es posible conectarse al servidor. Verifica tu conexión.</string>
+  <string name="contact_already_exist"><xliff:g id="USER">%1$s</xliff:g> ya existe en tu lista de contactos.</string>
+  <string name="contact_blocked">El contacto "<xliff:g id="USER">%1$s</xliff:g>" ha sido bloqueado.</string>
+  <string name="contact_not_loaded">Espera mientras se carga tu lista de contactos</string>
+  <string name="network_error">Se ha producido un error en la red.</string>
+  <string name="wifi_not_connected_error">Se requiere WiFi para esta conexión.</string>
+  <string name="service_not_support">El servidor no admite esta funcionalidad.</string>
+  <string name="invalid_password">La contraseña ingresada no es válida.</string>
+  <string name="internal_server_error">EL servidor encontró un error.</string>
+  <string name="not_implemented">El servidor no admite esta funcionalidad.</string>
+  <string name="service_unavaiable">El servidor no está disponible en este momento.</string>
+  <string name="timeout">El tiempo del servidor se ha agotado.</string>
+  <string name="version_not_supported">El servidor no admite la versión actual.</string>
+  <string name="message_queue_full">La lista de mensajes está llena.</string>
+  <string name="domain_not_supported">El servidor no admite reenviar al dominio.</string>
+  <string name="unknown_user">El nombre de usuario que has ingresado no está reconocido.</string>
+  <string name="recipient_blocked_the_user">Lo sentimos, el usuario te ha bloqueado.</string>
+  <string name="session_expired">La sesión ha expirado. Vuelve a iniciar sesión</string>
+  <string name="forced_logout">has iniciado sesión desde otro cliente.</string>
+  <string name="already_logged_in">ya has iniciado sesión desde otro cliente.</string>
+  <string name="msisdn_error">El número de teléfono no puede leerse de tu tarjeta SIM. Ponte en contacto con tu operador para obtener ayuda.</string>
+  <string name="not_signed_in">Actualmente, no has iniciado sesión.</string>
+  <string name="msg_sent_failed">Este mensaje no pudo enviarse.</string>
+  <string name="account_settings_title">Configuración de Cuentas</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Grupos</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Configuración</string>
+  <string name="menu_sign_out">Cerrar sesión</string>
+  <!--Other: Provider-->
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">En línea</string>
+  <string name="presence_busy">Ocupado</string>
+  <string name="presence_away">Ausente</string>
+  <string name="presence_idle">Inactivo</string>
+  <string name="presence_offline">Desconectado</string>
+  <string name="presence_invisible">Aparecer desconectado</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Feliz</item>
+    <item>Triste</item>
+    <item>Guiñando un ojo</item>
+    <item>Con la lengua afuera</item>
+    <item>Sorprendido</item>
+    <item>Besando</item>
+    <item>Gritando</item>
+    <item>En la onda</item>
+    <item>Dinero en boca</item>
+    <item>Meter la pata</item>
+    <item>Avergonzado</item>
+    <item>Ángel</item>
+    <item>Indeciso</item>
+    <item>Llorando</item>
+    <item>Los labios están cerrados</item>
+    <item>Riendo</item>
+    <item>Confundido</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Feliz</item>
+    <item>Triste</item>
+    <item>Guiñando un ojo</item>
+    <item>Con la lengua afuera</item>
+    <item>Sorprendido</item>
+    <item>Besando</item>
+    <item>Gritando</item>
+    <item>En la onda</item>
+    <item>Dinero en boca</item>
+    <item>Meter la pata</item>
+    <item>Avergonzado</item>
+    <item>Ángel</item>
+    <item>Indeciso</item>
+    <item>Llorando</item>
+    <item>Los labios están cerrados</item>
+    <item>Riendo</item>
+    <item>Confundido</item>
+  </string-array>
+  <string name="title_me">Yo</string>
+</resources>

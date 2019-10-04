@@ -1,0 +1,277 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Zom</string>
+  <string name="app_name">Zom</string>
+  <string name="im_label">Zom</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">baca pesan instan</string>
+  <string name="ro_perm_desc">
+        Perbolehkan aplikasi untuk membaca data dari penyedia konten IM.
+    </string>
+  <string name="wo_perm_label">tulis pesan instan</string>
+  <string name="wo_perm_desc">
+        Perbolehkan aplikasi untuk menulis data ke penyedia konten IM.
+    </string>
+  <string name="perm_label">mulai layanan IM</string>
+  <string name="perm_desc">Perbolehkan aplikasi untuk memulai layanan IM menggunakan intent.</string>
+  <!--General: Actions-->
+  <string name="confirm">Penegasan</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Batal</string>
+  <string name="yes">OK</string>
+  <string name="no">Batal</string>
+  <string name="connect">Hubungkan</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Setel Password</string>
+  <string name="lock_screen_confirm_passphrase">Tegaskan Password</string>
+  <string name="lock_screen_passphrase_hint">Password</string>
+  <string name="lock_screen_passphrase_not_set_enter">Password Baru</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Tegaskan Password Baru</string>
+  <string name="lock_screen_passphrases_not_matching">Password tidak cocok, silahkan coba lagi</string>
+  <string name="lock_screen_skip">Saya Merasa Malas (Tanpa Password!)</string>
+  <!--Views: Setup-->
+  <string name="add_account">Tambah akun <xliff:g id="account">%1$s</xliff:g> </string>
+  <string name="menu_about">Tentang</string>
+  <string name="signed_out_prompt_with_error">Anda telah melakukan Sign Out dari <xliff:g id="account">%1$s</xliff:g> karena <xliff:g id="reason">%2$s</xliff:g></string>
+  <string name="pass_err_length">Passphrase anda tidak cukup panjang</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Masuk</string>
+  <string name="account_setup_example_email_address">user@domain.com</string>
+  <string name="account_setup_new_username">username baru</string>
+  <string name="account_setup_password">password</string>
+  <string name="account_setup_password_confirm">penegasan password</string>
+  <string name="btn_create_new_account">Pendaftaran Akun</string>
+  <string name="account_setup_pers_now_title">Sign In Sekarang</string>
+  <string name="select_domain_new_account">Pilih sebuah domain</string>
+  <string name="registering_new_account_">Mendaftarkan akun baru…</string>
+  <string name="signing_in_wait">Melakukan Sign In\u2026</string>
+  <string name="signing_out_wait">Melakukan Sign Out\u2026</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">Lakukan SRV Lookup</string>
+  <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">Gunakan DNS SRV untuk mencari server XMPP sebenarnya dari nama domain</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Izinkan username dan password dikirim sebagai teks biasa ketika menggunakan transport yang tidak dienkripsi</string>
+  <string name="allow_plain_text_auth">Izinkan Otentifikasi dengan Teks Biasa</string>
+  <string name="require_tls_ssl_connection">Memerlukan Koneksi TLS</string>
+  <string name="transport_encryption">Enkripsi Transport</string>
+  <string name="how_encrypted_chats_are_started">bagaimana enkripsi percakapan dimulai</string>
+  <string name="the_server_to_connect_to_if_needed">Server yang ingin dihubungi, jika diperlukan</string>
+  <string name="connect_server">Menghubungi Server</string>
+  <string name="tcp_port_for_xmpp_server">Port TCP untuk Server XMPP</string>
+  <string name="server_port">Port Server</string>
+  <string name="xmpp_resource">Sumberdaya XMPP</string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">untuk membedakan koneksi ini dari klien lain yang juga sedang Log In</string>
+  <string name="xmpp_resource_prio_title">Prioritas Sumberdaya XMPP</string>
+  <string name="xmpp_resource_prio_summary">Pesan ke klien dengan beberapa sumberdaya aktif akan dikirim ke sumberdaya yang memiliki prioritas tertinggi</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">Percakapan</string>
+  <string name="empty_account_message">Anda tidak memiliki
+akun yang dikonfigurasi.
+
+Ketuk di sini untuk menambah!</string>
+  <string name="menu_remove_contact">Hapus kontak</string>
+  <string name="menu_view_blocked">Diblokir</string>
+  <string name="confirm_delete_contact">Kontak "<xliff:g id="user">%1$s</xliff:g>" akan dihapus.</string>
+  <string name="confirm_block_contact">Kontak "<xliff:g id="user">%1$s</xliff:g>" akan diblokir.</string>
+  <string name="add_contact_success">Kontak "<xliff:g id="user">%1$s</xliff:g>" ditambahkan.</string>
+  <string name="delete_contact_success">Kontak "<xliff:g id="user">%1$s</xliff:g>" dihapus.</string>
+  <string name="block_contact_success">Kontak "<xliff:g id="user">%1$s</xliff:g>" diblokir.</string>
+  <string name="unblock_contact_success">Kontak "<xliff:g id="user">%1$s</xliff:g>" batal diblokir.</string>
+  <string name="menu_verify">Sahkan Key</string>
+  <string name="empty_conversation_group">Tidak terdapat percakapan</string>
+  <string name="search_label">Kontak</string>
+  <string name="search_hint">ketika nama kontak dengan siapa anda ingin mengobrol</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online"><xliff:g id="user">%1$s</xliff:g> sedang online</string>
+  <string name="contact_away"><xliff:g id="user">%1$s</xliff:g> sedang tidak di tempat</string>
+  <string name="contact_busy"><xliff:g id="user">%1$s</xliff:g> sedang sibuk</string>
+  <string name="contact_offline"><xliff:g id="user">%1$s</xliff:g> sedang offline</string>
+  <string name="contact_joined"><xliff:g id="user">%1$s</xliff:g> telah bergabung</string>
+  <string name="contact_left"><xliff:g id="user">%1$s</xliff:g> telah keluar</string>
+  <string name="file_transfer">Transfer File</string>
+  <string name="accept_transfer_">Terima transfer?</string>
+  <string name="wants_to_send_you_the_file">ingin mengirim anda file</string>
+  <string name="compose_hint">Kirim sebuah pesan</string>
+  <string name="compose_hint_secure">Kirim pesan aman</string>
+  <string name="menu_end_conversation">Sudahi percakapan</string>
+  <string name="select_link_title">Pilih tautan</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt"><xliff:g id="user">%1$s</xliff:g> mengundang anda untuk bergabung di percakapan grup.</string>
+  <string name="accept_invitation">Setuju</string>
+  <string name="decline_invitation">Tolak</string>
+  <string name="connecting_to_group_chat_">Menghubungi percakapan grup…</string>
+  <string name="empty_contact_list">Kontak tidak ditemukan.
+
+Sentuh untuk mengundang.</string>
+  <string name="approve_subscription_error">Tidak dapat menyetujui langganan dari <xliff:g id="user">%1$s</xliff:g>. Silahkan coba lagi.</string>
+  <string name="decline_subscription_error">Tidak dapat menolak langganan dari <xliff:g id="user">%1$s</xliff:g>. Silahkan coba lagi.</string>
+  <!--Security: OTR-->
+  <string name="otr_session_status_finished">Kontak anda telah menghentikan percakapan terenkripsi.</string>
+  <!--Security: OTR: Keyring-->
+  <string name="detected_Otr_keystore_import">Kami mendeteksi sebuah OTR keystore yang bisa diimpor. Apakah anda mau memindai password QR sekarang?</string>
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Otentifikasi</string>
+  <string name="smp_question_summary">Masukkan pertanyaan yang akan dikirim ke kontak, dan jawaban yang anda harapkan akan diberikan oleh mereka, untuk memastikan bahwa mereka adalah benar sesuai pengakuannya.</string>
+  <string name="smp_question_hint">pertanyaan yang akan ditanyakan</string>
+  <string name="qmp_answer_hint">jawaban yang diharapkan</string>
+  <string name="remote_verified_us">Kontak anda berhasil mengotentikasi anda. Sekarang otentikasi kontak anda dengan menanyakan pertanyaan anda.</string>
+  <string name="otr_qa_send">Kirim</string>
+  <string name="otr_qa_cancel">Batal</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">Keamanan dan Privasi</string>
+  <string name="encryption_and_anonymity_title">Enkripsi dan Anonimitas</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">Bahasa</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Bahasa - bahasa</string>
+  <string name="button_yes_accept_all">Ya, Setujui Semua</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">Penyesuaian Lain</string>
+  <string name="start_on_boot_summary">Selalu mulai dan otomatis lakukan Sign In ke akun yang sebelumnya telah Log In</string>
+  <string name="hide_offline_contacts">Sembunyikan kontak offline</string>
+  <string name="foreground_service_title">Gunakan prioritas latar depan</string>
+  <string name="foreground_service_summary">Mengurangi kemungkinan Android untuk memulai kembali layanan koneksi. Ini akan menempatkan sebuah ikon pada notification area.</string>
+  <string name="heartbeat_interval_title">Rentang waktu Heartbeat</string>
+  <string name="heartbeat_interval_summary">Gunakan nilai yang lebih besar (dalam menit) untuk menghemat baterai. Nilai yang besar dapat menyebabkan penyedia layanan menutup koneksi karena tidak ada aktifitas.</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Pengaturan pemberitahuan</string>
+  <string name="notification_enabled_title">Notifikasi IM</string>
+  <string name="notification_enabled_summary">Tandai di status bar ketika ada IM</string>
+  <string name="notification_vibrate_title">Getar</string>
+  <string name="notification_vibrate_summary">Getar ketika ada IM</string>
+  <string name="notification_sound_title">Suara</string>
+  <string name="notification_sound_summary">Bunyikan ringtone ketika ada IM</string>
+  <string name="notification_ringtone_title">Gunakan nada dering Zom yang dibuat sendiri</string>
+  <!--Actions: Settings: General: Developer-->
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message">
+         Koneksi data jaringan (termasuk background data) diperlukan aplikasi untuk login.
+    </string>
+  <string name="prompt_create_new_account_">Buat akun baru?</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">Buar sebuah akun percakapan baru untuk username \'%1$s\'?</string>
+  <!--Alerts: Notifications-->
+  <string name="notify_groupchat_label">Undangan percakapan grup</string>
+  <string name="new_messages_notify">Pesan baru dari</string>
+  <string name="app_unlocked">Diaktifkan &amp; tak terkunci</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">Perhatian</string>
+  <string name="general_error">Kode kesalahan <xliff:g id="code">%1$d</xliff:g></string>
+  <string name="add_list_failed">Daftar tidak ditambahkan.</string>
+  <string name="block_contact_failed">Kontak tidak diblokir.</string>
+  <string name="unblock_contact_failed">Kontak tidak dibatalkan blokir.</string>
+  <string name="load_contact_list_failed">Daftar kontak tidak dimuat.</string>
+  <string name="cant_connect_to_server">Tidak dapat menghubungi server. Silahkan cek koneksi anda.</string>
+  <string name="contact_already_exist">"<xliff:g id="user">%1$s</xliff:g>" sudah terdapat di daftar Kontak anda.</string>
+  <string name="contact_blocked">Kontak "<xliff:g id="user">%1$s</xliff:g>" telah diblokir.</string>
+  <string name="contact_not_loaded">Silahkan tunggu sementara daftar Kontak anda dimuat.</string>
+  <string name="network_error">Terjadi kesalahan jaringan.</string>
+  <string name="wifi_not_connected_error">Koneksi ini memerlukan WiFi.</string>
+  <string name="service_not_support">Server tidak mendukung fungsi ini.</string>
+  <string name="invalid_password">Password yang anda masukkan tidak sah.</string>
+  <string name="internal_server_error">Terjadi kesalahan pada server.</string>
+  <string name="not_implemented">Server tidak mendukung fungsi ini.</string>
+  <string name="service_unavaiable">Server sedang tidak tersedia.</string>
+  <string name="timeout">Koneksi server timed out.</string>
+  <string name="version_not_supported">Server tidak mendukung versi ini.</string>
+  <string name="message_queue_full">Antrian pesan penuh.</string>
+  <string name="domain_not_supported">Server tidak mendukung penerusan ke domain.</string>
+  <string name="unknown_user">Username yang anda masukkan tidak dikenali.</string>
+  <string name="recipient_blocked_the_user">Maaf, anda diblokir oleh pengguna.</string>
+  <string name="session_expired">Sesi sudah berakhir, silahkan lakukan Sign In lagi.</string>
+  <string name="forced_logout">anda telah Sign In dari klien lain.</string>
+  <string name="already_logged_in">anda telah Sign In dari klien lain.</string>
+  <string name="msisdn_error">Maaf, nomor telepon tidak dapat dibaca dari kartu SIM anda. Silahkan hubungi operator anda untuk bantuan.</string>
+  <string name="not_signed_in">Saat ini anda tidak Sign In.</string>
+  <string name="account_setup_error_server">Zom mengalami masalah ketika menghubungi server percakapan - silahkan cek konfigurasi dan coba lagi.</string>
+  <string name="error_suspended_connection">Zom kehilangan koneksi ke jaringan</string>
+  <string name="unable_to_create_or_join_group_chat">Tidak dapat membuat atau bergabung ke percakapan grup</string>
+  <string name="otr_keysync_warning_message">Silahkan salin file \'otr_keystore.ofcaes\' dari desktop dengan alat OtrFileConverter ke root directory penyimpanan</string>
+  <string name="msg_sent_failed">Pesan ini tidak dapat dikirim.</string>
+  <string name="disconnected_warning">Pesan akan dikirim ketika terhubung kembali</string>
+  <string name="account_settings_title">Pengaturan Akun</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Grup</string>
+  <string name="buddies">Teman - teman</string>
+  <string name="contacts">Kontak</string>
+  <string name="mtm_accept_cert">Terima Certificate Server?</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Pengaturan</string>
+  <string name="menu_sign_out">Keluar</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">Online</string>
+  <string name="presence_busy">Sibuk</string>
+  <string name="presence_away">Tidak di tempat</string>
+  <string name="presence_idle">Diam</string>
+  <string name="presence_offline">Offline</string>
+  <string name="presence_invisible">Tampak offline</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Gembira</item>
+    <item>Sedih</item>
+    <item>Berkedip</item>
+    <item>Menjulurkan lidah</item>
+    <item>Terkejut</item>
+    <item>Mencium</item>
+    <item>Teriak</item>
+    <item>Jaim</item>
+    <item>Mulut uang</item>
+    <item>Kaki di muut</item>
+    <item>Malu</item>
+    <item>Malaikat</item>
+    <item>Bimbang</item>
+    <item>Menangis</item>
+    <item>Tutup mulut</item>
+    <item>Tertawa</item>
+    <item>Bingung</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Gembira</item>
+    <item>Sedih</item>
+    <item>Berkedip</item>
+    <item>Menjulurkan lidah</item>
+    <item>Terkejut</item>
+    <item>Mencium</item>
+    <item>Teriak</item>
+    <item>Jaim</item>
+    <item>Mulut uang</item>
+    <item>Kaki di muut</item>
+    <item>Malu</item>
+    <item>Malaikat</item>
+    <item>Bimbang</item>
+    <item>Menangis</item>
+    <item>Tutup mulut</item>
+    <item>Tertawa</item>
+    <item>Bingung</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="title_me">Saya</string>
+</resources>

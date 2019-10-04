@@ -179,9 +179,15 @@ interface IChatSession {
      void grantAdmin(String contact);
 
 /**
-     * Make a contact admin in a group chat
+     * Make a group able to be joined via a link
      **/
      void setPublic(boolean isPublic);
+
+
+/**
+     * Get links for public address
+     **/
+     String getPublicAddress();
 
      /**
       * Mark this chat session as seen.

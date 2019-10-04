@@ -20,6 +20,7 @@ import org.matrix.androidsdk.data.RoomState;
 import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.model.Event;
 import org.matrix.androidsdk.rest.model.MatrixError;
+import org.matrix.androidsdk.rest.model.RoomDirectoryVisibility;
 import org.matrix.androidsdk.rest.model.RoomMember;
 import org.matrix.androidsdk.rest.model.User;
 
@@ -458,19 +459,46 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
     }
 
+    public String getPublicAddress (ChatSession session)
+    {
+
+        Room room = getRoom(session);
+
+        List<String> listAlias = room.getAliases();
+
+        if (listAlias != null && (!listAlias.isEmpty()))
+        {
+            return listAlias.get(0);
+        }
+
+        return null;
+    }
+
     public void setPublic (ChatSession session, boolean isPublic)
     {
         Room room = getRoom(session);
 
         if (isPublic)
         {
+            List<String> listAlias = room.getAliases();
+            if (listAlias == null || listAlias.isEmpty())
+            {
+                String alias = "#" + room.getRoomId().substring(1);
+                room.addAlias(alias,new BasicApiCallback("setAlias"));
+                room.updateCanonicalAlias(alias,new BasicApiCallback("setAlias"));
+
+            }
+
             room.updateJoinRules(RoomState.JOIN_RULE_PUBLIC, new BasicApiCallback("updateJoinRules"));
-            room.updateGuestAccess(RoomState.GUEST_ACCESS_FORBIDDEN, new BasicApiCallback("updateGuestAccess"));
+            room.updateGuestAccess(RoomState.GUEST_ACCESS_CAN_JOIN, new BasicApiCallback("updateGuestAccess"));
+
         }
         else
         {
             room.updateJoinRules(RoomState.JOIN_RULE_INVITE, new BasicApiCallback("updateJoinRules"));
             room.updateGuestAccess(RoomState.GUEST_ACCESS_FORBIDDEN, new BasicApiCallback("updateGuestAccess"));
+            room.updateDirectoryVisibility(RoomDirectoryVisibility.DIRECTORY_VISIBILITY_PRIVATE , new BasicApiCallback("updateDirectoryVisibility"));
+
         }
     }
 }

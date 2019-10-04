@@ -1941,6 +1941,11 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     }
 
 
+    public String getPublicAddress ()
+    {
+        return mChatSession.getPublicAddress();
+    }
+
     public void setPublic (boolean isPublic)
     {
         mChatSession.setPublic(isPublic);

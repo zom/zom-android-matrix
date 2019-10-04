@@ -148,6 +148,8 @@ public abstract class ChatSessionManager {
 
     public abstract void enableEncryption (ChatSession session, boolean encryption);
     public abstract void setPublic (ChatSession session, boolean isPublic);
+    public abstract String getPublicAddress (ChatSession session);
+
 
 
 

@@ -1,0 +1,279 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Zom</string>
+  <string name="app_name">Zom</string>
+  <string name="im_label">Zom</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">læs beskeder</string>
+  <string name="ro_perm_desc">
+Tillader applikationer at læse data fra IM-indholdsleverandøren.
+</string>
+  <string name="wo_perm_label">skriv beskeder</string>
+  <string name="wo_perm_desc">
+Tillader applikationer at skrive data til IM-indholdsleverandøren.</string>
+  <string name="perm_label">start IM-tjeneste</string>
+  <string name="perm_desc">Lader programmer starte IM-tjeneste efter hensigt.</string>
+  <!--General: Actions-->
+  <string name="confirm">Bekræft</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Annuller</string>
+  <string name="yes">OK</string>
+  <string name="no">Annuller</string>
+  <string name="connect">Forbind</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Sæt adgangskode</string>
+  <string name="lock_screen_confirm_passphrase">Bekræft adgangskode</string>
+  <string name="lock_screen_passphrase_hint">Adgangskode</string>
+  <string name="lock_screen_passphrase_not_set_enter">Ny adgangskode</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Bekræft ny adgangskode</string>
+  <string name="lock_screen_passphrases_not_matching">Adgangskoder var ikke identiske, prøv igen </string>
+  <string name="lock_screen_skip">Jeg er så doven (ingen adgangskode!)</string>
+  <!--Views: Setup-->
+  <string name="add_account">Tilføj <xliff:g id="ACCOUNT">%1$s</xliff:g> konto</string>
+  <string name="menu_about">Om</string>
+  <string name="signed_out_prompt_with_error">Du er blevet logget ud af <xliff:g id="account">%1$s</xliff:g>, fordi <xliff:g id="reason">%2$s</xliff:g>.</string>
+  <string name="pass_err_length">Din adgangsfrase var ikke lang nok</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Log ind</string>
+  <string name="account_setup_example_email_address">bruger@domæne.dk</string>
+  <string name="account_setup_new_username">nyt brugernavn</string>
+  <string name="account_setup_password">adgangskode</string>
+  <string name="account_setup_password_confirm">bekræft adgangskode</string>
+  <string name="btn_create_new_account">Registrer konto</string>
+  <string name="account_setup_pers_now_title">Log ind nu</string>
+  <string name="select_domain_new_account">Vælg et domæne</string>
+  <string name="registering_new_account_">Registrerer ny konto…</string>
+  <string name="signing_in_wait">Logger ind …</string>
+  <string name="signing_out_wait">Logger ud\u2026</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">Brug SRV-opslag</string>
+  <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">Brug DNS SRV til at finde XMPP-servere ud fra domænenavn</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Tillad at brugernavn og adgangskode sendes ukrypteret når der anvendes en ukrypteret forbindelse</string>
+  <string name="allow_plain_text_auth">Tillad råtekst autentificering</string>
+  <string name="require_tls_ssl_connection">Gennemtving TLS-krypteret forbindelse</string>
+  <string name="transport_encryption">Transport-kryptering</string>
+  <string name="how_encrypted_chats_are_started">hvorledes krypterede samtaler startes</string>
+  <string name="the_server_to_connect_to_if_needed">Serveren der skal forbindes til, hvis nødvendig</string>
+  <string name="connect_server">Forbindelses-server</string>
+  <string name="tcp_port_for_xmpp_server">TCP-port for XMPP-server</string>
+  <string name="server_port">Server-port</string>
+  <string name="xmpp_resource">XMPP-ressource</string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">for at adskille denne forbindelse fra andre klienter der også er logget ind</string>
+  <string name="xmpp_resource_prio_title">XMPP ressourceprioritet</string>
+  <string name="xmpp_resource_prio_summary">Beskeder til klienter med flere aktive ressourcer vil blive afleveret til ressourcen med højeste prioritet</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">Samtaler</string>
+  <string name="empty_account_message">Du har ingen
+konfigurerede konti.
+
+Tryk her for at tilføje!</string>
+  <string name="menu_remove_contact">Slet kontakt</string>
+  <string name="menu_contact_nickname">Kontakt kaldenavn</string>
+  <string name="menu_view_blocked">Blokeret</string>
+  <string name="confirm_delete_contact">Kontakten "<xliff:g id="user">%1$s</xliff:g>" slettes.</string>
+  <string name="confirm_block_contact">Kontakten "<xliff:g id="user">%1$s</xliff:g>" blokeres.</string>
+  <string name="add_contact_success">Kontakten "<xliff:g id="USER">%1$s</xliff:g>" er tilføjet.</string>
+  <string name="delete_contact_success">Kontakten "<xliff:g id="USER">%1$s</xliff:g>" er slettet.</string>
+  <string name="block_contact_success">Kontakten "<xliff:g id="USER">%1$s</xliff:g>" er blokeret.</string>
+  <string name="unblock_contact_success">Kontakten "<xliff:g id="USER">%1$s</xliff:g>" er ikke længere blokeret.</string>
+  <string name="menu_verify">Bekræft nøgle</string>
+  <string name="empty_conversation_group">Der er ingen samtaler</string>
+  <string name="search_label">Kontakt</string>
+  <string name="search_hint">skriv navnet på en kontakt at chatte med</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_online"><xliff:g id="USER">%1$s</xliff:g> er online</string>
+  <string name="contact_away"><xliff:g id="USER">%1$s</xliff:g> er ikke til stede</string>
+  <string name="contact_busy"><xliff:g id="USER">%1$s</xliff:g> er optaget</string>
+  <string name="contact_offline"><xliff:g id="USER">%1$s</xliff:g> er offline</string>
+  <string name="contact_joined"><xliff:g id="USER">%1$s</xliff:g> har tilsluttet sig</string>
+  <string name="contact_left"><xliff:g id="USER">%1$s</xliff:g> er gået</string>
+  <string name="file_transfer">Filoverførsel</string>
+  <string name="accept_transfer_">Accepter overførsel?</string>
+  <string name="wants_to_send_you_the_file">vil sende dig filen</string>
+  <string name="compose_hint">Send besked</string>
+  <string name="compose_hint_secure">Send sikker besked</string>
+  <string name="menu_end_conversation">Afslut chat</string>
+  <string name="select_link_title">Vælg link</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt"><xliff:g id="USER">%1$s</xliff:g> har inviteret dig til at deltage i en gruppechat.</string>
+  <string name="accept_invitation">Accepter</string>
+  <string name="decline_invitation">Afvis</string>
+  <string name="connecting_to_group_chat_">Forbinder til gruppesamtale</string>
+  <string name="empty_contact_list">Ingen kontakter fundet.
+
+Rør skærm for at invitere.</string>
+  <string name="approve_subscription_error">Tilmelding fra <xliff:g id="USER">%1$s</xliff:g> kunne ikke godkendes. Prøv igen senere.</string>
+  <string name="decline_subscription_error">Tilmelding fra <xliff:g id="USER">%1$s</xliff:g> kunne ikke afvises. Prøv igen senere.</string>
+  <!--Security: OTR-->
+  <string name="otr_session_status_finished">Din kontakt har abrudt den krypterede samtale.</string>
+  <!--Security: OTR: Keyring-->
+  <string name="detected_Otr_keystore_import">Vi kan se der eksisterer et OTR-nøglelager der kan importeres. Vil du scanne QR-adgangskoden nu?</string>
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Autentifikation</string>
+  <string name="smp_question_summary">Skriv et spørgsmål som sendes til din kontakt, og det forventede svar, for at kontrollere at vedkommende er identisk med den person vedkommende udgiver sig for at være.</string>
+  <string name="smp_question_hint">spørgsmålet der skal stilles</string>
+  <string name="qmp_answer_hint">det forventede svar</string>
+  <string name="remote_verified_us">Din kontakt har autentificeret dig. Nu skal du autentificere din kontakt ved at stille dit eget spørgsmål til vedkommende.</string>
+  <string name="otr_qa_send">Send</string>
+  <string name="otr_qa_cancel">Annuller</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">Sikkerhed og privatliv</string>
+  <string name="encryption_and_anonymity_title">Kryptering og Anonymitet</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">Sprog</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Sprog</string>
+  <string name="button_yes_accept_all">Ja, accepter alle</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">Anden fintuning</string>
+  <string name="start_on_boot_summary">Start altid og log automatisk ind med sidst anvendte konti</string>
+  <string name="hide_offline_contacts">Skjul offline kontakter</string>
+  <string name="foreground_service_title">Brug forgrundsprioritet</string>
+  <string name="foreground_service_summary">Reducer risikoen for at Android genstarter forbindelsesservicen. Dette vil placere en permanent notifikation i notifikationsområdet.</string>
+  <string name="heartbeat_interval_title">Heartbeat-interval</string>
+  <string name="heartbeat_interval_summary">Brug en højere værdi (i minutter) for at spare batterikapacitet. En høj værdi vil måske forårsage at din udbyder lukker forbindelsen pga. inaktivitet.</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Meddelelsesindstillinger</string>
+  <string name="notification_enabled_title">IM-meddelelser</string>
+  <string name="notification_enabled_summary">Underret i statuslinjen, når der kommer en IM</string>
+  <string name="notification_vibrate_title">Vibrer</string>
+  <string name="notification_vibrate_summary">Vibrer også, når der kommer en IM</string>
+  <string name="notification_sound_title">Lyd</string>
+  <string name="notification_sound_summary">Spil også ringetone, når der kommer en IM</string>
+  <string name="notification_ringtone_title">Brug Zoms egen beskedtone</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">Aktiver fejlsøgningslog</string>
+  <string name="pref_debug_summary">Omdirriger applikationens log til standard out / logcat for fejlsøgning</string>
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message"><xliff:g id="PROVIDER">%1$s</xliff:g> kræver, at baggrundsdata aktiveres.</string>
+  <string name="prompt_create_new_account_">Opret ny konto?</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">Opret en ny chat-konto for brugernavn \'%1$s\'?</string>
+  <!--Alerts: Notifications-->
+  <string name="notify_groupchat_label">Gruppechatinvitation</string>
+  <string name="new_messages_notify">Ny(e) besked(er) fra</string>
+  <string name="app_unlocked">Aktiveret &amp; låst op</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">Bemærk</string>
+  <string name="general_error">Fejlkode <xliff:g id="CODE">%1$d</xliff:g></string>
+  <string name="login_service_failed">Der kunne ikke logges ind på tjenesten <xliff:g id="SERVICE">%1$s</xliff:g>. Prøv igen senere."\n"(Detalje: <xliff:g id="DESCRIPTION">%2$s</xliff:g>)</string>
+  <string name="add_list_failed">Listen blev ikke tilføjet.</string>
+  <string name="block_contact_failed">Kontakten blev ikke blokeret.</string>
+  <string name="unblock_contact_failed">Blokeringen af kontakten blev ikke ophævet.</string>
+  <string name="load_contact_list_failed">Listen over kontakter blev ikke indlæst.</string>
+  <string name="cant_connect_to_server">Der kan ikke oprettes forbindelse til serveren. Kontroller din forbindelse.</string>
+  <string name="contact_already_exist"><xliff:g id="USER">%1$s</xliff:g> findes allerede på din liste over kontakter.</string>
+  <string name="contact_blocked">Kontakten "<xliff:g id="USER">%1$s</xliff:g>" er blevet blokeret.</string>
+  <string name="contact_not_loaded">Vent, mens din liste over kontakter indlæses.</string>
+  <string name="network_error">Der opstod en netværksfejl.</string>
+  <string name="wifi_not_connected_error">WiFI er nødvendig for denne forbindelse.</string>
+  <string name="service_not_support">Serveren understøtter ikke denne funktionalitet.</string>
+  <string name="invalid_password">Den adgangskode, du indtastede, er ikke gyldig.</string>
+  <string name="internal_server_error">Serveren registrerede en fejl.</string>
+  <string name="not_implemented">Serveren understøtter ikke denne funktionalitet.</string>
+  <string name="service_unavaiable">Serveren er ikke tilgængelig i øjeblikket.</string>
+  <string name="timeout">Der opstod timeout for serveren.</string>
+  <string name="version_not_supported">Serveren understøtter ikke den aktuelle version.</string>
+  <string name="message_queue_full">Beskedkøen er fuld.</string>
+  <string name="domain_not_supported">Serveren understøtter ikke videresendelse til domænet.</string>
+  <string name="unknown_user">Det indtastede brugernavn kunne ikke genkendes.</string>
+  <string name="recipient_blocked_the_user">Beklager! Du er blokeret af brugeren.</string>
+  <string name="session_expired">Sessionen er udløbet. Log ind igen.</string>
+  <string name="forced_logout">du er logget ind fra en anden klient.</string>
+  <string name="already_logged_in">du er allerede logget ind fra en anden klient.</string>
+  <string name="msisdn_error">Beklager! Telefonnummeret kan ikke læses fra dit SIM-kort. Kontakt din udbyder for at få hjælp.</string>
+  <string name="not_signed_in">Du er ikke logget ind i øjeblikket.</string>
+  <string name="account_setup_error_server">Zom stødte på en fejl under etablering af forbindelse til server - kontoller din konfiguration og prøv igen.</string>
+  <string name="error_suspended_connection">Zom har mistet en forbindelse til netværket</string>
+  <string name="unable_to_create_or_join_group_chat">Kunne ikke oprette eller deltage i gruppesamtale</string>
+  <string name="there_is_no_viewer_available_for_this_file_format">Der er ingen fremviser tilgængelig for dette filformat</string>
+  <string name="otr_keysync_warning_message">Kopier filen \'otr_keystore.ofcaes\' fra computerværktøjet OtrFileConverter til rod-mappen af din enheds lager</string>
+  <string name="msg_sent_failed">Beskeden kunne ikke sendes.</string>
+  <string name="disconnected_warning">Beskeder afsendes ved genetablering af forbindelse</string>
+  <string name="account_settings_title">Account Settings</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Grupper</string>
+  <string name="buddies">Kontakter</string>
+  <string name="contacts">Kontakter</string>
+  <string name="mtm_accept_cert">Accepter servercertifikat?</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Indstillinger</string>
+  <string name="menu_sign_out">Log ud</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">Online</string>
+  <string name="presence_busy">Optaget</string>
+  <string name="presence_away">Ikke til stede</string>
+  <string name="presence_idle">Ikke aktiv</string>
+  <string name="presence_offline">Offline</string>
+  <string name="presence_invisible">Vis som offline</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Glad</item>
+    <item>Trist</item>
+    <item>Blinker</item>
+    <item>Rækker tunge</item>
+    <item>Overrasket</item>
+    <item>Kysser</item>
+    <item>Råber</item>
+    <item>Sej</item>
+    <item>Pengeglad</item>
+    <item>Forlegen</item>
+    <item>Flov</item>
+    <item>Engel</item>
+    <item>Uafklaret</item>
+    <item>Græder</item>
+    <item>Lukket med syv segl</item>
+    <item>Griner</item>
+    <item>Forvirret</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Glad</item>
+    <item>Trist</item>
+    <item>Blinker</item>
+    <item>Rækker tunge</item>
+    <item>Overrasket</item>
+    <item>Kysser</item>
+    <item>Råber</item>
+    <item>Sej</item>
+    <item>Pengeglad</item>
+    <item>Forlegen</item>
+    <item>Flov</item>
+    <item>Engel</item>
+    <item>Uafklaret</item>
+    <item>Græder</item>
+    <item>Lukket med syv segl</item>
+    <item>Griner</item>
+    <item>Forvirret</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="title_me">Mig</string>
+</resources>

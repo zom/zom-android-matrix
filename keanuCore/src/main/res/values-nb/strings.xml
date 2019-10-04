@@ -1,0 +1,293 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <!--General: Names-->
+  <string name="ic_launcher_name">Zom</string>
+  <string name="app_name">Zom</string>
+  <string name="im_label">Zom</string>
+  <!--General: Permissions-->
+  <string name="ro_perm_label">les meldinger</string>
+  <string name="ro_perm_desc">
+        Gir applikasjoner lov til å lese data fra meldingsleverandøren.
+    </string>
+  <string name="wo_perm_label">skriv meldinger</string>
+  <string name="wo_perm_desc">
+        Gir applikasjoner lov til å skrive til meldingsleverandøren.
+    </string>
+  <string name="perm_label">start lynmeldingstjeneste</string>
+  <string name="perm_desc">Tillater applikasjoner å starte lynmeldingstjenesten.</string>
+  <!--General: Actions-->
+  <string name="confirm">Bekreft</string>
+  <string name="ok">OK</string>
+  <string name="cancel">Avbryt</string>
+  <string name="yes">OK</string>
+  <string name="no">Avbryt</string>
+  <string name="connect">Koble til</string>
+  <!--Views-->
+  <string name="lock_screen_create_passphrase">Sett passord</string>
+  <string name="lock_screen_confirm_passphrase">Bekreft passord</string>
+  <string name="lock_screen_passphrase_hint">Passord</string>
+  <string name="lock_screen_passphrase_not_set_enter">Nytt passord</string>
+  <string name="lock_screen_passphrase_not_set_confirm">Bekreft nytt passord</string>
+  <string name="lock_screen_passphrases_not_matching">Passord samsvarte ikke med fasit, vennligst prøv igjen</string>
+  <string name="lock_screen_skip">Latmannsvariant (Inget passord!)</string>
+  <!--Views: Setup-->
+  <string name="add_account">Legg til <xliff:g id="ACCOUNT">%1$s</xliff:g>-konto</string>
+  <string name="menu_about">Om</string>
+  <string name="pass_err_length">Passordet ditt var ikke langt nok</string>
+  <!--Views: About: Welcome-->
+  <!--Views: About: OTR-->
+  <!--Views: About: Security-->
+  <!--Views: Account list-->
+  <!--Views: Setup: Account-->
+  <string name="sign_in">Logg på</string>
+  <string name="account_setup_example_email_address">user@domain.com</string>
+  <string name="account_setup_new_username">nytt brukernavn</string>
+  <string name="account_setup_password">passord</string>
+  <string name="account_setup_password_confirm">bekreft passord</string>
+  <string name="btn_create_new_account">Registrer konto</string>
+  <string name="account_setup_pers_now_title">Logg inn nå</string>
+  <string name="select_domain_new_account">Velg domene</string>
+  <string name="registering_new_account_">Registrer ny konto…</string>
+  <string name="signing_in_wait">Logger på…</string>
+  <string name="signing_out_wait">Logger ut\u2026</string>
+  <!--Views: Settings: Account-->
+  <string name="do_srv_lookup">Utfør SRV-sjekk</string>
+  <string name="use_dns_srv_to_find_actual_xmpp_server_from_domain_name">Bruk DNS SRV for å finne aktuell XMPP-serveren for domenenavnet</string>
+  <string name="allow_the_username_and_password_to_be_sent_as_plain_text_when_using_an_unencrypted_transport">Tillat at brukernavnet og passordet blir sendt som klartekst under bruk av ukryptert transport</string>
+  <string name="allow_plain_text_auth">Tillat autentisering i klartekst</string>
+  <string name="require_tls_ssl_connection">Krev TLS-tilkobling</string>
+  <string name="transport_encryption">Transport-kryptering</string>
+  <string name="how_encrypted_chats_are_started">hvordan krypterte chatter startes</string>
+  <string name="the_server_to_connect_to_if_needed">Serveren som skal tilkobles, etter behov</string>
+  <string name="connect_server">Tilkoblingsserver</string>
+  <string name="tcp_port_for_xmpp_server">XMPP-servers TCP-port</string>
+  <string name="server_port">Serverport</string>
+  <string name="xmpp_resource">XMPP-ressurs</string>
+  <string name="to_distinguish_this_connection_from_other_clients_that_are_also_logged_in">for å skille denne tilkoblingen fra andre klienter som også er logget inn</string>
+  <string name="xmpp_resource_prio_title">XMPP-ressursprioritering</string>
+  <string name="xmpp_resource_prio_summary">Meldinger til klienter med flere aktive resursser vil bli sendt til den resurssen med høyest prioritet</string>
+  <!--Views: Contact list-->
+  <string name="title_chats">Samtaler</string>
+  <string name="empty_account_message">Du har ingen
+kontoer tilknyttet.
+
+Trykk her for å legge til én!</string>
+  <string name="menu_remove_contact">Fjern kontakt</string>
+  <string name="menu_contact_nickname">Kontakt-kallenavn</string>
+  <string name="menu_view_blocked">Blokkert</string>
+  <string name="confirm_delete_contact">Kontakten "<xliff:g id="user">%1$s</xliff:g>" vil bli slettet.</string>
+  <string name="confirm_block_contact">Kontakten «<xliff:g id="USER">%1$s</xliff:g>» vil bli blokkert.</string>
+  <string name="add_contact_success">Kontakten «<xliff:g id="USER">%1$s</xliff:g>» ble lagt til.</string>
+  <string name="delete_contact_success">Kontakten «<xliff:g id="USER">%1$s</xliff:g>» ble slettet.</string>
+  <string name="block_contact_success">Kontakten «<xliff:g id="USER">%1$s</xliff:g>» ble blokkert.</string>
+  <string name="unblock_contact_success">Kontakten «<xliff:g id="USER">%1$s</xliff:g>» ble avblokkert.</string>
+  <string name="menu_verify">Kontroller nøkkel</string>
+  <string name="empty_conversation_group">Ingen samtaler</string>
+  <string name="search_label">Kontakt</string>
+  <string name="search_hint">oppgi navnet på kontakten du ønsker å chatte med</string>
+  <!--Views: Chat: Single-->
+  <string name="contact_away"><xliff:g id="USER">%1$s</xliff:g> er borte</string>
+  <string name="contact_busy"><xliff:g id="USER">%1$s</xliff:g> er opptatt</string>
+  <string name="contact_offline"><xliff:g id="USER">%1$s</xliff:g> er frakoblet</string>
+  <string name="contact_joined"><xliff:g id="USER">%1$s</xliff:g> har blitt med i samtalen</string>
+  <string name="contact_left"><xliff:g id="USER">%1$s</xliff:g> har forlatt samtalen</string>
+  <string name="file_transfer">Filoverføring</string>
+  <string name="accept_transfer_">Godta overføring?</string>
+  <string name="wants_to_send_you_the_file">ønsker å sende deg filen</string>
+  <string name="compose_hint">Send en melding</string>
+  <string name="compose_hint_secure">Send sikret melding</string>
+  <string name="menu_end_conversation">Avslutt samtale</string>
+  <string name="select_link_title">Velg kobling</string>
+  <string name="delete">Slett</string>
+  <string name="export_media">Eksporter mediafil?</string>
+  <!--Views: Chat: Group-->
+  <string name="invitation_prompt"><xliff:g id="USER">%1$s</xliff:g> har invitert deg til en gruppesamtale.</string>
+  <string name="accept_invitation">Godta</string>
+  <string name="decline_invitation">Avslå</string>
+  <string name="connecting_to_group_chat_">Kolber til gruppesludder…</string>
+  <string name="empty_contact_list">Finner ingen kontakter.
+
+Trykk for å invitere.</string>
+  <string name="approve_subscription">Ja</string>
+  <string name="decline_subscription">Nei</string>
+  <string name="approve_subscription_error">Kunne ikke godta abonnement fra <xliff:g id="USER">%1$s</xliff:g>. Prøv igjen senere.</string>
+  <string name="decline_subscription_error">Kunne ikke avslå abonnement fra <xliff:g id="USER">%1$s</xliff:g>. Prøv igjen senere.</string>
+  <!--Security: OTR-->
+  <string name="otr_session_status_finished">Din samtalepartner har stoppet krypteringen på sludringen.</string>
+  <!--Security: OTR: Keyring-->
+  <string name="detected_Otr_keystore_import">Vi har funnet et OTR-nøkkelknippe som kan importeres. Vil du skanne inn QR-passordet nå?</string>
+  <!--Security: OTR: Verification-->
+  <!--Security: OTR: Verification: QA-->
+  <string name="smp_question_title">Autentisering</string>
+  <string name="smp_question_summary">Angi et spørsmål som sendes kontakten din, og svaret du forventer at de oppgir, for å verifisere at du faktisk snakker med den de gir seg ut for være.</string>
+  <string name="smp_question_hint">spørsmålet som skal stilles</string>
+  <string name="qmp_answer_hint">svaret som forventes</string>
+  <string name="remote_verified_us">Kontakten din har verifisert deg. Verifiser nå din kontakt ved å stille ditt eget spørsmål.</string>
+  <string name="otr_qa_title">OTR Q&amp;A bekreftelse</string>
+  <string name="chat_encryption_title">Samtalekryptering</string>
+  <string name="otr_qa_send">Send</string>
+  <string name="otr_qa_cancel">Avbryt</string>
+  <!--Views: VoIP-->
+  <!--Views: Settings: General-->
+  <!--Actions: Settings: General: Security and Privacy-->
+  <string name="pref_group_security_title">Sikkerhet og Personvern</string>
+  <string name="encryption_and_anonymity_title">Kryptering og anonymitet</string>
+  <!--Actions: Settings: General: User Interface-->
+  <string name="menu_locale">Språk</string>
+  <string name="KEY_PREF_LANGUAGE_TITLE">Språk</string>
+  <string name="button_yes_accept_all">Ja, godta alle</string>
+  <string name="pref_delete_unsecured_media_summary">Etter deling av filer, det være seg photo eller annet, automatisk slett den fra original usikret lagringsplass etter import.</string>
+  <!--Actions: Settings: General: Other Tuning-->
+  <string name="pref_group_tuning_title">Andre justeringer</string>
+  <string name="start_on_boot_summary">Alltid start og automatisk logg inn på sist innloggede kontoer.</string>
+  <string name="hide_offline_contacts">Skjul avloggede kontakter</string>
+  <string name="foreground_service_title">Bruk forgrunnsprioritet</string>
+  <string name="foreground_service_summary">Reduser sjansen for at Android starter tilkoblingstjenesten vår på nytt. Dette vil gi deg et varsel i varslingsvinduet.</string>
+  <string name="heartbeat_interval_title">Pulsintervall</string>
+  <string name="heartbeat_interval_summary">Bruk en høyere verdi (i minutter) for å spare strøm. En høyere verdi kan gjøre at leverandøren avslutter tilkoblingen din grunnet inaktivitet.</string>
+  <!--Actions: Settings: General: Notifications-->
+  <string name="notification_group_title">Varslingsinnstillinger</string>
+  <string name="notification_enabled_title">Varsel om lynmeldinger</string>
+  <string name="notification_enabled_summary">Varsle i statusveltet når det kommer lynmeldinger</string>
+  <string name="notification_vibrate_title">Vibrer</string>
+  <string name="notification_vibrate_summary">Vibrer når det kommer lynmeldinger</string>
+  <string name="notification_sound_title">Lyd</string>
+  <string name="notification_sound_summary">Spill ringetone når det kommer lynmeldinger</string>
+  <string name="notification_ringtone_title">Bruk Zom spesial-ringetone</string>
+  <!--Actions: Settings: General: Developer-->
+  <string name="pref_debug_title">Skru på loggføring av feilsøkingsinformasjon</string>
+  <string name="pref_debug_summary">Skriv programloggdata til standard utdata / logcat for feilsøking</string>
+  <!--Alerts: Dialogs-->
+  <string name="bg_data_prompt_message"><xliff:g id="PROVIDER">%1$s</xliff:g> trenger at bakgrunnsdata er aktivert.</string>
+  <string name="prompt_create_new_account_">Opprett ny konto?</string>
+  <string name="allow_s_to_create_a_new_chat_account_for_s_">Opprett ny sludre-konto for brukernavnet \'%1$s\'?</string>
+  <!--Alerts: Notifications-->
+  <string name="notify_groupchat_label">Invitasjon til gruppesamtale</string>
+  <string name="new_messages_notify">Ny melding(er) fra</string>
+  <string name="app_unlocked">Aktivert &amp; låst opp</string>
+  <!--Alerts: Exceptions-->
+  <string name="error">NB</string>
+  <string name="error_prefix">Feil:</string>
+  <string name="general_error">Feilkode <xliff:g id="CODE">%1$d</xliff:g></string>
+  <string name="login_service_failed">Kunne ikke logge på <xliff:g id="SERVICE">%1$s</xliff:g>. Prøv igjen senere."\n"(Detaljer: <xliff:g id="DESCRIPTION">%2$s</xliff:g>)</string>
+  <string name="add_list_failed">Listen ble ikke lagt til.</string>
+  <string name="block_contact_failed">Kontakten ble ikke blokkert.</string>
+  <string name="unblock_contact_failed">Kontakten ble ikke avblokkert.</string>
+  <string name="load_contact_list_failed">Kontaktlisten ble ikke lastet.</string>
+  <string name="cant_connect_to_server">Kan ikke koble til tjeneren. Sjekk tilkoblingen.</string>
+  <string name="contact_already_exist"><xliff:g id="USER">%1$s</xliff:g> finnes allerede i kontaktlisten.</string>
+  <string name="contact_blocked">Kontakten «<xliff:g id="USER">%1$s</xliff:g>» er nå blokkert.</string>
+  <string name="contact_not_loaded">Vent mens kontaktlisten lastes.</string>
+  <string name="network_error">Det oppsto en nettfeil.</string>
+  <string name="wifi_not_connected_error">WiFi kreves for denne tilkoblingen.</string>
+  <string name="service_not_support">Tjeneren støtter ikke denne funksjonen.</string>
+  <string name="invalid_password">Passordet er ikke gyldig.</string>
+  <string name="internal_server_error">Det oppsto en feil på tjeneren.</string>
+  <string name="not_implemented">Tjeneren støtter ikke denne funksjonen.</string>
+  <string name="service_unavaiable">Tjeneren er utilgjengelig.</string>
+  <string name="timeout">Det oppsto et tidsavbrudd på tjeneren.</string>
+  <string name="version_not_supported">Tjeneren støtter ikke denne versjonen.</string>
+  <string name="message_queue_full">Meldingskøen er full.</string>
+  <string name="domain_not_supported">Tjeneren støtter ikke videresending til domenet.</string>
+  <string name="unknown_user">Brukernavnet du skrev inn ble ikke gjenkjent.</string>
+  <string name="recipient_blocked_the_user">Beklager, du er blokkert av brukeren.</string>
+  <string name="session_expired">Sesjonen har gått ut, logg på nytt.</string>
+  <string name="forced_logout">du er pålogget med en annen klient.</string>
+  <string name="already_logged_in">du allerede er pålogget med en annen klient.</string>
+  <string name="msisdn_error">Beklager, kan ikke lese telefonnummeret fra SIM-kortet. Kontakt operatøren for hjelp.</string>
+  <string name="not_signed_in">Du er ikke pålogget.</string>
+  <string name="account_setup_error_server">Zom støtte på en feil under tilkobling til chatserveren - vennligst sjekk konfigurasjonen og prøv igjen.</string>
+  <string name="error_suspended_connection">Zom har mistet forbindelsen til nettverket</string>
+  <string name="unable_to_create_or_join_group_chat">Klarte ikke å starte eller ta del i gruppesludder</string>
+  <string name="there_is_no_viewer_available_for_this_file_format">Det er inget tilknyttet program tilgjengelig for lesing av dette filformatet</string>
+  <string name="otr_keysync_warning_message">Vennligst kopier \'otr_keystore.ofcaes\' -filen med skrivebordsverktøyet OtrFileConverter til rotmappen av din enhets lagringsmedie</string>
+  <string name="msg_sent_failed">Kunne ikke sende meldingen.</string>
+  <string name="disconnected_warning">Meldinger vil bli sendt når forbindelsen gjenopprettes</string>
+  <string name="error_account_password_mismatch">Passord samsvarer ikke</string>
+  <string name="error_account_settings_priority">Prioritet må settes som et nummer fra [0 .. 127]</string>
+  <string name="error_account_settings_port">Port må oppgis som nummer</string>
+  <string name="error_welcome_database">Kjempefeil: Kunne ikke låse opp eller laste inn programdatabase. Installer programmet på ny eller tøm data.</string>
+  <string name="account_settings_title">Kontoinnstillinger</string>
+  <!--added 2011/09/01-->
+  <string name="menu_view_groups">Grupper</string>
+  <string name="buddies">Venner</string>
+  <string name="contacts">Kontakter</string>
+  <string name="mtm_accept_cert">Godta tjener-sertifikat?</string>
+  <string name="loading">laster…</string>
+  <!--Other-->
+  <!--Other: Slide Menu-->
+  <string name="menu_settings">Innstillinger</string>
+  <string name="menu_sign_out">Logg av</string>
+  <!--Other: Provider-->
+  <string name="provider_full_name_xmpp">Jabber (XMPP)</string>
+  <!--Other: Development Strings [Do not localize!]-->
+  <!--Other: Presence States-->
+  <string name="presence_available">Tilgjengelig</string>
+  <string name="presence_busy">Opptatt</string>
+  <string name="presence_away">Borte</string>
+  <string name="presence_idle">Inaktiv</string>
+  <string name="presence_offline">Frakoblet</string>
+  <string name="presence_invisible">Usynlig</string>
+  <!--Other: Smileys-->
+  <string-array name="default_smiley_names">
+    <item>Glad</item>
+    <item>Trist</item>
+    <item>Blunker</item>
+    <item>Rekker tunge</item>
+    <item>Overrasket</item>
+    <item>Kyss</item>
+    <item>Roper</item>
+    <item>Kul</item>
+    <item>Pengemunn</item>
+    <item>Fot i munnen</item>
+    <item>Flau</item>
+    <item>Engel</item>
+    <item>Usikker</item>
+    <item>Gråter</item>
+    <item>Stille som graven</item>
+    <item>Ler</item>
+    <item>Forvirret</item>
+  </string-array>
+  <!--[Do not localize!]-->
+  <string-array name="smiley_names">
+    <item>Glad</item>
+    <item>Trist</item>
+    <item>Blunker</item>
+    <item>Rekker tunge</item>
+    <item>Overrasket</item>
+    <item>Kyss</item>
+    <item>Roper</item>
+    <item>Kul</item>
+    <item>Pengemunn</item>
+    <item>Fot i munnen</item>
+    <item>Flau</item>
+    <item>Engel</item>
+    <item>Usikker</item>
+    <item>Gråter</item>
+    <item>Stille som graven</item>
+    <item>Ler</item>
+    <item>Forvirret</item>
+  </string-array>
+  <string-array name="smiley_texts">
+    <item>:-)</item>
+    <item>:-(</item>
+    <item>;-)</item>
+    <item>:-P</item>
+    <item>=-O</item>
+    <item>:-*</item>
+    <item>:O</item>
+    <item>B-)</item>
+    <item>:-$</item>
+    <item>:-!</item>
+    <item>:-[</item>
+    <item>O:-)</item>
+    <item>:-\\</item>
+    <item>:\'(</item>
+    <item>:-X</item>
+    <item>:-D</item>
+    <item>o_O</item>
+  </string-array>
+  <string name="this_is_a_group_chat">Dette er en gruppesamtale</string>
+  <string name="unable_to_securely_share_this_file">Kunne ikke dele denne filen på en sikker måte</string>
+  <string name="title_me">Meg</string>
+</resources>
