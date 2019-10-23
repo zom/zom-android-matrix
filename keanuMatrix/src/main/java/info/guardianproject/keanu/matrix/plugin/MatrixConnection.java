@@ -1075,7 +1075,7 @@ public class MatrixConnection extends ImConnection {
 
     protected void debug (String msg)
     {
-        if (Debug.DEBUG_ENABLED)
+      //  if (Debug.DEBUG_ENABLED)
             Log.d(TAG, msg);
 
     }

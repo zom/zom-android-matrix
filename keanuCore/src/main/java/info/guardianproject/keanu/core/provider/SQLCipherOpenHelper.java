@@ -7,6 +7,7 @@ import android.util.Log;
 
 import net.sqlcipher.database.SQLiteDatabase;
 import net.sqlcipher.database.SQLiteDatabase.CursorFactory;
+import net.sqlcipher.database.SQLiteDatabaseHook;
 import net.sqlcipher.database.SQLiteException;
 import net.sqlcipher.database.SQLiteOpenHelper;
 
@@ -37,8 +38,10 @@ public abstract class SQLCipherOpenHelper extends SQLiteOpenHelper {
     private char[] mKey;
 
     public SQLCipherOpenHelper(Context context, String name,
-            CursorFactory factory, int version, char[] key) {
-        super(context, name, factory, version, new SQLCipherV4MigrationHook(context));
+                               CursorFactory factory, int version, char[] key, SQLiteDatabaseHook hook) {
+
+            super(context, name, factory, version, hook);
+
 
         mKey = key;
     }

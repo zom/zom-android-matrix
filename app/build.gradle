@@ -37,7 +37,7 @@ android {
     }
 
     dexOptions {
-        javaMaxHeapSize "2g"
+        javaMaxHeapSize "3g"
         preDexLibraries true
     }
 
@@ -140,7 +140,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.5'
 
     implementation 'info.guardianproject.iocipher:IOCipher:0.5'
-    implementation 'net.zetetic:android-database-sqlcipher:4.2.0@aar'
+  //  implementation(name: 'IOCipher-release', ext: 'aar')
+    implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
 
     /************* Matrix SDK management **************/
     // use the matrix SDK as external lib

@@ -50,7 +50,8 @@ import info.guardianproject.keanu.core.provider.SQLCipherOpenHelper;
 public class SecureMediaStore {
 
     public static final String TAG = SecureMediaStore.class.getName();
-    private static String dbFilePath;
+   // private static String dbFilePath;
+//    private static final String LEGACY_BLOB_NAME = "keanumedia.db";
     private static final String BLOB_NAME = "keanumedia.db";
 
     public static final int DEFAULT_IMAGE_WIDTH = 1080;
@@ -227,7 +228,6 @@ public class SecureMediaStore {
         // there is only one VFS, so if its already mounted, nothing to do
         VirtualFileSystem vfs = VirtualFileSystem.get();
 
-
         if (vfs.isMounted()) {
             Log.w(TAG, "VFS " + vfs.getContainerPath() + " is already mounted, so unmount()");
             /**
@@ -244,52 +244,46 @@ public class SecureMediaStore {
 
         Log.w(TAG,"Mounting VFS: " + vfs.getContainerPath());
 
-        dbFilePath = getInternalDbFilePath(context);
+        java.io.File fileDb = new java.io.File(getInternalDbFilePath(context));
 
         //TODO check if moving from v3 to v4 and if so 'migrate cipher'
-        checkUpgrade(context, key);
-
-        if (!new java.io.File(dbFilePath).exists()) {
-            vfs.createNewContainer(dbFilePath, key);
-        }
+        //checkUpgrade(context, fileDb, key);
 
         try {
-            vfs.mount(dbFilePath, key);
-            //list("/");
+            if (!fileDb.exists()) {
+                fileDb.getParentFile().mkdirs();
+                vfs.setContainerPath(fileDb.getAbsolutePath());
+                vfs.createNewContainer(key);
+            }
+
+            if (!vfs.isMounted())
+                vfs.mount(fileDb.getAbsolutePath(), key);
+
         }
         catch (Exception e)
         {
             Log.w(TAG, "VFS " + vfs.getContainerPath() + " issues with mounting: " + e.getMessage());
         }
 
-      //  deleteLegacy (context);
+       // deleteLegacy (context);
 
     }
 
-    public static void checkUpgrade (Context context, byte[] key)
+    /**
+    public static void checkUpgrade (Context context, File fileDb, byte[] key)
     {
 
-     //   java.io.File fileDbLegacy = new java.io.File(getLegacyDbFilePath(context));
-        java.io.File fileDb= new java.io.File(getInternalDbFilePath(context));
+         java.io.File fileLegacy = new java.io.File(getLegacyDbFilePath(context));
+
         Log.d(TAG,"legacy db: " + fileDb.getAbsolutePath() + " size=" + fileDb.length());
 
-        /**
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                copyFile(fileLegacy,new File(context.getExternalFilesDir(null),fileLegacy.getName()));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }**/
-
-
-        if (fileDb.exists())
+        if (fileLegacy.exists())
         {
-            /**
+
             final boolean[] status = {false,false};
             char[] keyString = SQLCipherOpenHelper.encodeRawKey(key,true);
 
-            final SQLiteDatabase db= SQLiteDatabase.openDatabase(fileDb.getAbsolutePath(), keyString, null,SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.CREATE_IF_NECESSARY,
+            final SQLiteDatabase db= SQLiteDatabase.openDatabase(fileLegacy.getAbsolutePath(), keyString, null,SQLiteDatabase.OPEN_READWRITE | SQLiteDatabase.CREATE_IF_NECESSARY,
                     new SQLiteDatabaseHook() {
                         @Override
                         public void preKey(SQLiteDatabase database) {
@@ -302,6 +296,7 @@ public class SecureMediaStore {
 
 
                             database.rawQuery("PRAGMA cipher_page_size = 8192;", new String[]{});
+
 
                             Cursor c = database.rawQuery("PRAGMA cipher_migrate", null);
 
@@ -317,24 +312,24 @@ public class SecureMediaStore {
 
                             c.close();
 
-                            Log.d(TAG,"migrationOccurred: " + migrationOccurred);
+                                    Log.d(TAG,"migrationOccurred: " + migrationOccurred);
+
 
                             //database.rawQuery("PRAGMA journal_mode = WAL;", new String[]{});
                             //database.rawQuery("PRAGMA synchronous = NORMAL;", new String[]{});
 
-                            /**
+
                             if (database.isOpen()) {
 
-
                                 database.rawQuery("ATTACH DATABASE \""
-                                        + fileDbNew.getAbsolutePath() + "\" AS sqlcipher4 KEY \"" + keyString + "\";", new String[]{});
+                                        + fileDb.getAbsolutePath() + "\" AS sqlcipher4 KEY \"" + keyString + "\";", new String[]{});
                                 database.rawQuery("SELECT sqlcipher_export('sqlcipher4');", new String[]{});
                                 database.rawQuery("DETACH DATABASE sqlcipher4;", new String[]{});
 
-                                if (fileDbNew.exists())
+                                if (fileDb.exists())
                                 {
                                   //  fileLegacy.delete();
-                                    Log.d(TAG,"new db: " + fileDbNew.getAbsolutePath() + " size=" + fileDbNew.length());
+                                    Log.d(TAG,"new db: " + fileDb.getAbsolutePath() + " size=" + fileDb.length());
 
                                 }
 
@@ -364,11 +359,12 @@ public class SecureMediaStore {
 
             if (db != null && db.isOpen())
                 db.close();
-            **/
+
         }
 
 
-    }
+    }**/
+
     /**
     public static void checkUpgrade (Context context, byte[] key, String dbFilePath)
     {
@@ -438,6 +434,7 @@ public class SecureMediaStore {
         }
     }**/
 
+
     /**
     public static void deleteLegacy (Context context)
     {
@@ -459,6 +456,7 @@ public class SecureMediaStore {
 
         return c.getFilesDir() + "/" + BLOB_NAME;
     }
+
 
     /**
     public static String getLegacyDbFilePath(Context c) {

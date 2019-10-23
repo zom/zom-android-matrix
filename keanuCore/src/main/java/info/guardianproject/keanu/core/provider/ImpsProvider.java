@@ -98,7 +98,7 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
     private static final String LEGACY_UNENCRYPTED_DATABASE_NAME = "imps.db";
     private static final String DATABASE_NAME = "keanu.db";
 
-    private static final int DATABASE_VERSION = 117;
+    private static final int DATABASE_VERSION = 118;
 
     protected static final int MATCH_PROVIDERS = 1;
     protected static final int MATCH_PROVIDERS_BY_ID = 2;
@@ -348,8 +348,8 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
 
         char[] mKey;
 
-        DatabaseHelper(Context context, char[] key) throws Exception {
-            super(context, mDatabaseName, null, mDatabaseVersion, key);
+        DatabaseHelper(Context context, char[] key, SQLiteDatabaseHook hook) throws Exception {
+            super(context, mDatabaseName, null, mDatabaseVersion, key, hook);
             mKey = key;
         }
 
@@ -1410,7 +1410,13 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                         fileLegacyDb.delete();
 
                     char[] keyString = SQLCipherOpenHelper.encodeRawKey(pkey,true);
-                    mDbHelper = new DatabaseHelper(ctx, keyString);
+
+                    SQLiteDatabaseHook hook = null;
+
+                    if (mDatabaseVersion < 118)
+                        hook = new SQLCipherV4MigrationHook(ctx);
+
+                    mDbHelper = new DatabaseHelper(ctx, keyString, hook);
                     LogCleaner.debug(LOG_TAG, "Opened DB with key");
                     mDbHelperLock.notify();
 
