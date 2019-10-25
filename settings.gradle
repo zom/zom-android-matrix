@@ -1,1 +1,1 @@
-include ':app', ':keanuCore', ':keanuMatrix'
+include ':app'
