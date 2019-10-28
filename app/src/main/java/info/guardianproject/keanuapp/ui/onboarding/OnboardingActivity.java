@@ -749,6 +749,8 @@ public class OnboardingActivity extends BaseActivity {
             findViewById(R.id.progressExistingUser).setVisibility(View.VISIBLE);
             findViewById(R.id.progressExistingImage).setVisibility(View.VISIBLE);
 
+            hideKeyboard ();
+
             OnboardingManager.addExistingAccount(OnboardingActivity.this, mHandler, username, server, password, new OnboardingListener() {
                 @Override
                 public void registrationSuccessful(OnboardingAccount account) {
@@ -770,9 +772,13 @@ public class OnboardingActivity extends BaseActivity {
 
                 @Override
                 public void registrationFailed(String err) {
-                    Toast.makeText(OnboardingActivity.this,R.string.error,Toast.LENGTH_SHORT).show();
+
+
+                    showErrorMessage(getString(R.string.invalid_password));
 
                     mLoggingIn = false;
+                    findViewById(R.id.progressExistingUser).setVisibility(View.GONE);
+                    findViewById(R.id.progressExistingImage).setVisibility(View.GONE);
                 }
             });
 
@@ -782,6 +788,22 @@ public class OnboardingActivity extends BaseActivity {
         return false;
     }
 
+    private void hideKeyboard ()
+    {
+        // Check if no view has focus:
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    private void showErrorMessage (String message)
+    {
+        Snackbar sb = Snackbar.make(mViewFlipper,message,Snackbar.LENGTH_LONG);
+        sb.show();
+
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
