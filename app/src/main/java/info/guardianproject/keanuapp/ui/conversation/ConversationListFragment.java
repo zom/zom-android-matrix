@@ -148,7 +148,6 @@ public class ConversationListFragment extends Fragment {
             mLoaderManager = getLoaderManager();
             mLoaderCallbacks = new MyLoaderCallbacks();
             mLoaderManager.initLoader(mLoaderId, null, mLoaderCallbacks);
-
             Cursor cursor = null;
             mAdapter = new ConversationListRecyclerViewAdapter(getActivity(), cursor);
         }
@@ -543,6 +542,7 @@ public class ConversationListFragment extends Fragment {
 
                 loader = new CursorLoader(getActivity(), mUri, null,
                         buf == null ? null : buf.toString(), null, Imps.Messages.REVERSE_SORT_ORDER);
+
             }
             else
             {
