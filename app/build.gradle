@@ -120,9 +120,9 @@ dependencies {
     implementation(name: 'olm-sdk-release-3.1.2', ext: 'aar')
 
     /*********** KeanuApp components **********/
-    implementation(name: 'keanucore-0.0.1.44', ext: 'aar')
+    implementation(name: 'keanucore-0.0.1.45', ext: 'aar')
     //implementation project(':keanuCore')
-    implementation(name: 'keanumatrix-0.0.1.44', ext: 'aar')
+    implementation(name: 'keanumatrix-0.0.1.45', ext: 'aar')
     //implementation project(':keanuMatrix')
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
