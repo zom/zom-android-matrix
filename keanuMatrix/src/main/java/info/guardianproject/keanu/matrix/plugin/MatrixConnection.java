@@ -67,6 +67,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -155,6 +156,8 @@ public class MatrixConnection extends ImConnection {
     private final static String HTTPS_PREPEND = "https://";
 
     private ExecutorService mExecutor = null;
+
+    private final static long TIME_ONE_DAY_MS = 1000 * 60 * 60 * 24;
 
     public MatrixConnection (Context context)
     {
@@ -363,21 +366,18 @@ public class MatrixConnection extends ImConnection {
 
     }
 
-    private void checkAccount (String password, LoginListener listener)
+    private void checkAccount (final String password, LoginListener listener)
     {
-        if (password == null)
-            password = Imps.Account.getPassword(mContext.getContentResolver(), mAccountId);
-
-        loginAsync(password, listener);
+        mExecutor.execute(() -> loginSync(password, false, listener));
     }
 
     private void loginAsync (final String password, final LoginListener listener) {
 
-        mExecutor.execute(() -> loginSync(password, listener));
+        mExecutor.execute(() -> loginSync(password, true, listener));
 
     }
 
-    private void loginSync (String password, LoginListener listener) {
+    private void loginSync (String password, boolean enableEncryption, LoginListener listener) {
 
         String username = mUser.getAddress().getUser();
         setState(ImConnection.LOGGING_IN, null);
@@ -385,7 +385,6 @@ public class MatrixConnection extends ImConnection {
         if (password == null)
             password = Imps.Account.getPassword(mContext.getContentResolver(), mAccountId);
 
-        final boolean enableEncryption = true;
         final String initialToken = null;//Preferences.getValue(mUser.getAddress().getUser() + ".sync");
 
         File fileCredsJson = new File("/" + username + "/creds.json");
@@ -510,41 +509,49 @@ public class MatrixConnection extends ImConnection {
             mChatGroupManager.setSession(mSession);
             mChatSessionManager.setSession(mSession);
 
+            if (enableEncryption) {
+                mSession.enableCrypto(true, new ApiCallback<Void>() {
+                    @Override
+                    public void onNetworkError(Exception e) {
+                        debug("getCrypto().start.onNetworkError", e);
 
-            mSession.enableCrypto(true, new ApiCallback<Void>() {
-                @Override
-                public void onNetworkError(Exception e) {
-                    debug("getCrypto().start.onNetworkError", e);
+                    }
 
-                }
+                    @Override
+                    public void onMatrixError(MatrixError matrixError) {
+                        debug("getCrypto().start.onMatrixError", matrixError);
 
-                @Override
-                public void onMatrixError(MatrixError matrixError) {
-                    debug("getCrypto().start.onMatrixError", matrixError);
+                    }
 
-                }
+                    @Override
+                    public void onUnexpectedError(Exception e) {
+                        debug("getCrypto().start.onUnexpectedError", e);
 
-                @Override
-                public void onUnexpectedError(Exception e) {
-                    debug("getCrypto().start.onUnexpectedError", e);
+                    }
 
-                }
+                    @Override
+                    public void onSuccess(Void aVoid) {
 
-                @Override
-                public void onSuccess(Void aVoid) {
+                        debug("getCrypto().start.onSuccess");
+                        mSession.startEventStream(initialToken);
+                        setState(LOGGED_IN, null);
+                        mSession.setIsOnline(true);
 
-                    debug("getCrypto().start.onSuccess");
-                    mSession.startEventStream(initialToken);
-                    setState(LOGGED_IN, null);
-                    mSession.setIsOnline(true);
+                        mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
 
-                    mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
+                        mDataHandler.getMediaCache().clearShareDecryptedMediaCache();
+                        mDataHandler.getMediaCache().clearTmpDecryptedMediaCache();
 
-                    mDataHandler.getMediaCache().clearShareDecryptedMediaCache();
-                    mDataHandler.getMediaCache().clearTmpDecryptedMediaCache();
-
-                }
-            });
+                    }
+                });
+            }
+            else
+            {
+                debug("getCrypto().start.onSuccess");
+                mSession.startEventStream(initialToken);
+                setState(LOGGED_IN, null);
+                mSession.setIsOnline(true);
+            }
         });
     }
 
@@ -910,9 +917,11 @@ public class MatrixConnection extends ImConnection {
 
     protected void updateGroupMembers (final Room room, final ChatGroup group, boolean priority) {
 
+        updateGroupMembersAsync(room, group, priority);
+        /**
         if (priority)
         {
-            updateGroupMembersAsync(room, group, priority);
+
         }
         else {
             mExecutor.execute(
@@ -921,7 +930,7 @@ public class MatrixConnection extends ImConnection {
                         updateGroupMembersAsync(room1, group, false);
                     }
             );
-        }
+        }**/
 
     }
 
@@ -960,8 +969,8 @@ public class MatrixConnection extends ImConnection {
 
                 if (priority)
                 {
-                    gLoader.run();
-                 //   new Thread(gLoader).start();
+                    //gLoader.run();
+                    new Thread(gLoader).start();
                 }
                 else
                     mExecutor.execute(gLoader);
@@ -1248,8 +1257,13 @@ public class MatrixConnection extends ImConnection {
                 });
             }
             else if (!TextUtils.isEmpty(event.type)) {
-                if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
-                    mSession.getCrypto().reRequestRoomKeyForEvent(event);
+
+                if (mSession != null && mSession.isCryptoEnabled())
+                {
+                    if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
+                        if (mSession.getCrypto() != null)
+                            mSession.getCrypto().reRequestRoomKeyForEvent(event);
+                    }
                 }
             }
 
@@ -1420,7 +1434,9 @@ public class MatrixConnection extends ImConnection {
             debug ("onRoomFlush: " + s);
             Room room = mDataHandler.getRoom(s);
             if (room != null)
-                updateGroup(room);
+            {
+                mExecutor.execute(() -> updateGroup(room));
+            }
         }
 
         @Override
@@ -1528,7 +1544,9 @@ public class MatrixConnection extends ImConnection {
         public void onGroupProfileUpdate(String s) {
             Room room = mDataHandler.getRoom(s);
             if (room != null)
-                updateGroup(room);
+            {
+                mExecutor.execute(() -> updateGroup(room));
+            }
         }
 
         @Override
@@ -1543,14 +1561,18 @@ public class MatrixConnection extends ImConnection {
 
             Room room = mDataHandler.getRoom(s);
             if (room != null)
-                updateGroup(room);
+            {
+                mExecutor.execute(() -> updateGroup(room));
+            }
         }
 
         @Override
         public void onGroupInvitedUsersListUpdate(String s) {
             Room room = mDataHandler.getRoom(s);
             if (room != null)
-                updateGroup(room);
+            {
+                mExecutor.execute(() -> updateGroup(room));
+            }
         }
 
 
@@ -1905,7 +1927,16 @@ public class MatrixConnection extends ImConnection {
                             message.setType(Imps.MessageType.INCOMING);
                     }
 
-                    session.onReceiveMessage(message, !isFromMe);
+                    boolean notifyUser = !isFromMe;
+
+                    if (notifyUser) {
+                        //only notify if received in the last day, else we get swarmed
+                        Date now = new Date();
+                        if ((now.getTime() - event.getOriginServerTs()) > TIME_ONE_DAY_MS)
+                            notifyUser = false;
+                    }
+
+                    session.onReceiveMessage(message, notifyUser);
 
                     csa.setContactTyping(new Contact(addrSender), false);
 
