@@ -759,6 +759,11 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                     }
                     return;
 
+                case 117:
+                case 118:
+                    //nothing to change
+                    return;
+
                 case 1:
                 if (newVersion <= 100) {
                     return;
