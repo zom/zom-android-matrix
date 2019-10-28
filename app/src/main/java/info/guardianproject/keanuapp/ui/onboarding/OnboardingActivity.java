@@ -376,7 +376,7 @@ public class OnboardingActivity extends BaseActivity {
             showOnboarding();
         }
 
-        showUpgradeMessage();
+        //showUpgradeMessage();
     }
 
     private void setAnimLeft ()
