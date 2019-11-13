@@ -167,4 +167,6 @@
     <item>Confundido</item>
   </string-array>
   <string name="title_me">Yo</string>
+  <string name="send_message">Escribir para componer</string>
+  <string name="me_title">Yo</string>
 </resources>

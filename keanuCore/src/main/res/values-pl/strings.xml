@@ -301,4 +301,7 @@ Kliknij aby zaprosić.</string>
   <string name="unable_to_securely_share_this_file">Nie można bezpiecznie podzielić się tym plikiem</string>
   <string name="swipe_hint">&lt; przesuń w lewo i prawo po więcej opcji &gt;</string>
   <string name="title_me">Ja</string>
+  <string name="send_message">Wyślij wiadomość</string>
+  <string name="me_title">Ja</string>
+  <string name="add_account_action">Dodaj konto</string>
 </resources>

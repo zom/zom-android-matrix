@@ -300,4 +300,7 @@ Nätverkstrafik (även i bakgrunden) krävs för att kunna logga in med appen.</
   <string name="unable_to_securely_share_this_file">Kan inte dela denna fil säkert</string>
   <string name="swipe_hint">&lt; svep vänster och höger för fler alternativ &gt;</string>
   <string name="title_me">Jag</string>
+  <string name="send_message">Skicka ett meddelande</string>
+  <string name="me_title">Jag</string>
+  <string name="add_account_action">Lägg till konto</string>
 </resources>

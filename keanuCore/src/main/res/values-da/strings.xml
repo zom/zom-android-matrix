@@ -276,4 +276,7 @@ Rør skærm for at invitere.</string>
     <item>o_O</item>
   </string-array>
   <string name="title_me">Mig</string>
+  <string name="send_message">Send besked</string>
+  <string name="me_title">Mig</string>
+  <string name="add_account_action">Tilføj konto</string>
 </resources>

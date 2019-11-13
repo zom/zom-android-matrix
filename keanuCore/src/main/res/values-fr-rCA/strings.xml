@@ -295,4 +295,7 @@
   <string name="unable_to_securely_share_this_file">Le partage sécurisé de ce fichier est impossible</string>
   <string name="swipe_hint">&lt; Glisser gauche et droite pour plus d\'options &gt;</string>
   <string name="title_me">Moi</string>
+  <string name="send_message">Envoyer un message</string>
+  <string name="me_title">Moi</string>
+  <string name="add_account_action">Ajouter un compte</string>
 </resources>

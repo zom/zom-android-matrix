@@ -300,4 +300,7 @@
   <string name="unable_to_securely_share_this_file">Не е възможно сигурно споделяне на този файл</string>
   <string name="swipe_hint">&lt; плъзнете наляво и надясно за допълнителни опции &gt;</string>
   <string name="title_me">Аз</string>
+  <string name="send_message">Прати съобщение</string>
+  <string name="me_title">Аз</string>
+  <string name="add_account_action">Добави профил</string>
 </resources>

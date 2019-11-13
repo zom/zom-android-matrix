@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<resources>
-  <string name="app_name_zom">Keanu</string>
-  <string name="send_message">Envoyer un message</string>
-  <string name="me_title">Moi</string>
-  <string name="add_account_action">Ajouter un compte</string>
-</resources>

@@ -178,4 +178,6 @@ Deja que las aplicaciones escriban datos al proveedor de contenido MI. </string>
     <item>Confundido</item>
   </string-array>
   <string name="title_me">Yo</string>
+  <string name="me_title">Yo</string>
+  <string name="add_account_action">Añadir cuenta</string>
 </resources>

@@ -290,4 +290,7 @@ Trykk for å invitere.</string>
   <string name="this_is_a_group_chat">Dette er en gruppesamtale</string>
   <string name="unable_to_securely_share_this_file">Kunne ikke dele denne filen på en sikker måte</string>
   <string name="title_me">Meg</string>
+  <string name="send_message">Send en melding</string>
+  <string name="me_title">Meg</string>
+  <string name="add_account_action">Legg til konto</string>
 </resources>

@@ -296,4 +296,7 @@ cuentas configuradas.\n\n¡Pulse aquí para añadir una!</string>
   <string name="unable_to_securely_share_this_file">No se pudo compartir este fichero de forma segura</string>
   <string name="swipe_hint">&lt; haga un gesto de barrido a la izquierda y la derecha para más opciones &gt;</string>
   <string name="title_me">Yo</string>
+  <string name="send_message">Enviar un mensaje</string>
+  <string name="me_title">Yo</string>
+  <string name="add_account_action">Añadir cuenta</string>
 </resources>

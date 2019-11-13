@@ -207,4 +207,6 @@
     <item>o_O</item>
   </string-array>
   <string name="title_me">ကျွန်ုပ်</string>
+  <string name="me_title">ကျွန်ုပ်</string>
+  <string name="add_account_action">အကောင့်ပေါင်းထည့်</string>
 </resources>

@@ -276,4 +276,7 @@ Chạm vào để mời kết nối.</string>
     <item>o_O</item>
   </string-array>
   <string name="title_me">Tôi</string>
+  <string name="send_message">Gửi một tin nhắn</string>
+  <string name="me_title">Tôi</string>
+  <string name="add_account_action">Thêm tài khoản</string>
 </resources>

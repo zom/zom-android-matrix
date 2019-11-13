@@ -239,4 +239,7 @@ Sareko datuen konektibitatea (baita atzeko planoko datuena) beharrezkoa da aplik
     <item>o_O</item>
   </string-array>
   <string name="title_me">Ni</string>
+  <string name="send_message">Mezua bidali</string>
+  <string name="me_title">Ni</string>
+  <string name="add_account_action">Kontua gehitu</string>
 </resources>

@@ -288,4 +288,7 @@ Davet etmek için buraya basın.</string>
   </string-array>
   <string name="this_is_a_group_chat">Bu bir grup sohbetidir</string>
   <string name="title_me">Ben</string>
+  <string name="send_message">Bir ileti gönder</string>
+  <string name="me_title">Ben</string>
+  <string name="add_account_action">Hesap ekle</string>
 </resources>

@@ -274,4 +274,7 @@ Sentuh untuk mengundang.</string>
     <item>o_O</item>
   </string-array>
   <string name="title_me">Saya</string>
+  <string name="send_message">Kirim sebuah pesan</string>
+  <string name="me_title">Saya</string>
+  <string name="add_account_action">Tambah akun</string>
 </resources>

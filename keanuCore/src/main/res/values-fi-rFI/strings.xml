@@ -253,4 +253,6 @@ Klikkaa kutsuaksesi.</string>
     <item>o_O</item>
   </string-array>
   <string name="title_me">Minä</string>
+  <string name="me_title">Minä</string>
+  <string name="add_account_action">Lisää tili</string>
 </resources>

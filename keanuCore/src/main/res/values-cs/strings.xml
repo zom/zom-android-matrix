@@ -292,4 +292,7 @@ Klikněte pro pozvání.</string>
   <string name="unable_to_securely_share_this_file">Tento soubor nelze sdílet zabezpečeně</string>
   <string name="swipe_hint">&lt; přejeďte do leva a do prava pro více možností &gt;</string>
   <string name="title_me">Já</string>
+  <string name="send_message">Poslat zprávu</string>
+  <string name="me_title">Já</string>
+  <string name="add_account_action">Přidat účet</string>
 </resources>

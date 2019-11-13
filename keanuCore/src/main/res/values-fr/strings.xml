@@ -276,4 +276,7 @@ Appuyez pour inviter.</string>
     <item>o_O</item>
   </string-array>
   <string name="title_me">Moi</string>
+  <string name="send_message">Saisissez votre message</string>
+  <string name="me_title">Moi</string>
+  <string name="add_account_action">Ajouter un compte</string>
 </resources>

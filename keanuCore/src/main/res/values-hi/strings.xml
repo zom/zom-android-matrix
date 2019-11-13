@@ -110,4 +110,5 @@
     <item>हँसी</item>
     <item>Confused</item>
   </string-array>
+  <string name="add_account_action">खाता जोड़ें </string>
 </resources>

@@ -260,4 +260,7 @@ Es necesario tener conexión a la red de datos (incluyendo datos en segundo plan
     <item>o_O</item>
   </string-array>
   <string name="title_me">Yo</string>
+  <string name="send_message">Enviar un mensaje</string>
+  <string name="me_title">Yo</string>
+  <string name="add_account_action">Agregar cuenta</string>
 </resources>

@@ -112,4 +112,7 @@
   <!--Other: Smileys-->
   <!--[Do not localize!]-->
   <string name="title_me">Я</string>
+  <string name="send_message">Надіслати повідомлення</string>
+  <string name="me_title">Я</string>
+  <string name="add_account_action">Додати екаунт</string>
 </resources>

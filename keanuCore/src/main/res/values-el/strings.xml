@@ -267,4 +267,7 @@
     <item>o_O</item>
   </string-array>
   <string name="title_me">Εγώ</string>
+  <string name="send_message">Στείλτε ένα μήνυμα</string>
+  <string name="me_title">Εγώ</string>
+  <string name="add_account_action">Προσθήκη λογαριασμού</string>
 </resources>

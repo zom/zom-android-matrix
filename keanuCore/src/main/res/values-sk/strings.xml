@@ -150,4 +150,6 @@
     <item>Zmätený</item>
   </string-array>
   <string name="title_me">Mňa</string>
+  <string name="me_title">Mňa</string>
+  <string name="add_account_action">Pridať účet</string>
 </resources>
