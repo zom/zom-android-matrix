@@ -97,7 +97,7 @@ public class PanicSetupActivity extends BaseActivity {
 
         intent = getIntent();
         if (intent == null) {
-            // started from the Zom GUI, e.g. from a button/menu
+            // started from the GUI, e.g. from a button/menu
         } else {
             // started by an incoming Intent from another app
             String action = intent.getAction();

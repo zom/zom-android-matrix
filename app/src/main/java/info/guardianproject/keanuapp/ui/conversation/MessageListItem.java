@@ -697,37 +697,6 @@ public class MessageListItem extends FrameLayout {
         }
     }
 
-
-    /**
-    protected void onLongClickMediaIcon(final String mimeType, final Uri mediaUri) {
-
-        final java.io.File exportPath = SecureMediaStore.exportPath(mimeType, mediaUri);
-
-        new AlertDialog.Builder(context)
-        .setTitle(context.getString(R.string.export_media))
-        .setMessage(context.getString(R.string.export_media_file_to, exportPath.getAbsolutePath()))
-                .setNeutralButton("Share on Zom", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        reshareMediaFile(mimeType, mediaUri);
-                    }
-                })
-        .setPositiveButton(R.string.export, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                exportMediaFile(mimeType, mediaUri, exportPath);
-                return;
-            }
-        })
-        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                return;
-            }
-        })
-        .create().show();
-    }*/
-
     private String getImageFromContent (Context context, Uri mediaUri)
     {
         InputStream is;
