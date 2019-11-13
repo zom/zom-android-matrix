@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!--General: Names-->
-  <string name="ic_launcher_name">Zom</string>
-  <string name="app_name">Zom</string>
-  <string name="im_label">Zom</string>
+  <string name="ic_launcher_name">Keanu</string>
+  <string name="app_name">Keanu</string>
+  <string name="im_label">Keanu</string>
   <!--General: Permissions-->
   <string name="ro_perm_label">Sofortnachrichten lesen</string>
   <string name="ro_perm_desc">Erlaubt es Anwendungen, Daten vom Sofortnachrichteninhalteanbieter zu lesen.</string>
@@ -19,11 +19,11 @@
   <string name="no">Abbrechen</string>
   <string name="connect">Verbinden</string>
   <!--Views-->
-  <string name="title_activity_lock_screen">Zom Gesperrt</string>
+  <string name="title_activity_lock_screen">Keanu Gesperrt</string>
   <string name="lock_screen_create_passphrase">Passwort einstellen</string>
   <string name="lock_screen_confirm_passphrase">Passwort bestätigen</string>
   <string name="lock_screen_passphrase_hint">Passwort</string>
-  <string name="lock_screen_passphrase_not_set_enter">Sie können optional ein Hauptpasswort für Zom einstellen, um den Zugriff auf Ihre Kontakte und Nachrichten zu verhindern:</string>
+  <string name="lock_screen_passphrase_not_set_enter">Sie können optional ein Hauptpasswort für Keanu einstellen, um den Zugriff auf Ihre Kontakte und Nachrichten zu verhindern:</string>
   <string name="lock_screen_passphrase_not_set_confirm">Neues Passwort bestätigen</string>
   <string name="lock_screen_passphrases_not_matching">Passwort stimmt nicht überein, bitte versuchen Sie es erneut</string>
   <string name="lock_screen_skip">Überspringen &gt;&gt;</string>
@@ -83,7 +83,7 @@
   Hier antippen, um Unterhaltung zu beginnen!</string>
   <string name="search_label">Kontakt</string>
   <string name="search_hint">Den Namen des Kontakts eingeben, mit dem Sie sich unterhalten möchten.</string>
-  <string name="input_contact_label">Geben Sie den vollständigen Nutzernamen Ihres Freundes (zB. Zomisfun.4x3f5g@zom.im) hier ein:</string>
+  <string name="input_contact_label">Geben Sie den vollständigen Nutzernamen Ihres Freundes (zB. Keanuisfun.4x3f5g@zom.im) hier ein:</string>
   <!--Views: Chat: Single-->
   <string name="contact_online"><xliff:g id="user">%1$s</xliff:g> is verbunden</string>
   <string name="contact_away"><xliff:g id="user">%1$s</xliff:g> ist abwesend</string>
@@ -147,7 +147,7 @@
   <string name="pref_delete_unsecured_media_summary">Nach dem Import eines geteilten Fotos oder einer Datei wird das unverschlüsselte Original gelöscht.</string>
   <!--Actions: Settings: General: Other Tuning-->
   <string name="pref_group_tuning_title">Andere Feineinstellungen</string>
-  <string name="start_on_boot">Starten Sie Zom Automatisch</string>
+  <string name="start_on_boot">Starten Sie Keanu Automatisch</string>
   <string name="start_on_boot_summary">Start und Anmeldung automatisch in vorher angemeldeten Konten</string>
   <string name="hide_offline_contacts">Getrennte Kontakte ausblenden</string>
   <string name="foreground_service_title">Dienst mit Vordergrundpriorität</string>
@@ -176,7 +176,7 @@
   <string name="notify_groupchat_label">Einladung zur Gruppenunterhaltung</string>
   <string name="group_chat_invite_notify_text">Neue Einladung zur Gruppenunterhaltung von <xliff:g id="user">%s</xliff:g></string>
   <string name="new_messages_notify">Neue Nachricht(en) von</string>
-  <string name="starting_the_chatsecure_service_">Starte den Zom Dienst...</string>
+  <string name="starting_the_chatsecure_service_">Starte den Keanu Dienst...</string>
   <string name="app_unlocked">Aktiviert und entsperrt</string>
   <!--Alerts: Exceptions-->
   <string name="error">Achtung</string>
@@ -210,10 +210,10 @@
   <string name="msisdn_error">Die auf der SIM-Karte gespeicherte Telefonnummer kann nicht gelesen werden. Bitte wenden Sie sich an den Netzbetreiber.</string>
   <string name="not_signed_in">Sie sind derzeit nicht angemeldet.</string>
   <string name="account_setup_error_server">Beim Verbinden mit dem Server ist ein Fehler aufgetreten – bitte überprüfen Sie die Server-Konfiguration und versuchen Sie es erneut.</string>
-  <string name="error_suspended_connection">Zom hat die Verbindung zum Netzwerk verloren</string>
+  <string name="error_suspended_connection">Keanu hat die Verbindung zum Netzwerk verloren</string>
   <string name="unable_to_create_or_join_group_chat">Gruppenunterhaltung konnte nicht erstellt oder betreten werden</string>
   <string name="unsupported_incoming_data">Nicht unterstützte eingehende Daten, können nicht freigegeben werden!</string>
-  <string name="swipe_alert">Zom hat festgestellt, dass eine Anforderung zum Entfernen der Aufgabe gestellt wurde. Zom wird wahrscheinlich abstürzen. Bitte verwenden Sie stattdessen den Menüpunkt Alle abmelden auf dem Bildschirm Kontenliste.</string>
+  <string name="swipe_alert">Keanu hat festgestellt, dass eine Anforderung zum Entfernen der Aufgabe gestellt wurde. Keanu wird wahrscheinlich abstürzen. Bitte verwenden Sie stattdessen den Menüpunkt Alle abmelden auf dem Bildschirm Kontenliste.</string>
   <string name="there_is_no_viewer_available_for_this_file_format">Für dieses Dateiformat ist kein Betrachter vorhanden</string>
   <string name="otr_keysync_warning_message">Bitte die Datei »otr_keystore.ofcaes« von der Desktop-Software »OtrFileConverter« in das Stammverzeichnis des Gerätespeichers kopieren</string>
   <string name="msg_sent_failed">Die Nachricht konnte nicht gesendet werden.</string>
@@ -225,9 +225,9 @@
   <string name="account_settings_title">Kontoeinstellungen</string>
   <string name="pref_group_protect_data_title">Schützen Sie meine Daten</string>
   <string name="panic_trigger_app">Panik-Auslöser App</string>
-  <string name="panic_trigger_app_summary">Eine Panik-App kann Zom zum Sperren, Senden einer Nachricht, Löschen von Daten veranlassen usw.</string>
+  <string name="panic_trigger_app_summary">Eine Panik-App kann Keanu zum Sperren, Senden einer Nachricht, Löschen von Daten veranlassen usw.</string>
   <string name="panic_setup">Panik Einrichtung</string>
-  <string name="panic_setup_summary">Richten Sie ein, wie Zom auf eine Panikbenachrichtigung reagiert.</string>
+  <string name="panic_setup_summary">Richten Sie ein, wie Keanu auf eine Panikbenachrichtigung reagiert.</string>
   <string name="panic_app_none">Keins</string>
   <string name="panic_app_none_summary">Keine Panik-Auslöser App, ignoriere alle eingehenden Panik-Auslöser.</string>
   <string name="panic_app_default">Standard</string>
@@ -320,7 +320,7 @@
   </string-array>
   <string name="this_is_a_group_chat">Dieses ist eine Gruppenunterhaltung</string>
   <string name="unable_to_securely_share_this_file">Das verschlüsselte Teilen der Datei ist fehlgeschlagen.</string>
-  <string name="your_keystore_is_corrupted_please_re_install_chatsecure_or_clear_data_for_the_app">Ihr Schlüsselspeicher ist beschädigt. Bitte installieren Sie wieder Zom oder \'Lösche Daten\' für die App</string>
+  <string name="your_keystore_is_corrupted_please_re_install_chatsecure_or_clear_data_for_the_app">Ihr Schlüsselspeicher ist beschädigt. Bitte installieren Sie wieder Keanu oder \'Lösche Daten\' für die App</string>
   <string name="swipe_hint">&lt; Nach Rechts und Links wischen, für mehr Informationen &gt;</string>
   <string name="no_convos">Zeit zum Zooming!</string>
   <string name="title_more">Entdecken</string>

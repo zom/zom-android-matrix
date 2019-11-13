@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!--General: Names-->
-  <string name="ic_launcher_name">Zom</string>
-  <string name="app_name">Zom</string>
-  <string name="im_label">Zom</string>
+  <string name="ic_launcher_name">Keanu</string>
+  <string name="app_name">Keanu</string>
+  <string name="im_label">Keanu</string>
   <!--General: Permissions-->
   <string name="ro_perm_label">baca pesan instan</string>
   <string name="ro_perm_desc">
@@ -147,7 +147,7 @@ Sentuh untuk mengundang.</string>
   <string name="notification_vibrate_summary">Getar ketika ada IM</string>
   <string name="notification_sound_title">Suara</string>
   <string name="notification_sound_summary">Bunyikan ringtone ketika ada IM</string>
-  <string name="notification_ringtone_title">Gunakan nada dering Zom yang dibuat sendiri</string>
+  <string name="notification_ringtone_title">Gunakan nada dering Keanu yang dibuat sendiri</string>
   <!--Actions: Settings: General: Developer-->
   <!--Alerts: Dialogs-->
   <string name="bg_data_prompt_message">
@@ -188,8 +188,8 @@ Sentuh untuk mengundang.</string>
   <string name="already_logged_in">anda telah Sign In dari klien lain.</string>
   <string name="msisdn_error">Maaf, nomor telepon tidak dapat dibaca dari kartu SIM anda. Silahkan hubungi operator anda untuk bantuan.</string>
   <string name="not_signed_in">Saat ini anda tidak Sign In.</string>
-  <string name="account_setup_error_server">Zom mengalami masalah ketika menghubungi server percakapan - silahkan cek konfigurasi dan coba lagi.</string>
-  <string name="error_suspended_connection">Zom kehilangan koneksi ke jaringan</string>
+  <string name="account_setup_error_server">Keanu mengalami masalah ketika menghubungi server percakapan - silahkan cek konfigurasi dan coba lagi.</string>
+  <string name="error_suspended_connection">Keanu kehilangan koneksi ke jaringan</string>
   <string name="unable_to_create_or_join_group_chat">Tidak dapat membuat atau bergabung ke percakapan grup</string>
   <string name="otr_keysync_warning_message">Silahkan salin file \'otr_keystore.ofcaes\' dari desktop dengan alat OtrFileConverter ke root directory penyimpanan</string>
   <string name="msg_sent_failed">Pesan ini tidak dapat dikirim.</string>

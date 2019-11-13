@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources>
-  <string name="app_name_zom">Zom</string>
+  <string name="app_name_zom">Keanu</string>
   <string name="create_an_account">Account aanmaken</string>
-  <string name="create_id">Zom-ID aanmaken</string>
+  <string name="create_id">Keanu-ID aanmaken</string>
   <string name="advanced">Geavanceerd</string>
-  <string name="account_congrats">Ziezo, je bent klaar om Zom te gebruiken!</string>
+  <string name="account_congrats">Ziezo, je bent klaar om Keanu te gebruiken!</string>
   <string name="account_congrats_details">Je kan je wachtwoord en accountgegevens vinden op je profiel.</string>
   <string name="invite_friends">Voeg je vrienden toe!</string>
   <string name="invite_sms">SMS</string>
@@ -15,7 +15,7 @@
   <string name="friends">Vrienden</string>
   <string name="add_friends">Vrienden toevoegen</string>
   <string name="search_by_id">Zoeken op ID</string>
-  <string name="invite_accepted">Jullie zijn nu vrienden op Zom</string>
+  <string name="invite_accepted">Jullie zijn nu vrienden op Keanu</string>
   <string name="chats">Gesprekken</string>
   <string name="choose_friend">Kies een vriend</string>
   <string name="send_message">Verstuur een bericht</string>
@@ -36,8 +36,8 @@
   <string name="choose_photos">Kiezen uit foto\'s</string>
   <string name="choose_language">Taal wijzigen</string>
   <string name="welcome_to_zom">WELKOM BIJ ZOM</string>
-  <string name="onboarding_generate">Maak een Zom-ID aan en we zullen een veilig wachtwoord voor je creëren.</string>
-  <string name="grant_perms">Je moet Zom toestemming geven je camera te gebruiken</string>
+  <string name="onboarding_generate">Maak een Keanu-ID aan en we zullen een veilig wachtwoord voor je creëren.</string>
+  <string name="grant_perms">Je moet Keanu toestemming geven je camera te gebruiken</string>
   <string name="menu_refresh">Sessie herladen</string>
   <string name="action_archived">Gearchiveerd</string>
   <string name="action_unarchived">Gedearchiveerd</string>
@@ -59,18 +59,18 @@
   <string name="color_bg_summary">Kleur van gespreksachtergronden en lijsten</string>
   <string name="menu_approve_friend">Vriend goedkeuren?</string>
   <string name="header_got_invited">BEN JE UITGENODIGD?</string>
-  <string name="action_tap_invite">Tik op de Zom-uitnodigingslink van je vriend of scan hun QR-code</string>
+  <string name="action_tap_invite">Tik op de Keanu-uitnodigingslink van je vriend of scan hun QR-code</string>
   <string name="action_invite_new_friends">Verzend een uitnodigingslink naar je vrienden per SMS of deel ze met een app</string>
   <string name="not_verified">Verifieer de veilige identiteit van je vriend om veilig te zijn!</string>
   <string name="security_code">Veilige identiteit</string>
   <string name="reset_passphrase">Vergrendeling opnieuw instellen</string>
-  <string name="action_services">Zom-diensten</string>
+  <string name="action_services">Keanu-diensten</string>
   <string name="migrate_menu">Account migreren</string>
-  <string name="migrate_message">\"Ik heb een nieuwe account, Zom met me op</string>
+  <string name="migrate_message">\"Ik heb een nieuwe account, Keanu met me op</string>
   <string name="migrate_notification">Binnenkort verloopt je account. Open de app om bij te werken.</string>
   <string name="action_undo">Ongedaan maken</string>
-  <string name="message_upgrade">We moeten je Zom-account bijwerken naar een nieuwe server. We kunnen dit automatisch voor je doen.</string>
-  <string name="message_upgrade_more">We moeten je Zom-account bijwerken naar een nieuwe server. We kunnen dit automatisch voor je doen. Als je een geavanceerd gebruiker bent kan je ook je eigen server kiezen.</string>
+  <string name="message_upgrade">We moeten je Keanu-account bijwerken naar een nieuwe server. We kunnen dit automatisch voor je doen.</string>
+  <string name="message_upgrade_more">We moeten je Keanu-account bijwerken naar een nieuwe server. We kunnen dit automatisch voor je doen. Als je een geavanceerd gebruiker bent kan je ook je eigen server kiezen.</string>
   <string name="upgrade_desc">We brengen hier verbeteringen aan.\nVerkrijg nu je gratis update!</string>
   <string name="upgrade_action">Nu bijwerken</string>
   <string name="upgrade_complete">Bijwerken voltooid! Nu wachten we nog op je vrienden om je nieuwe account goed te keuren.</string>
@@ -81,8 +81,8 @@
   <string name="contact_migration_action">Nu chatten</string>
   <string name="upgrade_old_chats">Je gesprekken vanop je oude account worden hier opgeslagen</string>
   <string name="message_waiting_for_friend">Wachten op je vriend</string>
-  <string name="message_archive">Enkele van je Zom-vrienden werken hun accounts bij. Verlopen accounts worden hier opgeslagen.</string>
-  <string name="one_moment_please_privacy">Even geduld! We bereiden je privé-Zom voor.</string>
+  <string name="message_archive">Enkele van je Keanu-vrienden werken hun accounts bij. Verlopen accounts worden hier opgeslagen.</string>
+  <string name="one_moment_please_privacy">Even geduld! We bereiden je privé-Keanu voor.</string>
   <string name="action_got_it">Begrepen</string>
   <string name="action_inbox">Inbox</string>
   <string name="action_active">Actief</string>

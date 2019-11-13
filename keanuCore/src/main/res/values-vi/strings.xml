@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!--General: Names-->
-  <string name="ic_launcher_name">Zom</string>
-  <string name="app_name">Zom</string>
-  <string name="im_label">Zom</string>
+  <string name="ic_launcher_name">Keanu</string>
+  <string name="app_name">Keanu</string>
+  <string name="im_label">Keanu</string>
   <!--General: Permissions-->
   <string name="ro_perm_label">đọc nội dung chat</string>
   <string name="ro_perm_desc">
@@ -189,8 +189,8 @@ Chạm vào để mời kết nối.</string>
   <string name="already_logged_in">bạn đã đăng nhập vào dịch vụ từ một ứng dụng khác.</string>
   <string name="msisdn_error">Xin thứ lỗi, chúng tôi không thể đọc được số điện thoại từ SIM của bạn. Xin liên lạc với tổng đài để nhận giúp đỡ.</string>
   <string name="not_signed_in">Bạn hiện vẫn chưa đăng nhập vào.</string>
-  <string name="account_setup_error_server">Zom đã gặp lỗi khi đang kết nối và máy chủ - xin vui lòng xem lại cấu hình của bạn và thử lại.</string>
-  <string name="error_suspended_connection">Zom đã bị mất kết nối vào mạng lưới</string>
+  <string name="account_setup_error_server">Keanu đã gặp lỗi khi đang kết nối và máy chủ - xin vui lòng xem lại cấu hình của bạn và thử lại.</string>
+  <string name="error_suspended_connection">Keanu đã bị mất kết nối vào mạng lưới</string>
   <string name="unable_to_create_or_join_group_chat">Không thể tạo hoặc tham gia trò chuyện theo nhóm</string>
   <string name="there_is_no_viewer_available_for_this_file_format">Không tồn tại chương trình có thể đọc định dạng file này</string>
   <string name="otr_keysync_warning_message">Xin vui lòng sao chép tập tin \'otr_keystore.ofcaes\' từ desktop OtrFileConverter tool đến thư mục gốc trong thẻ nhớ của bạn</string>
