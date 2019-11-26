@@ -56,6 +56,8 @@ public class PdfViewActivity extends AppCompatActivity {
     private String mMimeType = null;
     private PDFView mPdfView = null;
 
+    private String mMessageId = null;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -146,6 +148,9 @@ public class PdfViewActivity extends AppCompatActivity {
                 return true;
 
 
+            case R.id.menu_message_delete:
+                deleteMediaFile ();
+
             case R.id.menu_message_nearby:
                 sendNearby();
                 return true;
@@ -180,6 +185,19 @@ public class PdfViewActivity extends AppCompatActivity {
 
     }
 
+
+    private void deleteMediaFile () {
+        Uri deleteUri = mMediaUri;
+        if (deleteUri.getScheme() != null && deleteUri.getScheme().equals("vfs"))
+        {
+            info.guardianproject.iocipher.File fileMedia = new info.guardianproject.iocipher.File(deleteUri.getPath());
+            fileMedia.delete();
+        }
+
+        Imps.deleteMessageInDb(getContentResolver(), mMessageId);
+        setResult(RESULT_OK);
+        finish();
+    }
 
     public void exportMediaFile ()
     { if (checkPermissions()) {

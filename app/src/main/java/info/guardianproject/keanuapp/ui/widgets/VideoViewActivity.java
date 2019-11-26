@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.ImUrlActivity;
 import info.guardianproject.keanuapp.R;
@@ -52,6 +53,7 @@ public class VideoViewActivity extends AppCompatActivity {
     private Uri mMediaUri = null;
     private String mMimeType = null;
     private String accessToken = null;
+    private String mMessageId = null;
 
     private SimpleExoPlayerView mPlayerView = null;
     private SimpleExoPlayer mExoPlayer;
@@ -168,6 +170,8 @@ public class VideoViewActivity extends AppCompatActivity {
                 return true;
 
 
+            case R.id.menu_message_delete:
+                deleteMediaFile ();
             case R.id.menu_message_nearby:
                 sendNearby();
                 return true;
@@ -200,6 +204,18 @@ public class VideoViewActivity extends AppCompatActivity {
 
     }
 
+    private void deleteMediaFile () {
+        Uri deleteUri = mMediaUri;
+        if (deleteUri.getScheme() != null && deleteUri.getScheme().equals("vfs"))
+        {
+            info.guardianproject.iocipher.File fileMedia = new info.guardianproject.iocipher.File(deleteUri.getPath());
+            fileMedia.delete();
+        }
+
+        Imps.deleteMessageInDb(getContentResolver(), mMessageId);
+        setResult(RESULT_OK);
+        finish();
+    }
 
     public void exportMediaFile() {
         if (checkPermissions()) {

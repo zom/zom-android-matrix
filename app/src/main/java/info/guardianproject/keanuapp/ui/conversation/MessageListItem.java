@@ -632,16 +632,22 @@ public class MessageListItem extends FrameLayout {
         else if (mimeType.contains("pdf")) {
             Intent intent = new Intent(context, PdfViewActivity.class);
             intent.setDataAndType(mediaUri,mimeType);
+            intent.putExtra("id",packetId);
+
             context.startActivity(intent);
         }
         else if (mimeType.contains("html")||mimeType.contains("text/plain")) {
             Intent intent = new Intent(context, WebViewActivity.class);
             intent.setDataAndType(mediaUri,mimeType);
+            intent.putExtra("id",packetId);
+
             context.startActivity(intent);
         }
         else if (mimeType.contains("video")) {
             Intent intent = new Intent(context, VideoViewActivity.class);
             intent.setDataAndType(mediaUri,mimeType);
+            intent.putExtra("id",packetId);
+
             context.startActivity(intent);
         }
         else if (mediaUri.getScheme().equals("content"))

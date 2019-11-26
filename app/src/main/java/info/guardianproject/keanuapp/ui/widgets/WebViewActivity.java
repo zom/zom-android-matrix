@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import info.guardianproject.iocipher.FileInputStream;
+import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.ImUrlActivity;
 import info.guardianproject.keanuapp.R;
@@ -31,6 +32,7 @@ public class WebViewActivity extends AppCompatActivity {
     private boolean mShowResend = false;
     private Uri mMediaUri = null;
     private String mMimeType = null;
+    private String mMessageId = null;
 
     private WebView mWebView = null;
 
@@ -83,6 +85,7 @@ public class WebViewActivity extends AppCompatActivity {
 
         mMediaUri = getIntent().getData();
         mMimeType = getIntent().getType();
+        mMessageId = getIntent().getStringExtra("id");
 
         InputStream is;
 
@@ -166,7 +169,8 @@ public class WebViewActivity extends AppCompatActivity {
                 resendMediaFile();
                 return true;
 
-
+            case R.id.menu_message_delete:
+                deleteMediaFile ();
             case R.id.menu_message_nearby:
                 sendNearby();
                 return true;
@@ -190,6 +194,19 @@ public class WebViewActivity extends AppCompatActivity {
         }
 
         return true;
+    }
+
+    private void deleteMediaFile () {
+        Uri deleteUri = mMediaUri;
+        if (deleteUri.getScheme() != null && deleteUri.getScheme().equals("vfs"))
+        {
+            info.guardianproject.iocipher.File fileMedia = new info.guardianproject.iocipher.File(deleteUri.getPath());
+            fileMedia.delete();
+        }
+
+        Imps.deleteMessageInDb(getContentResolver(), mMessageId);
+        setResult(RESULT_OK);
+        finish();
     }
 
     public void sendNearby ()
