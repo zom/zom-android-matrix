@@ -388,19 +388,7 @@
 
     <string name="your_keystore_is_corrupted_please_re_install_chatsecure_or_clear_data_for_the_app">ཁྱེད་ཀྱི་གསང་བའི་ལྡེ་མིག་ཉར་སྣོད་དེ་འཕྲོ་བརླགས་ལ་ཕྱིན་འདུག སྐུ་མཁྱེན། འཛོམས་བསྐྱར་འཇུག་བྱེད་པའམ་ཡང་ན་བཀོལ་ཆས་ཀྱི་མ་ལག་གཙང་བཟོ་བྱོས། 
 </string>
-<<<<<<< HEAD:app/src/main/res/values-bo/strings.xml
-  <string name="swipe_hint">གདམ་ཁ་མང་པོའི་ཆེད་གཡས་དང་གཡོན་ལ་མཛུབ་མོས་དེད།</string>
-  <string name="no_convos">ཉེན་སྲུང་གླེང་མོལ་འགོ་ཚུགས།</string>
-  <string name="title_more">གསར་རྙེད།</string>
-  <string name="title_me">ང་།</string>
-  <string name="no_photos">གཏོང་ལེན་བྱས་པའི་འདྲ་པར་ཁག་འདིར་འཆར་ངེས།</string>
-  <string name="group_admin">དོ་དམ་པ།</string>
-  <string name="group_you">ཁྱེད་རང་།</string>
 
-  <string name="upgrade_message"> ཁྱེད་ཀྱིས་འཛོམས་བེད་སྤྱོད་བཏང་བར་ཐུགས་རྗེ་ཆེ། ང་ཚོའི་ཐེངས་རྗེས་མའི་འཛོམས་བཀོལ་ཆས་གསར་སྣོན་གྱིས་ཡིད་རྟོན་གོང་མཐོར་དང་དུས་ཐོག་ཏུ་བརྡ་ཐོ་གཏོང་དུ་འཇུག་གི་ཡོད། འོན་ཀྱང་། ཁྱེད་ཀྱིས་ཡང་བསྐྱར་ཐོ་འགོད་བྱས་ཏེ། གྲོགས་པོ་བསྐྱར་དུ་ཁ་སྣོན་བྱེད་དགོས། ཁྱེད་ལ་དཀའ་ཚེགས་བཟོས་པར་དགོངས་དག་ཞུ། འ
-    ཛོམས་བཀོལ་ཆས་ཐོན་གསར་པའི་སྐོར་ལ་བསམ་ཚུལ་གང་ཡོད་གསུང་རོགས།</string>
-</resources>
-=======
     <string name="swipe_hint">གདམ་ཁ་མང་པོའི་ཆེད་གཡས་དང་གཡོན་ལ་མཛུབ་མོས་དེད།</string>
 
     <string name="no_convos">ཉེན་སྲུང་གླེང་མོལ་འགོ་ཚུགས།</string>
@@ -634,4 +622,3 @@
 
     <string name="create_session">ཚོགས་ཐུན་བཟོས།</string>
 </resources>
->>>>>>> 6b715250d6b3269ce1aaf055735bb352af713bda:keanuCore/src/main/res/values-bo/strings.xml

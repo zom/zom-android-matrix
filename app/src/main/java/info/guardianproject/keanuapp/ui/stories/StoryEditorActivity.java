@@ -11,7 +11,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
-import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -26,16 +25,13 @@ import android.widget.LinearLayout;
 
 import org.jcodec.containers.mp4.boxes.Edit;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.Date;
 import java.util.UUID;
 
 import info.guardianproject.iocipher.File;
-import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.provider.Imps;
@@ -342,18 +338,6 @@ public class StoryEditorActivity extends AppCompatActivity {
         });**/
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        saveDraft();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        loadDraft();
-    }
-
     //
 
     private void insertImage (String linkImage, String alt) {
@@ -461,19 +445,7 @@ public class StoryEditorActivity extends AppCompatActivity {
 
     private void saveDraft ()
     {
-        String html = mEditor.getHtml();
 
-        if (!TextUtils.isEmpty(html)) {
-            Uri vfsUri = storeHTML(html, "draft.html");
-        }
-
-    }
-
-    private void loadDraft ()
-    {
-        String html = loadHTML(Uri.parse("vfs://draft.html"));
-
-        mEditor.setHtml(html);
     }
 
     private void saveStory ()
@@ -483,33 +455,10 @@ public class StoryEditorActivity extends AppCompatActivity {
             String html = mEditor.getHtml();
 
             if (!TextUtils.isEmpty(html)) {
-
-                //clear out draft
-                storeHTML("", "draft.html");
-
-                Uri vfsUri = storeHTML(html,null);
-                sendStory(vfsUri);
-
+                storeHTML(html);
                 finish();
             }
         }
-    }
-
-    private void sendStory (Uri vfsUri)
-    {
-        String offerId = UUID.randomUUID().toString();
-        String mimeType = "text/html";
-
-        //adds in an empty message, so it can exist in the gallery and be forwarded
-        Imps.insertMessageInDb(
-                getContentResolver(), false, new Date().getTime(), true, null, vfsUri.toString(),
-                System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED,
-                0, offerId, mimeType, null);
-
-        Intent data = new Intent();
-        data.setDataAndType(vfsUri,mimeType);
-        setResult(RESULT_OK, data);
-
     }
 
 
@@ -535,90 +484,70 @@ public class StoryEditorActivity extends AppCompatActivity {
     }
 
 
-    private String loadHTML (Uri vfsUri)
-    {
-        // import
 
-        try {
-
-            StringBuffer sb = new StringBuffer();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(new File(vfsUri.getPath()))));
-
-            String line = null;
-
-            while ((line = reader.readLine()) != null)
-                sb.append(line);
-
-
-            return sb.toString();
-
-        }
-        catch (IOException ioe)
-        {
-            Log.e(LOG_TAG,"error importing photo",ioe);
-        }
-
-        return null;
-    }
-
-
-    private Uri storeHTML (String html, String path)
+    private void storeHTML (String html)
     {
         // import
         String sessionId = "self";
-        Uri result = null;
+        String offerId = UUID.randomUUID().toString();
 
         try {
 
-            if (path == null) {
-                String title = mEditTitle.getText().toString();
-                if (TextUtils.isEmpty(title))
-                    title = "story" + new Date().getTime() + ".html";
-                else
-                    title = URLEncoder.encode(title, "UTF-8") + ".html";
+            String title = mEditTitle.getText().toString();
+            if (TextUtils.isEmpty(title))
+                title = "story" + new Date().getTime() + ".html";
+            else
+                title = URLEncoder.encode(title,"UTF-8")  + ".html";
 
-                result = SecureMediaStore.createContentPath(sessionId,title);
-                path = result.getPath();
-            }
+            final Uri vfsUri = SecureMediaStore.createContentPath(sessionId,title);
 
-            OutputStream out = new FileOutputStream(new File(path));
+            OutputStream out = new FileOutputStream(new File(vfsUri.getPath()));
+            String mimeType = "text/html";
 
             out.write(html.getBytes());
             out.flush();
             out.close();
 
-            return result;
+            //adds in an empty message, so it can exist in the gallery and be forwarded
+            Imps.insertMessageInDb(
+                    getContentResolver(), false, new Date().getTime(), true, null, vfsUri.toString(),
+                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED,
+                    0, offerId, mimeType, null);
+
+
+            Intent data = new Intent();
+            data.setDataAndType(vfsUri,mimeType);
+            setResult(RESULT_OK, data);
+
+
 
         }
         catch (IOException ioe)
         {
             Log.e(LOG_TAG,"error importing photo",ioe);
         }
-
-        return null;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_ADD_MEDIA) {
-                if (data != null && data.hasExtra("resultUris")) {
-                    String[] mediaUris = data.getStringArrayExtra("resultUris");
-                    String[] mediaTypes = data.getStringArrayExtra("resultTypes");
+        if (requestCode == REQUEST_ADD_MEDIA)
+        {
+            if (data.hasExtra("resultUris")) {
+                String[] mediaUris = data.getStringArrayExtra("resultUris");
+                String[] mediaTypes = data.getStringArrayExtra("resultTypes");
 
-                    for (int i = 0; i < mediaUris.length; i++) {
-                        Uri mediaUri = Uri.parse(mediaUris[i]);
-                        try {
-                            uploadMediaAsync(mediaUri, mediaUri.getLastPathSegment(), mediaTypes[i]);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
+                for (int i = 0; i < mediaUris.length; i++) {
+                    Uri mediaUri = Uri.parse(mediaUris[i]);
+                    try {
+                        uploadMediaAsync(mediaUri, mediaUri.getLastPathSegment(), mediaTypes[i]);
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
                 }
-
             }
+
         }
 
     }
