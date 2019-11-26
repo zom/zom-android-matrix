@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!--General: Names-->
-  <string name="ic_launcher_name">Zom</string>
-  <string name="app_name">Zom</string>
-  <string name="im_label">Zom</string>
+  <string name="ic_launcher_name">Keanu</string>
+  <string name="app_name">Keanu</string>
+  <string name="im_label">Keanu</string>
   <!--General: Permissions-->
   <string name="ro_perm_label">leer mensajes </string>
   <string name="ro_perm_desc">\nPermitir a las aplicaciones leer del proveedor de contenido de mensajería instantánea.\n    </string>
@@ -156,8 +156,8 @@
   <string name="already_logged_in">ha iniciado sesión desde otro cliente.</string>
   <string name="msisdn_error">No se puede leer el número de teléfono de la tarjeta SIM. Póngase en contacto con su operador para obtener ayuda.</string>
   <string name="not_signed_in">No ha iniciado sesión.</string>
-  <string name="account_setup_error_server">Zom ha detectado un error al conectar con el servidor - por favor revise su configuración y vuelva a intentarlo.</string>
-  <string name="error_suspended_connection">Zom ha perdido la conexión a la red</string>
+  <string name="account_setup_error_server">Keanu ha detectado un error al conectar con el servidor - por favor revise su configuración y vuelva a intentarlo.</string>
+  <string name="error_suspended_connection">Keanu ha perdido la conexión a la red</string>
   <string name="msg_sent_failed">No se ha podido enviar el mensaje.</string>
   <string name="disconnected_warning">Se ha perdido la conexión con el servidor. Los mensajes se enviarán cuando se restablezca la conexión.</string>
   <string name="account_settings_title">Configuración de la cuenta</string>
@@ -237,4 +237,60 @@
     <item>o_O</item>
   </string-array>
   <string name="title_me">Yo</string>
+  <string name="create_an_account">Crear una cuenta</string>
+  <string name="create_id">Crear un ID de Keanu</string>
+  <string name="advanced">Avanzado</string>
+  <string name="account_congrats">Enhorabuena, está preparado para usar Keanu.</string>
+  <string name="account_congrats_details">Puede encontrar los datos de su cuenta y contraseña en la página de su perfil.</string>
+  <string name="invite_sms">SMS</string>
+  <string name="invite_share">Compartir</string>
+  <string name="invite_scan_qr">Escanear</string>
+  <string name="sign_in_message">Iniciar sesión con una cuenta existente</string>
+  <string name="invite_action">Invitar</string>
+  <string name="friends">Amigos</string>
+  <string name="add_friends">Añadir amigos</string>
+  <string name="search_by_id">Buscar por ID</string>
+  <string name="invite_accepted">Ya es amigo en Keanu</string>
+  <string name="chats">Conversaciones</string>
+  <string name="choose_friend">Elegir un amigo</string>
+  <string name="send_message">Escriba el texto aquí</string>
+  <string name="push_to_talk">Pulsar y hablar</string>
+  <string name="recording_release">Grabando… Suelte para enviar.</string>
+  <string name="recording_delete">Grabando… Suelte para eliminar.</string>
+  <string name="swipe_up_delete">Deslizar hacia arriba para eliminar</string>
+  <string name="create_group">Crear un grupo</string>
+  <string name="members">Miembros</string>
+  <string name="group_name">Nombre del grupo</string>
+  <string name="search_history">Buscar historial</string>
+  <string name="photo_gallery">Lista de fotos compartidas</string>
+  <string name="me_title">Yo</string>
+  <string name="accounts">Mis cuentas</string>
+  <string name="select_avatar">Seleccionar o crear un avatar</string>
+  <string name="delete_account">Eliminar cuenta</string>
+  <string name="add_account_action">Añadir cuenta</string>
+  <string name="choose_photos">Elegir desde fotos</string>
+  <string name="choose_language">Cambiar idioma</string>
+  <string name="welcome_to_zom">BIENVENIDO A ZOM</string>
+  <string name="onboarding_generate">Cree un ID de Keanu y nosotros generaremos una contraseña segura para usted.</string>
+  <string name="grant_perms">Debe permitir a Keanu el uso de la cámara</string>
+  <string name="menu_refresh">Actualizar sesión</string>
+  <string name="action_archived">Archivado</string>
+  <string name="action_verified">Comprobado</string>
+  <string name="action_theme">Cambiar tema</string>
+  <string name="action_stickers">Compartir con etiquetas</string>
+  <string name="pref_block_screenshots_title">Bloquear capturas de pantalla</string>
+  <string name="pref_block_screenshots_summary">Bloquear los intentos de hacer capturas de pantallas de esta aplicación por parte de otras aplicaciones.</string>
+  <string name="pref_enable_tibetan_dictionary_title">Habilitar diccionario tibetano</string>
+  <string name="pref_enable_tibetan_dictionary_summary">Si está presente, sugerir palabras en tibetano de la aplicación Monlam Tibetan Dictionary</string>
+  <string name="color_category_title">Personalizar colores</string>
+  <string name="color_reset_title">Restablecer colores</string>
+  <string name="color_reset_summary">Restablecer los colores con los valores predeterminados</string>
+  <string name="color_header_title">Colores de encabezados</string>
+  <string name="color_header_summary">Color de encabezados, barras de herramientas y de acciones.</string>
+  <string name="color_text_title">Color del texto</string>
+  <string name="color_text_summary">Color del texto en mensajes y listas</string>
+  <string name="color_bg_title">Color de fondo</string>
+  <string name="color_bg_summary">Color de fondo de conversaciones y listas</string>
+  <string name="menu_approve_friend">¿Autorizar amigo?</string>
+  <string name="header_got_invited">¿LO HAN INVITADO?</string>
 </resources>

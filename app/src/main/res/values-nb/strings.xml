@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!--General: Names-->
-  <string name="ic_launcher_name">Zom</string>
-  <string name="app_name">Zom</string>
-  <string name="im_label">Zom</string>
+  <string name="ic_launcher_name">Keanu</string>
+  <string name="app_name">Keanu</string>
+  <string name="im_label">Keanu</string>
   <!--General: Permissions-->
   <string name="ro_perm_label">les meldinger</string>
   <string name="ro_perm_desc">
@@ -153,7 +153,7 @@ Trykk for å invitere.</string>
   <string name="notification_vibrate_summary">Vibrer når det kommer lynmeldinger</string>
   <string name="notification_sound_title">Lyd</string>
   <string name="notification_sound_summary">Spill ringetone når det kommer lynmeldinger</string>
-  <string name="notification_ringtone_title">Bruk Zom spesial-ringetone</string>
+  <string name="notification_ringtone_title">Bruk Keanu spesial-ringetone</string>
   <!--Actions: Settings: General: Developer-->
   <string name="pref_debug_title">Skru på loggføring av feilsøkingsinformasjon</string>
   <string name="pref_debug_summary">Skriv programloggdata til standard utdata / logcat for feilsøking</string>
@@ -196,8 +196,8 @@ Trykk for å invitere.</string>
   <string name="already_logged_in">du allerede er pålogget med en annen klient.</string>
   <string name="msisdn_error">Beklager, kan ikke lese telefonnummeret fra SIM-kortet. Kontakt operatøren for hjelp.</string>
   <string name="not_signed_in">Du er ikke pålogget.</string>
-  <string name="account_setup_error_server">Zom støtte på en feil under tilkobling til chatserveren - vennligst sjekk konfigurasjonen og prøv igjen.</string>
-  <string name="error_suspended_connection">Zom har mistet forbindelsen til nettverket</string>
+  <string name="account_setup_error_server">Keanu støtte på en feil under tilkobling til chatserveren - vennligst sjekk konfigurasjonen og prøv igjen.</string>
+  <string name="error_suspended_connection">Keanu har mistet forbindelsen til nettverket</string>
   <string name="unable_to_create_or_join_group_chat">Klarte ikke å starte eller ta del i gruppesludder</string>
   <string name="there_is_no_viewer_available_for_this_file_format">Det er inget tilknyttet program tilgjengelig for lesing av dette filformatet</string>
   <string name="otr_keysync_warning_message">Vennligst kopier \'otr_keystore.ofcaes\' -filen med skrivebordsverktøyet OtrFileConverter til rotmappen av din enhets lagringsmedie</string>
@@ -290,4 +290,7 @@ Trykk for å invitere.</string>
   <string name="this_is_a_group_chat">Dette er en gruppesamtale</string>
   <string name="unable_to_securely_share_this_file">Kunne ikke dele denne filen på en sikker måte</string>
   <string name="title_me">Meg</string>
+  <string name="send_message">Send en melding</string>
+  <string name="me_title">Meg</string>
+  <string name="add_account_action">Legg til konto</string>
 </resources>

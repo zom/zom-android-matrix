@@ -295,4 +295,7 @@
   <string name="unable_to_securely_share_this_file">Не могу да безбедно делим овај фајл</string>
   <string name="swipe_hint">&lt; превуците прстом лево и десно за још опција &gt;</string>
   <string name="title_me">Ја</string>
+  <string name="send_message">Пошаљи поруку</string>
+  <string name="me_title">Ја</string>
+  <string name="add_account_action">Додај налог</string>
 </resources>

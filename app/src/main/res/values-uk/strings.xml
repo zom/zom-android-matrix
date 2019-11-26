@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!--General: Names-->
-  <string name="ic_launcher_name">Zom</string>
-  <string name="app_name">Zom</string>
-  <string name="im_label">Zom</string>
+  <string name="ic_launcher_name">Keanu</string>
+  <string name="app_name">Keanu</string>
+  <string name="im_label">Keanu</string>
   <!--General: Permissions-->
   <!--General: Actions-->
   <string name="confirm">Підтвердити</string>
@@ -112,4 +112,7 @@
   <!--Other: Smileys-->
   <!--[Do not localize!]-->
   <string name="title_me">Я</string>
+  <string name="send_message">Надіслати повідомлення</string>
+  <string name="me_title">Я</string>
+  <string name="add_account_action">Додати екаунт</string>
 </resources>

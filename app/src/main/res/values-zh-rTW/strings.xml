@@ -213,5 +213,6 @@
   <string name="title_me">我</string>
 
   <string name="upgrade_message">感谢您使用众！ 我们的下一次升级会提高可靠性并允许即时通知。但，您必须再次注册并添加您的朋友。 很抱歉给你带来不便。 请分享你对新的众的看法！</string>
-
+  <string name="me_title">我</string>
+  <string name="add_account_action">編輯帳戶</string>
 </resources>
