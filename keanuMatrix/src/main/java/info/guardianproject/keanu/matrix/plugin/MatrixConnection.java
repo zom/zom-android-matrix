@@ -1803,6 +1803,8 @@ public class MatrixConnection extends ImConnection {
                         if (session == null) {
                             ImEntity participant = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId));
                             session = mChatSessionManager.createChatSession(participant, false);
+                            if (session == null)
+                                return;
                         }
 
                         Message message = new Message(stickerAlt);
@@ -1863,6 +1865,8 @@ public class MatrixConnection extends ImConnection {
                 if (session == null) {
                     ImEntity participant = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId));
                     session = mChatSessionManager.createChatSession(participant, false);
+                    if (session == null)
+                        return;
 
                     final List<ReceiptData> receipts = mDataHandler.getStore().getEventReceipts(event.roomId, null, true, false);
                     for (ReceiptData data : receipts)

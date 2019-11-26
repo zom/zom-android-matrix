@@ -86,31 +86,17 @@ public class MatrixChatSessionManager extends ChatSessionManager {
     public ChatSession createChatSession(final ImEntity participant, boolean isNewSession) {
         ChatSession session = super.createChatSession(participant, isNewSession);
 
-        Room room =  mRoomMap.get(participant.getAddress().getAddress());
+        String uid = participant.getAddress().getAddress();
+
+        Room room =  mRoomMap.get(uid);
         if (room == null) {
-
             if (participant instanceof ChatGroup) {
-                room = mDataHandler.getRoom(session.getParticipant().getAddress().getAddress());
-               // mConn.addRoomContact(room);
+                room = mDataHandler.getRoom(uid);
 
-            } /**else if (participant instanceof Contact) {
-
-                User user = mDataHandler.getUser(participant.getAddress().getAddress());
-                if (user != null) {
-                    room = findRoom(participant.getAddress().getAddress());
-
-                    if (room == null)
-                        createOneToOneRoom(session.getParticipant().getAddress().getAddress());
+                if (room != null) {
+                    mConn.checkRoomEncryption(room);
+                    mRoomMap.put(uid, room);
                 }
-                else
-                    return null;
-            }**/
-
-            if (room != null) {
-
-                mConn.checkRoomEncryption(room);
-
-                mRoomMap.put(participant.getAddress().getAddress(), room);
             }
         }
 

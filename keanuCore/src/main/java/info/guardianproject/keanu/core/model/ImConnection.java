@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import info.guardianproject.keanu.core.service.IContactListListener;
+import info.guardianproject.keanu.core.service.adapters.ChatSessionAdapter;
 import info.guardianproject.keanu.core.util.UploadProgressListener;
 
 
