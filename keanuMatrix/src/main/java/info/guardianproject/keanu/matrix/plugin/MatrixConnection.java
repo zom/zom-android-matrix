@@ -1709,12 +1709,14 @@ public class MatrixConnection extends ImConnection {
                 String userId = element.getAsString();
                 if (!userId.equals(mSession.getMyUserId())) {
 
-                    IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
-                    if (csa != null) {
-                        try {
-                            csa.setContactTyping(new Contact(new MatrixAddress(userId)), true);
-                        } catch (RemoteException e) {
-                            e.printStackTrace();
+                    if (mChatSessionManager != null && mChatSessionManager.getAdapter() != null) {
+                        IChatSession csa = mChatSessionManager.getAdapter().getChatSession(event.roomId);
+                        if (csa != null) {
+                            try {
+                                csa.setContactTyping(new Contact(new MatrixAddress(userId)), true);
+                            } catch (RemoteException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
 
