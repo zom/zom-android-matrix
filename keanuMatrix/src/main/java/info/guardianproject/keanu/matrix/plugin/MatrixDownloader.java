@@ -6,11 +6,8 @@ import android.util.Base64;
 import android.util.Log;
 import android.webkit.URLUtil;
 
-import org.matrix.androidsdk.crypto.MXEncryptedAttachments;
-import org.matrix.androidsdk.rest.model.crypto.EncryptedFileInfo;
+import org.matrix.androidsdk.crypto.model.crypto.EncryptedFileInfo;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -113,7 +110,7 @@ public class MatrixDownloader {
                             return false;
                         }
                     } catch (Exception var17) {
-                        org.matrix.androidsdk.util.Log.e(LOG_TAG, "Fail to retrieve the file size", var17);
+                       Log.e(LOG_TAG, "Fail to retrieve the file size", var17);
                     }
 
                     long t0 = System.currentTimeMillis();
@@ -140,36 +137,36 @@ public class MatrixDownloader {
                         outStream.write(decodedBytes);
                         String currentDigestValue = base64ToUnpaddedBase64(Base64.encodeToString(messageDigest.digest(), 0));
                         if (!TextUtils.equals((CharSequence)encryptedFileInfo.hashes.get("sha256"), currentDigestValue)) {
-                            org.matrix.androidsdk.util.Log.e(LOG_TAG, "## decryptAttachment() :  Digest value mismatch");
+                            Log.e(LOG_TAG, "## decryptAttachment() :  Digest value mismatch");
                             outStream.close();
                             return false;
                         }
 
-                        org.matrix.androidsdk.util.Log.d(LOG_TAG, "Decrypt in " + (System.currentTimeMillis() - t0) + " ms");
+                        Log.d(LOG_TAG, "Decrypt in " + (System.currentTimeMillis() - t0) + " ms");
                         return true;
                     } catch (OutOfMemoryError var18) {
-                        org.matrix.androidsdk.util.Log.e(LOG_TAG, "## decryptAttachment() :  failed " + var18.getMessage(), var18);
+                        Log.e(LOG_TAG, "## decryptAttachment() :  failed " + var18.getMessage(), var18);
                     } catch (Exception var19) {
-                        org.matrix.androidsdk.util.Log.e(LOG_TAG, "## decryptAttachment() :  failed " + var19.getMessage(), var19);
+                        Log.e(LOG_TAG, "## decryptAttachment() :  failed " + var19.getMessage(), var19);
                     }
 
                     try {
                         outStream.close();
                     } catch (Exception var16) {
-                        org.matrix.androidsdk.util.Log.e(LOG_TAG, "## decryptAttachment() :  fail to close the file", var16);
+                        Log.e(LOG_TAG, "## decryptAttachment() :  fail to close the file", var16);
                     }
 
                     return false;
                 } else {
-                    org.matrix.androidsdk.util.Log.e(LOG_TAG, "## decryptAttachment() : invalid key fields");
+                    Log.e(LOG_TAG, "## decryptAttachment() : invalid key fields");
                     return false;
                 }
             } else {
-                org.matrix.androidsdk.util.Log.e(LOG_TAG, "## decryptAttachment() : some fields are not defined");
+                Log.e(LOG_TAG, "## decryptAttachment() : some fields are not defined");
                 return false;
             }
         } else {
-            org.matrix.androidsdk.util.Log.e(LOG_TAG, "## decryptAttachment() : null parameters");
+            Log.e(LOG_TAG, "## decryptAttachment() : null parameters");
             return false;
         }
     }

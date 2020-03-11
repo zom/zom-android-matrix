@@ -21,7 +21,7 @@ android {
         versionCode project.ext.keanuLibsVersionCode
         versionName project.ext.keanuLibsVersion
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     }
     buildTypes {
@@ -42,7 +42,10 @@ dependencies {
     /************* Matrix SDK management **************/
     // use the matrix SDK as external lib
     implementation(name: 'matrix-sdk', ext: 'aar')
-    implementation(name: 'olm-sdk-release-3.1.2', ext: 'aar')
+    implementation(name: 'olm-sdk-release-3.1.4', ext: 'aar')
+
+    implementation(name: 'matrix-sdk-core-release', ext: 'aar')
+    implementation(name: 'matrix-sdk-crypto-release', ext: 'aar')
     implementation project(':keanuCore')
 
     implementation 'info.guardianproject.iocipher:IOCipher:0.5'
@@ -50,15 +53,15 @@ dependencies {
 
     //implementation(name: 'IOCipher-release', ext: 'aar')
 
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:support-compat:28.0.0'
-    implementation 'com.android.support:preference-v7:28.0.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.core:core:1.2.0'
+    implementation 'androidx.preference:preference:1.1.0'
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'com.squareup.retrofit2:retrofit:2.6.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.4.0'
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.facebook.stetho:stetho:1.5.0'
     implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
     // Database
@@ -67,7 +70,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
     //for thumbnail extraction for videos!
-    implementation 'com.android.support:exifinterface:28.0.0'
+    implementation 'androidx.exifinterface:exifinterface:1.1.0'
 
     implementation 'commons-io:commons-io:2.6'
 

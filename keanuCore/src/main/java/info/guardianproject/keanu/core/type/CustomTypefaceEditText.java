@@ -7,7 +7,7 @@ import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 
-public class CustomTypefaceEditText extends android.support.v7.widget.AppCompatEditText {
+public class CustomTypefaceEditText extends androidx.appcompat.widget.AppCompatEditText {
 
     boolean mInit = false;
     int themeColorText = -1;

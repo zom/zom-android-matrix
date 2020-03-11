@@ -16,7 +16,7 @@ android {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 16
         targetSdkVersion 28
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
 
     }
@@ -106,25 +106,25 @@ android {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.android.support:design:28.0.0'
-    implementation 'com.android.support:recyclerview-v7:28.0.0'
-    implementation 'com.android.support:support-v4:28.0.0'
+    testImplementation 'junit:junit:4.13'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.zxing:core:3.3.3'
     implementation 'info.guardianproject.panic:panic:0.5'
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
-    implementation 'com.theartofdev.edmodo:android-image-cropper:2.0.0'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'de.hdodenhof:circleimageview:2.0.0'
 
     implementation 'com.github.bumptech.glide:glide:4.9.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
     kapt 'com.github.bumptech.glide:compiler:4.9.0'
 
-    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.github.javiersantos:AppUpdater:2.7'
     implementation 'com.github.QuadFlask:colorpicker:0.0.10'
 
@@ -136,7 +136,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.6'
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     //we must keep SQLCipher at 3.5.9 for now, as we can't upgrade to v4 encryption ciphers
     implementation 'info.guardianproject.iocipher:IOCipher:0.5'
@@ -146,7 +146,10 @@ dependencies {
     /************* Matrix SDK management **************/
     // use the matrix SDK as external lib
     implementation(name: 'matrix-sdk', ext: 'aar')
-    implementation(name: 'olm-sdk-release-3.1.2', ext: 'aar')
+    implementation(name: 'matrix-sdk-core-release', ext: 'aar')
+    implementation(name: 'matrix-sdk-crypto-release', ext: 'aar')
+
+    implementation(name: 'olm-sdk-release-3.1.4', ext: 'aar')
 
     //*********** KeanuApp components ********** /
     implementation project(':keanuCore')
@@ -166,9 +169,9 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.9.6'
     implementation 'org.jcodec:jcodec:0.2.3'
 
-    def lifecycle_version = "2.1.0"
+    def lifecycle_version = "2.2.0"
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
-    implementation "androidx.exifinterface:exifinterface:1.0.0"
+    implementation "androidx.exifinterface:exifinterface:1.1.0"
 
     //html wysiwyg editor
     implementation 'jp.wasabeef:richeditor-android:1.2.2'

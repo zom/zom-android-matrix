@@ -7,7 +7,7 @@ import android.graphics.Typeface;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
 
-public class CustomTypefaceTextView extends android.support.v7.widget.AppCompatTextView {
+public class CustomTypefaceTextView extends androidx.appcompat.widget.AppCompatTextView {
 
     boolean mInit = false;
     int themeColorText = -1;

@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.OrientationEventListener;
@@ -45,11 +45,9 @@ import java.util.concurrent.TimeUnit;
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.keanu.core.Preferences;
-import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
-import info.guardianproject.keanuapp.R;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 

@@ -17,38 +17,32 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Parcelable;
-import android.os.ResultReceiver;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.widget.ListPopupWindow;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+import androidx.appcompat.widget.ListPopupWindow;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import info.guardianproject.keanu.core.BuildConfig;
-import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.Server;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.ui.RoundedAvatarDrawable;
@@ -61,11 +55,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.util.Languages;
 import info.guardianproject.keanuapp.ImApp;
@@ -73,8 +63,6 @@ import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
 import info.guardianproject.keanuapp.tasks.SignInHelper;
 import info.guardianproject.keanuapp.ui.BaseActivity;
-import info.guardianproject.keanuapp.ui.contacts.AddContactActivity;
-import info.guardianproject.keanuapp.ui.contacts.ContactsPickerActivity;
 import info.guardianproject.keanuapp.ui.legacy.SimpleAlertHandler;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
@@ -857,7 +845,7 @@ public class OnboardingActivity extends BaseActivity {
                     mCropImageView.setImageBitmap(bmpThumbnail);
 
                     // Use the Builder class for convenient dialog construction
-                    android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(OnboardingActivity.this);
+                    androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(OnboardingActivity.this);
                     builder.setView(mCropImageView)
                             .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
@@ -876,7 +864,7 @@ public class OnboardingActivity extends BaseActivity {
                                 }
                             });
                     // Create the AlertDialog object and return it
-                    android.support.v7.app.AlertDialog dialog = builder.create();
+                    androidx.appcompat.app.AlertDialog dialog = builder.create();
                     dialog.show();
 
 

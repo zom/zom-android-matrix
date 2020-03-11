@@ -1,23 +1,17 @@
 package info.guardianproject.keanu.matrix.plugin;
 
-import android.app.backup.BackupDataInputStream;
 import android.content.Context;
-import android.opengl.Matrix;
-import android.os.AsyncTask;
 import android.os.RemoteException;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
+import org.matrix.androidsdk.core.callback.ApiCallback;
+import org.matrix.androidsdk.core.model.MatrixError;
 import org.matrix.androidsdk.data.Room;
-import org.matrix.androidsdk.rest.callback.ApiCallback;
-import org.matrix.androidsdk.rest.model.CreateRoomParams;
-import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.rest.model.PowerLevels;
 import org.matrix.androidsdk.rest.model.RoomDirectoryVisibility;
 import org.matrix.androidsdk.rest.model.RoomMember;
-import org.w3c.dom.Text;
 
 import java.util.List;
 
@@ -25,12 +19,8 @@ import info.guardianproject.keanu.core.model.Address;
 import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
 import info.guardianproject.keanu.core.model.ChatSession;
-import info.guardianproject.keanu.core.model.ChatSessionListener;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.Invitation;
-import info.guardianproject.keanu.core.model.Message;
-import info.guardianproject.keanu.core.model.impl.BaseAddress;
-import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.service.adapters.ChatSessionAdapter;
 
@@ -461,7 +451,8 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
         if (room != null ) {
 
-            room.invite(invitee.getAddress().getAddress(), new ApiCallback<Void>() {
+
+            room.invite(mSession, invitee.getAddress().getAddress(), new ApiCallback<Void>() {
                 @Override
                 public void onNetworkError(Exception e) {
 

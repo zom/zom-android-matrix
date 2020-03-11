@@ -30,16 +30,13 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.Telephony;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SimpleCursorAdapter;
-import android.support.v7.widget.ListPopupWindow;
+
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.widget.ListPopupWindow;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.util.Rfc822Token;
-import android.text.util.Rfc822Tokenizer;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -53,27 +50,20 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
-import info.guardianproject.keanu.core.model.Server;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IContactList;
 import info.guardianproject.keanu.core.service.IContactListListener;
-import info.guardianproject.keanu.core.service.IContactListManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.RemoteImService;
-import info.guardianproject.keanu.core.util.XmppUriHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.regex.Pattern;
 
 import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
@@ -81,13 +71,10 @@ import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
 import info.guardianproject.keanuapp.ui.BaseActivity;
 import info.guardianproject.keanuapp.ui.accounts.AccountListItem;
-import info.guardianproject.keanuapp.ui.accounts.AccountsActivity;
 import info.guardianproject.keanuapp.ui.legacy.SimpleAlertHandler;
-import info.guardianproject.keanuapp.ui.onboarding.OnboardingActivity;
 import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
 
 import static android.view.Gravity.CENTER_HORIZONTAL;
-import static info.guardianproject.keanu.core.KeanuConstants.IMPS_CATEGORY;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 

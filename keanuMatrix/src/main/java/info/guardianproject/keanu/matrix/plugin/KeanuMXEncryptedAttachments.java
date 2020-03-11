@@ -2,11 +2,11 @@ package info.guardianproject.keanu.matrix.plugin;
 
 import android.text.TextUtils;
 import android.util.Base64;
+import android.util.Log;
 
 import org.matrix.androidsdk.crypto.MXEncryptedAttachments;
-import org.matrix.androidsdk.rest.model.crypto.EncryptedFileInfo;
-import org.matrix.androidsdk.rest.model.crypto.EncryptedFileKey;
-import org.matrix.androidsdk.util.Log;
+import org.matrix.androidsdk.crypto.model.crypto.EncryptedFileInfo;
+import org.matrix.androidsdk.crypto.model.crypto.EncryptedFileKey;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

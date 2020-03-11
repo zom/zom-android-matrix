@@ -4,23 +4,15 @@
 package info.guardianproject.keanu.core.util;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Environment;
-import android.preference.PreferenceManager;
-import android.support.media.ExifInterface;
 import android.text.TextUtils;
 import android.util.Log;
 
-import net.sqlcipher.Cursor;
-import net.sqlcipher.DatabaseErrorHandler;
-import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SQLiteDatabaseHook;
-import net.sqlcipher.database.SQLiteOpenHelper;
+import androidx.exifinterface.media.ExifInterface;
 
 import org.apache.commons.io.IOUtils;
 
@@ -28,17 +20,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
-import java.util.Date;
 import java.util.UUID;
 
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.iocipher.VirtualFileSystem;
-import info.guardianproject.keanu.core.Preferences;
-import info.guardianproject.keanu.core.provider.SQLCipherOpenHelper;
 
 
 /**

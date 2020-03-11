@@ -24,30 +24,31 @@ import org.json.JSONException;
 import org.matrix.androidsdk.HomeServerConnectionConfig;
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
+import org.matrix.androidsdk.core.JsonUtils;
+import org.matrix.androidsdk.core.callback.ApiCallback;
+import org.matrix.androidsdk.core.callback.SimpleApiCallback;
+import org.matrix.androidsdk.core.model.MatrixError;
 import org.matrix.androidsdk.crypto.IncomingRoomKeyRequest;
 import org.matrix.androidsdk.crypto.IncomingRoomKeyRequestCancellation;
 import org.matrix.androidsdk.crypto.MXCrypto;
+import org.matrix.androidsdk.crypto.RoomKeysRequestListener;
 import org.matrix.androidsdk.crypto.data.MXDeviceInfo;
+import org.matrix.androidsdk.crypto.data.MXOlmSessionResult;
 import org.matrix.androidsdk.crypto.data.MXUsersDevicesMap;
+import org.matrix.androidsdk.crypto.model.crypto.EncryptedFileInfo;
 import org.matrix.androidsdk.data.MyUser;
 import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.data.RoomState;
 import org.matrix.androidsdk.data.store.IMXStoreListener;
 import org.matrix.androidsdk.listeners.IMXEventListener;
 import org.matrix.androidsdk.listeners.MXMediaUploadListener;
-import org.matrix.androidsdk.rest.callback.ApiCallback;
-import org.matrix.androidsdk.rest.callback.SimpleApiCallback;
 import org.matrix.androidsdk.rest.client.LoginRestClient;
-import org.matrix.androidsdk.rest.client.AccountDataRestClient;
 import org.matrix.androidsdk.rest.model.Event;
-import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.rest.model.PowerLevels;
 import org.matrix.androidsdk.rest.model.ReceiptData;
 import org.matrix.androidsdk.rest.model.RoomMember;
-import org.matrix.androidsdk.rest.model.TokensChunkEvents;
 import org.matrix.androidsdk.rest.model.User;
 import org.matrix.androidsdk.rest.model.bingrules.BingRule;
-import org.matrix.androidsdk.rest.model.crypto.EncryptedFileInfo;
 import org.matrix.androidsdk.rest.model.login.AuthParams;
 import org.matrix.androidsdk.rest.model.login.Credentials;
 import org.matrix.androidsdk.rest.model.login.LoginFlow;
@@ -58,7 +59,7 @@ import org.matrix.androidsdk.rest.model.message.FileMessage;
 import org.matrix.androidsdk.rest.model.message.ImageMessage;
 import org.matrix.androidsdk.rest.model.message.VideoMessage;
 import org.matrix.androidsdk.rest.model.search.SearchUsersResponse;
-import org.matrix.androidsdk.util.JsonUtils;
+import org.matrix.androidsdk.rest.model.sync.AccountDataElement;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -354,6 +355,8 @@ public class MatrixConnection extends ImConnection {
 
         mDataHandler = new MXDataHandler(mStore, mCredentials);
         mDataHandler.addListener(mEventListener);
+
+
         mDataHandler.setLazyLoadingEnabled(true);
 
         mStore.setDataHandler(mDataHandler);
@@ -706,10 +709,35 @@ public class MatrixConnection extends ImConnection {
         if (mDataHandler != null && mDataHandler.getCrypto() != null) {
             List<MXDeviceInfo> devices = mDataHandler.getCrypto().getUserDevices(address);
 
-            HashMap<String,List<MXDeviceInfo>> user = new HashMap<>();
-            user.put(address,devices);
+            //HashMap<String,List<MXDeviceInfo>> user = new HashMap<>();
+            //user.put(address,devices);
 
-            mDataHandler.getCrypto().ensureOlmSessionsForDevices(user,new BasicApiCallback("ensureOlmSessions"));
+            ArrayList<String> users = new ArrayList<>();
+            users.add(address);
+
+            mDataHandler.getCrypto().ensureOlmSessionsForUsers(users, new ApiCallback<MXUsersDevicesMap<MXOlmSessionResult>>() {
+                @Override
+                public void onNetworkError(Exception e) {
+
+                }
+
+                @Override
+                public void onMatrixError(MatrixError matrixError) {
+
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+
+                }
+
+                @Override
+                public void onSuccess(MXUsersDevicesMap<MXOlmSessionResult> mxOlmSessionResultMXUsersDevicesMap) {
+
+                }
+            });
+
+
 
             if (devices != null && devices.size() > 0) {
                 result = new ArrayList<>();
@@ -1065,7 +1093,7 @@ public class MatrixConnection extends ImConnection {
         ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
         if (csa != null) {
             if (mDataHandler != null && mDataHandler.getCrypto() != null) {
-                boolean isEncrypted = mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId());
+                boolean isEncrypted = mDataHandler.getRoom(room.getRoomId()).isEncrypted();
 
                 if (!csa.getUseEncryption() == isEncrypted)
                     csa.updateEncryptionState(isEncrypted);
@@ -1089,8 +1117,7 @@ public class MatrixConnection extends ImConnection {
 
     }
 
-    protected void debug (String msg, Exception e)
-    {
+    protected void debug (String msg, Exception e) {
         Log.e(TAG, msg, e);
     }
 
@@ -1309,12 +1336,15 @@ public class MatrixConnection extends ImConnection {
         }
 
         @Override
-        public void onEventDecrypted(Event event) {
-            debug ("onEventDecrypted: " + event);
+        public void onEventDecrypted(String s, String s1) {
+            debug ("onEventDecrypted: " + s + ":" + s1);
+
         }
+
 
         @Override
         public void onBingRulesUpdate() {
+            debug ("onBingRulesUpdate");
 
         }
 
@@ -1323,7 +1353,8 @@ public class MatrixConnection extends ImConnection {
 
             debug ("onInitialSyncComplete: " + s);
             if (null != mSession.getCrypto()) {
-                mSession.getCrypto().addRoomKeysRequestListener(new MXCrypto.IRoomKeysRequestListener() {
+
+                mSession.getCrypto().addRoomKeysRequestListener(new RoomKeysRequestListener() {
                     @Override
                     public void onRoomKeyRequest(IncomingRoomKeyRequest request) {
 
@@ -1353,7 +1384,7 @@ public class MatrixConnection extends ImConnection {
                     final MXDeviceInfo deviceInfo = devicesMap.getObject(device, user);
 
                     if (null == deviceInfo) {
-                        org.matrix.androidsdk.util.Log.e(LOG_TAG, "## displayKeyShareDialog() : No details found for device " + user + ":" + device);
+                      //  org.matrix.androidsdk.util.Log.e(LOG_TAG, "## displayKeyShareDialog() : No details found for device " + user + ":" + device);
                       //  onDisplayKeyShareDialogClose(false, false);
                         return;
                     }
@@ -1372,7 +1403,7 @@ public class MatrixConnection extends ImConnection {
                 }
 
                 private void onError(String errorMessage) {
-                    org.matrix.androidsdk.util.Log.e(LOG_TAG, "## displayKeyShareDialog : downloadKeys failed " + errorMessage);
+                 //   org.matrix.androidsdk.util.Log.e(LOG_TAG, "## displayKeyShareDialog : downloadKeys failed " + errorMessage);
                  //   onDisplayKeyShareDialogClose(false, false);
                 }
 
@@ -1537,6 +1568,7 @@ public class MatrixConnection extends ImConnection {
 
         @Override
         public void onLeaveGroup(String s) {
+            debug ("onLeaveGroup: " + s);
 
         }
 
@@ -1575,10 +1607,10 @@ public class MatrixConnection extends ImConnection {
             }
         }
 
-
         @Override
-        public void onAccountDataUpdated() {
-            debug ("onAccountDataUpdated!");
+        public void onAccountDataUpdated(AccountDataElement accountDataElement) {
+            debug ("onAccountDataUpdated: " + accountDataElement);
+
         }
 
 
@@ -1813,7 +1845,7 @@ public class MatrixConnection extends ImConnection {
                         message.setDateTime(new Date(event.originServerTs));//use "age"?
                         message.setContentType(stickerType);
 
-                        if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
+                        if (mDataHandler.getRoom(event.roomId).isEncrypted()) {
                             message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
                         } else
                             message.setType(Imps.MessageType.INCOMING);
@@ -1919,15 +1951,17 @@ public class MatrixConnection extends ImConnection {
 
                     boolean isFromMe = addrSender.mAddress.equals(mUser.getAddress().getAddress());
 
+                    boolean isEncrypted = mDataHandler.getRoom(event.roomId).isEncrypted();
+
                     if (isFromMe)
                     {
-                        if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
+                        if (isEncrypted) {
                             message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
                         } else
                             message.setType(Imps.MessageType.OUTGOING);
                     }
                     else {
-                        if (mDataHandler.getCrypto().isRoomEncrypted(event.roomId)) {
+                        if (isEncrypted) {
                             message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
                         } else
                             message.setType(Imps.MessageType.INCOMING);
@@ -2060,6 +2094,7 @@ public class MatrixConnection extends ImConnection {
 
                             if (isEncrypted) {
                                 storageStream = new info.guardianproject.iocipher.FileOutputStream(new File(fileDownload.getAbsolutePath() + ".thumb.jpg"));
+
                                 boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownloadThumb), encryptedThumbInfo, storageStream);
                                 fileDownloadThumb.delete();
                             }
@@ -2103,7 +2138,7 @@ public class MatrixConnection extends ImConnection {
             params.initial_device_display_name = mDeviceName;
             params.x_show_msisdn = false;
             params.bind_email = false;
-            params.bind_msisdn = false;
+            //params.bind_ = false;
 
             AuthParams authParams = new AuthParams(LoginRestClient.LOGIN_FLOW_TYPE_DUMMY);
 
@@ -2132,7 +2167,7 @@ public class MatrixConnection extends ImConnection {
                     if (TextUtils.equals(e.errcode, MatrixError.USER_IN_USE)) {
                         // user name is already taken, the registration process stops here (new user name should be provided)
                         // ex: {"errcode":"M_USER_IN_USE","error":"User ID already taken."}
-                        org.matrix.androidsdk.util.Log.d(LOG_TAG, "User name is used");
+                       Log.d(LOG_TAG, "User name is used");
                         listener.onRegistrationFailed(MatrixError.USER_IN_USE);
                     } else if (TextUtils.equals(e.errcode, MatrixError.UNAUTHORIZED)) {
                         // happens while polling email validation, do nothing
@@ -2143,7 +2178,7 @@ public class MatrixConnection extends ImConnection {
                             setRegistrationFlowResponse(registrationFlowResponse);
 
                         } catch (Exception castExcept) {
-                            org.matrix.androidsdk.util.Log.e(LOG_TAG, "JsonUtils.toRegistrationFlowResponse " + castExcept.getLocalizedMessage(), castExcept);
+                            Log.e(LOG_TAG, "JsonUtils.toRegistrationFlowResponse " + castExcept.getLocalizedMessage(), castExcept);
                         }
 
                         listener.onRegistrationFailed("ERROR_MISSING_STAGE");

@@ -3,44 +3,35 @@ package info.guardianproject.keanu.matrix.plugin;
 import android.content.ClipData;
 import android.content.Context;
 import android.net.Uri;
-import android.opengl.Matrix;
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
+import org.matrix.androidsdk.core.callback.ApiCallback;
+import org.matrix.androidsdk.core.model.MatrixError;
 import org.matrix.androidsdk.crypto.MXCryptoError;
-import org.matrix.androidsdk.crypto.MXDecryptionException;
-import org.matrix.androidsdk.crypto.MXEventDecryptionResult;
 import org.matrix.androidsdk.crypto.data.MXDeviceInfo;
 import org.matrix.androidsdk.crypto.data.MXUsersDevicesMap;
 import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.data.RoomMediaMessage;
 import org.matrix.androidsdk.data.RoomState;
-import org.matrix.androidsdk.rest.callback.ApiCallback;
 import org.matrix.androidsdk.rest.model.Event;
-import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.rest.model.RoomDirectoryVisibility;
-import org.matrix.androidsdk.rest.model.RoomMember;
-import org.matrix.androidsdk.rest.model.User;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatSession;
 import info.guardianproject.keanu.core.model.ChatSessionListener;
 import info.guardianproject.keanu.core.model.ChatSessionManager;
-import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImEntity;
 import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.adapters.ChatSessionAdapter;
-import info.guardianproject.keanu.core.util.UploadProgressListener;
 
 import static info.guardianproject.keanu.core.service.RemoteImService.debug;
 import static org.matrix.androidsdk.crypto.CryptoConstantsKt.MXCRYPTO_ALGORITHM_MEGOLM;
@@ -212,7 +203,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
                         debug("onSuccess: message sent: " + roomMediaMessage.getEvent().eventId);
 
-                        if (mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId()))
+                        if (mDataHandler.getRoom(room.getRoomId()).isEncrypted())
                             message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
                         else
                             message.setType(Imps.MessageType.OUTGOING);
@@ -319,7 +310,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
                         debug("onSuccess: message sent: " + roomMediaMessage.getEvent().eventId);
 
-                        if (mDataHandler.getCrypto().isRoomEncrypted(room.getRoomId()))
+                        if (mDataHandler.getRoom(room.getRoomId()).isEncrypted())
                             message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
                         else
                             message.setType(Imps.MessageType.OUTGOING);

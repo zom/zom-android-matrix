@@ -17,14 +17,12 @@
 
 package info.guardianproject.keanu.core.service;
 
-import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -38,14 +36,12 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.os.RemoteCallbackList;
 import android.os.RemoteException;
 import android.preference.PreferenceManager;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
-import android.text.TextUtils;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+
 import android.util.Log;
 import android.widget.Toast;
 
@@ -57,19 +53,15 @@ import java.util.List;
 import java.util.Map;
 
 import info.guardianproject.keanu.core.ConnectionFactory;
-import info.guardianproject.keanu.core.KeanuConstants;
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.R;
 import info.guardianproject.keanu.core.cacheword.CacheWordHandler;
 import info.guardianproject.keanu.core.cacheword.ICacheWordSubscriber;
-import info.guardianproject.keanu.core.model.ConnectionListener;
 import info.guardianproject.keanu.core.model.ImConnection;
-import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.model.ImException;
 import info.guardianproject.keanu.core.plugin.ImPluginInfo;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.adapters.ImConnectionAdapter;
-import info.guardianproject.keanu.core.ui.DummyActivity;
 import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanu.core.util.ImPluginHelper;
 import info.guardianproject.keanu.core.util.LogCleaner;
@@ -79,8 +71,6 @@ import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.NOTIFICATION_CHANNEL_ID_SERVICE;
 import static info.guardianproject.keanu.core.KeanuConstants.PREFERENCE_KEY_TEMP_PASS;
 import static info.guardianproject.keanu.core.service.AdvancedNetworking.TRANSPORT_SS2;
-import static info.guardianproject.keanu.core.service.HeartbeatService.NETWORK_STATE_ACTION;
-import static info.guardianproject.keanu.core.service.HeartbeatService.NETWORK_STATE_EXTRA;
 
 
 public class RemoteImService extends Service implements ImService, ICacheWordSubscriber {

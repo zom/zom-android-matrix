@@ -5,8 +5,8 @@ import android.app.job.JobService;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 
 import static android.net.ConnectivityManager.CONNECTIVITY_ACTION;

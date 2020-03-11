@@ -6,16 +6,14 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.SwitchCompat;
-import android.support.v7.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.content.ContextCompat;
+import androidx.appcompat.widget.SwitchCompat;
+import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,41 +22,27 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.Switch;
 import android.widget.TextView;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import info.guardianproject.keanu.core.type.CustomTypefaceManager;
-import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
-import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.provider.Imps;
-import info.guardianproject.keanu.core.service.IChatSession;
-import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IContactListManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.RemoteImService;
-import info.guardianproject.keanu.core.tasks.ChatSessionInitTask;
 import info.guardianproject.keanu.core.util.DatabaseUtils;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
 import info.guardianproject.keanuapp.ui.BaseActivity;
-import info.guardianproject.keanuapp.ui.conversation.ConversationDetailActivity;
 import info.guardianproject.keanuapp.ui.gallery.GalleryListFragment;
-import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
-import info.guardianproject.keanuapp.ui.qr.QrDisplayActivity;
-import info.guardianproject.keanuapp.ui.qr.QrShareAsyncTask;
 
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_WIDTH;
-import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
 
 public class ContactDisplayActivity extends BaseActivity {
@@ -272,7 +256,7 @@ public class ContactDisplayActivity extends BaseActivity {
 
     void deleteContact ()
     {
-        new android.support.v7.app.AlertDialog.Builder(this)
+        new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle(getString(R.string.menu_remove_contact))
                 .setMessage(getString(R.string.confirm_delete_contact, mNickname))
                 .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {

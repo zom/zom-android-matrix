@@ -17,8 +17,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.widget.CursorAdapter;
-import android.util.Log;
+import androidx.cursoradapter.widget.CursorAdapter;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +26,6 @@ import android.view.ViewGroup;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.RemoteImService;
-import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.tasks.SignInHelper;
 
 public class AccountAdapter extends CursorAdapter implements AccountListItem.SignInManager {
