@@ -6,6 +6,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.webkit.URLUtil;
 
+import org.apache.commons.io.IOUtils;
 import org.matrix.androidsdk.crypto.model.crypto.EncryptedFileInfo;
 
 import java.io.FileNotFoundException;
@@ -15,6 +16,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -22,6 +24,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 import info.guardianproject.iocipher.File;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MatrixDownloader {
 
@@ -35,33 +40,33 @@ public class MatrixDownloader {
     {
         try {
 
-            final URL url = new URL(urlString);
-            final HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS).build();
 
-            //wait up to 60 seconds
-            connection.setConnectTimeout(60000);
-            connection.setReadTimeout(60000);
+            Request request = new Request.Builder().url(urlString)
 
-            InputStream inputStream = connection.getInputStream();
-            connection.connect();
+                    .build();
+            Response response = client.newCall(request).execute();
 
-            mMimeType = connection.getContentType();
-            int contentLength = connection.getContentLength();
+            InputStream in = response.body().byteStream();
+
+            mMimeType = response.body().contentType().toString();
+
+            long contentLength = response.body().contentLength();
 
             if (mMimeType != null) {
-                byte[] buffer = new byte[4096];
-                int count;
-                while ((count = inputStream.read(buffer)) != -1) {
-                    storageStream.write(buffer, 0, count);
-                }
+
+                IOUtils.copy(in,storageStream);
                 storageStream.flush();
                 storageStream.close();
-                connection.disconnect();
+                response.body().close();
 
                 return true;
             }
             else {
-                connection.disconnect();
+                response.body().close();
                 storageStream.close();
                 return false;
             }
