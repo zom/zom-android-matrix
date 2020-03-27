@@ -290,7 +290,9 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                                 acceptUnknownDevices(devices);
 
                                 //now resend!
-                                sendMessageAsync(session, message, listener);
+                                //sendMessageAsync(session, message, listener);
+                                if (listener != null)
+                                    listener.onMessageSendFail(message, roomMediaMessage.getEvent().eventId);
                             }
                         }
 
