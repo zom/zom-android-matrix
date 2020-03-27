@@ -38,14 +38,17 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
-    implementation 'info.guardianproject.iocipher:IOCipher:0.5'
+    api 'info.guardianproject.iocipher:IOCipher:0.5'
     //implementation(name: 'IOCipher-release', ext: 'aar')
-    implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
-    implementation "androidx.sqlite:sqlite:2.1.0"
+    api 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
+    api "androidx.sqlite:sqlite:2.1.0"
+
+    //altbrandArm32Implementation  'info.guardianproject.iocipher:IOCipher:0.4'
+
 
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
-    implementation 'commons-codec:commons-codec:1.10'
-    implementation 'commons-io:commons-io:2.6'
+    api 'commons-codec:commons-codec:1.10'
+    api 'commons-io:commons-io:2.6'
     implementation 'org.thoughtcrime.ssl.pinning:AndroidPinning:1.0.0'
     implementation 'info.guardianproject.netcipher:netcipher:2.1.0'
     implementation 'info.guardianproject.netcipher:netcipher-httpclient:2.0.0-alpha1'
@@ -55,7 +58,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java
     implementation 'com.google.protobuf:protobuf-java:3.4.0'
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.8.6'
+    api 'com.google.code.gson:gson:2.8.6'
     implementation 'com.jrummyapps:android-shell:1.0.1'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
     // Network

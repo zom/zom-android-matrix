@@ -39,19 +39,16 @@ android {
 }
 
 dependencies {
-    /************* Matrix SDK management **************/
-    // use the matrix SDK as external lib
-    implementation(name: 'matrix-sdk', ext: 'aar')
-    implementation(name: 'olm-sdk-release-3.1.4', ext: 'aar')
 
-    implementation(name: 'matrix-sdk-core-release', ext: 'aar')
-    implementation(name: 'matrix-sdk-crypto-release', ext: 'aar')
     implementation project(':keanuCore')
 
-    implementation 'info.guardianproject.iocipher:IOCipher:0.5'
-    implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
+    /************* Matrix SDK management **************/
+    // use the matrix SDK as external lib
+    api(name: 'matrix-sdk', ext: 'aar')
+    api(name: 'olm-sdk-release-3.1.4', ext: 'aar')
 
-    //implementation(name: 'IOCipher-release', ext: 'aar')
+    api(name: 'matrix-sdk-core-release', ext: 'aar')
+    api(name: 'matrix-sdk-crypto-release', ext: 'aar')
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core:1.2.0'
@@ -72,10 +69,6 @@ dependencies {
     //for thumbnail extraction for videos!
     implementation 'androidx.exifinterface:exifinterface:1.1.0'
 
-    implementation 'commons-io:commons-io:2.6'
-
-    implementation 'commons-codec:commons-codec:1.10'
-    implementation 'commons-io:commons-io:2.6'
 }
 
 apply plugin: 'maven'

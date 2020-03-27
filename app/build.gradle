@@ -132,24 +132,7 @@ dependencies {
     //https://github.com/natario1/CameraView
     implementation 'com.otaliastudios:cameraview:2.0.0-beta04'
 
-    implementation 'commons-codec:commons-codec:1.10'
-    implementation 'commons-io:commons-io:2.6'
 
-    // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.8.6'
-
-    //we must keep SQLCipher at 3.5.9 for now, as we can't upgrade to v4 encryption ciphers
-    implementation 'info.guardianproject.iocipher:IOCipher:0.5'
-  //  implementation(name: 'IOCipher-release', ext: 'aar')
-    implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
-
-    /************* Matrix SDK management **************/
-    // use the matrix SDK as external lib
-    implementation(name: 'matrix-sdk', ext: 'aar')
-    implementation(name: 'matrix-sdk-core-release', ext: 'aar')
-    implementation(name: 'matrix-sdk-crypto-release', ext: 'aar')
-
-    implementation(name: 'olm-sdk-release-3.1.4', ext: 'aar')
 
     //*********** KeanuApp components ********** /
     implementation project(':keanuCore')
@@ -158,9 +141,8 @@ dependencies {
     // implementation 'info.guardianproject.keanuapp:keanuMatrix:+'
 
     //from here: https://github.com/guardianproject/proofmode
-    implementation 'org.witness:android-libproofmode:0.0.3'
+    implementation 'org.witness:android-libproofmode:0.0.4'
     implementation 'com.eternitywall:opentimestamps:0.1.14.1'
-
 
     //support for in app PDF viewing
     implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
