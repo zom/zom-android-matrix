@@ -7,6 +7,7 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.provider.MediaStore;
 import androidx.appcompat.app.AppCompatActivity;
@@ -30,6 +31,7 @@ import com.otaliastudios.cameraview.VideoResult;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -117,30 +119,41 @@ public class CameraActivity extends AppCompatActivity {
 
         mCameraView.addCameraListener(new CameraListener() {
 
-
             @Override
-            public void onPictureTaken(PictureResult result) {
+            public void onPictureTaken(final PictureResult result) {
                 super.onPictureTaken(result);
 
-                if (isRecordingVideo) {
-                    startVideoRecording ();
-                    result.toBitmap(new BitmapCallback() {
-                        @Override
-                        public void onBitmapReady(@Nullable Bitmap bitmap) {
-                            thumbnail = bitmap;
+                mExec.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isRecordingVideo) {
+                            startVideoRecording ();
+                            result.toBitmap(new BitmapCallback() {
+                                @Override
+                                public void onBitmapReady(@Nullable Bitmap bitmap) {
+                                    thumbnail = bitmap;
+                                }
+                            });
                         }
-                    });
-                }
-                else {
-                    result.toBitmap(bitmap -> {
-                        storeBitmap(bitmap);
-                        if (mOneAndDone)
-                            mHandler.sendEmptyMessage(2);
-                    });
+                        else {
+                            /**
+                            Looper.prepare();
+
+                            result.toBitmap(bitmap -> {
+                                storeBitmap(bitmap);
+                                if (mOneAndDone)
+                                    mHandler.sendEmptyMessage(2);
+                            });**/
+
+                            storePicture(result.getData());
 
 
-                    mHandler.sendEmptyMessage(1);
-                }
+                            mHandler.sendEmptyMessage(1);
+                        }
+                    }
+                });
+
+
 
             }
 
@@ -407,6 +420,53 @@ public class CameraActivity extends AppCompatActivity {
                 finish();
             } else {
                 onVideo(vfsUri, mimeType);
+            }
+
+            if (Preferences.useProofMode()) {
+
+                try {
+                    ProofMode.generateProof(CameraActivity.this, vfsUri);
+                } catch (FileNotFoundException e) {
+                    Log.e(LOG_TAG,"error generating proof for photo",e);
+                }
+            }
+
+
+        }
+        catch (IOException ioe)
+        {
+            Log.e(LOG_TAG,"error importing photo",ioe);
+        }
+    }
+
+    private void storePicture (byte[] picdata)
+    {
+        // import
+        String sessionId = "self";
+        String offerId = UUID.randomUUID().toString();
+
+        try {
+
+            final Uri vfsUri = SecureMediaStore.createContentPath(sessionId,"cam" + new Date().getTime() + ".jpg");
+
+            FileOutputStream out = new FileOutputStream(new File(vfsUri.getPath()));
+            IOUtils.copy(new ByteArrayInputStream(picdata),out);
+
+            String mimeType = "image/jpeg";
+
+            //adds in an empty message, so it can exist in the gallery and be forwarded
+            Imps.insertMessageInDb(
+                    getContentResolver(), false, new Date().getTime(), true, null, vfsUri.toString(),
+                    System.currentTimeMillis(), Imps.MessageType.OUTGOING_ENCRYPTED,
+                    0, offerId, mimeType, null);
+
+            if (mOneAndDone) {
+                Intent data = new Intent();
+                data.setDataAndType(vfsUri,mimeType);
+                setResult(RESULT_OK, data);
+                finish();
+            } else {
+                onBitmap(vfsUri, mimeType);
             }
 
             if (Preferences.useProofMode()) {
