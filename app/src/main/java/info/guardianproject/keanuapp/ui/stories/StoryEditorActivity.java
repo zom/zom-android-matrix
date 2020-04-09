@@ -530,7 +530,7 @@ public class StoryEditorActivity extends AppCompatActivity {
 
         if (requestCode == REQUEST_ADD_MEDIA)
         {
-            if (data.hasExtra("resultUris")) {
+            if (data!=null && data.hasExtra("resultUris")) {
                 String[] mediaUris = data.getStringArrayExtra("resultUris");
                 String[] mediaTypes = data.getStringArrayExtra("resultTypes");
 
