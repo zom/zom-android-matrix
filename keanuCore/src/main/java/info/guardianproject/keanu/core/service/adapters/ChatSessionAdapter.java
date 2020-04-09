@@ -388,6 +388,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         }
 
         int newType = mChatSession.sendMessageAsync(msg, new ChatSessionListener() {
+
             @Override
             public void onChatSessionCreated(ChatSession session) {
 
@@ -401,9 +402,11 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                 if (msg.getDateTime() != null)
                     sendTime = msg.getDateTime().getTime();
 
+              //  deleteMessageInDb(msg.getID());
+
                 updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, newMsgId);
 
-                msg.setID(newMsgId);
+                 msg.setID(newMsgId);
 
                 if (setLastMessage)
                     setLastMessage(text, sendTime);
@@ -601,7 +604,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                             sendTime = msg.getDateTime().getTime();
 
                         updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, newPacketId);
-
 
                         msg.setID(newPacketId);
                     }

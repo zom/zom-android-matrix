@@ -20,9 +20,12 @@ package info.guardianproject.keanu.matrix.plugin;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
@@ -610,6 +613,7 @@ class KeanuRoomMediaMessagesSender {
         if ((!mediaUrl.startsWith("file:"))
                 && (!mediaUrl.startsWith("vfs:"))) {
             // save the content:// file in to the media cache
+
             String mimeType = roomMediaMessage.getMimeType(mContext);
             ResourceUtils.Resource resource = ResourceUtils.openResource(mContext, roomMediaMessage.getUri(), mimeType);
 
@@ -800,16 +804,29 @@ class KeanuRoomMediaMessagesSender {
      * @return the video thumbnail
      */
     public String getVideoThumbnailUrl(final String videoUrl) {
-        String thumbUrl = videoUrl + ".thumb.jpg";
-        /**
+
+
+        String thumbUrl = null;
+
+
         try {
             Uri uri = Uri.parse(videoUrl);
-            //Bitmap thumb = createVideoThumbnail(uri, MediaStore.Images.Thumbnails.MINI_KIND);
-            Bitmap thumb = new BitmapDrawable(mContext.getDrawable(android.R.d))
-            thumbUrl = mDataHandler.getMediaCache().saveBitmap(thumb, null);
+            if (uri.getScheme().equals("file")) {
+                Bitmap thumb = ThumbnailUtils.createVideoThumbnail(uri.getPath(),
+                        MediaStore.Images.Thumbnails.MINI_KIND);
+                thumbUrl = mDataHandler.getMediaCache().saveBitmap(thumb, null);
+            } else if (uri.getScheme().equals("vfs"))
+            {
+                thumbUrl = videoUrl + ".thumb.jpg";
+            }
+            else if (uri.getScheme().equals("content"))
+            {
+                //nada
+            }
         } catch (Exception e) {
             Log.e(LOG_TAG, "## getVideoThumbnailUrl() failed with " + e.getMessage(), e);
-        }**/
+        }
+
 
         return thumbUrl;
     }
@@ -1067,6 +1084,7 @@ class KeanuRoomMediaMessagesSender {
 
                 if (mRoom.isEncrypted() && mDataHandler.isCryptoEnabled() && (null != stream)) {
                     File fileEncrypted = new File(uri.getPath() + ".encrypted");
+                    fileEncrypted.getParentFile().mkdirs();
                     FileOutputStream fos = new FileOutputStream(fileEncrypted);
                     encryptionResult = KeanuMXEncryptedAttachments.encryptAttachment(stream, mimeType,fos);
                     stream.close();

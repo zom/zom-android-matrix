@@ -470,7 +470,7 @@ public class ContactsPickerActivity extends BaseActivity {
         // I guess we should move that somewhere else.
         ContactListItem cli = new ContactListItem(this, null);
         ContactViewHolder cvh = new ContactViewHolder(view);
-        cli.bind(cvh, cursor, null,false);
+        cli.bind(cvh, cursor, null,!mShowGroups);
         View btnClose = view.findViewById(R.id.btnClose);
         btnClose.setOnClickListener(new View.OnClickListener() {
             private long itemId;
@@ -567,7 +567,7 @@ public class ContactsPickerActivity extends BaseActivity {
             }
 
 
-            v.bind(holder, cursor, mSearchString, false);
+            v.bind(holder, cursor, mSearchString, !mShowGroups);
             int index = cursor.getPosition();
             long itemId = getItemId(index);
             holder.mAvatarCheck.setVisibility(isSelected(itemId) ? View.VISIBLE : View.GONE);
@@ -602,6 +602,8 @@ public class ContactsPickerActivity extends BaseActivity {
 
             buf.append('(');
 
+            String orderBy = Imps.Contacts.ALPHA_SORT_ORDER;
+
             if (mShowGroups) {
                 buf.append("(")
                         // Mask out TYPE_FLAG_UNSEEN, we want unseen groups as well!
@@ -610,6 +612,8 @@ public class ContactsPickerActivity extends BaseActivity {
                 .append(Imps.Contacts.TYPE_FLAG_UNSEEN)
                 .append("))")
                 .append('=').append(Imps.Contacts.TYPE_GROUP);
+
+                orderBy = Imps.Contacts.TIME_ORDER;
             }
             else
             {
@@ -621,7 +625,7 @@ public class ContactsPickerActivity extends BaseActivity {
             buf.append(")) GROUP BY (" + Imps.Contacts.USERNAME);
 
             CursorLoader loader = new CursorLoader(ContactsPickerActivity.this, mUri, ContactListItem.CONTACT_PROJECTION,
-                    buf == null ? null : buf.toString(), null, Imps.Contacts.ALPHA_SORT_ORDER);
+                    buf == null ? null : buf.toString(), null, orderBy);
 
             return loader;
         }

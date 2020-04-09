@@ -75,6 +75,8 @@ import android.provider.Browser;
 import android.provider.MediaStore;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import android.provider.Settings;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -877,12 +879,24 @@ public class MessageListItem extends FrameLayout {
         aHolder.mMediaUri = mediaUri;
         // if a content uri - already scanned
 
-        File fileThumb = new File(mediaUri.getPath()+".thumb.jpg");
-        if (fileThumb.exists()) {
-            //GlideUtils.loadVideoFromUri(context, mediaUri, aHolder.mMediaThumbnail);
-            GlideUtils.loadImageFromUri(context, Uri.parse("vfs://"+fileThumb.getAbsolutePath()), aHolder.mMediaThumbnail);
+        if (SecureMediaStore.isVfsUri(mediaUri)) {
+            File fileThumb = new File(mediaUri.getPath() + ".thumb.jpg");
+            if (fileThumb.exists()) {
+                //GlideUtils.loadVideoFromUri(context, mediaUri, aHolder.mMediaThumbnail);
+                GlideUtils.loadImageFromUri(context, Uri.parse("vfs://" + fileThumb.getAbsolutePath()), aHolder.mMediaThumbnail);
+            }
+            else
+            {
+                aHolder.mMediaThumbnail.setImageResource(R.drawable.video256); // generic file icon
+                aHolder.mMediaThumbnail.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            }
         }
-        else {
+        else if (mediaUri.getScheme().equals("content")||mediaUri.getScheme().equals("file")) {
+
+            GlideUtils.loadImageFromUri(context, mediaUri, aHolder.mMediaThumbnail);
+        }
+        else
+        {
             aHolder.mMediaThumbnail.setImageResource(R.drawable.video256); // generic file icon
             aHolder.mMediaThumbnail.setScaleType(ImageView.ScaleType.FIT_CENTER);
         }

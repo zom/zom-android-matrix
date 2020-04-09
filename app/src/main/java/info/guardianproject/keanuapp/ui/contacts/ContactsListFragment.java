@@ -474,7 +474,7 @@ public class ContactsListFragment extends Fragment {
             viewHolder.mNickname = nickname;
 
             if (viewHolder.itemView instanceof ContactListItem) {
-                ((ContactListItem)viewHolder.itemView).bind(viewHolder, cursor, "", false, false);
+                ((ContactListItem)viewHolder.itemView).bind(viewHolder, cursor, "", false, true);
             }
 
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {

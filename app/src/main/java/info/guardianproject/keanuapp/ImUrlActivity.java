@@ -23,16 +23,22 @@ import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -626,7 +632,7 @@ public class ImUrlActivity extends Activity {
                     long providerId = resultIntent.getLongExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER, -1);
                     long accountId = resultIntent.getLongExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT, -1);
 
-                    sendOtrInBand(username, providerId, accountId, null);
+                    sendMedia(username, providerId, accountId, null);
 
                     startChat(providerId, accountId, username, true);
 
@@ -643,7 +649,7 @@ public class ImUrlActivity extends Activity {
                         if (providers != null && accounts != null)
                             for (int i = 0; i < providers.size(); i++)
                             {
-                                sendOtrInBand(usernames.get(i), providers.get(i), accounts.get(i), null);
+                                sendMedia(usernames.get(i), providers.get(i), accounts.get(i), null);
                             }
 
 
@@ -706,11 +712,21 @@ public class ImUrlActivity extends Activity {
             }.executeOnExecutor(ImApp.sThreadPoolExecutor,new Contact(new BaseAddress(username)));
     }
 
-    private void sendOtrInBand(String username, long providerId, long accountId, String replyId) {
+    private void sendMedia(String username, long providerId, long accountId, String replyId) {
 
-        try
+        ImApp.sThreadPoolExecutor.execute(new Runnable ()
         {
-            IImConnection conn = RemoteImService.getConnection(providerId,accountId);
+            public void run ()
+            {
+                sendMediaAsync(username, providerId, accountId, replyId);
+            }
+        });
+    }
+
+    private void sendMediaAsync(String username, long providerId, long accountId, String replyId) {
+
+        try {
+            IImConnection conn = RemoteImService.getConnection(providerId, accountId);
 
             if (conn == null)
                 return; //can't send without a connection
@@ -720,57 +736,109 @@ public class ImUrlActivity extends Activity {
             IChatSession session = getChatSession(username);
 
             if (mSendText != null)
-                session.sendMessage(mSendText,false, false, true, replyId);
-            else if (mSendUri != null)
-            {
+                session.sendMessage(mSendText, false, false, true, replyId);
+            else if (mSendUri != null) {
 
                 try {
 
 
-                        String offerId = UUID.randomUUID().toString();
+                    String offerId = UUID.randomUUID().toString();
 
-                        if (SecureMediaStore.isVfsUri(mSendUri)) {
+                    if (SecureMediaStore.isVfsUri(mSendUri)) {
 
 
-                            boolean sent = session.offerData(offerId, mSendUri.toString(),mSendType );
+                        boolean sent = session.offerData(offerId, mSendUri.toString(), mSendType);
 
+                        if (sent)
+                            return;
+                    } else {
+                        String fileName = mSendUri.getLastPathSegment();
+                        FileInfo importInfo = SystemServices.getFileInfoFromURI(this, mSendUri);
+
+                        if (!TextUtils.isEmpty(importInfo.type)) {
+                            if (importInfo.type.startsWith("image"))
+                                mSendUri = SecureMediaStore.resizeAndImportImage(this, session.getId() + "", mSendUri, importInfo.type);
+                            else {
+                                Uri importedMediaUri = SecureMediaStore.importContent(session.getId() + "", fileName, getContentResolver().openInputStream(mSendUri));
+                                generateVideoThumbnail(mSendUri,importedMediaUri);
+                                mSendUri = importedMediaUri;
+                            }
+
+                            boolean sent = session.offerData(offerId, mSendUri.toString(), importInfo.type);
                             if (sent)
                                 return;
                         }
-                        else
-                        {
-                            InputStream is = getContentResolver().openInputStream(mSendUri);
-                            String fileName = mSendUri.getLastPathSegment();
-                            FileInfo importInfo = SystemServices.getFileInfoFromURI(this, mSendUri);
-                            Uri vfsUri = null;
-
-                            if (!TextUtils.isEmpty(importInfo.type)) {
-                                if (importInfo.type.startsWith("image"))
-                                    vfsUri = SecureMediaStore.resizeAndImportImage(this, session.getId() + "", mSendUri, importInfo.type);
-                                else
-                                    vfsUri = SecureMediaStore.importContent(session.getId() + "", fileName, is);
-
-                                boolean sent = session.offerData(offerId, vfsUri.toString(), importInfo.type);
-                                if (sent)
-                                    return;
-                            }
-                        }
+                    }
 
 
                 } catch (Exception e) {
 
-                    Log.e(TAG,"error sending external file",e);
+                    Log.e(TAG, "error sending external file", e);
                 }
 
-                Toast.makeText(this, R.string.unable_to_securely_share_this_file, Toast.LENGTH_LONG).show();
+//                Toast.makeText(this, R.string.unable_to_securely_share_this_file, Toast.LENGTH_LONG).show();
 
             }
-        }
-        catch (RemoteException e)
-        {
-            Log.e(TAG,"Error sending data",e);
+        } catch (RemoteException e) {
+            Log.e(TAG, "Error sending data", e);
         }
 
+    }
+
+    private void generateVideoThumbnail (Uri contentUri, Uri sendUri) throws FileNotFoundException {
+        Bitmap bitmap = null;
+        String videoPath = new SystemServices().getUriRealPath(this, contentUri);
+        if (!TextUtils.isEmpty(videoPath)) {
+            bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Images.Thumbnails.MINI_KIND);
+
+            if (bitmap != null){
+                String thumbPath = sendUri.getPath() + ".thumb.jpg";
+                info.guardianproject.iocipher.File fileThumb = new info.guardianproject.iocipher.File(thumbPath);
+                bitmap.compress(Bitmap.CompressFormat.JPEG,100,new info.guardianproject.iocipher.FileOutputStream(fileThumb));
+                return;
+            }
+        }
+
+        if (bitmap == null)
+        {
+
+            long videoId = -1;
+            String lastPath = contentUri.getLastPathSegment();
+            try {
+                videoId = Long.parseLong(lastPath);
+            }
+            catch (Exception e)
+            {
+                String[] parts = lastPath.split(":");
+                if (parts.length > 1)
+                    videoId = Long.parseLong(parts[1]);
+            }
+
+            if (videoId != -1)
+            {
+                bitmap = MediaStore.Video.Thumbnails.getThumbnail(
+                        getContentResolver(), videoId,
+                        MediaStore.Video.Thumbnails.MINI_KIND,
+                        (BitmapFactory.Options) null);
+
+                if (bitmap != null) {
+                    String thumbPath = sendUri.getPath() + ".thumb.jpg";
+                    info.guardianproject.iocipher.File fileThumb = new info.guardianproject.iocipher.File(thumbPath);
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new info.guardianproject.iocipher.FileOutputStream(fileThumb));
+                    return;
+                }
+            }
+        }
+
+        MediaMetadataRetriever mMMR = new MediaMetadataRetriever();
+        mMMR.setDataSource(this, contentUri);
+        bitmap = mMMR.getFrameAtTime();
+        if (bitmap != null) {
+            String thumbPath = sendUri.getPath() + ".thumb.jpg";
+            info.guardianproject.iocipher.File fileThumb = new info.guardianproject.iocipher.File(thumbPath);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new info.guardianproject.iocipher.FileOutputStream(fileThumb));
+            return;
+        }
     }
 
     private IChatSession getChatSession(String username) {

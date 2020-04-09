@@ -46,7 +46,6 @@ dependencies {
     // use the matrix SDK as external lib
     api(name: 'matrix-sdk', ext: 'aar')
     api(name: 'olm-sdk-release-3.1.4', ext: 'aar')
-
     api(name: 'matrix-sdk-core-release', ext: 'aar')
     api(name: 'matrix-sdk-crypto-release', ext: 'aar')
 

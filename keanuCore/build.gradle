@@ -45,7 +45,6 @@ dependencies {
 
     //altbrandArm32Implementation  'info.guardianproject.iocipher:IOCipher:0.4'
 
-
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     api 'commons-codec:commons-codec:1.10'
     api 'commons-io:commons-io:2.6'

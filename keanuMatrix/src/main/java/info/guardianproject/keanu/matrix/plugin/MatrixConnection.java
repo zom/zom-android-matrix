@@ -144,7 +144,6 @@ public class MatrixConnection extends ImConnection {
     private Contact mUser = null;
 
     private String mDeviceName = null;
-    private String mDeviceId = null;
 
     private HashMap<String,String> mSessionContext = new HashMap<>();
     private MatrixChatSessionManager mChatSessionManager;
@@ -202,7 +201,6 @@ public class MatrixConnection extends ImConnection {
         mUserPresence = new Presence(Presence.AVAILABLE, null, Presence.CLIENT_TYPE_MOBILE);
 
         mDeviceName = providerSettings.getDeviceName();
-        mDeviceId = null;//mDeviceName;//providerSettings.getDeviceName(); //make them the same for now
 
         providerSettings.close();
 
@@ -310,7 +308,6 @@ public class MatrixConnection extends ImConnection {
         mCredentials = new Credentials();
         mCredentials.userId = mUser.getAddress().getAddress();
         mCredentials.homeServer = HTTPS_PREPEND + server;
-      //  mCredentials.deviceId = mDeviceId;
 
         mConfig.setCredentials(mCredentials);
         mConfig.forceUsageOfTlsVersions();
@@ -426,7 +423,7 @@ public class MatrixConnection extends ImConnection {
                 listener.onLoginSuccess();
         }
         else {
-            mLoginRestClient.loginWithUser(username, password, mDeviceName, mDeviceId, new SimpleApiCallback<Credentials>() {
+            mLoginRestClient.loginWithUser(username, password, mDeviceName, null, new SimpleApiCallback<Credentials>() {
 
                 @Override
                 public void onSuccess(Credentials credentials) {
@@ -451,7 +448,6 @@ public class MatrixConnection extends ImConnection {
                         debug("error turning creds into json",e);
                     }
 
-                  //  mCredentials.deviceId = mDeviceId;
                     mConfig.setCredentials(mCredentials);
 
                     initSession (enableEncryption, initialToken);
@@ -1112,13 +1108,14 @@ public class MatrixConnection extends ImConnection {
 
     protected void debug (String msg)
     {
-      //  if (Debug.DEBUG_ENABLED)
+        if (Debug.DEBUG_ENABLED)
             Log.d(TAG, msg);
 
     }
 
     protected void debug (String msg, Exception e) {
-        Log.e(TAG, msg, e);
+        if (Debug.DEBUG_ENABLED)
+            Log.e(TAG, msg, e);
     }
 
     IMXEventListener mEventListener = new IMXEventListener() {
@@ -1156,6 +1153,7 @@ public class MatrixConnection extends ImConnection {
 
         @Override
         public void onLiveEvent(final Event event, RoomState roomState) {
+
             debug ("onLiveEvent:type=" + event.getType());
 
             if (event.getType().equals(Event.EVENT_TYPE_MESSAGE))
@@ -1288,8 +1286,8 @@ public class MatrixConnection extends ImConnection {
                 if (mSession != null && mSession.isCryptoEnabled())
                 {
                     if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
-                        if (mSession.getCrypto() != null)
-                            mSession.getCrypto().reRequestRoomKeyForEvent(event);
+                     //   if (mSession.getCrypto() != null)
+                       //     mSession.getCrypto().reRequestRoomKeyForEvent(event);
                     }
                 }
             }
@@ -1359,14 +1357,15 @@ public class MatrixConnection extends ImConnection {
                     public void onRoomKeyRequest(IncomingRoomKeyRequest request) {
 
                         debug ("onRoomKeyRequest: " + request);
-//                        downloadKeys(request.mUserId,request.mDeviceId);
+                        downloadKeys(request.mUserId,request.mDeviceId);
 
                     }
 
                     @Override
                     public void onRoomKeyRequestCancellation(IncomingRoomKeyRequestCancellation request) {
-                     //  KeyRequestHandler.getSharedInstance().handleKeyRequestCancellation(request);
+                        //KeyRequestHandler.getSharedInstance().handleKeyRequestCancellation(request);
                         debug ("onRoomKeyRequestCancellation: " + request);
+
 
                     }
                 });
