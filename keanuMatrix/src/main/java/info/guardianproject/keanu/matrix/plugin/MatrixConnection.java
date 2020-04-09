@@ -941,11 +941,10 @@ public class MatrixConnection extends ImConnection {
 
     protected void updateGroupMembers (final Room room, final ChatGroup group, boolean priority) {
 
-        updateGroupMembersAsync(room, group, priority);
-        /**
+
         if (priority)
         {
-
+            updateGroupMembersAsync(room, group, priority);
         }
         else {
             mExecutor.execute(
@@ -954,7 +953,7 @@ public class MatrixConnection extends ImConnection {
                         updateGroupMembersAsync(room1, group, false);
                     }
             );
-        }**/
+        }
 
     }
 
