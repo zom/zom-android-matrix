@@ -3,7 +3,7 @@ package info.guardianproject.keanuapp.ui;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -97,7 +97,7 @@ public class PanicSetupActivity extends BaseActivity {
 
         intent = getIntent();
         if (intent == null) {
-            // started from the Zom GUI, e.g. from a button/menu
+            // started from the GUI, e.g. from a button/menu
         } else {
             // started by an incoming Intent from another app
             String action = intent.getAction();

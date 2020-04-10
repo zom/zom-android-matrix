@@ -2,7 +2,6 @@ package info.guardianproject.keanuapp.ui.stories;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -11,9 +10,9 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -22,8 +21,6 @@ import android.view.View;
 import android.webkit.ValueCallback;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-
-import org.jcodec.containers.mp4.boxes.Edit;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -40,7 +37,6 @@ import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.conversation.AddUpdateMediaActivity;
 import jp.wasabeef.richeditor.RichEditor;

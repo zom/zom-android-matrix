@@ -1,71 +1,36 @@
 package info.guardianproject.keanuapp.ui.contacts;
 
-import android.content.ContentResolver;
-import android.content.ContentUris;
-import android.content.ContentValues;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.appcompat.widget.SwitchCompat;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import org.apache.commons.codec.DecoderException;
-
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import info.guardianproject.keanu.core.Preferences;
-import info.guardianproject.keanu.core.model.Contact;
-import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.provider.Imps;
-import info.guardianproject.keanu.core.service.IChatListener;
 import info.guardianproject.keanu.core.service.IChatSession;
-import info.guardianproject.keanu.core.service.IChatSessionListener;
-import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.RemoteImService;
-import info.guardianproject.keanu.core.service.adapters.ChatListenerAdapter;
-import info.guardianproject.keanu.core.util.DatabaseUtils;
-import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
-import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.BaseActivity;
-import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
-import info.guardianproject.keanuapp.ui.qr.QrShareAsyncTask;
-import info.guardianproject.keanuapp.ui.widgets.GroupAvatar;
-import info.guardianproject.keanuapp.ui.widgets.LetterAvatar;
-
-import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
-import static info.guardianproject.keanu.core.KeanuConstants.SMALL_AVATAR_HEIGHT;
-import static info.guardianproject.keanu.core.KeanuConstants.SMALL_AVATAR_WIDTH;
 
 public class DeviceDisplayActivity extends BaseActivity {
 

@@ -28,15 +28,15 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.annotation.Nullable;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -44,7 +44,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import info.guardianproject.keanu.core.model.Address;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
@@ -53,7 +52,6 @@ import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.provider.Imps;
 
 import info.guardianproject.keanu.core.service.RemoteImService;
-import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
@@ -476,7 +474,7 @@ public class ContactsListFragment extends Fragment {
             viewHolder.mNickname = nickname;
 
             if (viewHolder.itemView instanceof ContactListItem) {
-                ((ContactListItem)viewHolder.itemView).bind(viewHolder, cursor, "", false, false);
+                ((ContactListItem)viewHolder.itemView).bind(viewHolder, cursor, "", false, true);
             }
 
             viewHolder.itemView.setOnClickListener(new View.OnClickListener() {

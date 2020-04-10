@@ -19,7 +19,7 @@ package info.guardianproject.keanuapp.ui.gallery;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.support.v4.util.LruCache;
+import androidx.collection.LruCache;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 

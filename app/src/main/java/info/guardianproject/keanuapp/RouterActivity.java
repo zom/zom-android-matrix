@@ -19,19 +19,21 @@ package info.guardianproject.keanuapp;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.ProgressDialog;
+import android.content.ClipData;
 import android.content.ContentUris;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.net.Uri;
 import android.net.Uri.Builder;
 import android.os.Bundle;
 import android.os.Message;
 import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -59,6 +61,8 @@ import info.guardianproject.panic.PanicResponder;
 
 import java.io.File;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static info.guardianproject.keanu.core.KeanuConstants.IMPS_CATEGORY;
@@ -258,13 +262,47 @@ public class RouterActivity extends AppCompatActivity implements ICacheWordSubsc
 
         Intent intent = getIntent();
         if (intent != null && intent.getAction() != null && !intent.getAction().equals(Intent.ACTION_MAIN)) {
+
+            Intent imUrlIntent = new Intent(this, ImUrlActivity.class);
+
             String action = intent.getAction();
-                Intent imUrlIntent = new Intent(this, ImUrlActivity.class);
+            Uri sharedData = intent.getData();
+            if (sharedData != null) {
+                List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+                for (ResolveInfo resolveInfo : resInfoList) {
+                    String packageName = resolveInfo.activityInfo.packageName;
+                    grantUriPermission(packageName, sharedData, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+
+                imUrlIntent.setData(sharedData);
+            }
+            else
+            {
+                if (intent.getClipData() != null) {
+                    ClipData mClipData = intent.getClipData();
+                    ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
+                    for (int i = 0; i < mClipData.getItemCount(); i++) {
+
+                        ClipData.Item item = mClipData.getItemAt(i);
+                        Uri uri = item.getUri();
+
+                        List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+                        for (ResolveInfo resolveInfo : resInfoList) {
+                            String packageName = resolveInfo.activityInfo.packageName;
+                            grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        }
+
+                    }
+                }
+
+            }
+
                 imUrlIntent.setAction(action);
                 imUrlIntent.setType(intent.getType());
 
-                if (intent.getData() != null)
-                    imUrlIntent.setData(intent.getData());
+
 
               //  imUrlIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 if (intent.getExtras() != null)

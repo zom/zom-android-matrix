@@ -259,11 +259,11 @@ public class ContactListItem extends FrameLayout {
         holder.mLine1.setVisibility(View.VISIBLE);
     }
 
-    public void bind(ContactViewHolder holder, Cursor cursor, String underLineText, boolean scrolling) {
-        bind(holder, cursor, underLineText, true, scrolling);
+    public void bind(ContactViewHolder holder, Cursor cursor, String underLineText, boolean showAddress) {
+        bind(holder, cursor, underLineText, true, showAddress);
     }
 
-    public void bind(ContactViewHolder holder, Cursor cursor, String underLineText, boolean showChatMsg, boolean scrolling) {
+    public void bind(ContactViewHolder holder, Cursor cursor, String underLineText, boolean showChatMsg, boolean showAddress) {
 
         final String address = cursor.getString(COLUMN_CONTACT_USERNAME);
         String nickname = cursor.getString(COLUMN_CONTACT_NICKNAME);
@@ -379,7 +379,7 @@ public class ContactListItem extends FrameLayout {
             statusText += " | " + getContext().getString(R.string.action_archive);
         }
 
-        if (holder.mLine2 != null)
+        if (holder.mLine2 != null && showAddress)
             holder.mLine2.setText(statusText);
 
         if (Imps.Contacts.TYPE_NORMAL == type)

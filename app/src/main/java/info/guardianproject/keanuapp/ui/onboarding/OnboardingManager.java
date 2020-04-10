@@ -4,7 +4,7 @@ import info.guardianproject.keanu.matrix.plugin.MatrixConnection;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.provider.Imps;
 import org.json.JSONException;
-import org.matrix.androidsdk.rest.model.MatrixError;
+import org.matrix.androidsdk.core.model.MatrixError;
 
 import info.guardianproject.keanu.core.util.ImPluginHelper;
 import info.guardianproject.keanu.core.util.LogCleaner;
@@ -357,7 +357,8 @@ public class OnboardingManager {
         }
     }
 
-    public static void registerAccount (final Context context, final String nickname, final String username, final String password, final String domain, final String server, final int port, final OnboardingListener oListener) throws JSONException {
+    public static void registerAccount (final Context context, final String nickname, final String username, final String password, final String domain,
+                                        final String server, final int port, final OnboardingListener oListener) throws JSONException {
 
 
 
@@ -437,6 +438,7 @@ public class OnboardingManager {
                     if (oListener != null)
                         oListener.registrationFailed(message);
                 }
+
 
                 @Override
                 public void onResourceLimitExceeded(MatrixError e) {

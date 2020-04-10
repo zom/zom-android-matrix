@@ -1,7 +1,7 @@
 package info.guardianproject.keanuapp.tasks;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.bumptech.glide.Priority;
@@ -16,7 +16,6 @@ import com.bumptech.glide.load.model.MultiModelLoaderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
-import java.util.Date;
 
 import info.guardianproject.iocipher.FileInputStream;
 

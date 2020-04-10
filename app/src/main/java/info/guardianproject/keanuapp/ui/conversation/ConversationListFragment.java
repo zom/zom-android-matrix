@@ -30,15 +30,15 @@ import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.helper.ItemTouchHelper;
+import androidx.annotation.Nullable;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -55,12 +55,8 @@ import android.widget.TextView;
 
 import info.guardianproject.keanu.core.provider.Imps;
 
-import info.guardianproject.keanuapp.BuildConfig;
-import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.R;
-import info.guardianproject.keanuapp.tasks.MigrateAccountTask;
-import info.guardianproject.keanuapp.ui.onboarding.OnboardingAccount;
 import info.guardianproject.keanuapp.ui.widgets.ConversationViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
 

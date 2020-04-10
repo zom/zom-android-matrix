@@ -19,7 +19,7 @@
 --><resources>
     <color name="error">#ffcc5555</color>
     <color name="window_background">#e6e7e8</color>
-
+    <color name="colorDarkBlue">#3F51B5</color>
     <color name="android_green">#ccA4C639</color>
             <color name="honeycombish_blue">#cc58BAED</color>
     <color name="background_light">#DDDEDEDE</color>

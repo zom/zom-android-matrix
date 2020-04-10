@@ -120,7 +120,7 @@
             android:text="@string/group_encryption_title"
             android:layout_weight="0"
             />
-        <android.support.v7.widget.SwitchCompat
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/chkGroupEncryption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -147,7 +147,7 @@
         android:text="@string/notifications"
         android:layout_weight="0"
         />
-        <android.support.v7.widget.SwitchCompat
+        <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/chkNotifications"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

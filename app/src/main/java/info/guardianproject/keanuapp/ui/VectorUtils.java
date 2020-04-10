@@ -32,10 +32,11 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.support.annotation.Nullable;
-import android.support.v4.util.LruCache;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.Nullable;
+import androidx.collection.LruCache;
+import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewParent;
 import android.webkit.WebView;
@@ -44,32 +45,27 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 
 import org.matrix.androidsdk.MXSession;
-import org.matrix.androidsdk.call.MXCallsManager;
+import org.matrix.androidsdk.core.ImageUtils;
+import org.matrix.androidsdk.core.ResourceUtils;
+import org.matrix.androidsdk.core.callback.ApiCallback;
+import org.matrix.androidsdk.core.callback.SimpleApiCallback;
 import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.data.RoomPreviewData;
 import org.matrix.androidsdk.db.MXMediaCache;
-import org.matrix.androidsdk.rest.callback.ApiCallback;
-import org.matrix.androidsdk.rest.callback.SimpleApiCallback;
-import org.matrix.androidsdk.rest.model.MatrixError;
 import org.matrix.androidsdk.rest.model.RoomMember;
 import org.matrix.androidsdk.rest.model.User;
 import org.matrix.androidsdk.rest.model.group.Group;
 import org.matrix.androidsdk.rest.model.publicroom.PublicRoom;
-import org.matrix.androidsdk.util.ImageUtils;
-import org.matrix.androidsdk.util.Log;
-import org.matrix.androidsdk.util.ResourceUtils;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.R;
 
 

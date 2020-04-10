@@ -49,16 +49,13 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
@@ -77,8 +74,10 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Browser;
 import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import android.provider.Settings;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -223,7 +222,7 @@ public class MessageListItem extends FrameLayout {
 
     public String getPacketId () { return packetId; }
 
-    public void bindIncomingMessage(MessageViewHolder holder, int id, int messageType, String roomAddress, String userAddress, final String mimeType, final String body, Date date, Markup smileyRes,
+    public void bindIncomingMessage(MessageViewHolder holder, int id, int messageType, String userAddress, String nickname, final String mimeType, final String body, Date date, Markup smileyRes,
                                     boolean scrolling, EncryptionState encryption, boolean showContact, int presenceStatus, IChatSession session, String packetId, String replyId) {
 
         mHolder = holder;
@@ -234,8 +233,6 @@ public class MessageListItem extends FrameLayout {
         mHolder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
 
         this.packetId = packetId;
-
-        String nickname = userAddress.split("\\|")[0];
 
         if (nickname.startsWith("@"))
             nickname = new MatrixAddress(userAddress).getUser();
@@ -639,16 +636,22 @@ public class MessageListItem extends FrameLayout {
         else if (mimeType.contains("pdf")) {
             Intent intent = new Intent(context, PdfViewActivity.class);
             intent.setDataAndType(mediaUri,mimeType);
+            intent.putExtra("id",packetId);
+
             context.startActivity(intent);
         }
         else if (mimeType.contains("html")||mimeType.contains("text/plain")) {
             Intent intent = new Intent(context, WebViewActivity.class);
             intent.setDataAndType(mediaUri,mimeType);
+            intent.putExtra("id",packetId);
+
             context.startActivity(intent);
         }
         else if (mimeType.contains("video")) {
             Intent intent = new Intent(context, VideoViewActivity.class);
             intent.setDataAndType(mediaUri,mimeType);
+            intent.putExtra("id",packetId);
+
             context.startActivity(intent);
         }
         else if (mediaUri.getScheme().equals("content"))
@@ -703,37 +706,6 @@ public class MessageListItem extends FrameLayout {
             **/
         }
     }
-
-
-    /**
-    protected void onLongClickMediaIcon(final String mimeType, final Uri mediaUri) {
-
-        final java.io.File exportPath = SecureMediaStore.exportPath(mimeType, mediaUri);
-
-        new AlertDialog.Builder(context)
-        .setTitle(context.getString(R.string.export_media))
-        .setMessage(context.getString(R.string.export_media_file_to, exportPath.getAbsolutePath()))
-                .setNeutralButton("Share on Zom", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        reshareMediaFile(mimeType, mediaUri);
-                    }
-                })
-        .setPositiveButton(R.string.export, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                exportMediaFile(mimeType, mediaUri, exportPath);
-                return;
-            }
-        })
-        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int whichButton) {
-                return;
-            }
-        })
-        .create().show();
-    }*/
 
     private String getImageFromContent (Context context, Uri mediaUri)
     {
@@ -912,12 +884,24 @@ public class MessageListItem extends FrameLayout {
         aHolder.mMediaUri = mediaUri;
         // if a content uri - already scanned
 
-        File fileThumb = new File(mediaUri.getPath()+".thumb.jpg");
-        if (fileThumb.exists()) {
-            //GlideUtils.loadVideoFromUri(context, mediaUri, aHolder.mMediaThumbnail);
-            GlideUtils.loadImageFromUri(context, Uri.parse("vfs://"+fileThumb.getAbsolutePath()), aHolder.mMediaThumbnail);
+        if (SecureMediaStore.isVfsUri(mediaUri)) {
+            File fileThumb = new File(mediaUri.getPath() + ".thumb.jpg");
+            if (fileThumb.exists()) {
+                //GlideUtils.loadVideoFromUri(context, mediaUri, aHolder.mMediaThumbnail);
+                GlideUtils.loadImageFromUri(context, Uri.parse("vfs://" + fileThumb.getAbsolutePath()), aHolder.mMediaThumbnail);
+            }
+            else
+            {
+                aHolder.mMediaThumbnail.setImageResource(R.drawable.video256); // generic file icon
+                aHolder.mMediaThumbnail.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            }
         }
-        else {
+        else if (mediaUri.getScheme().equals("content")||mediaUri.getScheme().equals("file")) {
+
+            GlideUtils.loadImageFromUri(context, mediaUri, aHolder.mMediaThumbnail);
+        }
+        else
+        {
             aHolder.mMediaThumbnail.setImageResource(R.drawable.video256); // generic file icon
             aHolder.mMediaThumbnail.setScaleType(ImageView.ScaleType.FIT_CENTER);
         }
