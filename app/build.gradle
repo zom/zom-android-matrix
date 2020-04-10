@@ -168,9 +168,8 @@ dependencies {
     //https://github.com/natario1/CameraView
     implementation 'com.otaliastudios:cameraview:2.0.0-beta04'
 
-
-
     implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
+    implementation 'info.guardianproject.iocipher:IOCipher:0.5'
 
     //from here: https://github.com/guardianproject/proofmode
     implementation 'org.witness:android-libproofmode:0.0.4'
