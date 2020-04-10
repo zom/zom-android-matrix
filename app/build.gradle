@@ -14,7 +14,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "info.guardianproject.keanuapp"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -68,8 +68,8 @@ android {
         altbrand {
             dimension = "release"
             applicationId "im.zom.messenger"
-            versionCode 2130002
-            versionName "2.1.3-RC-2"
+            versionCode 2140001
+            versionName "2.1.4-BETA-1"
             archivesBaseName = "Zom-$versionName"
         }
 
@@ -128,12 +128,14 @@ dependencies {
     /************* Matrix SDK management **************/
     // use the matrix SDK as external lib
     implementation(name: 'matrix-sdk', ext: 'aar')
-    implementation(name: 'olm-sdk-release-3.1.2', ext: 'aar')
+    implementation(name: 'matrix-sdk-core-release', ext: 'aar')
+    implementation(name: 'matrix-sdk-crypto-release', ext: 'aar')
+    implementation(name: 'olm-sdk-release-3.1.4', ext: 'aar')
 
     /*********** KeanuApp components **********/
-    implementation(name: 'keanucore-0.0.1.48', ext: 'aar')
+    implementation(name: 'keanucore-0.0.1.50', ext: 'aar')
     //implementation project(':keanuCore')
-    implementation(name: 'keanumatrix-0.0.1.48', ext: 'aar')
+    implementation(name: 'keanumatrix-0.0.1.50', ext: 'aar')
     //implementation project(':keanuMatrix')
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -150,7 +152,7 @@ dependencies {
     implementation 'com.google.zxing:core:3.3.3'
     implementation 'info.guardianproject.panic:panic:0.5'
     implementation 'org.ocpsoft.prettytime:prettytime:4.0.1.Final'
-    implementation 'com.theartofdev.edmodo:android-image-cropper:2.0.0'
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
     implementation 'de.hdodenhof:circleimageview:2.0.0'
 
     implementation 'com.github.bumptech.glide:glide:4.9.0'
@@ -170,7 +172,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.6'
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
 
     //keep at sqlcipher 3.5.9 so we can use the v3 ciphers. can't migrate IOCipher yet.
     implementation 'info.guardianproject.iocipher:IOCipher:0.5'
@@ -179,11 +181,11 @@ dependencies {
     implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
 
     //from here: https://github.com/guardianproject/proofmode
-    implementation 'org.witness:android-libproofmode:0.0.3'
+    implementation 'org.witness:android-libproofmode:0.0.4'
     implementation 'com.eternitywall:opentimestamps:0.1.14.1'
     implementation 'info.guardianproject.panic:panic:0.5'
     implementation 'org.thoughtcrime.ssl.pinning:AndroidPinning:1.0.0'
-    implementation 'info.guardianproject.netcipher:netcipher:2.0.0-beta1'
+    implementation 'info.guardianproject.netcipher:netcipher:2.1.0'
     implementation 'info.guardianproject.netcipher:netcipher-httpclient:2.0.0-alpha1'
 
     //support for in app PDF viewing
@@ -195,7 +197,7 @@ dependencies {
 
     def lifecycle_version = "2.1.0"
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
-    implementation "androidx.exifinterface:exifinterface:1.0.0"
+    implementation "androidx.exifinterface:exifinterface:1.2.0"
 
 
     implementation 'commons-codec:commons-codec:1.10'
@@ -209,7 +211,7 @@ dependencies {
     implementation 'com.google.protobuf:protobuf-java:3.4.0'
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.jrummyapps:android-shell:1.0.1'
     implementation 'org.bouncycastle:bcprov-jdk15on:1.60'
 
@@ -228,6 +230,7 @@ dependencies {
     implementation 'com.facebook.stetho:stetho:1.5.0'
     implementation 'com.facebook.stetho:stetho-okhttp3:1.5.0'
 
+
     // Database
     kapt 'dk.ilios:realmfieldnameshelper:1.1.1'
 
@@ -242,6 +245,7 @@ dependencies {
 
     //html wysiwyg editor
     implementation 'jp.wasabeef:richeditor-android:1.2.2'
+
 }
 
 // Map for the version code that gives each ABI a value.
