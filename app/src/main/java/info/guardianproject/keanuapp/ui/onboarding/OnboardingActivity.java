@@ -43,6 +43,7 @@ import android.widget.ViewFlipper;
 
 import com.theartofdev.edmodo.cropper.CropImageView;
 
+import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.Server;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.ui.RoundedAvatarDrawable;
@@ -1063,27 +1064,6 @@ public class OnboardingActivity extends BaseActivity {
 
 
 
-    public void showUpgradeMessage () {
-
-        if (TextUtils.isEmpty(Preferences.getValue("showUpgradeMessage"))) {
-
-            android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(this).create();
-            alertDialog.setTitle(R.string.welcome_message);
-            alertDialog.setMessage(this.getString(R.string.upgrade_message));
-            alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_NEUTRAL, this.getString(R.string.ok),
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
-
-            PreferenceManager.getDefaultSharedPreferences(this).edit().putString("showUpgradeMessage","false").commit();
-
-        }
-
-
-    }
 
 
 }

@@ -1,6 +1,7 @@
 package info.guardianproject.keanuapp.ui.bots;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Outline;
 import android.os.Build;
 import androidx.core.content.ContextCompat;
@@ -39,6 +40,7 @@ public class ServicesRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         TypedArray ta = context.getResources().obtainTypedArray(R.array.bots);
         for (int i = 0; i < ta.length(); i++) {
             int resIdBot = ta.getResourceId(i, -1);
+
             if (resIdBot >= 0) {
                 TypedArray botArray = context.getResources().obtainTypedArray(resIdBot);
                 int resIdName = botArray.getResourceId(0, 0);

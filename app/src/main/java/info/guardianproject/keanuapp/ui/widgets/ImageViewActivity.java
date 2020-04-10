@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
@@ -258,6 +259,7 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
     private void exportMediaFile (String mimeType, Uri mediaUri, java.io.File exportPath)
     {
         try {
+
 
             SecureMediaStore.exportContent(mimeType, mediaUri, exportPath);
             Uri uriFileShare = FileProvider.getUriForFile(this,getPackageName() + ".provider",exportPath);

@@ -69,6 +69,7 @@ import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.ImServiceConstants;
 import info.guardianproject.keanu.core.service.RemoteImService;
+import info.guardianproject.keanu.core.util.AssetUtil;
 import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.core.util.SystemServices;

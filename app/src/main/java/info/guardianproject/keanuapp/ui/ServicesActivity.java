@@ -30,6 +30,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.MenuItem;
 
 
+import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
 
 import info.guardianproject.keanu.core.model.ImErrorInfo;
