@@ -477,19 +477,12 @@ public class ImConnectionAdapter extends IImConnection.Stub {
                     saveSessionCookie(cr);
                 }
 
-                try {
-                    ArrayList<ChatSessionAdapter> adapters = new ArrayList<ChatSessionAdapter>(mChatSessionManager.mActiveChatSessionAdapters.values());
 
-                    synchronized (adapters) {
-                        for (ChatSessionAdapter session : adapters) {
-                            session.sendPostponedMessages();
-                        }
-                    }
+                ArrayList<ChatSessionAdapter> adapters = new ArrayList<ChatSessionAdapter>(mChatSessionManager.mActiveChatSessionAdapters.values());
+                for (ChatSessionAdapter session : adapters) {
+                    session.sendPostponedMessages();
                 }
-                catch (ConcurrentModificationException cme)
-                {
-                    Log.w(LOG_TAG,"concurrent mod exception on login",cme);
-                }
+
 
                 loadSavedPresence();
                 

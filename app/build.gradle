@@ -14,7 +14,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "info.guardianproject.keanuapp"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -157,6 +157,9 @@ dependencies {
 
     //html wysiwyg editor
     implementation 'jp.wasabeef:richeditor-android:1.2.2'
+
+    //improved audio recorder
+    implementation 'com.github.n8fr8:AudioRecorderView:1.0.0'
 }
 
 // Map for the version code that gives each ABI a value.
