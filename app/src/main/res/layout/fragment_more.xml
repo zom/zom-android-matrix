@@ -85,11 +85,11 @@
         <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:src="@drawable/ic_group_add_white_36dp"
+            android:src="@drawable/ic_group"
             android:layout_margin="6dp"
             android:padding="6dp"
             android:layout_gravity="center"
-            app:circleColor="@android:color/holo_green_light"
+            app:circleColor="#50E3C2"
             />
     <info.guardianproject.keanu.core.type.CustomTypefaceTextView
         android:layout_width="match_parent"

@@ -295,6 +295,7 @@ public class AddContactActivity extends BaseActivity {
                         OnboardingManager.inviteScan(AddContactActivity.this, xmppLink);
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
+                        Log.v("FingerPrint","FingerPrint=="+e.getMessage());
                         e.printStackTrace();
                     }
                 }
@@ -603,6 +604,7 @@ public class AddContactActivity extends BaseActivity {
                 ArrayList<String> resultScans = resultIntent.getStringArrayListExtra("result");
                 for (String resultScan : resultScans)
                 {
+                    Log.v("ScannerDon","Result--"+resultScan);
 
                     try {
                         if (resultScan.startsWith("keanu://"))
@@ -619,7 +621,7 @@ public class AddContactActivity extends BaseActivity {
                                 intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, address);
                                 intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER, mApp.getDefaultProviderId());
                                 intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT, mApp.getDefaultAccountId());
-
+                                Log.v("ScannerDon","Result 1--"+address);
                                 setResult(RESULT_OK, intent);
                             }
                         }
@@ -634,7 +636,7 @@ public class AddContactActivity extends BaseActivity {
                             intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, diLink.username);
                             intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER, mApp.getDefaultProviderId());
                             intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT, mApp.getDefaultAccountId());
-
+                            Log.v("ScannerDon","Result 2--"+diLink.username);
                             setResult(RESULT_OK, intent);
                         }
 
@@ -642,6 +644,7 @@ public class AddContactActivity extends BaseActivity {
                     }
                     catch (Exception e)
                     {
+                        Log.v("ScannerDon","Result 3--"+e.getMessage());
                         Log.w(LOG_TAG, "error parsing QR invite link", e);
                     }
                 }
