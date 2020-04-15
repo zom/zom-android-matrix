@@ -188,6 +188,7 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
                 forwardMediaFile();
                 return true;
             case R.id.menu_message_share:
+                Log.v("Export","call from here");
                 exportMediaFile();
                 return true;
                 /**

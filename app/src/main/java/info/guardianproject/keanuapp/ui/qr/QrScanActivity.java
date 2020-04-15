@@ -27,10 +27,9 @@ import com.google.zxing.Result;
 import java.util.ArrayList;
 
 @SuppressWarnings("deprecation")
-public class QrScanActivity extends BaseActivity
-implements QrCodeDecoder.ResultCallback {
+public class QrScanActivity extends BaseActivity implements QrCodeDecoder.ResultCallback {
 
-	private static String TAG = QrScanActivity.class.getPackage().getName();
+	private static String TAG = "Qrcode";
 
 	private CameraView cameraView = null;
 	private View layoutMain = null;
@@ -173,7 +172,6 @@ implements QrCodeDecoder.ResultCallback {
 				gotResult = true;
 
 				String resultString = result.getText();
-
                 if (!resultStrings.contains(resultString)) {
 
                     resultStrings.add(resultString);

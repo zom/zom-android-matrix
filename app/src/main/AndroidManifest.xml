@@ -145,7 +145,9 @@
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:theme="@style/AppThemeNoAction">
+            android:theme="@style/AppThemeNoAction"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+           >
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
 

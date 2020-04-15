@@ -22,6 +22,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -37,6 +38,8 @@ import android.preference.PreferenceManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -53,6 +56,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
@@ -120,6 +124,8 @@ public class MainActivity extends BaseActivity {
     private ContactsListFragment mContactList;
     private MoreFragment mMoreFragment;
     private AccountFragment mAccountFragment;
+    private static final String SELECTED_ITEM_POSITION = "ItemPosition";
+    private int mPosition;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -625,8 +631,10 @@ public class MainActivity extends BaseActivity {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
-        if (mLastPhoto != null)
+        if (mLastPhoto != null) {
             savedInstanceState.putString("lastphoto", mLastPhoto.toString());
+        }
+
 
     }
 
@@ -752,9 +760,11 @@ public class MainActivity extends BaseActivity {
 
             case R.id.menu_list_normal:
                 clearFilters();
+                Log.v("Filter","Normal");
                 return true;
 
             case R.id.menu_list_archive:
+                Log.v("Filter","Archive");
                 enableArchiveFilter();
                 return true;
 
@@ -783,10 +793,13 @@ public class MainActivity extends BaseActivity {
     private void clearFilters ()
     {
 
-        if (mTabLayout.getSelectedTabPosition() == 0)
+        if (mTabLayout.getSelectedTabPosition() == 0) {
             mConversationList.setArchiveFilter(false);
-        else
+            Log.v("Filter","clear_1");
+        }else {
+            Log.v("Filter","clear_2");
             mContactList.setArchiveFilter(false);
+        }
 
         setToolbarTitle(mTabLayout.getSelectedTabPosition());
 
@@ -796,10 +809,13 @@ public class MainActivity extends BaseActivity {
     {
 
         if (mTabLayout.getSelectedTabPosition() == 0)
+        {
             mConversationList.setArchiveFilter(true);
-        else
+            Log.v("Filter","clear_11");
+        }else {
+            Log.v("Filter","clear_22");
             mContactList.setArchiveFilter(true);
-
+        }
 
         setToolbarTitle(mTabLayout.getSelectedTabPosition());
 
@@ -1267,5 +1283,6 @@ public class MainActivity extends BaseActivity {
         }
 
     }**/
+
 
 }

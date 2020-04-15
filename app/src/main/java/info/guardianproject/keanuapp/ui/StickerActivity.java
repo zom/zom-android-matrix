@@ -30,6 +30,8 @@ import com.google.android.material.snackbar.Snackbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
+
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -163,7 +165,7 @@ public class StickerActivity extends BaseActivity {
 
                 String mimeType = "image/png";
                 File exportPath = new File(Environment.getExternalStorageDirectory(), name + ".png");
-
+                Log.v("exportAsset","exportAsset=="+exportPath.getPath());
                 InputStream fis = getResources().getAssets().open(mediaUri.getPath());
                 java.io.FileOutputStream fos = new java.io.FileOutputStream(exportPath, false);
 
