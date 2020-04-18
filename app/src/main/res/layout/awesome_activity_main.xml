@@ -46,6 +46,33 @@
             />
 
     </com.google.android.material.appbar.AppBarLayout>
+    <LinearLayout
+        android:id="@+id/bannerLayout"
+        android:layout_width="match_parent"
+        android:background="#000000"
+        android:visibility="gone"
+        android:elevation="5dp"
+        android:layout_height="?attr/actionBarSize"
+        android:orientation="horizontal">
+        <TextView
+            android:id="@+id/bannerText"
+            android:layout_gravity="center_vertical"
+            android:textColor="@color/app_accent"
+            android:gravity="center_horizontal"
+            android:text="Internet Connection Problem"
+            android:layout_width="wrap_content"
+            android:layout_weight="0.8"
+            android:layout_height="wrap_content">
+        </TextView>
+        <ImageView
+            android:id="@+id/bannerClose"
+            android:layout_width="wrap_content"
+            android:layout_weight="0.2"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_close_white_24dp"
+            android:layout_height="wrap_content">
+        </ImageView>
+    </LinearLayout>
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/viewpager"

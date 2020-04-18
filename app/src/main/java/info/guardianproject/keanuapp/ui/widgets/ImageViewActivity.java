@@ -3,6 +3,7 @@ package info.guardianproject.keanuapp.ui.widgets;
 import android.Manifest;
 import android.animation.Animator;
 import android.annotation.SuppressLint;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,6 +18,8 @@ import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Environment;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -47,6 +50,7 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -252,9 +256,27 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
         if (currentItem >= 0 && currentItem < uris.size()) {
             java.io.File exportPath = SecureMediaStore.exportPath(mimeTypes.get(currentItem), uris.get(currentItem));
             exportMediaFile(mimeTypes.get(currentItem), uris.get(currentItem), exportPath);
+            Log.v("ExportPath","ExportPath 1=="+mimeTypes.get(currentItem));
+            Log.v("ExportPath","ExportPath 2=="+uris.get(currentItem));
+            Log.v("ExportPath","ExportPath 3=="+exportPath);
         }
     }
     };
+
+    private void downloadImage(String uri){
+        Uri imageUri = Uri.fromFile(new File(uri));
+
+        DownloadManager.Request request = new DownloadManager.Request(imageUri);
+        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
+        request.setAllowedOverRoaming(false);
+        request.setTitle("GadgetSaint Downloading " + "Sample" + ".png");
+        request.setDescription("Downloading " + "Sample" + ".png");
+        request.setVisibleInDownloadsUi(true);
+        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/Keanu/"  + "/" + "Sample" + ".png");
+        DownloadManager downloadManager= (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+       downloadManager.enqueue(request);
+
+    }
 
     private void exportMediaFile (String mimeType, Uri mediaUri, java.io.File exportPath)
     {
@@ -429,7 +451,8 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
                     if (SecureMediaStore.isVfsUri(mediaInfo.uri)) {
 
                         info.guardianproject.iocipher.File fileMedia = new info.guardianproject.iocipher.File(mediaInfo.uri.getPath());
-
+                        Log.v("ExportPath","ExportPath 4=="+fileMedia.getPath());
+                        Log.v("ExportPath","ExportPath 5=="+mediaInfo.uri);
                         if (fileMedia.exists()) {
                             Glide.with(context)
                                     .asBitmap()
@@ -442,6 +465,7 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
                                     .apply(imageRequestOptions)
                                     .load(R.drawable.broken_image_large)
                                     .into(imageView);
+                            Log.v("ExportPath","ExportPath 66==");
                         }
                     } else {
                         Glide.with(context)
@@ -449,6 +473,7 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
                                 .apply(imageRequestOptions)
                                 .load(mediaInfo.uri)
                                 .into(imageView);
+                        Log.v("ExportPath","ExportPath 666==");
                     }
                 } catch (Throwable t) { // may run Out Of Memory
                     Log.w(LOG_TAG, "unable to load thumbnail: " + t);
