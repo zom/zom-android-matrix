@@ -7,12 +7,21 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.PagerAdapter;
@@ -20,6 +29,7 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -33,8 +43,14 @@ import android.view.Window;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -52,9 +68,15 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import info.guardianproject.keanu.core.provider.Imps;
@@ -178,7 +200,6 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
 
         menu.findItem(R.id.menu_message_copy).setVisible(false);
         menu.findItem(R.id.menu_message_resend).setVisible(mShowResend);
-
         return true;
     }
 
@@ -194,6 +215,17 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
             case R.id.menu_message_share:
                 Log.v("Export","call from here");
                 exportMediaFile();
+                return true;
+
+            case R.id.menu_downLoad:
+                Log.v("Download","call from here");
+                if (checkPermissions()) {
+                    int currentItem = viewPagerPhotos.getCurrentItem();
+                    if (currentItem >= 0 && currentItem < uris.size()) {
+                        java.io.File exportPath = SecureMediaStore.exportPath(mimeTypes.get(currentItem), uris.get(currentItem));
+                        new DownloadImage().execute(Uri.fromFile(exportPath));
+                    }
+                }
                 return true;
                 /**
             case R.id.menu_message_copy:
@@ -263,20 +295,7 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
     }
     };
 
-    private void downloadImage(String uri){
-        Uri imageUri = Uri.fromFile(new File(uri));
 
-        DownloadManager.Request request = new DownloadManager.Request(imageUri);
-        request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE);
-        request.setAllowedOverRoaming(false);
-        request.setTitle("GadgetSaint Downloading " + "Sample" + ".png");
-        request.setDescription("Downloading " + "Sample" + ".png");
-        request.setVisibleInDownloadsUi(true);
-        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "/Keanu/"  + "/" + "Sample" + ".png");
-        DownloadManager downloadManager= (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-       downloadManager.enqueue(request);
-
-    }
 
     private void exportMediaFile (String mimeType, Uri mediaUri, java.io.File exportPath)
     {
@@ -287,13 +306,58 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
             shareIntent.setAction(Intent.ACTION_SEND);
             shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(exportPath));
             shareIntent.setType(mimeType);
+
+            Log.v("ExportPath","ExportPath 4=="+Uri.fromFile(exportPath));
             startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.export_media)));
         } catch (IOException e) {
             Toast.makeText(this, "Export Failed " + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
+
+    }
+    private class DownloadImage extends AsyncTask<Uri, Void, Bitmap> {
+        private Bitmap downloadImageBitmap(Uri sUrl) throws IOException {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),sUrl);
+            return bitmap;
+        }
+
+        @Override
+        protected Bitmap doInBackground(Uri... params) {
+            try {
+                return downloadImageBitmap(params[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            Log.v("saveFile","saveFileInDownloadFolder result=="+result);
+            saveFileInDownloadFolder(result);
+        }
     }
 
+
+    public void saveFileInDownloadFolder(Bitmap bitmap){
+        String filename = "Keanu_"+getDateTime()+".jpeg";
+        File sd = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File dest = new File(sd, filename);
+        try {
+            FileOutputStream out = new FileOutputStream(dest);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+            Toast.makeText(getApplicationContext(),"Save Image Successfully.",Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Log.v("saveFile","saveFileInDownloadFolder=="+e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    private String getDateTime() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
     private void forwardMediaFile ()
     {
         int currentItem = viewPagerPhotos.getCurrentItem();

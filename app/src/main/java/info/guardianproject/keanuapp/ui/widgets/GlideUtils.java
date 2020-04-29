@@ -65,6 +65,7 @@ public class GlideUtils {
                 if (fileImage.exists())
                 {
                     FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(fileImage);
+
                     Glide.with(context)
                             .load(fis)
                             .apply(noDiskCacheOptions)

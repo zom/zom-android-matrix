@@ -299,6 +299,11 @@
             android:exported="false"
             android:theme="@style/AppThemeNoAction" />
         <activity
+            android:name="info.guardianproject.keanuapp.MultipleImageSelectionActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="false"
+            android:theme="@style/AppThemeNoAction" />
+        <activity
             android:name=".ui.stories.StoryGalleryActivity"
             android:exported="false"
             android:theme="@style/AppThemeNoAction"

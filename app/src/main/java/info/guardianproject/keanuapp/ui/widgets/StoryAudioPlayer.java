@@ -62,7 +62,11 @@ public class StoryAudioPlayer {
         this.cursor = cursor;
         if (this.cursor != null) {
             getOrCreatePlayer();
-            for (int index = (currentPosition + 1); index < this.cursor.getCount(); index++) {
+            Log.d("AudioPlayer", "currentPosition " + currentPosition);
+            Log.d("AudioPlayer", "getCount " + this.cursor.getCount());
+            /*for (int index = (currentPosition + 1); index < this.cursor.getCount(); index++) {
+                Log.d("AudioPlayer", "index " + index);
+
                 cursor.moveToPosition(index);
                 String mime = cursor.getString(mimeTypeColumn);
                 Uri uri = Uri.parse(cursor.getString(uriColumn));
@@ -86,7 +90,30 @@ public class StoryAudioPlayer {
                 Log.d("AudioPlayer", "Add media source " + uri);
                 concatenatingMediaSource.addMediaSource(mediaSource);
             }
-            currentPosition = this.cursor.getCount() - 1;
+            currentPosition = this.cursor.getCount() - 1;*/
+
+            cursor.moveToPosition(this.cursor.getCount() -1);
+            String mime = cursor.getString(mimeTypeColumn);
+            Uri uri = Uri.parse(cursor.getString(uriColumn));
+
+            DataSpec dataSpec = new DataSpec(uri);
+            final VideoViewActivity.InputStreamDataSource inputStreamDataSource = new VideoViewActivity.InputStreamDataSource(context, dataSpec);
+            try {
+                inputStreamDataSource.open(dataSpec);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            DataSource.Factory factory = new DataSource.Factory() {
+                @Override
+                public DataSource createDataSource() {
+                    return inputStreamDataSource;
+                }
+            };
+            MediaSource mediaSource = new ExtractorMediaSource(inputStreamDataSource.getUri(),
+                    factory, new DefaultExtractorsFactory(), null, null);
+            Log.d("AudioPlayer", "Add media source " + uri);
+            concatenatingMediaSource.addMediaSource(mediaSource);
         }
 
         player.setPlayWhenReady(true);

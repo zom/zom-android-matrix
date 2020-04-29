@@ -823,6 +823,8 @@ public class MessageListItem extends FrameLayout {
         if (mimeType != null && mediaUri != null) {
             java.io.File exportPath = SecureMediaStore.exportPath(mimeType, mediaUri);
             exportMediaFile(mimeType, mediaUri, exportPath, true);
+            Log.v("ExportPath","ExportPath messageList=="+exportPath);
+
         }
         else
         {

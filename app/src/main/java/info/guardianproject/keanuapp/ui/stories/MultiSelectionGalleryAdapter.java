@@ -11,31 +11,34 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
 import info.guardianproject.keanuapp.ui.widgets.GlideUtils;
 import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
 
-/**
- * Created by N-Pex on 2019-04-12.
- */
-public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder> {
-    public static final String LOGTAG = "GalleryAdapter";
-    public static final boolean LOGGING = true;
+import static info.guardianproject.keanuapp.ui.stories.GalleryAdapter.LOGGING;
+
+public class MultiSelectionGalleryAdapter extends CursorRecyclerViewAdapter<MultiSelectGalleryViewHolder> {
+    private static final String LOGTAG = "MultiSelectionAdapter";
 
     public interface GalleryAdapterListener {
-        void onMediaItemClicked(MediaInfo media);
+        void onMediaItemClicked(ArrayList<MediaInfo> media);
     }
 
     public enum MediaType {
@@ -45,36 +48,34 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
         Video,
         Audio
     }
-
     private final Context context;
-    private final GalleryAdapterListener listener;
-    private MediaType mediaType = MediaType.All;
+    private MediaType mediaType =MediaType.All;
     private LoadCursorTask loadCursorTask;
-
-    public GalleryAdapter(Context context, GalleryAdapterListener listener) {
-        super(context, null);
-        this.context = context;
-        this.listener = listener;
-    }
-
+    private ArrayList<MediaInfo> listChecked = new ArrayList<>();
     public void setMediaType(MediaType mediaType) {
         this.mediaType = mediaType;
         loadCursor();
     }
-
-    @Override
-    public GalleryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.story_gallery_item, parent, false);
-        return new GalleryViewHolder(view);
+    public MultiSelectionGalleryAdapter(Context context) {
+        super(context,null);
+        this.context = context;
     }
+    @NonNull
+    @Override
+    public MultiSelectGalleryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.item_multiple_list, parent, false);
+        return new MultiSelectGalleryViewHolder(view);
+    }
+
+
 
     @Override
     public int getItemViewType(int position) {
         return 0;
     }
-
     @Override
-    public void onBindViewHolder(GalleryViewHolder holder, Cursor cursor) {
+    public void onBindViewHolder(MultiSelectGalleryViewHolder holder, Cursor cursor) {
+
         try {
             int uriColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA);
             int typeColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.MEDIA_TYPE);
@@ -88,7 +89,7 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
 
                 // We know it's a file uri here, it's from MediaStore.Files
                 File fileData = new File(data);
-                Uri uri = Uri.fromFile(fileData);
+                final Uri uri = Uri.fromFile(fileData);
                 int mediaType = cursor.getInt(typeColumn);
                 String mimeType = (mimeTypeColumn >= 0) ? cursor.getString(mimeTypeColumn) : "";
                 String displayName = cursor.getString(titleColumn);
@@ -120,14 +121,7 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                     }
                 }
 
-                holder.titleView.setText(displayName);
-
-                if (this.mediaType == GalleryAdapter.MediaType.Pdf || this.mediaType == MediaType.Audio)
-                    holder.titleView.setVisibility(View.VISIBLE);
-                else
-                    holder.titleView.setVisibility(View.GONE);
-
-                holder.itemView.setOnClickListener(new View.OnClickListener() {
+               /* holder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         if (listener != null) {
@@ -135,15 +129,30 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                             listener.onMediaItemClicked(new MediaInfo(uri, mimeType));
                         }
                     }
-                });
+                });*/
+
+
+               if(isChecked(uri)){
+                   holder.checkBox.setChecked(true);
+               }else {
+                   holder.checkBox.setChecked(false);
+               }
+
+                CheckBoxListener checkBoxListener = new CheckBoxListener(uri,mimeType);
+                holder.checkBox.setOnTouchListener(checkBoxListener);
+                holder.checkBox.setOnCheckedChangeListener(checkBoxListener);
+
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    public ArrayList<MediaInfo> getCheckedList(){
+        return listChecked;
+    }
     @Override
-    public void onViewRecycled(@NonNull GalleryViewHolder holder) {
+    public void onViewRecycled(@NonNull MultiSelectGalleryViewHolder holder) {
         super.onViewRecycled(holder);
         holder.imageView.setImageDrawable(null);
     }
@@ -203,13 +212,13 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                         selection = MediaStore.Files.FileColumns.MIME_TYPE + " = ?";
                         selectionArgs = new String[]{"application/pdf"};
                         break;
-                    case Audio:
+                   case Audio:
                         selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " = " + MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO;
                         break;
                     case Image:
                         selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " = " + MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
                         break;
-                    case Video:
+                   case Video:
                         selection = MediaStore.Files.FileColumns.MEDIA_TYPE + " = " + MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO;
                         break;
                     default:
@@ -239,7 +248,7 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
 
         @Override
         protected void onPostExecute(Cursor cursor) {
-            synchronized (GalleryAdapter.this) {
+            synchronized (MultiSelectionGalleryAdapter.this) {
                 if (loadCursorTask == this) {
                     loadCursorTask = null;
                 } else {
@@ -261,11 +270,11 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
         private final Uri uri;
         private long id;
         WeakReference<Context> _context;
-        WeakReference<GalleryViewHolder> _owner;
+        WeakReference<MultiSelectGalleryViewHolder> _owner;
 
-        ThumbnailLoader(Context context, GalleryViewHolder owner, int mediaType, Uri uri, long id) {
+        ThumbnailLoader(Context context, MultiSelectGalleryViewHolder owner, int mediaType, Uri uri, long id) {
             _context = new WeakReference<Context>(context);
-            _owner = new WeakReference<GalleryViewHolder>(owner);
+            _owner = new WeakReference<MultiSelectGalleryViewHolder>(owner);
             this.mediaType = mediaType;
             this.uri = uri;
             this.id = id;
@@ -305,7 +314,7 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                 break;
                 case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE: {
                     Context context = _context.get();
-                    GalleryViewHolder holder = _owner.get();
+                    MultiSelectGalleryViewHolder holder = _owner.get();
                     if (context != null && holder != null) {
                         int width = holder.imageView.getWidth();
                         int height = holder.imageView.getHeight();
@@ -333,12 +342,12 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
         @Override
         protected void onPostExecute(Bitmap result) {
             super.onPostExecute(result);
-            GalleryViewHolder owner = _owner.get();
+            MultiSelectGalleryViewHolder owner = _owner.get();
             if (owner != null) {
                 if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO ||
-                    mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE) {
+                        mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_NONE) {
                     if (result != null) {
-                        owner.imageView.setImageBitmap(result);
+                       owner.imageView.setImageBitmap(result);
                     }
                 } else if (mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
                     if (result == null) {
@@ -355,4 +364,47 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
             }
         }
     }
+
+    public boolean isChecked(Uri uri){
+        for (MediaInfo mediaInfo : listChecked){
+            if(mediaInfo.uri.equals(uri)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public class CheckBoxListener implements CheckBox.OnCheckedChangeListener, View.OnTouchListener{
+        private Uri uri;
+        private String mimeType;
+        boolean userSelect = false;
+        public CheckBoxListener(Uri uri,String mimeType){
+            this.uri = uri;
+            this.mimeType = mimeType;
+        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            userSelect = true;
+            return false;
+        }
+        MediaInfo model = new MediaInfo(null,null);
+        @Override
+        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            if(userSelect){
+                if(isChecked){
+                    Log.v("onCheckedChanged","onCheckedChanged is called");
+                    model.uri = uri;
+                    model.mimeType = mimeType;
+                    listChecked.add(model);
+                }else {
+                    Log.v("onCheckedChanged","onCheckedChanged is not checked");
+                    listChecked.remove(model);
+                }
+                userSelect = false;
+            }
+
+        }
+    }
+
 }
