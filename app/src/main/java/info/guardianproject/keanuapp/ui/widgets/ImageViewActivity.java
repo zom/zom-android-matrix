@@ -3,33 +3,34 @@ package info.guardianproject.keanuapp.ui.widgets;
 import android.Manifest;
 import android.animation.Animator;
 import android.annotation.SuppressLint;
-import android.app.DownloadManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Environment;
-import android.provider.MediaStore;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -43,14 +44,8 @@ import android.view.Window;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.DecodeFormat;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.load.engine.GlideException;
-import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.SimpleTarget;
-import com.bumptech.glide.request.target.Target;
-import com.bumptech.glide.request.transition.Transition;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -71,21 +66,25 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.service.IConnectionListener;
+import info.guardianproject.keanu.core.service.IImConnection;
+import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
+import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.ImUrlActivity;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.nearby.NearbyShareActivity;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanuapp.ui.widgets.SecureCameraActivity.THUMBNAIL_SIZE;
 
 public class ImageViewActivity extends AppCompatActivity implements PZSImageView.PSZImageViewImageMatrixListener {
 
@@ -219,12 +218,20 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
 
             case R.id.menu_downLoad:
                 Log.v("Download","call from here");
-                if (checkPermissions()) {
+
+                if (ContextCompat.checkSelfPermission(ImageViewActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                     int currentItem = viewPagerPhotos.getCurrentItem();
                     if (currentItem >= 0 && currentItem < uris.size()) {
                         java.io.File exportPath = SecureMediaStore.exportPath(mimeTypes.get(currentItem), uris.get(currentItem));
                         new DownloadImage().execute(Uri.fromFile(exportPath));
+                     /*   Uri mOutputFileUri = FileProvider.getUriForFile(this,
+                                getPackageName() + ".provider",
+                                exportPath);*/
                     }
+                } else {
+                    // Request permission from the user
+                    ActivityCompat.requestPermissions(ImageViewActivity.this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE}, 104);
                 }
                 return true;
                 /**
@@ -317,7 +324,7 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
     }
     private class DownloadImage extends AsyncTask<Uri, Void, Bitmap> {
         private Bitmap downloadImageBitmap(Uri sUrl) throws IOException {
-            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),sUrl);
+            Bitmap bitmap = getThumbnail(sUrl,ImageViewActivity.this);
             return bitmap;
         }
 
@@ -336,7 +343,38 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
             saveFileInDownloadFolder(result);
         }
     }
+    public  Bitmap getThumbnail(Uri uri,Context context) throws FileNotFoundException, IOException{
+        InputStream input = context.getContentResolver().openInputStream(uri);
 
+        BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();
+        onlyBoundsOptions.inJustDecodeBounds = true;
+        onlyBoundsOptions.inDither=true;//optional
+        onlyBoundsOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//optional
+        BitmapFactory.decodeStream(input, null, onlyBoundsOptions);
+        input.close();
+
+        if ((onlyBoundsOptions.outWidth == -1) || (onlyBoundsOptions.outHeight == -1)) {
+            return null;
+        }
+
+        int originalSize = (onlyBoundsOptions.outHeight > onlyBoundsOptions.outWidth) ? onlyBoundsOptions.outHeight : onlyBoundsOptions.outWidth;
+
+        double ratio = (originalSize > THUMBNAIL_SIZE) ? (originalSize / THUMBNAIL_SIZE) : 1.0;
+
+        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+        bitmapOptions.inSampleSize = getPowerOfTwoForSampleRatio(ratio);
+        bitmapOptions.inDither = true; //optional
+        bitmapOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//
+        input = context.getContentResolver().openInputStream(uri);
+        Bitmap bitmap = BitmapFactory.decodeStream(input, null, bitmapOptions);
+        input.close();
+        return bitmap;
+    }
+    private  int getPowerOfTwoForSampleRatio(double ratio){
+        int k = Integer.highestOneBit((int)Math.floor(ratio));
+        if(k==0) return 1;
+        else return k;
+    }
 
     public void saveFileInDownloadFolder(Bitmap bitmap){
         String filename = "Keanu_"+getDateTime()+".jpeg";
@@ -734,5 +772,29 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
             }
         }
     };
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 104:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    int currentItem = viewPagerPhotos.getCurrentItem();
+                    if (currentItem >= 0 && currentItem < uris.size()) {
+                        java.io.File exportPath = SecureMediaStore.exportPath(mimeTypes.get(currentItem), uris.get(currentItem));
+                        new DownloadImage().execute(Uri.fromFile(exportPath));
+                    }
+                } else {
+                    // Permission Denied
+                    Toast.makeText(ImageViewActivity.this, "Permission Denied", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+
 
 }

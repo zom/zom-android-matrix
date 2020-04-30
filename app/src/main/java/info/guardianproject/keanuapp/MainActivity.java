@@ -348,10 +348,9 @@ public class MainActivity extends BaseActivity {
                 new String[] { IMPS_CATEGORY } /* selection args */,
                 Imps.Provider.DEFAULT_SORT_ORDER);
         cursor.moveToFirst();
-        int mProviderId = cursor.getInt(cursor.getColumnIndexOrThrow(Imps.Provider._ID));
-
+        int mProviderId = cursor.getInt(cursor.getColumnIndexOrThrow(
+                Imps.Provider._ID));
         cursor.close();
-
         //Fetching provider account detail using provider id
         Cursor pCursor = cr.query(Imps.ProviderSettings.CONTENT_URI,new String[] {Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?",new String[] { Long.toString(mProviderId)},null);
         Imps.ProviderSettings.QueryMap settings = new Imps.ProviderSettings.QueryMap(pCursor, cr,

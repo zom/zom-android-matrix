@@ -26,7 +26,7 @@
 
     <item
         android:id="@+id/menu_message_forward"
-        android:icon="@drawable/ic_send_white_24dp"
+        android:icon="@drawable/icon_download"
         android:title="@string/send_message"
         app:showAsAction="always" />
 

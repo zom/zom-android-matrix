@@ -246,6 +246,7 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                     // We are not the current task anymore(?)
                     if (cursor != null) {
                         cursor.close();
+                        Log.v(LOGTAG, "LoadCursorTask: crsor close finished");
                     }
                     return;
                 }

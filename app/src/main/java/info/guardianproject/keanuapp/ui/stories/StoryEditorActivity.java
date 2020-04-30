@@ -50,6 +50,7 @@ public class StoryEditorActivity extends AppCompatActivity {
 
     private RichEditor mEditor;
     private EditText mEditTitle;
+    private String imageUrl = "";
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -341,6 +342,9 @@ public class StoryEditorActivity extends AppCompatActivity {
             ArrayList<MediaInfo> list = (ArrayList<MediaInfo>) intent.getSerializableExtra("listMediaInfo");
             for (MediaInfo mediaInfo : list){
                 try {
+                    Log.v("Download","Download 5=="+mediaInfo.uri);
+                    Log.v("Download","Download 6=="+mediaInfo.mimeType);
+                    Log.v("Download","Download 6=="+mediaInfo.uri.getLastPathSegment());
                     uploadMediaAsync(mediaInfo.uri, mediaInfo.uri.getLastPathSegment(), mediaInfo.mimeType);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -367,19 +371,23 @@ public class StoryEditorActivity extends AppCompatActivity {
 
         String html = ("<img src=\"" + linkImage + "\" alt=\"" + alt + "\" style=\"max-width: 100%; width:auto; height: auto;\"/>");
         String jsInsert = "(function (){ var html='" + html + "'; RE.insertHTML(html);})();";
-        Log.v("mEditor","mEditor===="+jsInsert);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mEditor.evaluateJavascript("javascript:" + jsInsert + "", new ValueCallback<String>() {
                 @Override
                 public void onReceiveValue(String value) {
                     Log.d(getClass().getName(),"editor callback: " + value);
-                    Log.v("mEditor","mEditorv2===="+value);
+                    //Log.v("mEditor","mEditorv2===="+value);
                 }
             });
+            imageUrl += html +"\n";
+            mEditor.loadData(imageUrl, "text/html", "UTF-8");
            // mEditor.loadUrl("javascript:" + jsInsert + "");
+            Log.v("mEditor","mEditor final===="+imageUrl);
         } else {
-            Log.v("mEditor","mEditor 1===="+jsInsert);
-            mEditor.loadUrl("javascript:" + jsInsert + "");
+            //Log.v("mEditor","mEditor 1===="+jsInsert);
+            //mEditor.loadUrl("javascript:" + jsInsert + "");
+            mEditor.loadData(html, "text/html", "UTF-8");
         }
 
 
