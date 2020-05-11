@@ -87,6 +87,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gsconrad.richcontentedittext.RichContentEditText;
+import com.tougee.recorderview.AudioRecordView;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -193,7 +194,7 @@ public class ConversationView {
     CustomTypefaceEditText mComposeMessage;
     ShareRequest mShareDraft;
 
-    protected ImageButton mSendButton, mMicButton;
+    protected ImageButton mSendButton;//, mMicButton;
     private TextView mButtonTalk;
     private ImageButton mButtonAttach;
     private View mViewAttach;
@@ -201,7 +202,8 @@ public class ConversationView {
     private ImageView mButtonDeleteVoice;
     private View mViewDeleteVoice;
 
-
+    private AudioRecordView mAudioRecordView;
+    private View mBtnAttachSticker;
     private ImageView mDeliveryIcon;
     private boolean mExpectingDelivery;
 
@@ -746,7 +748,7 @@ public class ConversationView {
 
 
         mSendButton = (ImageButton) mActivity.findViewById(R.id.btnSend);
-        mMicButton = (ImageButton) mActivity.findViewById(R.id.btnMic);
+       // mMicButton = (ImageButton) mActivity.findViewById(R.id.btnMic);
         mButtonTalk = (TextView)mActivity.findViewById(R.id.buttonHoldToTalk);
 
         mButtonDeleteVoice = (ImageView)mActivity.findViewById(R.id.btnDeleteVoice);
@@ -837,9 +839,9 @@ public class ConversationView {
             });
         }
 
-        View btnAttachSticker = mActivity.findViewById(R.id.btnAttachSticker);
-        if (btnAttachSticker != null) {
-            btnAttachSticker.setOnClickListener(new View.OnClickListener() {
+        mBtnAttachSticker = mActivity.findViewById(R.id.btnAttachSticker);
+        if (mBtnAttachSticker != null) {
+            mBtnAttachSticker.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     toggleStickers();
@@ -858,6 +860,45 @@ public class ConversationView {
             });
         }
 
+        mAudioRecordView = mActivity.findViewById(R.id.record_view);
+        mAudioRecordView.activity = mActivity;
+
+        mAudioRecordView.callback = new AudioRecordView.Callback() {
+            @Override
+            public void onRecordStart(boolean b) {
+                //onRecordStart
+                Log.d("AudioRecord","onRecordStart: " + b);
+                mActivity.startAudioRecording();
+            }
+
+            @Override
+            public boolean isReady() {
+                return true;
+            }
+
+            @Override
+            public void onRecordEnd() {
+                Log.d("AudioRecord","onRecordEnd");
+                if (mActivity.isAudioRecording()) {
+                    boolean send = true;//inViewInBounds(mMicButton, (int) motionEvent.getX(), (int) motionEvent.getY());
+                    mActivity.stopAudioRecording(send);
+                }
+
+            }
+
+            @Override
+            public void onRecordCancel() {
+                Log.d("AudioRecord","onRecordCancel");
+                if (mActivity.isAudioRecording()) {
+                    boolean send = false;
+                    mActivity.stopAudioRecording(send);
+                }
+
+
+            }
+        };
+
+        /**
         if (mMicButton != null) {
             mMicButton.setOnClickListener(new View.OnClickListener() {
 
@@ -884,7 +925,7 @@ public class ConversationView {
                 }
 
             });
-        }
+        }**/
 
 
         final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
@@ -908,6 +949,7 @@ public class ConversationView {
             }
         });
 
+        /**
         if (mMicButton != null) {
             mMicButton.setOnTouchListener(new View.OnTouchListener() {
                 @Override
@@ -916,7 +958,7 @@ public class ConversationView {
 
                 }
             });
-        }
+        }**/
 
         if (mButtonTalk != null) {
             mButtonTalk.setOnTouchListener(new View.OnTouchListener() {
@@ -1083,7 +1125,9 @@ public class ConversationView {
                 mButtonTalk.setVisibility(View.GONE);
             }
             mComposeMessage.setVisibility(View.VISIBLE);
-            mMicButton.setVisibility(View.VISIBLE);
+            mAudioRecordView.setVisibility(View.VISIBLE);
+
+            //     mMicButton.setVisibility(View.VISIBLE);
         }
     }
 
@@ -2163,15 +2207,20 @@ public class ConversationView {
     {
         if (mButtonTalk == null || mButtonTalk.getVisibility() == View.GONE) {
             if (mComposeMessage.getText().length() > 0 && mSendButton.getVisibility() == View.GONE) {
-                mMicButton.setVisibility(View.GONE);
+
+                mAudioRecordView.setVisibility(View.GONE);
+
+                if (mBtnAttachSticker != null)
+                    mBtnAttachSticker.setVisibility(View.GONE);
+
                 mSendButton.setVisibility(View.VISIBLE);
-                //mSendButton.setImageResource(R.drawable.ic_send_holo_light);
-
-                    mSendButton.setImageResource(R.drawable.ic_send_secure);
-
+                mSendButton.setImageResource(R.drawable.ic_send_secure);
 
             } else if (mComposeMessage.getText().length() == 0) {
-                mMicButton.setVisibility(View.VISIBLE);
+                if (mBtnAttachSticker != null)
+                    mBtnAttachSticker.setVisibility(View.VISIBLE);
+
+                mAudioRecordView.setVisibility(View.VISIBLE);
                 mSendButton.setVisibility(View.GONE);
 
             }

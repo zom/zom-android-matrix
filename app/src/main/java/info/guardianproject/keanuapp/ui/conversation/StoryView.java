@@ -70,6 +70,8 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
     private int currentPage = -1;
     private RecyclerView.ViewHolder currentPageViewHolder = null;
 
+    private View mMicButton;
+
     private static final int AUTO_ADVANCE_TIMEOUT_IMAGE = 5000; // Milliseconds
     private static final int AUTO_ADVANCE_TIMEOUT_PDF = 5000; // Milliseconds
 
@@ -115,6 +117,8 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
+
+          mMicButton = activity.findViewById(R.id.btnMic);
         mMicButton.setOnClickListener(null);
         mMicButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

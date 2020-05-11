@@ -116,6 +116,8 @@ import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanu.core.util.Downloader;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.matrix.R;
+import okio.BufferedSink;
+import okio.Okio;
 
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_WIDTH;
@@ -941,11 +943,10 @@ public class MatrixConnection extends ImConnection {
 
     protected void updateGroupMembers (final Room room, final ChatGroup group, boolean priority) {
 
-        updateGroupMembersAsync(room, group, priority);
-        /**
+
         if (priority)
         {
-
+            updateGroupMembersAsync(room, group, priority);
         }
         else {
             mExecutor.execute(
@@ -954,7 +955,7 @@ public class MatrixConnection extends ImConnection {
                         updateGroupMembersAsync(room1, group, false);
                     }
             );
-        }**/
+        }
 
     }
 

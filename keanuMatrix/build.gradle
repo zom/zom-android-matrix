@@ -16,7 +16,7 @@ android {
         //   incremental true
     }
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode project.ext.keanuLibsVersionCode
         versionName project.ext.keanuLibsVersion

@@ -284,7 +284,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         if (!chatGroup.hasMemberListener())
             chatGroup.addMemberListener(adapter.getListenerAdapter());
 
-        mConn.updateGroupMembersAsync(room,chatGroup, true);
+        //mConn.updateGroupMembersAsync(room,chatGroup, false);
 
         if (listener != null) {
 

@@ -9,6 +9,7 @@ import android.webkit.URLUtil;
 import org.apache.commons.io.IOUtils;
 import org.matrix.androidsdk.crypto.model.crypto.EncryptedFileInfo;
 
+import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +28,7 @@ import info.guardianproject.keanu.core.util.SecureMediaStore;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okio.BufferedSink;
 
 public class MatrixDownloader {
 
@@ -50,26 +52,18 @@ public class MatrixDownloader {
                     .build();
             Response response = client.newCall(request).execute();
 
-            InputStream in = response.body().byteStream();
+            InputStream in = new BufferedInputStream(response.body().byteStream());
 
             mMimeType = response.body().contentType().toString();
 
-            long contentLength = response.body().contentLength();
+//            long contentLength = response.body().contentLength();
 
-            if (mMimeType != null) {
+            IOUtils.copy(in,storageStream);
+            storageStream.flush();
+            storageStream.close();
+            response.body().close();
 
-                IOUtils.copy(in,storageStream);
-                storageStream.flush();
-                storageStream.close();
-                response.body().close();
-
-                return true;
-            }
-            else {
-                response.body().close();
-                storageStream.close();
-                return false;
-            }
+            return true;
 
         } catch (Exception e) {
 

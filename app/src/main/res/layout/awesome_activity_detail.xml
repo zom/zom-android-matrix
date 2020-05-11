@@ -297,19 +297,26 @@
                 android:src="@drawable/broken_image_large"
                 />
         </LinearLayout>
-        <LinearLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:padding="3dp"
             android:layout_alignParentBottom="true"
-            android:background="@android:color/white"
-            android:id="@+id/inputLayout"
             android:layout_below="@+id/mediaPreviewContainer"
             android:layout_weight="2"
 
             >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:orientation="horizontal"
+                android:padding="3dp"
+                android:background="@android:color/white"
+                android:id="@+id/inputLayout"
+                android:gravity="center_vertical"
+                android:layout_gravity="bottom"
+                >
+
 
             <ImageButton
                 android:id="@+id/btnAttach"
@@ -358,6 +365,7 @@
 
                 />
 
+
             <ImageButton
                 android:id="@+id/btnMic"
 
@@ -367,6 +375,7 @@
                 android:background="@android:color/transparent"
                 android:src="@drawable/ic_mic_black_36dp"
                 android:layout_margin="6dp"
+                android:visibility="invisible"
                 />
 
             <ImageButton
@@ -385,6 +394,15 @@
 
         </LinearLayout>
 
+        <com.tougee.recorderview.AudioRecordView
+            android:id="@+id/record_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:visibility="visible"
+            />
+
+        </FrameLayout>
     </LinearLayout>
 
         <!-- Waiting for friend view, covers the whole container -->
