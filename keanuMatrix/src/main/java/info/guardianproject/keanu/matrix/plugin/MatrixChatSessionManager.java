@@ -175,6 +175,9 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                         message.setType(Imps.MessageType.QUEUED);
                         String finalMsgId = roomMediaMessage.getEvent().eventId;
 
+                        if (listener != null)
+                            listener.onMessageSendFail(message, finalMsgId);
+
                         if (matrixError instanceof MXCryptoError) {
                             MXCryptoError mxCryptoError = (MXCryptoError) matrixError;
 
@@ -186,12 +189,9 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
                                 //now resend!
                                 sendMessageAsync(session, message, listener);
-                                return;
+
                             }
                         }
-
-                        if (listener != null)
-                            listener.onMessageSendFail(message, finalMsgId);
 
                     }
 

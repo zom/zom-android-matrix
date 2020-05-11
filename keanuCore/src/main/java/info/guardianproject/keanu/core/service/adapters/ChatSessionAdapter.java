@@ -603,7 +603,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         if (msg.getDateTime() != null)
                             sendTime = msg.getDateTime().getTime();
 
-                        updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, newPacketId);
+                        updateMessageInDb(msg.getID(),Imps.MessageType.QUEUED,sendTime, null, newPacketId);
 
                         msg.setID(newPacketId);
                     }
