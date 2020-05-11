@@ -138,7 +138,7 @@ public class MainActivity extends BaseActivity {
     private LinearLayout mBannerLayout;
     private TextView mBannerText;
     private ImageView mBannerClose;
-    private String mServerName;
+
     private static final String[] PROVIDER_PROJECTION = {
             Imps.Provider._ID,
             Imps.Provider.NAME,
@@ -301,10 +301,6 @@ public class MainActivity extends BaseActivity {
 
         setToolbarTitle(0);
 
-        //don't wnat this to happen to often
-        //checkForUpdates();
-//Code Added for Test Ticket(Network connection Banner)
-        mServerName = getServerName();
         mServiceHandler = new ServiceHandler();
 
         installRingtones ();
@@ -327,8 +323,16 @@ public class MainActivity extends BaseActivity {
                 case EVENT_NETWORK_STATE_CHANGED:
                     // Log.d(TAG, "network");
                     if(mNetworkConnectivityListener.getState() == NetworkConnectivityReceiver.State.NOT_CONNECTED){
-                        mBannerLayout.setVisibility(View.VISIBLE);
-                        mBannerText.setText(String.format("App server is down %s",mServerName));
+
+
+                        //don't wnat this to happen to often
+                        //checkForUpdates();
+//Code Added for Test Ticket(Network connection Banner)
+                        String serverName = getServerName();
+                        if (!TextUtils.isEmpty(serverName)) {
+                            mBannerLayout.setVisibility(View.VISIBLE);
+                            mBannerText.setText(String.format(getString(R.string.error_server_down), serverName));
+                        }
                     }else{
                         mBannerLayout.setVisibility(View.GONE);
                     }
@@ -347,22 +351,26 @@ public class MainActivity extends BaseActivity {
         Cursor cursor = cr.query(Imps.Provider.CONTENT_URI_WITH_ACCOUNT, PROVIDER_PROJECTION, Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" /* selection */,
                 new String[] { IMPS_CATEGORY } /* selection args */,
                 Imps.Provider.DEFAULT_SORT_ORDER);
-        cursor.moveToFirst();
-        int mProviderId = cursor.getInt(cursor.getColumnIndexOrThrow(
-                Imps.Provider._ID));
-        cursor.close();
-        //Fetching provider account detail using provider id
-        Cursor pCursor = cr.query(Imps.ProviderSettings.CONTENT_URI,new String[] {Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?",new String[] { Long.toString(mProviderId)},null);
-        Imps.ProviderSettings.QueryMap settings = new Imps.ProviderSettings.QueryMap(pCursor, cr,
-                mProviderId, false /* keep updated */, null /* no handler */);
-        if(TextUtils.isEmpty(settings.getServer())) {
-            server_name = settings.getDomain();
-        }else{
-            server_name = settings.getServer();
+        if (cursor != null) {
+            cursor.moveToFirst();
+            int mProviderId = cursor.getInt(cursor.getColumnIndexOrThrow(
+                    Imps.Provider._ID));
+            cursor.close();
+            //Fetching provider account detail using provider id
+            Cursor pCursor = cr.query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(mProviderId)}, null);
+            Imps.ProviderSettings.QueryMap settings = new Imps.ProviderSettings.QueryMap(pCursor, cr,
+                    mProviderId, false /* keep updated */, null /* no handler */);
+            if (TextUtils.isEmpty(settings.getServer())) {
+                server_name = settings.getDomain();
+            } else {
+                server_name = settings.getServer();
+            }
+
+            settings.close();
+            return server_name;
         }
 
-        settings.close();
-        return server_name;
+        return null;
 
     }
 

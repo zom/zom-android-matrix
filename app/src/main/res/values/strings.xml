@@ -7,5 +7,6 @@
     <string name="im_label">Keanu</string>
     <string name="menu_live_mode">Live Mode</string>
     <string name="add_link_info">https://...</string>
+    <string name="error_server_down">App server is down %s</string>
 
 </resources>
