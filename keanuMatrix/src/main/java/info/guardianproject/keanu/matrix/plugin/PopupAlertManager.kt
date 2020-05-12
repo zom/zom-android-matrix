@@ -189,7 +189,7 @@ object PopupAlertManager {
                 })
                 .enableSwipeToDismiss()
                 .enableInfiniteDuration(true)
-                .setBackgroundColorRes(alert.colorRes ?: R.color.app_accent)
+                .setBackgroundColorRes(alert.colorRes ?: R.color.background_dark)
                 .show()
     }
 

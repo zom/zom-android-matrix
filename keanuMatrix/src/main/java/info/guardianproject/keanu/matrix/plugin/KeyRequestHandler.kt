@@ -20,6 +20,7 @@
 package info.guardianproject.keanu.matrix.plugin
 
 import android.content.Context
+import android.content.Intent
 import android.text.TextUtils
 import info.guardianproject.keanu.matrix.R
 import org.matrix.androidsdk.MXSession
@@ -188,7 +189,7 @@ class KeyRequestHandler(val session: MXSession) : VerificationManager.Verificati
                 R.drawable.ic_send_secure
         )
 
-        alert.colorRes = R.color.app_accent
+        alert.colorRes = R.color.background_dark
 
         val mappingKey = keyForMap(deviceId, userId)
         alert.dismissedAction = Runnable {
@@ -206,6 +207,10 @@ class KeyRequestHandler(val session: MXSession) : VerificationManager.Verificati
                                 userId, deviceId)
                         it.startActivity(intent)
                         **/
+                        val intent = Intent(it, Class.forName("info.guardianproject.keanuapp.ui.contacts.DeviceDisplayActivity"))
+                        intent.putExtra("address", session.myUserId)
+                        it.startActivity(intent)
+
                     }
                 },
                 false

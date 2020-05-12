@@ -1360,7 +1360,8 @@ public class MatrixConnection extends ImConnection {
             debug ("onInitialSyncComplete: " + s);
             if (null != mSession.getCrypto()) {
 
-                mKeyRequestHandler = new KeyRequestHandler(mSession);
+                if (mKeyRequestHandler == null)
+                    mKeyRequestHandler = new KeyRequestHandler(mSession);
 
                 mSession.getCrypto().addRoomKeysRequestListener(new RoomKeysRequestListener() {
                     @Override
