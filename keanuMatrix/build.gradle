@@ -68,6 +68,9 @@ dependencies {
     //for thumbnail extraction for videos!
     implementation 'androidx.exifinterface:exifinterface:1.1.0'
 
+    //Alerter
+    implementation 'com.tapadoo.android:alerter:4.0.3'
+
 }
 
 apply plugin: 'maven'

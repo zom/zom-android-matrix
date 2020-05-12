@@ -13,6 +13,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
+import androidx.annotation.Nullable;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -160,6 +162,11 @@ public class MatrixConnection extends ImConnection {
     private ExecutorService mExecutor = null;
 
     private final static long TIME_ONE_DAY_MS = 1000 * 60 * 60 * 24;
+
+    // Request Handler
+    @Nullable
+    private KeyRequestHandler mKeyRequestHandler;
+
 
     public MatrixConnection (Context context)
     {
@@ -1287,8 +1294,8 @@ public class MatrixConnection extends ImConnection {
                 if (mSession != null && mSession.isCryptoEnabled())
                 {
                     if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
-                     //   if (mSession.getCrypto() != null)
-                       //     mSession.getCrypto().reRequestRoomKeyForEvent(event);
+                        if (mSession.getCrypto() != null)
+                            mSession.getCrypto().reRequestRoomKeyForEvent(event);
                     }
                 }
             }
@@ -1353,12 +1360,15 @@ public class MatrixConnection extends ImConnection {
             debug ("onInitialSyncComplete: " + s);
             if (null != mSession.getCrypto()) {
 
+                mKeyRequestHandler = new KeyRequestHandler(mSession);
+
                 mSession.getCrypto().addRoomKeysRequestListener(new RoomKeysRequestListener() {
                     @Override
                     public void onRoomKeyRequest(IncomingRoomKeyRequest request) {
 
                         debug ("onRoomKeyRequest: " + request);
-                        downloadKeys(request.mUserId,request.mDeviceId);
+//                        downloadKeys(request.mUserId,request.mDeviceId);
+                        mKeyRequestHandler.handleKeyRequest(request, mContext);
 
                     }
 
@@ -1366,6 +1376,7 @@ public class MatrixConnection extends ImConnection {
                     public void onRoomKeyRequestCancellation(IncomingRoomKeyRequestCancellation request) {
                         //KeyRequestHandler.getSharedInstance().handleKeyRequestCancellation(request);
                         debug ("onRoomKeyRequestCancellation: " + request);
+                        mKeyRequestHandler.handleKeyRequestCancellation(request);
 
 
                     }
@@ -1384,8 +1395,9 @@ public class MatrixConnection extends ImConnection {
                     final MXDeviceInfo deviceInfo = devicesMap.getObject(device, user);
 
                     if (null == deviceInfo) {
-                      //  org.matrix.androidsdk.util.Log.e(LOG_TAG, "## displayKeyShareDialog() : No details found for device " + user + ":" + device);
-                      //  onDisplayKeyShareDialogClose(false, false);
+                        Log.e(LOG_TAG, "## displayKeyShareDialog() : No details found for device " + user + ":" + device);
+                     //   onDisplayKeyShareDialogClose(false, false);
+
                         return;
                     }
 
@@ -1394,17 +1406,26 @@ public class MatrixConnection extends ImConnection {
                                 .setDeviceVerification(MXDeviceInfo.DEVICE_VERIFICATION_UNVERIFIED, device, user, new SimpleApiCallback<Void>() {
                                     @Override
                                     public void onSuccess(Void info) {
-                                      //  displayKeyShareDialog(session, deviceInfo, true);
+                        //                displayKeyShareDialog(session, deviceInfo, true);
+
                                     }
                                 });
                     } else {
-                     //   displayKeyShareDialog(session, deviceInfo, false);
+                      //  displayKeyShareDialog(session, deviceInfo, false);
+                        mSession.getCrypto()
+                                .setDeviceVerification(MXDeviceInfo.DEVICE_VERIFICATION_UNVERIFIED, device, user, new SimpleApiCallback<Void>() {
+                                    @Override
+                                    public void onSuccess(Void info) {
+                                        //                displayKeyShareDialog(session, deviceInfo, true);
+
+                                    }
+                                });
                     }
                 }
 
                 private void onError(String errorMessage) {
-                 //   org.matrix.androidsdk.util.Log.e(LOG_TAG, "## displayKeyShareDialog : downloadKeys failed " + errorMessage);
-                 //   onDisplayKeyShareDialogClose(false, false);
+                 Log.e(LOG_TAG, "## displayKeyShareDialog : downloadKeys failed " + errorMessage);
+                    //onDisplayKeyShareDialogClose(false, false);
                 }
 
                 @Override

@@ -1,3 +1,29 @@
 <resources>
     <string name="app_name">keanu</string>
+
+    <!-- share keys -->
+    <string name="you_added_a_new_device">You added a new session \'%s\', which is requesting encryption keys.</string>
+    <string name="you_added_a_new_device_with_info">A new session is requesting encryption keys.\Session name: %1$s\nLast seen: %2$s\nIf you didn’t log in on another session, ignore this request.</string>
+    <string name="your_unverified_device_requesting">Your unverified session  \'%s\' is requesting encryption keys.</string>
+    <string name="your_unverified_device_requesting_with_info">An unverified session is requesting encryption keys.\nSession name: %1$s\nLast seen: %2$s\nIf you didn’t log in on another session, ignore this request.</string>
+
+    <string name="start_verification">Start verification</string>
+    <!-- Keep the label as small as possible-->
+    <string name="start_verification_short_label">Verify</string>
+    <string name="share_without_verifying">Share without verifying</string>
+    <!-- Keep the label as small as possible-->
+    <string name="share_without_verifying_short_label">Share</string>
+    <string name="key_share_request">Key Share Request</string>
+    <string name="ignore_request">Ignore request</string>
+    <!-- Keep the label as small as possible-->
+    <string name="ignore_request_short_label">Ignore</string>
+
+    <string name="encryption_information_unknown_device">unknown session</string>
+    <string name="encryption_information_unknown_ip">unknown ip</string>
+    <string name="encryption_information_none">none</string>
+
+    <string name="devices_details_last_seen_title">Last seen</string>
+    <string name="devices_details_last_seen_format">%1$s @ %2$s</string>
+
+
 </resources>
