@@ -133,9 +133,9 @@ dependencies {
     implementation(name: 'olm-sdk-release-3.1.4', ext: 'aar')
 
     /*********** KeanuApp components **********/
-    implementation(name: 'keanucore-0.0.1.50', ext: 'aar')
+    implementation(name: 'keanucore-0.0.1.51', ext: 'aar')
     //implementation project(':keanuCore')
-    implementation(name: 'keanumatrix-0.0.1.50', ext: 'aar')
+    implementation(name: 'keanumatrix-0.0.1.51', ext: 'aar')
     //implementation project(':keanuMatrix')
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -235,7 +235,7 @@ dependencies {
     implementation 'jp.wasabeef:richeditor-android:1.2.2'
 
     //improved audio recorder
-    implementation 'com.github.n8fr8:AudioRecorderView:1.0.0'
+    implementation 'com.github.n8fr8:AudioRecorderView:228d48dbbc'
 }
 
 // Map for the version code that gives each ABI a value.
