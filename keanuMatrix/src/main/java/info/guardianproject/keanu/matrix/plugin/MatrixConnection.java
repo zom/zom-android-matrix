@@ -935,7 +935,7 @@ public class MatrixConnection extends ImConnection {
             if (csa != null)
                 csa.presenceChanged(Presence.AVAILABLE);
 
-            updateGroupMembers(room, group, false);
+           //                                                                                                                                                          updateGroupMembers(room, group, false);
 
 
         }
@@ -1463,11 +1463,12 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onRoomFlush(String s) {
             debug ("onRoomFlush: " + s);
+            /**
             Room room = mDataHandler.getRoom(s);
             if (room != null)
             {
                 mExecutor.execute(() -> updateGroup(room));
-            }
+            }**/
         }
 
         @Override
