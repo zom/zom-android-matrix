@@ -58,8 +58,8 @@ android {
 
         primary {// Assigns this product flavor to the "mode" flavor dimension.
             dimension "release"
-            versionCode 44000
-            versionName "0.0.4.4"
+            versionCode 45000
+            versionName "0.0.4.5"
             archivesBaseName = "KeanuAlt-$versionName"
             applicationIdSuffix ".altbrand"
             versionNameSuffix "-altbrand"
@@ -230,7 +230,7 @@ dependencies {
 
 
     implementation "androidx.exifinterface:exifinterface:1.1.0"
-
+    implementation 'com.gsconrad:richcontentedittext:1.0.0'
     //html wysiwyg editor
     implementation 'jp.wasabeef:richeditor-android:1.2.2'
 

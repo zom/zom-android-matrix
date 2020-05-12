@@ -17,11 +17,14 @@
 package info.guardianproject.keanuapp;
 
 import android.app.SearchManager;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -30,6 +33,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.RemoteException;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
@@ -37,6 +41,8 @@ import android.preference.PreferenceManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -53,6 +59,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.javiersantos.appupdater.AppUpdater;
 import com.github.javiersantos.appupdater.enums.Display;
@@ -63,11 +73,13 @@ import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.ImConnection;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.service.HeartbeatService;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.ImServiceConstants;
+import info.guardianproject.keanu.core.service.NetworkConnectivityReceiver;
 import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.util.AssetUtil;
 import info.guardianproject.keanu.core.util.Debug;
@@ -98,6 +110,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import static info.guardianproject.keanu.core.KeanuConstants.IMPS_CATEGORY;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.PREFERENCE_KEY_TEMP_PASS;
 
@@ -121,6 +134,32 @@ public class MainActivity extends BaseActivity {
     private ContactsListFragment mContactList;
     private MoreFragment mMoreFragment;
     private AccountFragment mAccountFragment;
+    private static final String SELECTED_ITEM_POSITION = "ItemPosition";
+    private int mPosition;
+    private LinearLayout mBannerLayout;
+    private TextView mBannerText;
+    private ImageView mBannerClose;
+
+    private static final String[] PROVIDER_PROJECTION = {
+            Imps.Provider._ID,
+            Imps.Provider.NAME,
+            Imps.Provider.FULLNAME,
+            Imps.Provider.CATEGORY,
+            Imps.Provider.ACTIVE_ACCOUNT_ID,
+            Imps.Provider.ACTIVE_ACCOUNT_USERNAME,
+            Imps.Provider.ACTIVE_ACCOUNT_PW,
+            Imps.Provider.ACTIVE_ACCOUNT_LOCKED,
+            Imps.Provider.ACTIVE_ACCOUNT_KEEP_SIGNED_IN,
+            Imps.Provider.ACCOUNT_PRESENCE_STATUS,
+            Imps.Provider.ACCOUNT_CONNECTION_STATUS,
+            Imps.Provider.ACTIVE_ACCOUNT_NICKNAME
+
+
+    };
+    private static final int EVENT_NETWORK_STATE_CHANGED = 201;
+    private ServiceHandler mServiceHandler;
+    private NetworkConnectivityReceiver mNetworkConnectivityListener;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -156,6 +195,15 @@ public class MainActivity extends BaseActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mBannerLayout = (LinearLayout) findViewById(R.id.bannerLayout);
+        mBannerText = (TextView) findViewById(R.id.bannerText);
+        mBannerClose = (ImageView) findViewById(R.id.bannerClose);
+        mBannerClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mBannerLayout.setVisibility(View.GONE);
+            }
+        });
 
         setSupportActionBar(mToolbar);
 
@@ -254,16 +302,78 @@ public class MainActivity extends BaseActivity {
 
         setToolbarTitle(0);
 
-        //don't wnat this to happen to often
-        //checkForUpdates();
+        mServiceHandler = new ServiceHandler();
 
         installRingtones ();
 
         applyStyle();
+//Code Added for Test Ticket(Network connection Banner)
+        mNetworkConnectivityListener = new NetworkConnectivityReceiver();
+        NetworkConnectivityReceiver.registerHandler(mServiceHandler, EVENT_NETWORK_STATE_CHANGED);
+        mNetworkConnectivityListener.startListening(this);
 
 
     }
+    private final class ServiceHandler extends Handler {
+        public ServiceHandler() {
+        }
 
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case EVENT_NETWORK_STATE_CHANGED:
+                    // Log.d(TAG, "network");
+                    if(mNetworkConnectivityListener.getState() == NetworkConnectivityReceiver.State.NOT_CONNECTED){
+
+
+                        //don't wnat this to happen to often
+                        //checkForUpdates();
+//Code Added for Test Ticket(Network connection Banner)
+                        String serverName = getServerName();
+                        if (!TextUtils.isEmpty(serverName)) {
+                            mBannerLayout.setVisibility(View.VISIBLE);
+                            mBannerText.setText(String.format(getString(R.string.error_server_down), serverName));
+                        }
+                    }else{
+                        mBannerLayout.setVisibility(View.GONE);
+                    }
+                    break;
+
+                default:
+            }
+        }
+    }
+
+    //Code Added for Test Ticket(Network connection Banner)
+    private String getServerName(){
+        String server_name = "";
+        ContentResolver cr = getContentResolver();
+        //Fetching provider ID
+        Cursor cursor = cr.query(Imps.Provider.CONTENT_URI_WITH_ACCOUNT, PROVIDER_PROJECTION, Imps.Provider.CATEGORY + "=?" + " AND " + Imps.Provider.ACTIVE_ACCOUNT_USERNAME + " NOT NULL" /* selection */,
+                new String[] { IMPS_CATEGORY } /* selection args */,
+                Imps.Provider.DEFAULT_SORT_ORDER);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            int mProviderId = cursor.getInt(cursor.getColumnIndexOrThrow(
+                    Imps.Provider._ID));
+            cursor.close();
+            //Fetching provider account detail using provider id
+            Cursor pCursor = cr.query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(mProviderId)}, null);
+            Imps.ProviderSettings.QueryMap settings = new Imps.ProviderSettings.QueryMap(pCursor, cr,
+                    mProviderId, false /* keep updated */, null /* no handler */);
+            if (TextUtils.isEmpty(settings.getServer())) {
+                server_name = settings.getDomain();
+            } else {
+                server_name = settings.getServer();
+            }
+
+            settings.close();
+            return server_name;
+        }
+
+        return null;
+
+    }
 
 
     private void installRingtones ()
@@ -275,7 +385,7 @@ public class MainActivity extends BaseActivity {
 
     }
 
-    private void setToolbarTitle (int tabPosition)
+    private void setToolbarTitle(int tabPosition)
     {
         StringBuffer sb = new StringBuffer();
         sb.append(getString(R.string.app_name));
@@ -629,8 +739,10 @@ public class MainActivity extends BaseActivity {
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
-        if (mLastPhoto != null)
+        if (mLastPhoto != null) {
             savedInstanceState.putString("lastphoto", mLastPhoto.toString());
+        }
+
 
     }
 
@@ -756,9 +868,11 @@ public class MainActivity extends BaseActivity {
 
             case R.id.menu_list_normal:
                 clearFilters();
+                Log.v("Filter","Normal");
                 return true;
 
             case R.id.menu_list_archive:
+                Log.v("Filter","Archive");
                 enableArchiveFilter();
                 return true;
 
@@ -787,10 +901,13 @@ public class MainActivity extends BaseActivity {
     private void clearFilters ()
     {
 
-        if (mTabLayout.getSelectedTabPosition() == 0)
+        if (mTabLayout.getSelectedTabPosition() == 0) {
             mConversationList.setArchiveFilter(false);
-        else
+            Log.v("Filter","clear_1");
+        }else {
+            Log.v("Filter","clear_2");
             mContactList.setArchiveFilter(false);
+        }
 
         setToolbarTitle(mTabLayout.getSelectedTabPosition());
 
@@ -800,10 +917,13 @@ public class MainActivity extends BaseActivity {
     {
 
         if (mTabLayout.getSelectedTabPosition() == 0)
+        {
             mConversationList.setArchiveFilter(true);
-        else
+            Log.v("Filter","clear_11");
+        }else {
+            Log.v("Filter","clear_22");
             mContactList.setArchiveFilter(true);
-
+        }
 
         setToolbarTitle(mTabLayout.getSelectedTabPosition());
 
@@ -846,6 +966,7 @@ public class MainActivity extends BaseActivity {
     public void handleExit ()
     {
         stopService(new Intent(this,RemoteImService.class));
+        stopService(new Intent(this, RemoteImService.class));
         finish();
     }
 
@@ -1274,5 +1395,6 @@ public class MainActivity extends BaseActivity {
         }
 
     }**/
+
 
 }

@@ -23,6 +23,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ClipData;
+import android.content.ClipDescription;
 import android.content.ClipboardManager;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -49,6 +50,7 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.provider.Browser;
 
+import androidx.core.view.inputmethod.InputContentInfoCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
@@ -84,6 +86,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gsconrad.richcontentedittext.RichContentEditText;
 import com.tougee.recorderview.AudioRecordView;
 
 import java.io.IOException;
@@ -94,6 +97,7 @@ import java.util.HashMap;
 
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.service.IChatSessionListener;
+import info.guardianproject.keanu.core.type.CustomTypefaceEditText;
 import info.guardianproject.keanu.matrix.plugin.MatrixAddress;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanu.core.model.Contact;
@@ -187,7 +191,7 @@ public class ConversationView {
     //private ImageView mStatusIcon;
    // private TextView mTitle;
     /*package*/RecyclerView mHistory;
-    EditText mComposeMessage;
+    CustomTypefaceEditText mComposeMessage;
     ShareRequest mShareDraft;
 
     protected ImageButton mSendButton;//, mMicButton;
@@ -714,7 +718,35 @@ public class ConversationView {
             }
         });
 
-        mComposeMessage = (EditText) mActivity.findViewById(R.id.composeMessage);
+        mComposeMessage = (CustomTypefaceEditText) mActivity.findViewById(R.id.composeMessage);
+        mComposeMessage.setReachContentClickListner(new CustomTypefaceEditText.OnReachContentSelect() {
+            @Override
+            public void onReachContentClick(InputContentInfoCompat inputContentInfoCompat) {
+                ShareRequest request = new ShareRequest();
+                request.deleteFile = false;
+                request.resizeImage = false;
+                request.importContent = true;
+                request.media = inputContentInfoCompat.getContentUri();
+                request.mimeType = "image/gif";
+                mActivity.sendShareRequest(request);
+            }
+        });
+        /*mComposeMessage.setOnRichContentListener(new RichContentEditText.OnRichContentListener() {
+            @Override
+            public void onRichContent(Uri contentUri, ClipDescription description) {
+                Log.v("mComposeMessage","mComposeMessage==="+contentUri);
+                ShareRequest request = new ShareRequest();
+                request.deleteFile = false;
+                request.resizeImage = false;
+                request.importContent = true;
+                request.media = contentUri;
+                request.mimeType = "image/gif";
+                mActivity.sendShareRequest(request);
+
+            }
+        });*/
+
+
         mSendButton = (ImageButton) mActivity.findViewById(R.id.btnSend);
        // mMicButton = (ImageButton) mActivity.findViewById(R.id.btnMic);
         mButtonTalk = (TextView)mActivity.findViewById(R.id.buttonHoldToTalk);

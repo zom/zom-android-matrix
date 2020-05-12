@@ -3,21 +3,34 @@ package info.guardianproject.keanuapp.ui.widgets;
 import android.Manifest;
 import android.animation.Animator;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Environment;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
@@ -48,19 +61,30 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import info.guardianproject.keanu.core.model.ImErrorInfo;
 import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.service.IConnectionListener;
+import info.guardianproject.keanu.core.service.IImConnection;
+import info.guardianproject.keanu.core.service.RemoteImService;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
+import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.ImUrlActivity;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.nearby.NearbyShareActivity;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanuapp.ui.widgets.SecureCameraActivity.THUMBNAIL_SIZE;
 
 public class ImageViewActivity extends AppCompatActivity implements PZSImageView.PSZImageViewImageMatrixListener {
 
@@ -175,7 +199,6 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
 
         menu.findItem(R.id.menu_message_copy).setVisible(false);
         menu.findItem(R.id.menu_message_resend).setVisible(mShowResend);
-
         return true;
     }
 
@@ -189,7 +212,27 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
                 forwardMediaFile();
                 return true;
             case R.id.menu_message_share:
+                Log.v("Export","call from here");
                 exportMediaFile();
+                return true;
+
+            case R.id.menu_downLoad:
+                Log.v("Download","call from here");
+
+                if (ContextCompat.checkSelfPermission(ImageViewActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    int currentItem = viewPagerPhotos.getCurrentItem();
+                    if (currentItem >= 0 && currentItem < uris.size()) {
+                        java.io.File exportPath = SecureMediaStore.exportPath(mimeTypes.get(currentItem), uris.get(currentItem));
+                        new DownloadImage().execute(Uri.fromFile(exportPath));
+                     /*   Uri mOutputFileUri = FileProvider.getUriForFile(this,
+                                getPackageName() + ".provider",
+                                exportPath);*/
+                    }
+                } else {
+                    // Request permission from the user
+                    ActivityCompat.requestPermissions(ImageViewActivity.this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE}, 104);
+                }
                 return true;
                 /**
             case R.id.menu_message_copy:
@@ -252,9 +295,14 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
         if (currentItem >= 0 && currentItem < uris.size()) {
             java.io.File exportPath = SecureMediaStore.exportPath(mimeTypes.get(currentItem), uris.get(currentItem));
             exportMediaFile(mimeTypes.get(currentItem), uris.get(currentItem), exportPath);
+            Log.v("ExportPath","ExportPath 1=="+mimeTypes.get(currentItem));
+            Log.v("ExportPath","ExportPath 2=="+uris.get(currentItem));
+            Log.v("ExportPath","ExportPath 3=="+exportPath);
         }
     }
     };
+
+
 
     private void exportMediaFile (String mimeType, Uri mediaUri, java.io.File exportPath)
     {
@@ -268,13 +316,89 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
             shareIntent.setAction(Intent.ACTION_SEND);
             shareIntent.putExtra(Intent.EXTRA_STREAM, uriFileShare);
             shareIntent.setType(mimeType);
+
+            Log.v("ExportPath","ExportPath 4=="+Uri.fromFile(exportPath));
             startActivity(Intent.createChooser(shareIntent, getResources().getText(R.string.export_media)));
         } catch (IOException e) {
             Toast.makeText(this, "Export Failed " + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
+
+    }
+    private class DownloadImage extends AsyncTask<Uri, Void, Bitmap> {
+        private Bitmap downloadImageBitmap(Uri sUrl) throws IOException {
+            Bitmap bitmap = getThumbnail(sUrl,ImageViewActivity.this);
+            return bitmap;
+        }
+
+        @Override
+        protected Bitmap doInBackground(Uri... params) {
+            try {
+                return downloadImageBitmap(params[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            Log.v("saveFile","saveFileInDownloadFolder result=="+result);
+            saveFileInDownloadFolder(result);
+        }
+    }
+    public  Bitmap getThumbnail(Uri uri,Context context) throws FileNotFoundException, IOException{
+        InputStream input = context.getContentResolver().openInputStream(uri);
+
+        BitmapFactory.Options onlyBoundsOptions = new BitmapFactory.Options();
+        onlyBoundsOptions.inJustDecodeBounds = true;
+        onlyBoundsOptions.inDither=true;//optional
+        onlyBoundsOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//optional
+        BitmapFactory.decodeStream(input, null, onlyBoundsOptions);
+        input.close();
+
+        if ((onlyBoundsOptions.outWidth == -1) || (onlyBoundsOptions.outHeight == -1)) {
+            return null;
+        }
+
+        int originalSize = (onlyBoundsOptions.outHeight > onlyBoundsOptions.outWidth) ? onlyBoundsOptions.outHeight : onlyBoundsOptions.outWidth;
+
+        double ratio = (originalSize > THUMBNAIL_SIZE) ? (originalSize / THUMBNAIL_SIZE) : 1.0;
+
+        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+        bitmapOptions.inSampleSize = getPowerOfTwoForSampleRatio(ratio);
+        bitmapOptions.inDither = true; //optional
+        bitmapOptions.inPreferredConfig=Bitmap.Config.ARGB_8888;//
+        input = context.getContentResolver().openInputStream(uri);
+        Bitmap bitmap = BitmapFactory.decodeStream(input, null, bitmapOptions);
+        input.close();
+        return bitmap;
+    }
+    private  int getPowerOfTwoForSampleRatio(double ratio){
+        int k = Integer.highestOneBit((int)Math.floor(ratio));
+        if(k==0) return 1;
+        else return k;
     }
 
+    public void saveFileInDownloadFolder(Bitmap bitmap){
+        String filename = "Keanu_"+getDateTime()+".jpeg";
+        File sd = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File dest = new File(sd, filename);
+        try {
+            FileOutputStream out = new FileOutputStream(dest);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+            out.flush();
+            out.close();
+            Toast.makeText(getApplicationContext(),"Save Image Successfully.",Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            Log.v("saveFile","saveFileInDownloadFolder=="+e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    private String getDateTime() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
     private void forwardMediaFile ()
     {
         int currentItem = viewPagerPhotos.getCurrentItem();
@@ -432,7 +556,8 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
                     if (SecureMediaStore.isVfsUri(mediaInfo.uri)) {
 
                         info.guardianproject.iocipher.File fileMedia = new info.guardianproject.iocipher.File(mediaInfo.uri.getPath());
-
+                        Log.v("ExportPath","ExportPath 4=="+fileMedia.getPath());
+                        Log.v("ExportPath","ExportPath 5=="+mediaInfo.uri);
                         if (fileMedia.exists()) {
                             Glide.with(context)
                                     .asBitmap()
@@ -445,6 +570,7 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
                                     .apply(imageRequestOptions)
                                     .load(R.drawable.broken_image_large)
                                     .into(imageView);
+                            Log.v("ExportPath","ExportPath 66==");
                         }
                     } else {
                         Glide.with(context)
@@ -452,6 +578,7 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
                                 .apply(imageRequestOptions)
                                 .load(mediaInfo.uri)
                                 .into(imageView);
+                        Log.v("ExportPath","ExportPath 666==");
                     }
                 } catch (Throwable t) { // may run Out Of Memory
                     Log.w(LOG_TAG, "unable to load thumbnail: " + t);
@@ -648,5 +775,29 @@ public class ImageViewActivity extends AppCompatActivity implements PZSImageView
             }
         }
     };
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 104:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    int currentItem = viewPagerPhotos.getCurrentItem();
+                    if (currentItem >= 0 && currentItem < uris.size()) {
+                        java.io.File exportPath = SecureMediaStore.exportPath(mimeTypes.get(currentItem), uris.get(currentItem));
+                        new DownloadImage().execute(Uri.fromFile(exportPath));
+                    }
+                } else {
+                    // Permission Denied
+                    Toast.makeText(ImageViewActivity.this, "Permission Denied", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+
 
 }

@@ -655,7 +655,6 @@ public class ConversationDetailActivity extends BaseActivity {
     }
 
     public void handleSendDelete(Uri contentUri, String defaultType, boolean delete, boolean resizeImage, boolean importContent) {
-
         final Snackbar sb = Snackbar.make(mConvoView.getHistoryView(), R.string.upgrade_progress_action, Snackbar.LENGTH_INDEFINITE);
         sb.show();
 

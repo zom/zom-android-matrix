@@ -33,6 +33,7 @@ import java.util.ArrayList;
 
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
+import info.guardianproject.keanuapp.MultipleImageSelectionActivity;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.camera.CameraActivity;
 import info.guardianproject.keanuapp.ui.stories.GalleryAdapter;
@@ -55,6 +56,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     private View bottomSheet;
     private boolean isInViewerMode = false;
     private CircularPulseImageButton cameraButton;
+    private CircularPulseImageButton btnAddMultipleImage;
     private View cameraFlipButton;
     private CircularPulseImageButton microphoneButton;
     private View sendButton;
@@ -95,7 +97,14 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
         }
 
         cameraButton = findViewById(R.id.btnCameraVideo);
-
+        btnAddMultipleImage = findViewById(R.id.btnAddMultipleImage);
+        btnAddMultipleImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(AddUpdateMediaActivity.this, MultipleImageSelectionActivity.class));
+                finish();
+            }
+        });
         // Override functionality from super - We use the same button for photo and video: click
         // means take photo, long press means take video.
         //
@@ -318,9 +327,10 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     private void setViewerMode(boolean viewerMode) {
         isInViewerMode = viewerMode;
         if (isInViewerMode) {
-            microphoneButton.setVisibility((addedAudio() == null && addedVideo() == null && !isRecordingVideo) ? View.VISIBLE : View.INVISIBLE);
-            cameraButton.setVisibility(isRecordingVideo ? View.VISIBLE : View.INVISIBLE);
-            cameraFlipButton.setVisibility(View.INVISIBLE);
+            microphoneButton.setVisibility((addedAudio() == null && addedVideo() == null && !isRecordingVideo) ? View.VISIBLE : View.GONE);
+            cameraButton.setVisibility(isRecordingVideo ? View.VISIBLE : View.GONE);
+            btnAddMultipleImage.setVisibility(isRecordingVideo ? View.GONE : View.VISIBLE);
+            cameraFlipButton.setVisibility(View.GONE);
             bottomSheet.setVisibility(View.GONE);
             sendButton.setVisibility(addedMedia.size() > 0 ? View.VISIBLE : View.GONE);
             getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close_white_24dp);

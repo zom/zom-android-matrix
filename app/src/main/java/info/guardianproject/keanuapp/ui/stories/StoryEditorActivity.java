@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
@@ -39,6 +40,7 @@ import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.conversation.AddUpdateMediaActivity;
+import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
 import jp.wasabeef.richeditor.RichEditor;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
@@ -48,6 +50,7 @@ public class StoryEditorActivity extends AppCompatActivity {
 
     private RichEditor mEditor;
     private EditText mEditTitle;
+    private String imageUrl = "";
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +84,7 @@ public class StoryEditorActivity extends AppCompatActivity {
             @Override public void onClick(View v) {
                 mEditor.redo();
             }
+
         });**/
 
         findViewById(R.id.action_bold).setOnClickListener(new View.OnClickListener() {
@@ -332,6 +336,21 @@ public class StoryEditorActivity extends AppCompatActivity {
                 mEditor.insertTodo();
             }
         });**/
+
+        Intent intent = getIntent();
+        if(intent != null && intent.getSerializableExtra("listMediaInfo") != null){
+            ArrayList<MediaInfo> list = (ArrayList<MediaInfo>) intent.getSerializableExtra("listMediaInfo");
+            for (MediaInfo mediaInfo : list){
+                try {
+                    Log.v("Download","Download 5=="+mediaInfo.uri);
+                    Log.v("Download","Download 6=="+mediaInfo.mimeType);
+                    Log.v("Download","Download 6=="+mediaInfo.uri.getLastPathSegment());
+                    uploadMediaAsync(mediaInfo.uri, mediaInfo.uri.getLastPathSegment(), mediaInfo.mimeType);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     //
@@ -358,11 +377,17 @@ public class StoryEditorActivity extends AppCompatActivity {
                 @Override
                 public void onReceiveValue(String value) {
                     Log.d(getClass().getName(),"editor callback: " + value);
+                    //Log.v("mEditor","mEditorv2===="+value);
                 }
             });
-
+            imageUrl += html +"\n";
+            mEditor.loadData(imageUrl, "text/html", "UTF-8");
+           // mEditor.loadUrl("javascript:" + jsInsert + "");
+            Log.v("mEditor","mEditor final===="+imageUrl);
         } else {
-            mEditor.loadUrl("javascript:" + jsInsert + "");
+            //Log.v("mEditor","mEditor 1===="+jsInsert);
+            //mEditor.loadUrl("javascript:" + jsInsert + "");
+            mEditor.loadData(html, "text/html", "UTF-8");
         }
 
 
@@ -530,12 +555,14 @@ public class StoryEditorActivity extends AppCompatActivity {
 
         if (requestCode == REQUEST_ADD_MEDIA)
         {
-            if (data.hasExtra("resultUris")) {
+            if (data!=null && data.hasExtra("resultUris")) {
                 String[] mediaUris = data.getStringArrayExtra("resultUris");
                 String[] mediaTypes = data.getStringArrayExtra("resultTypes");
 
                 for (int i = 0; i < mediaUris.length; i++) {
+
                     Uri mediaUri = Uri.parse(mediaUris[i]);
+                    Log.v("onMediaItemClicked","onMediaItemClicked mediaUri=="+mediaUri.getLastPathSegment());
                     try {
                         uploadMediaAsync(mediaUri, mediaUri.getLastPathSegment(), mediaTypes[i]);
                     } catch (Exception e) {

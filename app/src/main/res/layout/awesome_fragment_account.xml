@@ -121,7 +121,7 @@
 			                               android:textAppearance="?android:attr/textAppearanceMedium"
 			                               />
 			                               <ImageView
-			                                       android:layout_width="wrap_content"
+			                                       android:layout_width="22dp"
 			                                       android:layout_height="20dp"
 			                                       android:id="@+id/btnShowPass"
 			                                       android:src="@drawable/ic_visibility_black_24dp"

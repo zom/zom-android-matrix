@@ -519,27 +519,36 @@ public class OnboardingActivity extends BaseActivity {
         String password = ((EditText)findViewById(R.id.edtNewPass)).getText().toString();
         String passwordConfirm = ((EditText)findViewById(R.id.edtNewPassConfirm)).getText().toString();
 
-        if (TextUtils.isEmpty(password) || password.length() < 4)
-        {
-            ((EditText)findViewById(R.id.edtNewPassConfirm)).setBackgroundColor(R.color.holo_red_dark);
-            Toast.makeText(this,R.string.pass_err_length,Toast.LENGTH_LONG).show();
+        if(!TextUtils.isEmpty(password)){
+
+            if(!TextUtils.isEmpty(passwordConfirm)){
+               if (password.equals(passwordConfirm)) {
+                    mViewFlipper.setDisplayedChild(4);
+
+                    if (mCurrentFindServerTask != null)
+                        mCurrentFindServerTask.cancel(true);
+
+                    mCurrentFindServerTask = new FindServerTask();
+                    mCurrentFindServerTask.execute(mNickname, username, domain, password);
+                }
+                else
+                {
+                    Toast.makeText(this,R.string.lock_screen_passphrases_not_matching,Toast.LENGTH_LONG).show();
+
+                    ((EditText)findViewById(R.id.edtNewPassConfirm)).setBackgroundColor(R.color.holo_red_dark);
+                }
+            }else {
+                ((EditText)findViewById(R.id.edtNewPassConfirm)).setBackgroundColor(R.color.holo_red_dark);
+                Toast.makeText(this,"The confirm password field cannot be blank.",Toast.LENGTH_LONG).show();
+            }
+
+        }else {
+            ((EditText)findViewById(R.id.edtNewPass)).setBackgroundColor(R.color.holo_red_dark);
+            Toast.makeText(this,"The password field cannot be blank.",Toast.LENGTH_LONG).show();
 
         }
-        else if (password.equals(passwordConfirm)) {
-            mViewFlipper.setDisplayedChild(4);
 
-            if (mCurrentFindServerTask != null)
-                mCurrentFindServerTask.cancel(true);
 
-            mCurrentFindServerTask = new FindServerTask();
-            mCurrentFindServerTask.execute(mNickname, username, domain, password);
-        }
-        else
-        {
-            Toast.makeText(this,R.string.lock_screen_passphrases_not_matching,Toast.LENGTH_LONG).show();
-
-            ((EditText)findViewById(R.id.edtNewPassConfirm)).setBackgroundColor(R.color.holo_red_dark);
-        }
     }
     
     private void startAccountSetup()

@@ -45,6 +45,7 @@ import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -122,13 +123,14 @@ public class ConversationListFragment extends Fragment {
         view.setBackgroundColor(themeColorBg);
             */
 
-
+        Log.v("mLoaderManager","onCreate");
         return view;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Log.v("mLoaderManager","onResume");
         if (mLoaderManager != null)
             mLoaderManager.restartLoader(mLoaderId, null, mLoaderCallbacks);
     }
@@ -323,7 +325,7 @@ public class ConversationListFragment extends Fragment {
         else
             mChatType = Imps.Chats.CHAT_TYPE_ACTIVE;
 
-        if (mLoaderManager != null)
+
             mLoaderManager.restartLoader(mLoaderId, null, mLoaderCallbacks);
     }
 

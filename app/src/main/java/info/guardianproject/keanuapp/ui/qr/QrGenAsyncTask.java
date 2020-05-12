@@ -69,7 +69,7 @@ public class QrGenAsyncTask extends AsyncTask<String, Void, Void> {
 
     @Override
     protected void onPostExecute(Void v) {
-
+        Log.v(TAG, qrBitmap.toString());
         // If the generation takes too long for whatever reason, then this view, and indeed the entire
         // activity may not be around any more.
         if (view != null) {

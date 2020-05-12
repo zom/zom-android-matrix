@@ -74,6 +74,21 @@
                 app:durationExpand="930"
                 app:durationGap="330" />
             <info.guardianproject.keanuapp.ui.widgets.CircularPulseImageButton
+                android:id="@+id/btnAddMultipleImage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:src="@drawable/icon_plus"
+                android:tint="@android:color/white"
+                android:background="@null"
+                android:scaleType="centerInside"
+                app:lineWidth="4dp"
+                android:visibility="gone"
+                app:color="@android:color/white"
+                app:durationExpand="930"
+                app:durationGap="330" />
+            <info.guardianproject.keanuapp.ui.widgets.CircularPulseImageButton
                 android:id="@+id/btnCameraVideo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -161,10 +176,10 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:visibility="invisible"
+            android:background="@null"
             android:focusable="false"
             android:focusableInTouchMode="false"
-            android:background="@null" />
+            android:visibility="invisible" />
     </LinearLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

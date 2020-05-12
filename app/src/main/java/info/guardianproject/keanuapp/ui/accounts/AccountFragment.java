@@ -132,14 +132,18 @@ public class AccountFragment extends Fragment {
         mTvPassword = (TextView) mView.findViewById(R.id.edtPass);
         mTvPassword.setText(DEFAULT_PASSWORD_TEXT);
 
-        View btnShowPassword = mView.findViewById(R.id.btnShowPass);
+        ImageView btnShowPassword = mView.findViewById(R.id.btnShowPass);
         btnShowPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mTvPassword.getText().toString().equals(DEFAULT_PASSWORD_TEXT))
+                if (mTvPassword.getText().toString().equals(DEFAULT_PASSWORD_TEXT)) {
                     mTvPassword.setText(getAccountPassword(mProviderId));
-                else
+                    btnShowPassword.setImageResource(R.drawable.eye_slash_icon);
+                }
+                else {
                     mTvPassword.setText(DEFAULT_PASSWORD_TEXT);
+                    btnShowPassword.setImageResource(R.drawable.ic_visibility_black_24dp);
+                }
             }
         });
 

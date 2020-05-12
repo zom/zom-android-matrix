@@ -12,8 +12,8 @@ import info.guardianproject.keanuapp.ui.conversation.AddUpdateMediaActivity;
  * Created by N-Pex on 2019-04-17.
  */
 public class MediaInfo extends Object implements Parcelable {
-    public final Uri uri;
-    public final String mimeType;
+    public Uri uri;
+    public String mimeType;
 
     public MediaInfo(Uri uri, String mimeType) {
         this.uri = uri;
