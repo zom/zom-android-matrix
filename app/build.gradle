@@ -153,13 +153,18 @@ dependencies {
 
     def lifecycle_version = "2.2.0"
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
-    implementation "androidx.exifinterface:exifinterface:1.1.0"
+    implementation "androidx.exifinterface:exifinterface:1.2.0"
     implementation 'com.gsconrad:richcontentedittext:1.0.0'
+
     //html wysiwyg editor
     implementation 'jp.wasabeef:richeditor-android:1.2.2'
 
     //improved audio recorder
     implementation 'com.github.n8fr8:AudioRecorderView:228d48dbbc'
+
+    // AirShare
+    implementation 'com.github.tladesignz:AirShare-Android:master-SNAPSHOT'
+    implementation 'com.google.code.gson:gson:2.8.6'
 }
 
 // Map for the version code that gives each ABI a value.

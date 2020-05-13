@@ -4,7 +4,8 @@
     package="info.guardianproject.keanuapp"
     android:installLocation="auto"
     android:sharedUserLabel="@string/perm_label"
-    android:usesCleartextTraffic="false">
+    android:usesCleartextTraffic="false"
+    tools:ignore="UnusedAttribute">
 
     <supports-screens
         android:anyDensity="true"
@@ -86,7 +87,7 @@
         android:hardwareAccelerated="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,android:label">
-        <activity android:name=".ui.conversation.StoryIntroActivity"></activity>
+        <activity android:name=".ui.conversation.StoryIntroActivity" />
         <activity
             android:name=".RouterActivity"
             android:theme="@style/InviteDialog">
@@ -374,6 +375,10 @@
             android:name=".ui.camera.CameraActivity"
             android:exported="false"
             android:label="" />
+
+        <service android:name="pro.dbro.airshare.app.AirShareService"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>
