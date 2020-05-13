@@ -8,6 +8,8 @@ public class Payload {
 
     public Invite invite;
 
+    public HugeTestData testData;
+
     public Payload() {
     }
 

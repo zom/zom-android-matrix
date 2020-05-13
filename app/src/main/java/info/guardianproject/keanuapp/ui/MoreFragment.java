@@ -185,6 +185,11 @@ public class MoreFragment extends Fragment implements AirShareManager.Listener {
             return;
         }
 
+//        Payload payload = new Payload();
+//        payload.testData = new HugeTestData(context);
+//
+//        mAirShareManager.send(payload);
+
         mAirShareManager.sendInvite("#example_room_alias:neo.keanu.im");
     }
 

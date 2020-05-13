@@ -325,7 +325,7 @@ public class AirShareManager implements ServiceConnection, AirShareService.Callb
 
             long now = Calendar.getInstance().getTimeInMillis();
 
-            for (int i = Math.max(0, mMessages.size() - 1); i > -1; i--) {
+            for (int i = mMessages.size() - 1; i > -1; i--) {
                 if (mMessages.get(i).timeout < now) {
                     mMessages.remove(i);
                 }
