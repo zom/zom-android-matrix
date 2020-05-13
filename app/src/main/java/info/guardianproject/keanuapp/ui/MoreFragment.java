@@ -1,5 +1,6 @@
 package info.guardianproject.keanuapp.ui;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
@@ -21,6 +22,7 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 import com.google.gson.Gson;
 
+import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.nearby.AirShareManager;
@@ -92,11 +94,16 @@ public class MoreFragment extends Fragment implements AirShareManager.Listener {
             view.findViewById(R.id.btnAirShareTest)
                     .setOnClickListener(btnAirShareTest -> airShareTest());
 
-            Context context = getContext();
-            if (context != null) {
-                mAirShareManager = AirShareManager.getInstance(context, "Foo", "Keanu");
-                mAirShareManager.addListener(this);
-                mAirShareManager.startListening();
+            Activity activity = getActivity();
+            if (activity != null) {
+                String alias = ((ImApp) activity.getApplication()).getDefaultUsername();
+                String serviceName = getString(R.string.app_name); // FIXME: This will cause problems when app_name gets translated.
+
+                Log.d(getClass().getSimpleName(), String.format("Starting AirShareManager with alias=%s, serviceName=%s", alias, serviceName));
+
+                mAirShareManager = AirShareManager.getInstance(activity, alias, serviceName)
+                        .addListener(this)
+                        .startListening();
             }
         }
         else {
