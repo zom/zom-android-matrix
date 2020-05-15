@@ -412,9 +412,12 @@ public class StoryEditorActivity extends AppCompatActivity {
         String jsInsert = "(function (){     document.execCommand('insertHTML', false, '" + html + "');})();";
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mEditor.evaluateJavascript("javascript:" + jsInsert + "",null);
+            imageUrl += html +"\n";
+            mEditor.loadData(imageUrl, "text/html", "UTF-8");
+           // mEditor.evaluateJavascript("javascript:" + jsInsert + "",null);
         } else {
-            mEditor.loadUrl("javascript:" + jsInsert + "");
+            imageUrl += html +"\n";
+            mEditor.loadData(imageUrl, "text/html", "UTF-8");
         }
 
 
@@ -473,7 +476,7 @@ public class StoryEditorActivity extends AppCompatActivity {
     {
         if (mEditor != null) {
 
-            String html = mEditor.getHtml();
+            String html = mEditor.getOriginalUrl();
 
             if (!TextUtils.isEmpty(html)) {
                 storeHTML(html);
@@ -499,6 +502,7 @@ public class StoryEditorActivity extends AppCompatActivity {
         else if (item.getItemId() == R.id.menu_send)
         {
             saveStory();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
