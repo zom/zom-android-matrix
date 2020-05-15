@@ -67,6 +67,7 @@ android {
         }
 
         primary {// Assigns this product flavor to the "mode" flavor dimension.
+
             dimension "release"
             versionCode 46000
             versionName "0.0.4.6"
