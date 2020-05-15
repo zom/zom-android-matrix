@@ -1,198 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
-    >
-<LinearLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-
-    android:orientation="vertical"
-    android:padding="0dp">
+    android:layout_height="wrap_content">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="6dp"
-        android:id="@+id/btnOpenServices"
-        >
+        android:orientation="vertical"
+        android:padding="0dp">
 
-        <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/notify_app"
-            android:layout_margin="6dp"
-            android:padding="6dp"
-            android:layout_gravity="center"
-            app:circleColor="@color/app_primary"
-            />
-        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
-
+        <LinearLayout
+            android:id="@+id/btnOpenServices"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:text="@string/action_services"
-            android:layout_gravity="center"
-            android:gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="?contactTextSecondary"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="6dp">
 
-            android:layout_marginLeft="6dp"
-            />
+            <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_margin="6dp"
+                android:padding="6dp"
+                android:src="@drawable/notify_app"
+                app:circleColor="@color/app_primary" />
+
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="6dp"
+                android:gravity="center_vertical"
+                android:text="@string/action_services"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="?contactTextSecondary" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnOpenGallery"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="6dp">
+
+            <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_margin="6dp"
+                android:padding="6dp"
+                android:src="@drawable/ic_photo_library_white_36dp"
+                app:circleColor="@color/honeycombish_blue" />
+
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="6dp"
+                android:gravity="center_vertical"
+                android:text="@string/photo_gallery"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="?contactTextSecondary" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnOpenGroups"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="6dp">
+
+            <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_margin="6dp"
+                android:padding="6dp"
+                android:src="@drawable/ic_group"
+                app:circleColor="#50E3C2" />
+
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="6dp"
+                android:gravity="center_vertical"
+                android:text="@string/create_group"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="?contactTextSecondary" />
+
+        </LinearLayout>
+
+        <!--
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="6dp"
+            android:id="@+id/btnCreateSession">
+
+            <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/baseline_subscriptions_white_24"
+                android:layout_margin="6dp"
+                android:padding="6dp"
+                android:layout_gravity="center"
+                app:circleColor="@android:color/holo_red_light" />
+
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:text="@string/create_session"
+                android:layout_gravity="center"
+                android:gravity="center_vertical"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="?contactTextSecondary"
+                android:layout_marginLeft="6dp" />
+
+        </LinearLayout>
+        -->
+
+        <LinearLayout
+            android:id="@+id/btnOpenStickers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="6dp">
+
+            <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_margin="6dp"
+                android:padding="6dp"
+                android:src="@drawable/ic_insert_emoticon_white_36dp"
+                app:circleColor="@android:color/holo_orange_light" />
+
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="6dp"
+                android:gravity="center_vertical"
+                android:text="@string/action_stickers"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="?contactTextSecondary" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnOpenThemes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="6dp">
+
+            <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_margin="6dp"
+                android:padding="6dp"
+                android:src="@drawable/tshirt128px"
+                app:circleColor="@android:color/holo_purple" />
+
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="6dp"
+                android:gravity="center_vertical"
+                android:text="@string/action_theme"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="?contactTextSecondary" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/btnAirShareTest"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="6dp">
+
+            <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                android:layout_margin="6dp"
+                android:padding="6dp"
+                android:src="@drawable/tshirt128px"
+                app:circleColor="@android:color/holo_purple" />
+
+            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_gravity="center"
+                android:layout_marginStart="6dp"
+                android:gravity="center_vertical"
+                android:text="AirShare Test"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="?contactTextSecondary" />
+
+        </LinearLayout>
 
     </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="6dp"
-        android:id="@+id/btnOpenGalllery"
-        >
 
-        <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_photo_library_white_36dp"
-            android:layout_margin="6dp"
-            android:padding="6dp"
-            android:layout_gravity="center"
-            app:circleColor="@color/honeycombish_blue"
-            />
-        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
-
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:text="@string/photo_gallery"
-            android:layout_gravity="center"
-            android:gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="?contactTextSecondary"
-
-            android:layout_marginLeft="6dp"
-            />
-
-</LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="6dp"
-        android:id="@+id/btnOpenGroups"
-        >
-
-        <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_group"
-            android:layout_margin="6dp"
-            android:padding="6dp"
-            android:layout_gravity="center"
-            app:circleColor="#50E3C2"
-            />
-    <info.guardianproject.keanu.core.type.CustomTypefaceTextView
-        android:layout_width="match_parent"
-        android:layout_height="64dp"
-        android:text="@string/create_group"
-        android:layout_gravity="center"
-        android:gravity="center_vertical"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="?contactTextSecondary"
-
-        android:layout_marginLeft="6dp"
-
-        />
-</LinearLayout>
-    <!--
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="6dp"
-        android:id="@+id/btnCreateSession"
-        >
-
-        <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/baseline_subscriptions_white_24"
-            android:layout_margin="6dp"
-            android:padding="6dp"
-            android:layout_gravity="center"
-            app:circleColor="@android:color/holo_red_light"
-            />
-        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:text="@string/create_session"
-            android:layout_gravity="center"
-            android:gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="?contactTextSecondary"
-
-            android:layout_marginLeft="6dp"
-
-            />
-    </LinearLayout>-->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="6dp"
-        android:id="@+id/btnOpenStickers"
-        >
-
-        <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/ic_insert_emoticon_white_36dp"
-            android:layout_margin="6dp"
-            android:padding="6dp"
-            android:layout_gravity="center"
-            app:circleColor="@android:color/holo_orange_light"
-            />
-        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:text="@string/action_stickers"
-            android:layout_gravity="center"
-            android:gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_marginLeft="6dp"
-            android:textColor="?contactTextSecondary"
-
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="6dp"
-        android:id="@+id/btnOpenThemes"
-        >
-
-        <info.guardianproject.keanuapp.ui.widgets.CircleColorImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/tshirt128px"
-            android:layout_margin="6dp"
-            android:padding="6dp"
-            android:layout_gravity="center"
-            app:circleColor="@android:color/holo_purple"
-            />
-        <info.guardianproject.keanu.core.type.CustomTypefaceTextView
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:text="@string/action_theme"
-            android:layout_gravity="center"
-            android:gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_marginLeft="6dp"
-            android:textColor="?contactTextSecondary"
-
-            />
-    </LinearLayout>
-
-</LinearLayout>
 </ScrollView>
