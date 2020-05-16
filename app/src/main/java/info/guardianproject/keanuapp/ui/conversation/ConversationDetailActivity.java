@@ -796,7 +796,6 @@ public class ConversationDetailActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
 
         if (resultCode == RESULT_OK) {
-
             if (requestCode == REQUEST_PICK_CONTACTS) {
 
                 if (resultIntent == null)

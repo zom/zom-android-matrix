@@ -861,42 +861,43 @@ public class ConversationView {
         }
 
         mAudioRecordView = mActivity.findViewById(R.id.record_view);
-        mAudioRecordView.activity = mActivity;
-
-        mAudioRecordView.callback = new AudioRecordView.Callback() {
-            @Override
-            public void onRecordStart(boolean b) {
-                //onRecordStart
-                Log.d("AudioRecord","onRecordStart: " + b);
-                mActivity.startAudioRecording();
-            }
-
-            @Override
-            public boolean isReady() {
-                return true;
-            }
-
-            @Override
-            public void onRecordEnd() {
-                Log.d("AudioRecord","onRecordEnd");
-                if (mActivity.isAudioRecording()) {
-                    boolean send = true;//inViewInBounds(mMicButton, (int) motionEvent.getX(), (int) motionEvent.getY());
-                    mActivity.stopAudioRecording(send);
+        if(mAudioRecordView != null){
+            mAudioRecordView.setActivity(mActivity);
+            mAudioRecordView.setCallback(new AudioRecordView.Callback() {
+                @Override
+                public void onRecordStart(boolean b) {
+                    Log.d("AudioRecord","onRecordStart: " + b);
+                    mActivity.startAudioRecording();
                 }
 
-            }
-
-            @Override
-            public void onRecordCancel() {
-                Log.d("AudioRecord","onRecordCancel");
-                if (mActivity.isAudioRecording()) {
-                    boolean send = false;
-                    mActivity.stopAudioRecording(send);
+                @Override
+                public boolean isReady() {
+                    return false;
                 }
 
+                @Override
+                public void onRecordEnd() {
+                    Log.d("AudioRecord","onRecordEnd");
+                    if (mActivity.isAudioRecording()) {
+                        boolean send = true;//inViewInBounds(mMicButton, (int) motionEvent.getX(), (int) motionEvent.getY());
+                        mActivity.stopAudioRecording(send);
+                    }
+                }
 
-            }
-        };
+                @Override
+                public void onRecordCancel() {
+                    Log.d("AudioRecord","onRecordCancel");
+                    if (mActivity.isAudioRecording()) {
+                        boolean send = false;
+                        mActivity.stopAudioRecording(send);
+                    }
+                }
+            });
+        }
+
+       // mAudioRecordView.activity = mActivity;
+
+
 
         /**
         if (mMicButton != null) {
@@ -1125,7 +1126,10 @@ public class ConversationView {
                 mButtonTalk.setVisibility(View.GONE);
             }
             mComposeMessage.setVisibility(View.VISIBLE);
-            mAudioRecordView.setVisibility(View.VISIBLE);
+            if(mAudioRecordView != null){
+                mAudioRecordView.setVisibility(View.VISIBLE);
+            }
+
 
             //     mMicButton.setVisibility(View.VISIBLE);
         }
@@ -2207,8 +2211,10 @@ public class ConversationView {
     {
         if (mButtonTalk == null || mButtonTalk.getVisibility() == View.GONE) {
             if (mComposeMessage.getText().length() > 0 && mSendButton.getVisibility() == View.GONE) {
+                if(mAudioRecordView != null){
+                    mAudioRecordView.setVisibility(View.GONE);
+                }
 
-                mAudioRecordView.setVisibility(View.GONE);
 
                 if (mBtnAttachSticker != null)
                     mBtnAttachSticker.setVisibility(View.GONE);
@@ -2219,8 +2225,10 @@ public class ConversationView {
             } else if (mComposeMessage.getText().length() == 0) {
                 if (mBtnAttachSticker != null)
                     mBtnAttachSticker.setVisibility(View.VISIBLE);
+                if(mAudioRecordView != null){
+                    mAudioRecordView.setVisibility(View.VISIBLE);
+                }
 
-                mAudioRecordView.setVisibility(View.VISIBLE);
                 mSendButton.setVisibility(View.GONE);
 
             }

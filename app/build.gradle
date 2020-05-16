@@ -4,7 +4,6 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'realm-android'
 apply plugin: 'testdroid'
 
-
 android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -21,7 +20,11 @@ android {
 
     }
 
-
+    allprojects {
+        repositories {
+            maven { url = 'https://jitpack.io' }
+        }
+    }
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/LICENSE'
