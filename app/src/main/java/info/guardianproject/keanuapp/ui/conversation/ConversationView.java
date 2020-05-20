@@ -45,6 +45,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
@@ -87,6 +88,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gsconrad.richcontentedittext.RichContentEditText;
+import com.stefanosiano.powerful_libraries.imageview.blur.PivBlurMode;
 import com.tougee.recorderview.AudioRecordView;
 
 import java.io.IOException;
@@ -1955,6 +1957,7 @@ public class ConversationView {
 
         if (mShareDraft != null)
         {
+            Log.v("ImageSend","sendMessage");
             mActivity.sendShareRequest(mShareDraft);
             mShareDraft = null;
             mActivity.findViewById(R.id.mediaPreviewContainer).setVisibility(View.GONE);
@@ -2768,17 +2771,64 @@ public class ConversationView {
 
             if (showDelivery && !isDelivered && mExpectingDelivery) {
                 deliveryState = MessageListItem.DeliveryState.UNDELIVERED;
+
             }
             else if (isDelivered)
             {
                 deliveryState = MessageListItem.DeliveryState.DELIVERED;
+
             }
 
 
 
             if (!mExpectingDelivery && isDelivered) {
                 mExpectingDelivery = true;
+               // Log.v("ImageSend","isDelivered");
             } else if (cursor.getPosition() == cursor.getCount() - 1) {
+                //Log.v("ImageSend","isDelivered last");
+                if(messageType ==Imps.MessageType.OUTGOING){
+                    viewHolder.progress.setVisibility(View.VISIBLE);
+                    viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
+                    viewHolder.mMediaThumbnail.setBlurRadius(10);
+                    viewHolder.progress.setProgress(3);
+                    viewHolder.progress.setProgress(6);
+                    viewHolder.progress.setProgress(7);
+                    //Log.v("ImageSend","isDelivered last 1");
+                }else if(messageType ==Imps.MessageType.QUEUED){
+                    viewHolder.progress.setVisibility(View.VISIBLE);
+                    viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
+                    viewHolder.mMediaThumbnail.setBlurRadius(10);
+                    viewHolder.progress.setProgress(3);
+                    viewHolder.progress.setProgress(6);
+                    viewHolder.progress.setProgress(7);
+                   // Log.v("ImageSend","isDelivered last 2");
+                }else if(messageType == Imps.MessageType.SENDING){
+                   viewHolder.progress.setVisibility(View.VISIBLE);
+                    viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
+                    viewHolder.mMediaThumbnail.setBlurRadius(10);
+                    viewHolder.progress.setProgress(3);
+                    viewHolder.progress.setProgress(6);
+                    viewHolder.progress.setProgress(7);
+                    //Log.v("ImageSend","isDelivered last 3");
+                }else {
+                    viewHolder.progress.setProgress(8);
+                    viewHolder.progress.setProgress(9);
+                    viewHolder.progress.setProgress(10);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            viewHolder.progress.setVisibility(View.GONE);
+                            viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
+                            viewHolder.mMediaThumbnail.setBlurRadius(0);
+                        }
+                    },100);
+
+                  /*  viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN);
+                    viewHolder.mMediaThumbnail.setBlurRadius(0);
+                    viewHolder.mMediaThumbnail.setPivBlurDownSamplingRate(0);*/
+                  // Log.v("ImageSend","isDelivered last 4");
+                }
+
                 /*
                 // if showTimeStamp is false for the latest message, then set a timer to query the
                 // cursor again in a minute, so we can update the last message timestamp if no new
@@ -2804,6 +2854,7 @@ public class ConversationView {
             }
             else if (messageType == Imps.MessageType.OUTGOING_ENCRYPTED)
             {
+
                 messageType = Imps.MessageType.OUTGOING;
                 encState = MessageListItem.EncryptionState.ENCRYPTED;
             }
@@ -2818,11 +2869,11 @@ public class ConversationView {
             case Imps.MessageType.QUEUED:
             case Imps.MessageType.SENDING:
 
-
                 int errCode = cursor.getInt(mErrCodeColumn);
                 if (errCode != 0) {
                     messageView.bindErrorMessage(errCode);
                 } else {
+
                     messageView.bindOutgoingMessage(viewHolder, id, messageType, null, mimeType, body, date, mMarkup, false,
                             deliveryState, encState, packetId);
                 }
@@ -2830,7 +2881,9 @@ public class ConversationView {
                 break;
 
             default:
+               // Log.v("ImageSend","default in switch");
                 messageView.bindPresenceMessage(viewHolder, userAddress, nick, messageType, date, isGroupChat(), false);
+
             }
 
             sendMessageRead(packetId);

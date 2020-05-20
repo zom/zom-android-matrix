@@ -7,7 +7,11 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
+import com.stefanosiano.powerful_libraries.imageview.PowerfulImageView;
+import com.stefanosiano.powerful_libraries.imageview.blur.PivBlurMode;
 
 import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
@@ -69,6 +73,44 @@ public class GlideUtils {
                     Glide.with(context)
                             .load(fis)
                             .apply(noDiskCacheOptions)
+                            .into(imageView);
+                }
+            }
+            catch (Exception e)
+            {
+                Log.w(LOG_TAG,"unable to load image: " + uri.toString());
+            }
+        }
+        else if (uri.getScheme() != null && uri.getScheme().equals("asset"))
+        {
+            String assetPath = "file:///android_asset/" + uri.getPath().substring(1);
+            Glide.with(context)
+                    .load(assetPath)
+                    .apply(noDiskCacheOptions)
+                    .into(imageView);
+        }
+        else
+        {
+            Glide.with(context)
+                    .load(uri)
+                    .into(imageView);
+        }
+    }
+
+    public static void loadImageFromUri(Context context, Uri uri, PowerfulImageView imageView) {
+        if(SecureMediaStore.isVfsUri(uri))
+        {
+            try {
+                info.guardianproject.iocipher.File fileImage = new info.guardianproject.iocipher.File(uri.getPath());
+                if (fileImage.exists())
+                {
+                    FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(fileImage);
+                    RequestOptions requestOptions = new RequestOptions();
+                    requestOptions = requestOptions.transforms(new CenterCrop(), new RoundedCorners(25));
+                    Glide.with(context)
+                            .load(fis)
+                            .apply(noDiskCacheOptions)
+                            .apply(requestOptions)
                             .into(imageView);
                 }
             }

@@ -480,6 +480,7 @@ public class SecureMediaStore {
      */
     public static Uri importContent(String sessionId, String fileName, InputStream sourceStream) throws IOException {
         //list("/");
+       // Log.v("ImageSend","upload_5==");
         String targetPath = "/" + sessionId + "/upload/" + UUID.randomUUID().toString() + '/' + fileName;
         targetPath = createUniqueFilename(targetPath);
         copyToVfs( sourceStream, targetPath );

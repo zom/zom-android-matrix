@@ -17,7 +17,6 @@ android {
         targetSdkVersion 28
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-
     }
 
     allprojects {
@@ -134,8 +133,7 @@ dependencies {
     //built in camera now!
     //https://github.com/natario1/CameraView
     implementation 'com.otaliastudios:cameraview:2.0.0-beta04'
-
-
+    implementation 'com.stefanosiano.powerful_libraries:imageview_rs:1.0.15'
 
     //*********** KeanuApp components ********** /
     implementation project(':keanuCore')
