@@ -219,6 +219,12 @@ public class MessageListItem extends FrameLayout {
 
     public String getPacketId () { return packetId; }
 
+    public ProgressBar getProgressBar(){
+        return mHolder.progress;
+    }
+    public PowerfulImageView getPowerFullImageView(){
+        return mHolder.mMediaThumbnail;
+    }
 
     public void bindIncomingMessage(MessageViewHolder holder, int id, int messageType, String userAddress, String nickname, final String mimeType, final String body, Date date, Markup smileyRes,
                                     boolean scrolling, EncryptionState encryption, boolean showContact, int presenceStatus, IChatSession session, String packetId, String replyId) {

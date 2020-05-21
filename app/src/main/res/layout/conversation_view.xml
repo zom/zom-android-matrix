@@ -104,16 +104,30 @@
 
     </LinearLayout>
 
-    <ImageView
+    <com.stefanosiano.powerful_libraries.imageview.PowerfulImageView
         android:id="@+id/media_thumbnail"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         android:layout_marginTop="30dp"
-        android:scaleType="centerCrop"
         android:focusableInTouchMode="false"
         android:layout_gravity="left|bottom"
         android:visibility="gone"
+        app:piv_shape_mode="normal"
+        app:piv_shape_scaleType="fitXY"
         />
+
+    <ProgressBar
+        android:id="@+id/progress"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:visibility="gone"
+        android:progressDrawable="@drawable/circle_progress"
+        android:background="@drawable/circle_shape"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:progressTint="@color/app_primary"
+        android:layout_gravity="center">
+
+    </ProgressBar>
 
     <ImageView
         android:id="@+id/avatar"

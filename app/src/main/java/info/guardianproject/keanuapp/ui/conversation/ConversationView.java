@@ -2811,6 +2811,7 @@ public class ConversationView {
                     viewHolder.progress.setProgress(7);
                     //Log.v("ImageSend","isDelivered last 3");
                 }else {
+                    viewHolder.progress.setVisibility(View.VISIBLE);
                     viewHolder.progress.setProgress(8);
                     viewHolder.progress.setProgress(9);
                     viewHolder.progress.setProgress(10);
@@ -2822,6 +2823,7 @@ public class ConversationView {
                             viewHolder.mMediaThumbnail.setBlurRadius(0);
                         }
                     },100);
+
 
                   /*  viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN);
                     viewHolder.mMediaThumbnail.setBlurRadius(0);

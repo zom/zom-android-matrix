@@ -18,12 +18,12 @@
  */
 -->
 <view xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     class="info.guardianproject.keanuapp.ui.conversation.MessageListItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="3dp"	
-    android:layout_margin="6dp"
-     >
+    android:padding="3dp"
+    android:layout_margin="6dp">
      
 			
 	        	
@@ -75,12 +75,14 @@
             android:descendantFocusability="blocksDescendants"
             android:visibility="gone"
             >
-            <ImageView
+            <com.stefanosiano.powerful_libraries.imageview.PowerfulImageView
                 android:id="@+id/media_thumbnail"
                 android:layout_width="wrap_content"
                 android:layout_height="200dp"
                 android:scaleType="centerCrop"
                 android:focusableInTouchMode="true"
+                app:piv_shape_mode="normal"
+                app:piv_shape_scaleType="fitXY"
                 />
             <ImageView
                 android:id="@+id/media_thumbnail_play"
@@ -93,6 +95,18 @@
                 android:visibility="gone"
                 android:layout_gravity="center_horizontal|center_vertical"
                 />
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:visibility="gone"
+                android:progressDrawable="@drawable/circle_progress"
+                android:background="@drawable/circle_shape"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:progressTint="@color/app_primary"
+                android:layout_gravity="center">
+
+            </ProgressBar>
         </FrameLayout>
 
 
