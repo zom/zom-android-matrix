@@ -5,12 +5,18 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Environment;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -31,13 +37,21 @@ import com.google.android.exoplayer2.upstream.DataSpec;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.TransferListener;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.EOFException;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanuapp.ImUrlActivity;
@@ -166,18 +180,68 @@ public class VideoViewActivity extends AppCompatActivity {
                 resendMediaFile();
                 return true;
 
-
             case R.id.menu_message_delete:
                 deleteMediaFile ();
             case R.id.menu_message_nearby:
                 sendNearby();
                 return true;
 
+            case R.id.menu_downLoad:
+                if (ContextCompat.checkSelfPermission(VideoViewActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                    File sd = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/Keanu/");
+                    String extension = mMediaUri.getPath().substring(mMediaUri.getPath().lastIndexOf("."));
+                    String filename = "Keanu_"+getDateTime()+extension;
+                    new DownloadVideo().execute(mMediaUri,filename,sd);
+                } else {
+                    ActivityCompat.requestPermissions(VideoViewActivity.this,
+                            new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE}, 104);
+                }
+                return true;
             default:
         }
         return super.onOptionsItemSelected(item);
     }
+    private class DownloadVideo extends AsyncTask<Object, Void, Long> {
+        String storagePath = null;
+        @Override
+        protected Long doInBackground(Object... params) {
+            Uri videoUri = (Uri) params[0];
+            String filename = (String) params[1];
+            File sd = (File) params[2];
+            storagePath = sd.getPath();
 
+            long bytesCopied= 0;
+            if(!sd.exists()){
+                sd.mkdirs();
+            }
+            File dest = new File(sd, filename);
+            FileInputStream fis = null;
+            FileOutputStream fos = null;
+            try {
+                fis = new FileInputStream(new info.guardianproject.iocipher.File(videoUri.getPath()));
+                fos = new java.io.FileOutputStream(dest, false);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            try {
+                bytesCopied = IOUtils.copyLarge(fis, fos);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return bytesCopied;
+        }
+
+        protected void onPostExecute(Long result) {
+            if(result > 0){
+                Toast.makeText(getApplicationContext(),"Video Downloaded at :-"+storagePath,Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    private String getDateTime() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
     private boolean checkPermissions() {
         int permissionCheck = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -378,6 +442,27 @@ public class VideoViewActivity extends AppCompatActivity {
                 }
             }
 
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 104:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    File sd = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/Keanu/");
+                    String extension = mMediaUri.getPath().substring(mMediaUri.getPath().lastIndexOf("."));
+                    String filename = "Keanu_"+getDateTime()+extension;
+                    new DownloadVideo().execute(mMediaUri,filename,sd);
+                } else {
+                    // Permission Denied
+                    Toast.makeText(VideoViewActivity.this, "Permission Denied", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }

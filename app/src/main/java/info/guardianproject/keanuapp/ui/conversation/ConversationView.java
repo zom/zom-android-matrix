@@ -17,6 +17,7 @@
 
 package info.guardianproject.keanuapp.ui.conversation;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
@@ -30,6 +31,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.CharArrayBuffer;
 import android.database.ContentObserver;
@@ -45,12 +47,15 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.provider.Browser;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.inputmethod.InputContentInfoCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
@@ -91,12 +96,20 @@ import com.gsconrad.richcontentedittext.RichContentEditText;
 import com.stefanosiano.powerful_libraries.imageview.blur.PivBlurMode;
 import com.tougee.recorderview.AudioRecordView;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 
+import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.type.CustomTypefaceEditText;
@@ -138,6 +151,7 @@ import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
 import info.guardianproject.keanuapp.ui.widgets.ImageViewActivity;
 import info.guardianproject.keanuapp.ui.widgets.MessageViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.ShareRequest;
+import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
@@ -2975,7 +2989,19 @@ public class ConversationView {
                         mode.finish();
                         Toast.makeText(mActivity, R.string.action_copied,Toast.LENGTH_SHORT).show();
                         return true;
-
+                    case R.id.menu_downLoad:
+                        if (ContextCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                            Uri mediaUri = ((MessageListItem)mLastSelectedView).getMediaUri();
+                            File sd = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/Keanu/");
+                            String extension = mediaUri.getPath().substring(mediaUri.getPath().lastIndexOf("."));
+                            String filename = "Keanu_"+getDateTime()+extension;
+                            new DownloadAudio().execute(mediaUri,filename,sd);
+                        } else {
+                            ActivityCompat.requestPermissions(mActivity,
+                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE}, 104);
+                        }
+                        mode.finish();
+                        return true;
                     default:
                         return false;
                 }
@@ -3039,7 +3065,48 @@ public class ConversationView {
             }
         }
     }
+    private class DownloadAudio extends AsyncTask<Object, Void, Long> {
+        String storagePath = null;
 
+        @Override
+        protected Long doInBackground(Object... params) {
+            Uri audioUri = (Uri) params[0];
+            String filename = (String) params[1];
+            File sd = (File) params[2];
+            storagePath = sd.getPath();
+
+            long bytesCopied= 0;
+            if(!sd.exists()){
+                sd.mkdirs();
+            }
+            File dest = new File(sd, filename);
+            FileInputStream fis = null;
+            FileOutputStream fos = null;
+            try {
+                fis = new FileInputStream(new info.guardianproject.iocipher.File(audioUri.getPath()));
+                fos = new java.io.FileOutputStream(dest, false);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            try {
+                bytesCopied = IOUtils.copyLarge(fis, fos);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return bytesCopied;
+        }
+
+        protected void onPostExecute(Long result) {
+            if(result > 0){
+                Toast.makeText(mActivity,"Audio Downloaded at :-"+storagePath.toString(),Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    private String getDateTime() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
     public Cursor getMessageAtPosition(int position) {
         Object item = mMessageAdapter.getItem(position);
 

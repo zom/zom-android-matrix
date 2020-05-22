@@ -786,6 +786,10 @@ public class MessageListItem extends FrameLayout {
         return containedUrls;
     }
 
+    public Uri getMediaUri(){
+        return mediaUri;
+    }
+
     private void forwardMediaFile (String mimeType, Uri mediaUri)
     {
 
