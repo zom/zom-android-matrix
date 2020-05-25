@@ -50,6 +50,7 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.provider.Browser;
 
+import androidx.annotation.NonNull;
 import androidx.core.view.inputmethod.InputContentInfoCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
@@ -88,12 +89,14 @@ import android.widget.Toast;
 
 import com.gsconrad.richcontentedittext.RichContentEditText;
 import com.tougee.recorderview.AudioRecordView;
+import com.vanniktech.emoji.EmojiUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.service.IChatSessionListener;
@@ -1648,6 +1651,9 @@ public class ConversationView {
     private LoaderManager mLoaderManager;
     protected int loaderId = 100001;
 
+    // This will map a message id to a loader for replies to that id
+    protected Map<String,Integer> eventReplyLoaders = new HashMap<String, Integer>();
+
     private synchronized void startQuery(long chatId) {
 
         mUri = Imps.Messages.getContentUriByThreadId(chatId);
@@ -1662,7 +1668,11 @@ public class ConversationView {
     }
 
     protected Loader<Cursor> createLoader() {
-        CursorLoader loader = new CursorLoader(mActivity, mUri, null, null, null, Imps.Messages.DEFAULT_SORT_ORDER);
+        // For now, assume Quick Reactions are only 1 char long. We don't want to show them as
+        // "separate messages", so filter those out here.
+        String selection = Imps.Messages.REPLY_ID + " IS NULL OR " +
+                "LENGTH(" + Imps.Messages.BODY + ") > 1";
+        CursorLoader loader = new CursorLoader(mActivity, mUri, null, selection, null, Imps.Messages.DEFAULT_SORT_ORDER);
         return loader;
     }
 
@@ -1702,6 +1712,82 @@ public class ConversationView {
         public void onLoaderReset(Loader<Cursor> loader) {
 
             mMessageAdapter.swapCursor(null);
+
+        }
+    }
+
+    class MessageRepliesLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+
+        private Context context;
+        private String messageId;
+        private MessageViewHolder messageViewHolder;
+
+        public final String[] MESSAGE_PROJECTION = {
+                Imps.Messages._ID,
+                Imps.Messages.NICKNAME,
+                Imps.Messages.BODY,
+                Imps.Messages.TYPE,
+                Imps.Messages.IS_DELIVERED,
+                Imps.Messages.MIME_TYPE,
+                Imps.Messages.THREAD_ID,
+                Imps.Messages.REPLY_ID,
+                Imps.Messages.DATE,
+                Imps.Messages.PACKET_ID
+        };
+
+        public MessageRepliesLoaderCallbacks (Context context, MessageViewHolder messageViewHolder, String messageId)
+        {
+            super();
+            this.context = context;
+            this.messageViewHolder = messageViewHolder;
+            this.messageId = messageId;
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            StringBuilder buf = new StringBuilder();
+            buf.append(Imps.Messages.REPLY_ID).append("=").append("\"").append(messageId).append("\"");
+            CursorLoader loader = new CursorLoader(context, mUri, MESSAGE_PROJECTION, buf.toString(), null, Imps.Messages.REVERSE_SORT_ORDER);
+            return loader;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
+
+            if (newCursor == null)
+                return; // the app was quit or something while this was working
+
+            int nicknameCol = newCursor.getColumnIndexOrThrow(Imps.Messages.NICKNAME);
+            int bodyCol = newCursor.getColumnIndexOrThrow(Imps.Messages.BODY);
+
+            ArrayList<QuickReaction> quickReactions = new ArrayList<>();
+            Map<String, QuickReaction> map = new HashMap<>();
+
+            while (newCursor.moveToNext())
+            {
+                String reaction = newCursor.getString(bodyCol);
+                String address = newCursor.getString(nicknameCol);
+                QuickReaction react = map.get(reaction);
+                if (react == null) {
+                    react = new QuickReaction(reaction, null);
+                    map.put(reaction, react);
+                }
+                react.senders.add(address);
+                if (address.equals(((ImApp)((Activity)context).getApplication()).getDefaultUsername())) {
+                    react.sentByMe = true;
+                }
+                if (reaction != null && EmojiUtils.isOnlyEmojis(reaction))
+                {
+                    quickReactions.add(react);
+                }
+            }
+
+            messageViewHolder.setReactions(quickReactions);
+            newCursor.setNotificationUri(context.getContentResolver(), mUri);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
 
         }
     }
@@ -2586,7 +2672,7 @@ public class ConversationView {
     }
 
     public class ConversationRecyclerViewAdapter
-            extends CursorRecyclerViewAdapter<MessageViewHolder> implements MessageViewHolder.OnImageClickedListener {
+            extends CursorRecyclerViewAdapter<MessageViewHolder> implements MessageViewHolder.OnImageClickedListener, MessageViewHolder.OnQuickReactionClickedListener {
 
         private int mScrollState;
         private boolean mNeedRequeryCursor;
@@ -2722,6 +2808,7 @@ public class ConversationView {
             MessageViewHolder mvh = new MessageViewHolder(view);
             mvh.setLayoutInflater(inflater);
             mvh.setOnImageClickedListener(this);
+            mvh.setOnQuickReactionClickedListener(this);
             view.applyStyleColors();
             return mvh;
         }
@@ -2826,7 +2913,20 @@ public class ConversationView {
             }
 
             sendMessageRead(packetId);
+            loadMessageReplies(viewHolder, packetId);
+        }
 
+        private void loadMessageReplies(MessageViewHolder messageViewHolder, String messageId) {
+            // Load all replies to the given event and populate view holder.
+            Integer loaderIdReplies = eventReplyLoaders.get(messageId);
+            if (loaderIdReplies == null || mLoaderManager.getLoader(loaderIdReplies) == null) {
+                loaderIdReplies = loaderId++;
+                eventReplyLoaders.put(messageId, loaderIdReplies);
+                mLoaderManager.initLoader(loaderIdReplies, null, new MessageRepliesLoaderCallbacks(messageViewHolder.itemView.getContext(), messageViewHolder, messageId));
+            } else {
+                // Already loading, refresh
+                mLoaderManager.restartLoader(loaderIdReplies, null, new MessageRepliesLoaderCallbacks(messageViewHolder.itemView.getContext(), messageViewHolder, messageId));
+            }
         }
 
         public void onScrollStateChanged(AbsListView viewNew, int scrollState) {
@@ -2973,6 +3073,15 @@ public class ConversationView {
                 }
                 intent.putExtra(ImageViewActivity.CURRENT_INDEX, indexOfCurrent);
                 mContext.startActivityForResult(intent,ConversationDetailActivity.REQUEST_IMAGE_VIEW);
+            }
+        }
+
+        @Override
+        public void onQuickReactionClicked(MessageViewHolder viewHolder, QuickReaction quickReaction) {
+            if (quickReaction.sentByMe) {
+                // TODO - Remove
+            } else {
+                // TODO - Send
             }
         }
     }
