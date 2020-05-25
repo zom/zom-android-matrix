@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
  * Copyright (C) 2008 Esmertec AG.
  * Copyright (C) 2008 The Android Open Source Project
@@ -18,33 +17,32 @@
  */
 -->
 <view xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     class="info.guardianproject.keanuapp.ui.conversation.MessageListItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="3dp"	
     android:layout_margin="6dp"
-     >
-     
+    android:padding="3dp">
+
     <LinearLayout
-        android:id="@+id/message_container" 
+        android:id="@+id/message_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="0dp"         
+        android:layout_alignParentTop="true"
         android:layout_marginLeft="0dp"
-        android:layout_marginRight="36dp"        
+        android:layout_marginRight="36dp"
         android:orientation="vertical"
-        >
+        android:padding="0dp">
 
         <LinearLayout
             android:id="@+id/audio_container"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:padding="0dp"
-            android:descendantFocusability="blocksDescendants"
-            android:visibility="gone"
-            android:orientation="horizontal"
             android:layout_marginLeft="24dp"
-            >
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="horizontal"
+            android:padding="0dp"
+            android:visibility="gone">
             <!--
          <ImageView android:src="@drawable/media_audio_play"
              android:id="@+id/audio_button"
@@ -61,47 +59,43 @@
 
 
         <info.guardianproject.keanuapp.type.CustomTypefaceTextView
-                    android:id="@+id/message"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-light"
-                    android:padding="6dp"
-              android:layout_gravity="left"
-              android:gravity="left"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:layout_marginLeft="24dp"
-                    android:color="?messageTextPrimary"
-                     />
-
-
+            android:id="@+id/message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginLeft="24dp"
+            android:color="?messageTextPrimary"
+            android:fontFamily="sans-serif-light"
+            android:gravity="left"
+            android:padding="6dp"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
 
         <FrameLayout
             android:id="@+id/media_thumbnail_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="0dp"
             android:descendantFocusability="blocksDescendants"
-            android:visibility="gone"
-            >
+            android:padding="0dp"
+            android:visibility="gone">
+
             <ImageView
                 android:id="@+id/media_thumbnail"
                 android:layout_width="wrap_content"
                 android:layout_height="200dp"
-                android:scaleType="centerCrop"
                 android:focusableInTouchMode="true"
-                />
+                android:scaleType="centerCrop" />
+
             <ImageView
                 android:id="@+id/media_thumbnail_play"
                 android:layout_width="64dp"
                 android:layout_height="64dp"
-                android:scaleType="center"
+                android:layout_gravity="center_horizontal|center_vertical"
                 android:focusableInTouchMode="true"
+                android:scaleType="center"
                 android:src="@drawable/media_audio_play"
                 android:tint="?colorAccent"
-                android:visibility="gone"
-                android:layout_gravity="center_horizontal|center_vertical"
-                />
+                android:visibility="gone" />
 
         </FrameLayout>
 
@@ -110,16 +104,22 @@
             android:id="@+id/messagets"
             android:layout_width="wrap_content"
             android:layout_height="22sp"
-            android:gravity="center|left"
             android:layout_gravity="left"
             android:layout_marginLeft="24dp"
             android:layout_marginBottom="1dp"
-            android:textSize="12sp"
             android:color="?messageTextSecondary"
-            />
-
+            android:gravity="center|left"
+            android:textSize="12sp" />
 
     </LinearLayout>
-          	
-     
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/quick_reaction_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/message_container"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
 </view>

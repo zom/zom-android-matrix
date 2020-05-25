@@ -38,6 +38,7 @@ import info.guardianproject.keanuapp.ui.widgets.ImageViewActivity;
 import info.guardianproject.keanuapp.ui.widgets.LetterAvatar;
 import info.guardianproject.keanuapp.ui.widgets.MessageViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.PdfViewActivity;
+import info.guardianproject.keanuapp.ui.widgets.QuickReactionsRecyclerViewAdapter;
 import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
 import info.guardianproject.keanuapp.ui.widgets.WebViewActivity;
 
@@ -93,13 +94,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.SMALL_AVATAR_HEIGHT;
 import static info.guardianproject.keanu.core.KeanuConstants.SMALL_AVATAR_WIDTH;
 
-public class MessageListItem extends FrameLayout {
+public class MessageListItem extends RelativeLayout {
 
     public enum DeliveryState {
         NEUTRAL, DELIVERED, UNDELIVERED
@@ -1396,7 +1398,12 @@ public class MessageListItem extends FrameLayout {
             else
             {
                 mHolder.mContainer.setBackgroundResource(R.drawable.message_view_rounded_light);
+            }
 
+            if (themeColorHeader != -1) {
+                QuickReactionsRecyclerViewAdapter.setThemeColor(getContext(), themeColorHeader);
+            } else {
+                QuickReactionsRecyclerViewAdapter.setThemeColor(getContext(), ContextCompat.getColor(getContext(), R.color.app_accent));
             }
         }
 
