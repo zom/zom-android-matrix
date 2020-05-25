@@ -969,7 +969,7 @@ public class MessageListItem extends FrameLayout {
         mHolder.mTextViewForMessages.setVisibility(View.VISIBLE);
         mHolder.mAudioContainer.setVisibility(View.GONE);
         mHolder.mMediaContainer.setVisibility(View.GONE);
-
+        mHolder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
 
         mHolder.resetOnClickListenerMediaThumbnail();
 

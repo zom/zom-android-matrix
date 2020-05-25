@@ -24,14 +24,14 @@
     android:layout_height="wrap_content"
     android:padding="3dp"
     android:layout_margin="6dp">
-     
+
     <LinearLayout
-        android:id="@+id/message_container" 
+        android:id="@+id/message_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="0dp"         
+        android:padding="0dp"
         android:layout_marginLeft="0dp"
-        android:layout_marginRight="36dp"        
+        android:layout_marginRight="36dp"
         android:orientation="vertical"
         >
 
@@ -61,17 +61,17 @@
 
 
         <info.guardianproject.keanuapp.type.CustomTypefaceTextView
-                    android:id="@+id/message"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif-light"
-                    android:padding="6dp"
-              android:layout_gravity="left"
-              android:gravity="left"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:layout_marginLeft="24dp"
-                    android:color="?messageTextPrimary"
-                     />
+            android:id="@+id/message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-light"
+            android:padding="6dp"
+            android:layout_gravity="left"
+            android:gravity="left"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:layout_marginLeft="24dp"
+            android:color="?messageTextPrimary"
+            />
 
 
 
@@ -134,6 +134,6 @@
 
 
     </LinearLayout>
-          	
-     
+
+
 </view>
