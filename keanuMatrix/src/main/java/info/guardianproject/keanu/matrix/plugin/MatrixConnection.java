@@ -891,7 +891,7 @@ public class MatrixConnection extends ImConnection {
 
         }
 
-        if (!subject.equals(mContext.getString(R.string.default_group_title)))
+        if (csa != null && !subject.equals(mContext.getString(R.string.default_group_title)))
         {
             try {
                 csa.setGroupChatSubject(subject);
@@ -1157,7 +1157,7 @@ public class MatrixConnection extends ImConnection {
 
             debug ("onLiveEvent:type=" + event.getType());
 
-            if (event.getType().equals(Event.EVENT_TYPE_MESSAGE))
+            if (event.getType().equals(Event.EVENT_TYPE_MESSAGE) || event.getType().equals("m.reaction"))  // TODO - Why is this not a constant in the SDK, does it still rely on some server side hack that the IOS code mentions?
             {
                 mExecutor.execute(() -> handleIncomingMessage(event));
             }
@@ -1883,6 +1883,13 @@ public class MatrixConnection extends ImConnection {
             if (event.getContent().getAsJsonObject().has("body"))
                 messageBody = event.getContent().getAsJsonObject().get("body").getAsString();
 
+            Pair<String,String> replyToInfo = getReplyToFromEvent(event);
+
+            boolean isQuickReaction = event.getType().equals("m.reaction");
+            if (isQuickReaction && replyToInfo != null) {
+                messageBody = replyToInfo.second;
+            }
+
             if (TextUtils.isEmpty(messageBody)) {
                 debug("WARN: MESSAGE HAS NO BODY: " + event.toString());
                 return;
@@ -1912,7 +1919,10 @@ public class MatrixConnection extends ImConnection {
                 if (!csa.doesMessageExist(event.eventId)) {
                     MatrixAddress addrSender = new MatrixAddress(event.sender);
 
-                    Message message = downloadMedia (event, messageBody, addrSender);
+                    Message message = null;
+                    if (!isQuickReaction) {
+                        message = downloadMedia(event, messageBody, addrSender);
+                    }
 
                     if (message == null) {
                         message = new Message(messageBody);
@@ -1921,33 +1931,9 @@ public class MatrixConnection extends ImConnection {
                         message.setDateTime(new Date(event.getOriginServerTs()));
                     }
 
-                    String replyToId = null;
-
-                    if (event.getClearEvent() != null) {
-                        if (event.getClearEvent().getContent().getAsJsonObject().has("m.relates_to")) {
-                            JsonObject jObj = event.getClearEvent().getContent().getAsJsonObject().getAsJsonObject("m.relates_to");
-
-                            if (jObj != null && jObj.has("m.in_reply_to")) {
-                                jObj = jObj.getAsJsonObject("m.in_reply_to");
-                                if (jObj != null && jObj.has("event_id"))
-                                    replyToId = jObj.get("event_id").getAsString();
-                            }
-                        }
-
+                    if (replyToInfo != null) {
+                        message.setReplyId(replyToInfo.first);
                     }
-                    else if (event.getContent().getAsJsonObject().has("m.relates_to")) {
-                        JsonObject jObj = event.getContent().getAsJsonObject().getAsJsonObject("m.relates_to");
-
-                        if (jObj != null && jObj.has("m.in_reply_to"))
-                        {
-                            jObj = jObj.getAsJsonObject("m.in_reply_to");
-                            if (jObj != null) {
-                                replyToId = jObj.get("event_id").getAsString();
-                            }
-                        }
-                    }
-
-                    message.setReplyId(replyToId);
 
                     boolean isFromMe = addrSender.mAddress.equals(mUser.getAddress().getAddress());
 
@@ -2467,4 +2453,35 @@ public class MatrixConnection extends ImConnection {
         }, 0, 10000);
     }
 
+    /**
+     * Get "reply to" info from the event. Also, if the event is a reaction, return that.
+     * @param event
+     * @return a Pair<String,String> of originalEventId, reaction.
+     */
+    private Pair<String, String> getReplyToFromEvent(Event event) {
+        Event readEvent = event.getClearEvent() != null ? event.getClearEvent() : event;
+        JsonObject json = readEvent.getContent().getAsJsonObject();
+        if (json.has("m.relates_to")) {
+            JsonObject jObj = json.getAsJsonObject("m.relates_to");
+
+            String reaction = null;
+            String eventId = null;
+
+            if (jObj != null) {
+                if (jObj.has("key")) {
+                    reaction = jObj.get("key").getAsString();
+                }
+                if (jObj.has("event_id")) {
+                    eventId = jObj.get("event_id").getAsString();
+                } else if (jObj.has("m.in_reply_to")) {
+                    JsonObject jObj2 = jObj.getAsJsonObject("m.in_reply_to");
+                    if (jObj2 != null && jObj2.has("event_id")) {
+                        eventId = jObj2.get("event_id").getAsString();
+                    }
+                }
+            }
+            return new Pair<>(eventId, reaction);
+        }
+        return null;
+    }
 }
