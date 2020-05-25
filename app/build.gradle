@@ -160,6 +160,9 @@ dependencies {
 
     //improved audio recorder
     implementation 'com.github.n8fr8:AudioRecorderView:228d48dbbc'
+
+    // Emojis
+    implementation 'com.vanniktech:emoji-google:0.6.0'
 }
 
 // Map for the version code that gives each ABI a value.

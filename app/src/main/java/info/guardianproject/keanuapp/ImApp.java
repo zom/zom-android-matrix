@@ -42,6 +42,9 @@ import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.vanniktech.emoji.EmojiManager;
+import com.vanniktech.emoji.google.GoogleEmojiProvider;
+
 import net.sqlcipher.database.SQLiteDatabase;
 
 import java.io.File;
@@ -192,6 +195,8 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         Debug.onAppStart();
 
         PRNGFixes.apply(); //Google's fix for SecureRandom bug: http://android-developers.blogspot.com/2013/08/some-securerandom-thoughts.html
+
+        EmojiManager.install(new GoogleEmojiProvider());
 
         // load these libs up front to shorten the delay after typing the passphrase
         SQLiteDatabase.loadLibs(getApplicationContext());
