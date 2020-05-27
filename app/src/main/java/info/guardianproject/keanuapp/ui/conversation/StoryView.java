@@ -265,7 +265,7 @@ public class StoryView extends ConversationView implements AudioRecorder.AudioRe
     @Override
     protected Loader<Cursor> createLoader() {
         String selection = "mime_type LIKE 'image/%' OR mime_type LIKE 'NOTaudio/%' OR mime_type LIKE 'video/%' OR mime_type LIKE 'application/pdf'";
-        CursorLoader loader = new CursorLoader(mActivity, mUri, null, selection, null, Imps.Messages.DEFAULT_SORT_ORDER);
+        CursorLoader loader = new CursorLoader(mActivity, mUri, null, selection, null, Imps.Messages.REVERSE_SORT_ORDER);
         return loader;
     }
 
