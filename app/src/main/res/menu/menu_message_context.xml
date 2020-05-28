@@ -43,7 +43,7 @@
     <item
         android:id="@+id/menu_downLoad"
         android:icon="@drawable/icon_download"
-        android:title="DownLoad"
+        android:title="Download"
         app:showAsAction="ifRoom" />
 
 </menu>

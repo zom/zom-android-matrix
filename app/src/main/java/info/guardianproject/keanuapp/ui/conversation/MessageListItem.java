@@ -93,7 +93,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
+
+import com.stefanosiano.powerful_libraries.imageview.PowerfulImageView;
+import com.stefanosiano.powerful_libraries.imageview.blur.PivBlurMode;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.SMALL_AVATAR_HEIGHT;
@@ -214,6 +218,13 @@ public class MessageListItem extends FrameLayout {
     }
 
     public String getPacketId () { return packetId; }
+
+    public ProgressBar getProgressBar(){
+        return mHolder.progress;
+    }
+    public PowerfulImageView getPowerFullImageView(){
+        return mHolder.mMediaThumbnail;
+    }
 
     public void bindIncomingMessage(MessageViewHolder holder, int id, int messageType, String userAddress, String nickname, final String mimeType, final String body, Date date, Markup smileyRes,
                                     boolean scrolling, EncryptionState encryption, boolean showContact, int presenceStatus, IChatSession session, String packetId, String replyId) {
@@ -775,6 +786,10 @@ public class MessageListItem extends FrameLayout {
         return containedUrls;
     }
 
+    public Uri getMediaUri(){
+        return mediaUri;
+    }
+
     private void forwardMediaFile (String mimeType, Uri mediaUri)
     {
 
@@ -915,6 +930,7 @@ public class MessageListItem extends FrameLayout {
                 && aHolder.mMediaUri.getPath().equals(mediaUri.getPath()))
             return;
 
+
         // pair this holder to the uri. if the holder is recycled, the pairing is broken
         aHolder.mMediaUri = mediaUri;
         // if a content uri - already scanned
@@ -954,6 +970,7 @@ public class MessageListItem extends FrameLayout {
         mHolder.mTextViewForMessages.setVisibility(View.VISIBLE);
         mHolder.mAudioContainer.setVisibility(View.GONE);
         mHolder.mMediaContainer.setVisibility(View.GONE);
+        mHolder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
 
         mHolder.resetOnClickListenerMediaThumbnail();
 
@@ -982,12 +999,12 @@ public class MessageListItem extends FrameLayout {
 
             }
             else {
+              //  Log.v("ImageSend","showMediaThumbnail _1");
                 mHolder.mTextViewForMessages.setVisibility(View.GONE);
                 mHolder.mMediaContainer.setVisibility(View.VISIBLE);
                 String displayName = mediaUri.getLastPathSegment();
                 boolean centerCrop = mimeType.contains("jpg")||mimeType.contains("jpeg")||mimeType.contains("video")|| mimeType.contains("html");
                 showMediaThumbnail(displayName,mimeType, mediaUri, id, mHolder, centerCrop);
-
             }
 
         }
@@ -1009,6 +1026,7 @@ public class MessageListItem extends FrameLayout {
                     Uri mediaUri = Uri.parse("asset://localhost/" + cmds[1].toLowerCase());
 
                     //now load the thumbnail
+                   // Log.v("ImageSend","showMediaThumbnail _2");
                     cmdSuccess = showMediaThumbnail(mediaUri.getLastPathSegment(), mimeTypeSticker, mediaUri, id, mHolder, false);
                 } catch (Exception e) {
                     cmdSuccess = false;
@@ -1040,6 +1058,7 @@ public class MessageListItem extends FrameLayout {
                     Uri mediaUri = Uri.parse("asset://localhost/" + stickerPath);
 
                     //now load the thumbnail
+                    //Log.v("ImageSend","showMediaThumbnail _3");
                     cmdSuccess = showMediaThumbnail(mediaUri.getLastPathSegment(), mimeTypeSticker, mediaUri, id, mHolder, false);
                 } catch (Exception e) {
                     cmdSuccess = false;

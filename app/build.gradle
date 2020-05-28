@@ -4,7 +4,6 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'realm-android'
 apply plugin: 'testdroid'
 
-
 android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -18,10 +17,13 @@ android {
         targetSdkVersion 28
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
-
     }
 
-
+    allprojects {
+        repositories {
+            maven { url = 'https://jitpack.io' }
+        }
+    }
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/LICENSE'
@@ -56,11 +58,10 @@ android {
 
     productFlavors {
 
-
         altbrand {
             dimension "release"
-            versionCode 46000
-            versionName "0.0.4.6"
+            versionCode 47000
+            versionName "0.0.4.7"
             archivesBaseName = "KeanuAlt-$versionName"
             applicationIdSuffix ".altbrand"
             versionNameSuffix "-altbrand"
@@ -69,8 +70,8 @@ android {
         primary {// Assigns this product flavor to the "mode" flavor dimension.
 
             dimension "release"
-            versionCode 46000
-            versionName "0.0.4.6"
+            versionCode 47000
+            versionName "0.0.4.7"
             archivesBaseName = "Keanu-$versionName"
         }
 
@@ -132,8 +133,7 @@ dependencies {
     //built in camera now!
     //https://github.com/natario1/CameraView
     implementation 'com.otaliastudios:cameraview:2.0.0-beta04'
-
-
+    implementation 'com.stefanosiano.powerful_libraries:imageview_rs:1.0.15'
 
     //*********** KeanuApp components ********** /
     implementation project(':keanuCore')

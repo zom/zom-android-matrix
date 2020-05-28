@@ -5,8 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+
+import com.stefanosiano.powerful_libraries.imageview.PowerfulImageView;
 
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.conversation.MessageListItem;
@@ -26,6 +29,10 @@ public class MessageViewHolder extends MediaViewHolder
 
     public ViewGroup mMediaContainer;
     public ViewGroup mAudioContainer;
+   public PowerfulImageView mMediaThumbnail;
+   public ProgressBar progress;
+
+
    // public VisualizerView mVisualizerView;
    // public ImageView mAudioButton;
 
@@ -44,6 +51,8 @@ public class MessageViewHolder extends MediaViewHolder
         mAvatar = (ImageView) view.findViewById(R.id.avatar);
         mMediaContainer = (ViewGroup)view.findViewById(R.id.media_thumbnail_container);
         mAudioContainer = (ViewGroup)view.findViewById(R.id.audio_container);
+        mMediaThumbnail = (PowerfulImageView)view.findViewById(R.id.media_thumbnail);
+        progress  = (ProgressBar)view.findViewById(R.id.progress);
        // mVisualizerView = (VisualizerView) view.findViewById(R.id.audio_view);
        // mAudioButton = (ImageView) view.findViewById(R.id.audio_button);
 

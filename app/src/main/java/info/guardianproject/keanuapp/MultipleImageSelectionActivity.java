@@ -1,5 +1,6 @@
 package info.guardianproject.keanuapp;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,11 +17,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import info.guardianproject.keanuapp.ui.stories.MultiSelectionGalleryAdapter;
 import info.guardianproject.keanuapp.ui.stories.StoryEditorActivity;
 
+import static info.guardianproject.keanuapp.ui.conversation.ConversationDetailActivity.REQUEST_ADD_MEDIA;
+
 public class MultipleImageSelectionActivity extends AppCompatActivity {
 
     Toolbar toolbar;
     private RecyclerView list_image;
     private ImageView btn_send;
+    private String storyTitle;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,17 +39,18 @@ public class MultipleImageSelectionActivity extends AppCompatActivity {
 
         MultiSelectionGalleryAdapter multiSelectionGalleryAdapter = new MultiSelectionGalleryAdapter(getApplicationContext());
         list_image.setAdapter(multiSelectionGalleryAdapter);
-
-
+        Intent intent = getIntent();
+        storyTitle = intent.getStringExtra("title");
         btn_send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(multiSelectionGalleryAdapter != null){
-                    Intent intent = new Intent(MultipleImageSelectionActivity.this, StoryEditorActivity.class);
-                    intent.putExtra("listMediaInfo",multiSelectionGalleryAdapter.getCheckedList());
-                    startActivity(intent);
+
+                    Intent result = new Intent();
+                    result.putExtra("listMediaInfo",multiSelectionGalleryAdapter.getCheckedList());
+                    result.putExtra("title",storyTitle);
+                    setResult(Activity.RESULT_OK, result);
                     finish();
-                    Log.v("multiSelection","multiSelection==="+multiSelectionGalleryAdapter.getCheckedList().size());
                 }
             }
         });

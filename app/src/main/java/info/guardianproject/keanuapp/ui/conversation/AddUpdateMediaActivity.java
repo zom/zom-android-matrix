@@ -1,6 +1,7 @@
 package info.guardianproject.keanuapp.ui.conversation;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,6 +17,8 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -65,6 +68,7 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
     private PDFView previewPdf;
     private ProgressBar progressBar;
     private AudioRecorder audioRecorder;
+    private String storyTitle;
 
     private ArrayList<MediaInfo> addedMedia = new ArrayList<>();
 
@@ -98,11 +102,17 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
 
         cameraButton = findViewById(R.id.btnCameraVideo);
         btnAddMultipleImage = findViewById(R.id.btnAddMultipleImage);
+        Intent intent = getIntent();
+        if(intent != null){
+            storyTitle = intent.getStringExtra("title");
+        }
+
         btnAddMultipleImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(AddUpdateMediaActivity.this, MultipleImageSelectionActivity.class));
-                finish();
+
+                startActivityForResult(new Intent(AddUpdateMediaActivity.this, MultipleImageSelectionActivity.class).putExtra("title",storyTitle),101);
+                //finish();
             }
         });
         // Override functionality from super - We use the same button for photo and video: click
@@ -246,6 +256,15 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
             if (selectedMedia != null) {
                 onMediaItemClicked(selectedMedia);
             }
+        }else if(requestCode == 101 && resultCode == RESULT_OK && data != null){
+            ArrayList<MediaInfo> list = (ArrayList<MediaInfo>) data.getSerializableExtra("listMediaInfo");
+            String title = data.getStringExtra("title");
+            Intent result = new Intent();
+            result.putExtra("listMediaInfo",list);
+            result.putExtra("title",title);
+            setResult(Activity.RESULT_OK, result);
+            finish();
+
         }
     }
 

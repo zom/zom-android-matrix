@@ -141,7 +141,9 @@ public class GalleryMediaViewHolder extends MediaViewHolder
      */
     private void setThumbnail(ContentResolver contentResolver, Uri mediaUri) {
 
-        RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE).placeholder(R.drawable.ic_photo_library_white_36dp);
+        mMediaThumbnail.setImageResource(R.drawable.icon_download);
+
+        RequestOptions options = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE);
 
         if(SecureMediaStore.isVfsUri(mediaUri))
         {
@@ -149,9 +151,7 @@ public class GalleryMediaViewHolder extends MediaViewHolder
                 info.guardianproject.iocipher.File fileMedia = new info.guardianproject.iocipher.File(mediaUri.getPath());
                 if (fileMedia.exists()) {
                     Log.d("Gallery","VFS loading: " + mediaUri.toString());
-
                     Glide.with(context)
-                            .asBitmap()
                             .load(new info.guardianproject.iocipher.FileInputStream(fileMedia))
                             .apply(options)
                             .into(mMediaThumbnail);
@@ -159,8 +159,8 @@ public class GalleryMediaViewHolder extends MediaViewHolder
                 else
                 {
                     Log.d("Gallery","VFS file not found: " + mediaUri.toString());
+
                     Glide.with(context)
-                            .asBitmap()
                             .load(R.drawable.broken_image_large)
                             .apply(options)
                             .into(mMediaThumbnail);
@@ -176,7 +176,6 @@ public class GalleryMediaViewHolder extends MediaViewHolder
         {
             String assetPath = "file:///android_asset/" + mediaUri.getPath().substring(1);
             Glide.with(context)
-                    .asBitmap()
                     .load(assetPath)
                     .apply(options)
                    .into(mMediaThumbnail);
@@ -184,7 +183,6 @@ public class GalleryMediaViewHolder extends MediaViewHolder
         else
         {
             Glide.with(context)
-                    .asBitmap()
                     .load(mediaUri)
                     .apply(options)
                     .into(mMediaThumbnail);
