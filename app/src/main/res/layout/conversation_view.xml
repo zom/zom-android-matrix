@@ -113,7 +113,7 @@
         android:layout_gravity="left|bottom"
         android:visibility="gone"
         app:piv_shape_mode="normal"
-        app:piv_shape_scaleType="fitXY"
+        app:piv_shape_scaleType="centerCrop"
         />
 
     <ProgressBar

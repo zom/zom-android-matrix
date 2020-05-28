@@ -89,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 app:piv_shape_mode="normal"
-                app:piv_shape_scaleType="fitXY"
+                app:piv_shape_scaleType="centerCrop"
                 />
             <ImageView
                 android:id="@+id/media_thumbnail_play"
