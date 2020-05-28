@@ -3081,7 +3081,7 @@ public class ConversationView {
         @Override
         public void onQuickReactionClicked(MessageViewHolder viewHolder, QuickReaction quickReaction, String messageId) {
             if (quickReaction.sentByMe) {
-                // TODO - Remove
+                // TODO - Remove //do a redact message?
             } else {
                 sendMessage(quickReaction.reaction,false,messageId);
             }
