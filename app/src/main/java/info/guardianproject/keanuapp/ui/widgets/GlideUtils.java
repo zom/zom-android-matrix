@@ -98,6 +98,8 @@ public class GlideUtils {
     }
 
     public static void loadImageFromUri(Context context, Uri uri, PowerfulImageView imageView) {
+
+
         if(SecureMediaStore.isVfsUri(uri))
         {
             try {

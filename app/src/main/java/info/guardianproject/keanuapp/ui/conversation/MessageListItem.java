@@ -930,6 +930,7 @@ public class MessageListItem extends FrameLayout {
                 && aHolder.mMediaUri.getPath().equals(mediaUri.getPath()))
             return;
 
+
         // pair this holder to the uri. if the holder is recycled, the pairing is broken
         aHolder.mMediaUri = mediaUri;
         // if a content uri - already scanned
