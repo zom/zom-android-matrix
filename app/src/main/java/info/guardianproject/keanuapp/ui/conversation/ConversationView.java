@@ -1767,18 +1767,20 @@ public class ConversationView {
             {
                 String reaction = newCursor.getString(bodyCol);
                 String address = newCursor.getString(nicknameCol);
-                QuickReaction react = map.get(reaction);
-                if (react == null) {
-                    react = new QuickReaction(reaction, null);
-                    map.put(reaction, react);
-                }
-                react.senders.add(address);
-                if (address.equals(((ImApp)((Activity)context).getApplication()).getDefaultUsername())) {
-                    react.sentByMe = true;
-                }
-                if (reaction != null && EmojiUtils.isOnlyEmojis(reaction))
-                {
-                    quickReactions.add(react);
+
+                if (!TextUtils.isEmpty(address)) {
+                    QuickReaction react = map.get(reaction);
+                    if (react == null) {
+                        react = new QuickReaction(reaction, null);
+                        map.put(reaction, react);
+                    }
+                    react.senders.add(address);
+                    if (address.equals(((ImApp) ((Activity) context).getApplication()).getDefaultUsername())) {
+                        react.sentByMe = true;
+                    }
+                    if (reaction != null && EmojiUtils.isOnlyEmojis(reaction)) {
+                        quickReactions.add(react);
+                    }
                 }
             }
 
@@ -3077,11 +3079,11 @@ public class ConversationView {
         }
 
         @Override
-        public void onQuickReactionClicked(MessageViewHolder viewHolder, QuickReaction quickReaction) {
+        public void onQuickReactionClicked(MessageViewHolder viewHolder, QuickReaction quickReaction, String messageId) {
             if (quickReaction.sentByMe) {
                 // TODO - Remove
             } else {
-                // TODO - Send
+                sendMessage(quickReaction.reaction,false,messageId);
             }
         }
     }

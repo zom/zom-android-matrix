@@ -226,8 +226,10 @@ public class MessageListItem extends RelativeLayout {
         mHolder.mAudioContainer.setVisibility(View.GONE);
         mHolder.mMediaContainer.setVisibility(View.GONE);
         mHolder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
+        mHolder.mPacketId = packetId;
 
         this.packetId = packetId;
+
 
         if (nickname.startsWith("@"))
             nickname = new MatrixAddress(userAddress).getUser();

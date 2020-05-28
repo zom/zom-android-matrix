@@ -26,7 +26,7 @@ public class MessageViewHolder extends MediaViewHolder implements QuickReactions
     }
 
     public interface OnQuickReactionClickedListener {
-        void onQuickReactionClicked(MessageViewHolder viewHolder, QuickReaction quickReaction);
+        void onQuickReactionClicked(MessageViewHolder viewHolder, QuickReaction quickReaction, String messageId);
     }
 
     public TextView mTextViewForMessages;
@@ -46,6 +46,8 @@ public class MessageViewHolder extends MediaViewHolder implements QuickReactions
     private OnImageClickedListener onImageClickedListener;
     private OnQuickReactionClickedListener onQuickReactionClickedListener;
     public AudioWife mAudioWife;
+
+    public String mPacketId; //this is the message ID
 
     public MessageViewHolder(View view) {
         super(view);
@@ -137,7 +139,7 @@ public class MessageViewHolder extends MediaViewHolder implements QuickReactions
     @Override
     public void onReactionClicked(QuickReaction reaction) {
         if (onQuickReactionClickedListener != null) {
-            onQuickReactionClickedListener.onQuickReactionClicked(this, reaction);
+            onQuickReactionClickedListener.onQuickReactionClicked(this, reaction, mPacketId);
         }
     }
 }
