@@ -12,6 +12,7 @@ import android.os.RemoteException;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -335,16 +336,22 @@ public class MatrixConnection extends ImConnection {
             public void onStoreReady(String s) {
                 debug ("MXSTORE: onStoreReady: " + s);
 
+                Toast.makeText(mContext,"Your message store is ready!", Toast.LENGTH_LONG).show();
+
             }
 
             @Override
             public void onStoreCorrupted(String s, String s1) {
                 debug ("MXSTORE: onStoreCorrupted: " + s + " " + s1);
+
+                Toast.makeText(mContext,"WARNING: Your message store is corrupted!", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onStoreOOM(String s, String s1) {
                 debug ("MXSTORE: onStoreOOM: " + s + " " + s1);
+
+                Toast.makeText(mContext,"WARNING: Your message store is out of memory!", Toast.LENGTH_LONG).show();
 
             }
 
@@ -362,8 +369,7 @@ public class MatrixConnection extends ImConnection {
         mDataHandler = new MXDataHandler(mStore, mCredentials);
         mDataHandler.addListener(mEventListener);
 
-
-        mDataHandler.setLazyLoadingEnabled(true);
+        mDataHandler.setLazyLoadingEnabled(false);
 
         mStore.setDataHandler(mDataHandler);
 
@@ -394,7 +400,7 @@ public class MatrixConnection extends ImConnection {
         if (password == null)
             password = Imps.Account.getPassword(mContext.getContentResolver(), mAccountId);
 
-        final String initialToken = null;//Preferences.getValue(mUser.getAddress().getUser() + ".sync");
+        final String initialToken = Preferences.getValue(mUser.getAddress().getUser() + ".sync");
 
         File fileCredsJson = new File("/" + username + "/creds.json");
 
@@ -1300,7 +1306,7 @@ public class MatrixConnection extends ImConnection {
                 }
             }
 
-        //    Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
+            Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
 
         }
 
