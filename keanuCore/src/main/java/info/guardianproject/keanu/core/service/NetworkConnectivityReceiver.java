@@ -110,7 +110,7 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
      *
      * @param context
      */
-    public synchronized void startListening(Context context) {
+    public void startListening(Context context) {
         if (!mListening) {
             mContext = context;
 
@@ -122,7 +122,7 @@ public class NetworkConnectivityReceiver extends BroadcastReceiver {
     }
 
     /** This method stops this class from listening for network changes. */
-    public synchronized void stopListening() {
+    public void stopListening() {
         if (mListening) {
             mContext.unregisterReceiver(this);
             mContext = null;

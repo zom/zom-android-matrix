@@ -23,6 +23,7 @@ import android.util.Pair;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -37,6 +38,9 @@ public class ChatGroup extends ImEntity {
 
     private boolean mAreJoined = true; //by default assume we are joined
     private boolean mIsLoaded = false;
+
+    private Date mLastUpdated = null;
+    private final static long UPDATE_PERIOD = 1000*60*5;
 
     /** Store the role and affiliation for a contact in a pair data structure, the first being
      * the role and the second the affiliation.
@@ -74,6 +78,27 @@ public class ChatGroup extends ImEntity {
     public boolean isJoined ()
     {
         return mAreJoined;
+    }
+
+    public Date getLastUpdated ()
+    {
+        return mLastUpdated;
+    }
+
+    public void setLastUpdated ()
+    {
+        mLastUpdated = new Date();
+    }
+
+    public boolean shouldUpdate ()
+    {
+        if (mLastUpdated == null)
+            return true;
+
+        if (new Date().getTime() - mLastUpdated.getTime() > UPDATE_PERIOD)
+            return true;
+        else
+            return false;
     }
 
     @Override
@@ -186,6 +211,8 @@ public class ChatGroup extends ImEntity {
             if (groupAddress != null)
                 mGroupAddressToContactMap.put(groupAddress, contact);
         }
+
+
     }
 
     public void notifyMemberRoleUpdate(Contact newContact, String role, String affiliation) {

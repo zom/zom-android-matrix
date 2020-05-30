@@ -722,7 +722,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     boolean sendingPostponed = false;
 
-    synchronized void sendPostponedMessages() {
+    void sendPostponedMessages() {
 
         if (!sendingPostponed) {
             sendingPostponed = true;

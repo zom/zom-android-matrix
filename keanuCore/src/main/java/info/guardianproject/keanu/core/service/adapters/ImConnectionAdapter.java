@@ -477,12 +477,11 @@ public class ImConnectionAdapter extends IImConnection.Stub {
                     saveSessionCookie(cr);
                 }
 
-
+                /**
                 ArrayList<ChatSessionAdapter> adapters = new ArrayList<ChatSessionAdapter>(mChatSessionManager.mActiveChatSessionAdapters.values());
                 for (ChatSessionAdapter session : adapters) {
                     session.sendPostponedMessages();
-                }
-
+                }**/
 
                 loadSavedPresence();
                 
