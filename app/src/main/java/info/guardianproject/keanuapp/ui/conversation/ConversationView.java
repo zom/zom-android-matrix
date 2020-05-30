@@ -1463,7 +1463,11 @@ public class ConversationView {
 
     public String getTitle ()
     {
-        return mRemoteNickname;
+        if (!TextUtils.isEmpty(mRemoteNickname))
+            return mRemoteNickname;
+        else
+            return mRemoteAddress;
+
 
     }
 
@@ -1521,23 +1525,9 @@ public class ConversationView {
             }
 
             if (mRemoteNickname == null) {
-                StringBuilder buf = new StringBuilder();
-
-                int count = -1;
-
-                try {
-                    buf.append(mCurrentChatSession.getName());
-                    count = mCurrentChatSession.getParticipants().length;
-                } catch (Exception e) {
-                }
-
-                if (count > 0) {
-                    buf.append(" (");
-                    buf.append(count);
-                    buf.append(")");
-                }
-                mRemoteNickname = buf.toString();
+                mRemoteNickname = mRemoteAddress;
             }
+
             mActivity.getSupportActionBar().setTitle(mRemoteNickname);
         }
     }
