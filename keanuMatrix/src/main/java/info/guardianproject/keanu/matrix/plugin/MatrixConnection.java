@@ -336,7 +336,6 @@ public class MatrixConnection extends ImConnection {
             public void onStoreReady(String s) {
                 debug ("MXSTORE: onStoreReady: " + s);
 
-                Toast.makeText(mContext,"Your message store is ready!", Toast.LENGTH_LONG).show();
 
             }
 
@@ -344,14 +343,12 @@ public class MatrixConnection extends ImConnection {
             public void onStoreCorrupted(String s, String s1) {
                 debug ("MXSTORE: onStoreCorrupted: " + s + " " + s1);
 
-                Toast.makeText(mContext,"WARNING: Your message store is corrupted!", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onStoreOOM(String s, String s1) {
                 debug ("MXSTORE: onStoreOOM: " + s + " " + s1);
 
-                Toast.makeText(mContext,"WARNING: Your message store is out of memory!", Toast.LENGTH_LONG).show();
 
             }
 
@@ -400,11 +397,11 @@ public class MatrixConnection extends ImConnection {
         if (password == null)
             password = Imps.Account.getPassword(mContext.getContentResolver(), mAccountId);
 
-        final String initialToken = Preferences.getValue(mUser.getAddress().getUser() + ".sync");
+        final String initialToken = ""; //Preferences.getValue(mUser.getAddress().getUser() + ".sync");
 
         File fileCredsJson = new File("/" + username + "/creds.json");
 
-        if (fileCredsJson.exists()& fileCredsJson.length() > 0)
+        if (fileCredsJson != null && fileCredsJson.exists()& fileCredsJson.length() > 0)
         {
             mCredentials = new Credentials();
             try {
@@ -548,6 +545,7 @@ public class MatrixConnection extends ImConnection {
 
                         debug("getCrypto().start.onSuccess");
                         mSession.startEventStream(initialToken);
+
                         setState(LOGGED_IN, null);
                         mSession.setIsOnline(true);
 
@@ -679,7 +677,6 @@ public class MatrixConnection extends ImConnection {
         Event event = mStore.getEvent(eventId, roomId);
         Room room = mStore.getRoom(roomId);
         room.sendReadReceipt(event, new BasicApiCallback("sendReadReceipt"));
-      //  room.markAllAsRead(new BasicApiCallback("markAllAsRead"));
 
     }
 
@@ -938,18 +935,18 @@ public class MatrixConnection extends ImConnection {
     protected void updateGroup (Room room, ChatGroup group)
     {
         if (room.isInvited() || room.isMember()) {
-            if (group == null) {
+
+            if (group == null)
                 group = mChatGroupManager.getChatGroup(new MatrixAddress(room.getRoomId()));
-                if (TextUtils.isEmpty(group.getName()))
-                    group.setName(room.getRoomDisplayName(mContext));
-            }
+
+            group.setName(room.getRoomDisplayName(mContext));
 
             ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
             if (csa != null)
                 csa.presenceChanged(Presence.AVAILABLE);
 
-           //                                                                                                                                                          updateGroupMembers(room, group, false);
-
+            if (group.shouldUpdate())
+               updateGroupMembers(room, group, false);
 
         }
     }
@@ -976,6 +973,8 @@ public class MatrixConnection extends ImConnection {
     {
         if (!priority)
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+
+        group.setLastUpdated();
 
         room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
             @Override
@@ -1206,6 +1205,10 @@ public class MatrixConnection extends ImConnection {
                                 } else {
                                     mChatSessionManager.getChatSessionAdapter(event.roomId).markAsRead();
                                 }
+                            }if (!userId.equals(mSession.getMyUserId())) {
+                                session.onMessageReceipt(eventId, session.useEncryption());
+                            } else {
+                                mChatSessionManager.getChatSessionAdapter(event.roomId).markAsRead();
                             }
                         }
 
@@ -1306,7 +1309,7 @@ public class MatrixConnection extends ImConnection {
                 }
             }
 
-            Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
+          //  Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
 
         }
 
@@ -1491,12 +1494,12 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onRoomFlush(String s) {
             debug ("onRoomFlush: " + s);
-            /**
+
             Room room = mDataHandler.getRoom(s);
             if (room != null)
             {
                 mExecutor.execute(() -> updateGroup(room));
-            }**/
+            }
         }
 
         @Override
@@ -1542,6 +1545,10 @@ public class MatrixConnection extends ImConnection {
                     ReceiptData data = mStore.getReceipt(roomId, userId);
                     session.onMessageReadMarker(data.eventId, session.useEncryption());
 
+                    if (userId.equals(mSession.getMyUserId())) {
+
+                        mChatSessionManager.getChatSessionAdapter(roomId).markAsRead();
+                    }
 
                 }
 
@@ -2008,6 +2015,11 @@ public class MatrixConnection extends ImConnection {
                     session.onReceiveMessage(message, notifyUser);
 
                     csa.setContactTyping(new Contact(addrSender), false);
+
+                    if (room != null)
+                    {
+                        mExecutor.execute(() -> updateGroup(room));
+                    }
 
                     // if we send here, things go wrong
                    // sendMessageRead(event.roomId, event.eventId);
