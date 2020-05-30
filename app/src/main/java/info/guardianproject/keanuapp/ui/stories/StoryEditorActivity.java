@@ -464,7 +464,7 @@ public class StoryEditorActivity extends AppCompatActivity {
     {
         if (mEditor != null) {
 
-            String html = mEditor.getOriginalUrl();
+            String html = mEditor.getHtml();
 
             if (!TextUtils.isEmpty(html)) {
                 storeHTML(html);
