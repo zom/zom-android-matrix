@@ -385,7 +385,7 @@ public class StoryEditorActivity extends AppCompatActivity {
 
     }
 
-    private void insertVideo (String linkAudio) {
+    private void insertVideo (String linkVideo) {
 
         /**
          String jsInsert = "(function() {" +
@@ -399,18 +399,15 @@ public class StoryEditorActivity extends AppCompatActivity {
          "}) ();";
          **/
 
-        String html = ("<video width=\"320\" height=\"240\" controls src=\"" + linkAudio + "\"></video>");
-        String jsInsert = "(function (){     document.execCommand('insertHTML', false, '" + html + "');})();";
+        String html = ("<video width=\"320\" height=\"240\" controls src=\"" + linkVideo + "\"></video>");
+
+        String jsInsert = "(function (){ var html='" + html + "'; RE.insertHTML(html);})();";
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            imageUrl += html +"\n";
-            mEditor.loadData(imageUrl, "text/html", "UTF-8");
-           // mEditor.evaluateJavascript("javascript:" + jsInsert + "",null);
+            mEditor.evaluateJavascript("javascript:" + jsInsert + "",null);
         } else {
-            imageUrl += html +"\n";
-            mEditor.loadData(imageUrl, "text/html", "UTF-8");
+            mEditor.loadUrl("javascript:" + jsInsert + "");
         }
-
 
 
     }
