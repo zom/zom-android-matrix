@@ -60,8 +60,8 @@ android {
 
         altbrand {
             dimension "release"
-            versionCode 47000
-            versionName "0.0.4.7"
+            versionCode 48000
+            versionName "0.0.4.8"
             archivesBaseName = "KeanuAlt-$versionName"
             applicationIdSuffix ".altbrand"
             versionNameSuffix "-altbrand"
@@ -70,8 +70,8 @@ android {
         primary {// Assigns this product flavor to the "mode" flavor dimension.
 
             dimension "release"
-            versionCode 47000
-            versionName "0.0.4.7"
+            versionCode 48000
+            versionName "0.0.4.8"
             archivesBaseName = "Keanu-$versionName"
         }
 
