@@ -1164,6 +1164,8 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+        if (mNetworkConnectivityListener != null)
+            mNetworkConnectivityListener.stopListening();
 
     }
 
