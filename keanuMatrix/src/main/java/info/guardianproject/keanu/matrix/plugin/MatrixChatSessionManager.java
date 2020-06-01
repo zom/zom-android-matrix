@@ -5,6 +5,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.google.gson.JsonObject;
+
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
 import org.matrix.androidsdk.core.callback.ApiCallback;
@@ -142,7 +144,12 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
     private void sendMessageWithRoomAndReply (Room room, Event replyToEvent, final ChatSession session, final Message message, final ChatSessionListener listener)
     {
-
+//        int cpCount = message.getBody().codePointCount(0, message.getBody().length());
+//        boolean isQuickReaction = (message.getReplyId() != null && cpCount > 0) /* && isEmoji */;
+//
+//        if (isQuickReaction) {
+//            message.setContentType("m.reaction");
+//        }
         room.sendTextMessage(message.getBody(), null, MESSAGE_TEXT_PLAIN, replyToEvent, new RoomMediaMessage.EventCreationListener() {
 
             @Override
@@ -223,6 +230,18 @@ public class MatrixChatSessionManager extends ChatSessionManager {
                             listener.onMessageSendSuccess(message, finalMsgId);
                     }
                 });
+
+//                if (isQuickReaction) {
+//                    roomMediaMessage.setMessageType("m.reaction");
+//                    roomMediaMessage.getEvent().setType("m.reaction");
+//                    JsonObject newObject = new JsonObject();
+//                    newObject.addProperty("event_id", message.getReplyId());
+//                    newObject.addProperty("rel_type", "m.annotation");
+//                    newObject.addProperty("key", message.getBody());
+//                    JsonObject content = new JsonObject();
+//                    content.add("m.relates_to", newObject);
+//                    roomMediaMessage.getEvent().contentJson = content;
+//                }
             }
 
             @Override
