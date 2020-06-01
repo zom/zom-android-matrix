@@ -59,6 +59,7 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.StyleSpan;
@@ -75,6 +76,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -89,7 +91,14 @@ import android.widget.Toast;
 
 import com.gsconrad.richcontentedittext.RichContentEditText;
 import com.tougee.recorderview.AudioRecordView;
+import com.vanniktech.emoji.EmojiEditText;
+import com.vanniktech.emoji.EmojiImageView;
+import com.vanniktech.emoji.EmojiPopup;
 import com.vanniktech.emoji.EmojiUtils;
+import com.vanniktech.emoji.SingleEmojiTrait;
+import com.vanniktech.emoji.emoji.Emoji;
+import com.vanniktech.emoji.listeners.OnEmojiClickListener;
+import com.vanniktech.emoji.listeners.OnEmojiPopupDismissListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -2914,6 +2923,13 @@ public class ConversationView {
                 messageView.bindPresenceMessage(viewHolder, userAddress, nick, messageType, date, isGroupChat(), false);
             }
 
+            // Set quick reaction listener
+            viewHolder.itemView.setOnClickListener(v -> {
+                // Pick emoji as quick reaction
+                showQuickReactionsPopup(packetId, (View)mHistory.getParent());
+            });
+
+
             sendMessageRead(packetId);
             loadMessageReplies(viewHolder, packetId);
         }
@@ -3080,12 +3096,15 @@ public class ConversationView {
 
         @Override
         public void onQuickReactionClicked(MessageViewHolder viewHolder, QuickReaction quickReaction, String messageId) {
-            if (quickReaction.sentByMe) {
-                // TODO - Remove //do a redact message?
-            } else {
-                sendMessage(quickReaction.reaction,false,messageId);
-            }
+            // TODO - Remove my own reaction, but that is just sending it twice right?
+            //if (quickReaction.sentByMe) {
+            //}
+            sendQuickReaction(quickReaction.reaction,messageId);
         }
+    }
+
+    private void sendQuickReaction(String reaction, String messageId) {
+        sendMessage(reaction,false,messageId);
     }
 
     public Cursor getMessageAtPosition(int position) {
@@ -3359,4 +3378,54 @@ public class ConversationView {
 
     }
 
+    private EmojiPopup emojiPopup;
+    private void showQuickReactionsPopup(final String messageId, View rootView) {
+        try {
+            if (emojiPopup != null) {
+                return;
+            }
+            Context context = rootView.getContext();
+            final EmojiEditText editText = new EmojiEditText(context);
+            editText.setImeOptions(EditorInfo.IME_ACTION_SEND);
+            editText.setInputType(InputType.TYPE_NULL);
+            editText.setBackgroundColor(0x80000000);
+            editText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // If tap on background, close popup!
+                    if (emojiPopup != null) {
+                        InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                        emojiPopup.dismiss();
+                    }
+                }
+            });
+            SingleEmojiTrait.install(editText);
+            ((ViewGroup)rootView).addView(editText, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
+                    .setOnEmojiPopupDismissListener(new OnEmojiPopupDismissListener() {
+                        @Override
+                        public void onEmojiPopupDismiss() {
+                            emojiPopup = null;
+                            ((ViewGroup)rootView).removeView(editText);
+                        }
+                    })
+                    .setOnEmojiClickListener(new OnEmojiClickListener() {
+                        @Override
+                        public void onEmojiClick(@NonNull EmojiImageView emoji, @NonNull Emoji variant) {
+                            sendQuickReaction(variant.getUnicode(), messageId);
+                            emojiPopup.dismiss();
+                        }
+                    })
+                    .build(editText);
+            rootView.post(new Runnable() {
+                @Override
+                public void run() {
+                    emojiPopup.toggle();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
