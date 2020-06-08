@@ -150,6 +150,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 //        if (isQuickReaction) {
 //            message.setContentType("m.reaction");
 //        }
+
         room.sendTextMessage(message.getBody(), null, MESSAGE_TEXT_PLAIN, replyToEvent, new RoomMediaMessage.EventCreationListener() {
 
             @Override
