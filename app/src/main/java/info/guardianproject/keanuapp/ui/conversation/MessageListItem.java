@@ -1097,8 +1097,8 @@ public class MessageListItem extends RelativeLayout {
 
             RoundedAvatarDrawable avatar = null;
 
-            try { avatar = (RoundedAvatarDrawable)DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);}
-            catch (Exception e){}
+         //   try { avatar = (RoundedAvatarDrawable)DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);}
+         //   catch (Exception e){}
 
             if (avatar != null)
             {
