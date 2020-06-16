@@ -3,10 +3,8 @@ package info.guardianproject.keanu.matrix.plugin;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.drawable.Drawable;
 import android.net.TrafficStats;
 import android.net.Uri;
-import android.os.Handler;
 import android.os.Process;
 import android.os.RemoteException;
 import android.text.TextUtils;
@@ -33,7 +31,6 @@ import org.matrix.androidsdk.core.callback.SimpleApiCallback;
 import org.matrix.androidsdk.core.model.MatrixError;
 import org.matrix.androidsdk.crypto.IncomingRoomKeyRequest;
 import org.matrix.androidsdk.crypto.IncomingRoomKeyRequestCancellation;
-import org.matrix.androidsdk.crypto.MXCrypto;
 import org.matrix.androidsdk.crypto.RoomKeysRequestListener;
 import org.matrix.androidsdk.crypto.data.MXDeviceInfo;
 import org.matrix.androidsdk.crypto.data.MXOlmSessionResult;
@@ -64,14 +61,11 @@ import org.matrix.androidsdk.rest.model.message.VideoMessage;
 import org.matrix.androidsdk.rest.model.search.SearchUsersResponse;
 import org.matrix.androidsdk.rest.model.sync.AccountDataElement;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -87,13 +81,9 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileInputStream;
-import info.guardianproject.iocipher.FileReader;
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.ChatGroup;
 import info.guardianproject.keanu.core.model.ChatGroupManager;
@@ -119,11 +109,8 @@ import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanu.core.util.Downloader;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.matrix.R;
-import okio.BufferedSink;
-import okio.Okio;
 
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
-import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_WIDTH;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 import static org.matrix.androidsdk.rest.model.Event.EVENT_TYPE_MESSAGE_ENCRYPTED;
 
@@ -160,7 +147,8 @@ public class MatrixConnection extends ImConnection {
 
     private final static String HTTPS_PREPEND = "https://";
 
-    private ExecutorService mExecutor = null;
+    private ExecutorService mMessageExecutor = null;
+    private ExecutorService mStateExecutor = null;
 
     private final static long TIME_ONE_DAY_MS = 1000 * 60 * 60 * 24;
 
@@ -178,8 +166,10 @@ public class MatrixConnection extends ImConnection {
         mChatSessionManager = new MatrixChatSessionManager(context, this);
         mChatGroupManager = new MatrixChatGroupManager(context, this,mChatSessionManager);
 
-        //mExecutor = Executors.newSingleThreadExecutor();
-        mExecutor = new ThreadPoolExecutor( 2, 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        //mStateExecutor = Executors.newCachedThreadPool();
+        //mStateExecutor = new ThreadPoolExecutor( 2, 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        mMessageExecutor = Executors.newSingleThreadExecutor();
+        mStateExecutor = Executors.newFixedThreadPool(5);
     }
 
     @Override
@@ -246,12 +236,15 @@ public class MatrixConnection extends ImConnection {
     @Override
     public void loginAsync(long accountId, final String password, long providerId, boolean retry) {
 
+        if (mDataHandler == null || (!mDataHandler.isAlive()))
+            return;
+
         setState(LOGGING_IN, null);
 
         mProviderId = providerId;
         mAccountId = accountId;
 
-        mExecutor.execute(() -> loginAsync (password, new LoginListener() {
+        mStateExecutor.execute(() -> loginAsync (password, new LoginListener() {
 
             @Override
             public void onLoginSuccess() {
@@ -273,7 +266,7 @@ public class MatrixConnection extends ImConnection {
         mProviderId = providerId;
         mAccountId = accountId;
 
-        mExecutor.execute(() -> loginAsync (password, listener));
+        mStateExecutor.execute(() -> loginAsync (password, listener));
 
     }
 
@@ -284,7 +277,7 @@ public class MatrixConnection extends ImConnection {
         mProviderId = providerId;
         mAccountId = accountId;
 
-        mExecutor.execute(() -> checkAccount (password, listener));
+        mStateExecutor.execute(() -> checkAccount (password, listener));
 
     }
 
@@ -380,12 +373,12 @@ public class MatrixConnection extends ImConnection {
 
     private void checkAccount (final String password, LoginListener listener)
     {
-        mExecutor.execute(() -> loginSync(password, false, listener));
+        mStateExecutor.execute(() -> loginSync(password, false, listener));
     }
 
     private void loginAsync (final String password, final LoginListener listener) {
 
-        mExecutor.execute(() -> loginSync(password, true, listener));
+        mStateExecutor.execute(() -> loginSync(password, true, listener));
 
     }
 
@@ -478,7 +471,7 @@ public class MatrixConnection extends ImConnection {
                     if (listener != null)
                         listener.onLoginFailed(e.getMessage());
 
-                    mExecutor.execute(new Runnable() {
+                    mStateExecutor.execute(new Runnable() {
                         public void run() {
                             loginAsync(null, listener);
                         }
@@ -512,7 +505,7 @@ public class MatrixConnection extends ImConnection {
 
     private void initSession (boolean enableEncryption, String initialToken)
     {
-        mExecutor.execute(() -> {
+        mStateExecutor.execute(() -> {
             mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
                     .withFileEncryption(enableEncryption)
                     .build();
@@ -589,9 +582,11 @@ public class MatrixConnection extends ImConnection {
 
         if (fullLogout)
         {
-            mSession.stopEventStream();
-            mSession.isOnline();
-            mSession.logout(mContext,new BasicApiCallback("loggout full"));
+            if (mSession.isOnline() && mDataHandler.isAlive()) {
+                mSession.stopEventStream();
+                mSession.logout(mContext, new BasicApiCallback("loggout full"));
+            }
+
             String username = mUser.getAddress().getUser();
             File fileCredsJson = new File("/" + username + "/creds.json");
             if (fileCredsJson.exists())
@@ -862,7 +857,7 @@ public class MatrixConnection extends ImConnection {
     private void loadStateAsync ()
     {
 
-        mExecutor.execute(() -> {
+        mStateExecutor.execute(() -> {
 
             Collection<Room> rooms = mStore.getRooms();
 
@@ -901,7 +896,7 @@ public class MatrixConnection extends ImConnection {
 
         }
 
-        if (!subject.equals(mContext.getString(R.string.default_group_title)))
+        if (csa != null && !subject.equals(mContext.getString(R.string.default_group_title)))
         {
             try {
                 csa.setGroupChatSubject(subject);
@@ -910,7 +905,7 @@ public class MatrixConnection extends ImConnection {
             }
         }
 
-        updateGroup(room, group);
+        updateRoom(room, group);
 
         checkRoomEncryption(room);
 
@@ -927,12 +922,12 @@ public class MatrixConnection extends ImConnection {
         return group;
     }
 
-    protected void updateGroup (Room room)
+    protected void updateRoom(Room room)
     {
-        updateGroup(room, null);
+        updateRoom(room, null);
     }
 
-    protected void updateGroup (Room room, ChatGroup group)
+    protected void updateRoom(Room room, ChatGroup group)
     {
         if (room.isInvited() || room.isMember()) {
 
@@ -959,10 +954,10 @@ public class MatrixConnection extends ImConnection {
             updateGroupMembersAsync(room, group, priority);
         }
         else {
-            mExecutor.execute(
+            mStateExecutor.execute(
                     () -> {
-                        Room room1 = mDataHandler.getRoom(group.getAddress().getAddress());
-                        updateGroupMembersAsync(room1, group, false);
+                        //Room room1 = mDataHandler.getRoom(group.getAddress().getAddress());
+                        updateGroupMembersAsync(room, group, false);
                     }
             );
         }
@@ -1010,7 +1005,7 @@ public class MatrixConnection extends ImConnection {
                     new Thread(gLoader).start();
                 }
                 else
-                    mExecutor.execute(gLoader);
+                    mStateExecutor.execute(gLoader);
 
             }
         });
@@ -1102,7 +1097,7 @@ public class MatrixConnection extends ImConnection {
         ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(room.getRoomId());
         if (csa != null) {
             if (mDataHandler != null && mDataHandler.getCrypto() != null) {
-                boolean isEncrypted = mDataHandler.getRoom(room.getRoomId()).isEncrypted();
+                boolean isEncrypted = room.isEncrypted();
 
                 if (!csa.getUseEncryption() == isEncrypted)
                     csa.updateEncryptionState(isEncrypted);
@@ -1143,7 +1138,7 @@ public class MatrixConnection extends ImConnection {
         public void onPresenceUpdate(Event event, User user) {
 
             debug ("PRESENCE: from=" + event.getSender() + ": " + event.getContent());
-            mExecutor.execute(() -> handlePresence(event));
+            mStateExecutor.execute(() -> handlePresence(event));
 
         }
 
@@ -1169,22 +1164,19 @@ public class MatrixConnection extends ImConnection {
 
             debug ("onLiveEvent:type=" + event.getType());
 
-            if (event.getType().equals(Event.EVENT_TYPE_MESSAGE))
+            if (event.getType().equals(Event.EVENT_TYPE_MESSAGE) || event.getType().equals("m.reaction"))  // TODO - Why is this not a constant in the SDK, does it still rely on some server side hack that the IOS code mentions?
             {
-                mExecutor.execute(() -> handleIncomingMessage(event));
+                mMessageExecutor.execute(() -> handleIncomingMessage(event));
             }
             else if (event.getType().equals(Event.EVENT_TYPE_STATE_ROOM_MEMBER))
             {
-
-                mExecutor.execute(() -> handleRoomMemberEvent(event));
-
-
+                mStateExecutor.execute(() -> handleRoomMemberEvent(event));
 
             }
             else if (event.getType().equals(Event.EVENT_TYPE_PRESENCE))
             {
                 debug ("PRESENCE: from=" + event.getSender() + ": " + event.getContent());
-                mExecutor.execute(() -> handlePresence(event));
+                mStateExecutor.execute(() -> handlePresence(event));
 
             }
             else if (event.getType().equals(Event.EVENT_TYPE_READ_MARKER))
@@ -1258,7 +1250,7 @@ public class MatrixConnection extends ImConnection {
             else if (event.getType().equals(Event.EVENT_TYPE_TYPING))
             {
                 debug ("TYPING: from=" + event.getSender() + ": " + event.getContent());
-                mExecutor.execute(() -> handleTyping(event));
+                mStateExecutor.execute(() -> handleTyping(event));
             }
             else if (event.getType().equals(Event.EVENT_TYPE_FORWARDED_ROOM_KEY))
             {
@@ -1268,12 +1260,12 @@ public class MatrixConnection extends ImConnection {
             else if (event.getType().equals(Event.EVENT_TYPE_STICKER))
             {
                 debug ("STICKER: from=" + event.getSender() + ": " + event.getContent());
-                mExecutor.execute(() -> handleIncomingSticker(event));
+                mStateExecutor.execute(() -> handleIncomingSticker(event));
 
 
             }
             else if (event.getType().equals(Event.EVENT_TYPE_STATE_ROOM_NAME)) {
-                mExecutor.execute(() -> {
+                mStateExecutor.execute(() -> {
                     ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(event.roomId);
                     if (csa != null) {
                         String newName = event.getContent().getAsJsonObject().get("name").getAsString();
@@ -1287,7 +1279,7 @@ public class MatrixConnection extends ImConnection {
                 });
             }
             else if (event.getType().equals(Event.EVENT_TYPE_STATE_ROOM_AVATAR)) {
-                mExecutor.execute(() -> {
+                mStateExecutor.execute(() -> {
                     Room room = mStore.getRoom(event.roomId);
                     String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(room.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
 
@@ -1303,8 +1295,8 @@ public class MatrixConnection extends ImConnection {
                 if (mSession != null && mSession.isCryptoEnabled())
                 {
                     if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
-                        if (mSession.getCrypto() != null)
-                            mSession.getCrypto().reRequestRoomKeyForEvent(event);
+                    //    if (mSession.getCrypto() != null)
+                     //       mSession.getCrypto().reRequestRoomKeyForEvent(event);
                     }
                 }
             }
@@ -1393,7 +1385,7 @@ public class MatrixConnection extends ImConnection {
                 });
             }
 
-            mExecutor.execute(() -> loadStateAsync());
+            mStateExecutor.execute(() -> loadStateAsync());
 
         }
 
@@ -1486,7 +1478,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mStore.getRoom(s);
             if (room != null) {
 
-                mExecutor.execute(() -> addRoomContact(room, null));
+                mStateExecutor.execute(() -> addRoomContact(room, null));
             }
 
         }
@@ -1498,7 +1490,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mDataHandler.getRoom(s);
             if (room != null)
             {
-                mExecutor.execute(() -> updateGroup(room));
+                mStateExecutor.execute(() -> updateRoom(room));
             }
         }
 
@@ -1508,7 +1500,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mDataHandler.getRoom(s);
             if (room != null)
             {
-                mExecutor.execute(() -> updateGroup(room));
+                mStateExecutor.execute(() -> updateRoom(room));
             }
         }
 
@@ -1589,7 +1581,7 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onJoinGroup(String s) {
 
-            mExecutor.execute(new Runnable ()
+            mStateExecutor.execute(new Runnable ()
             {
                 public void run ()
                 {
@@ -1613,7 +1605,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mDataHandler.getRoom(s);
             if (room != null)
             {
-                mExecutor.execute(() -> updateGroup(room));
+                mStateExecutor.execute(() -> updateRoom(room));
             }
         }
 
@@ -1630,7 +1622,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mDataHandler.getRoom(s);
             if (room != null)
             {
-                mExecutor.execute(() -> updateGroup(room));
+                mStateExecutor.execute(() -> updateRoom(room));
             }
         }
 
@@ -1639,7 +1631,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mDataHandler.getRoom(s);
             if (room != null)
             {
-                mExecutor.execute(() -> updateGroup(room));
+                mStateExecutor.execute(() -> updateRoom(room));
             }
         }
 
@@ -1919,6 +1911,13 @@ public class MatrixConnection extends ImConnection {
             if (event.getContent().getAsJsonObject().has("body"))
                 messageBody = event.getContent().getAsJsonObject().get("body").getAsString();
 
+            Pair<String,String> replyToInfo = getReplyToFromEvent(event);
+
+            boolean isQuickReaction = event.getType().equals("m.reaction");
+            if (isQuickReaction && replyToInfo != null) {
+                messageBody = replyToInfo.second;
+            }
+
             if (TextUtils.isEmpty(messageBody)) {
                 debug("WARN: MESSAGE HAS NO BODY: " + event.toString());
                 return;
@@ -1948,7 +1947,10 @@ public class MatrixConnection extends ImConnection {
                 if (!csa.doesMessageExist(event.eventId)) {
                     MatrixAddress addrSender = new MatrixAddress(event.sender);
 
-                    Message message = downloadMedia (event, messageBody, addrSender);
+                    Message message = null;
+                    if (!isQuickReaction) {
+                        message = downloadMedia(event, messageBody, addrSender);
+                    }
 
                     if (message == null) {
                         message = new Message(messageBody);
@@ -1957,33 +1959,9 @@ public class MatrixConnection extends ImConnection {
                         message.setDateTime(new Date(event.getOriginServerTs()));
                     }
 
-                    String replyToId = null;
-
-                    if (event.getClearEvent() != null) {
-                        if (event.getClearEvent().getContent().getAsJsonObject().has("m.relates_to")) {
-                            JsonObject jObj = event.getClearEvent().getContent().getAsJsonObject().getAsJsonObject("m.relates_to");
-
-                            if (jObj != null && jObj.has("m.in_reply_to")) {
-                                jObj = jObj.getAsJsonObject("m.in_reply_to");
-                                if (jObj != null && jObj.has("event_id"))
-                                    replyToId = jObj.get("event_id").getAsString();
-                            }
-                        }
-
+                    if (replyToInfo != null) {
+                        message.setReplyId(replyToInfo.first);
                     }
-                    else if (event.getContent().getAsJsonObject().has("m.relates_to")) {
-                        JsonObject jObj = event.getContent().getAsJsonObject().getAsJsonObject("m.relates_to");
-
-                        if (jObj != null && jObj.has("m.in_reply_to"))
-                        {
-                            jObj = jObj.getAsJsonObject("m.in_reply_to");
-                            if (jObj != null) {
-                                replyToId = jObj.get("event_id").getAsString();
-                            }
-                        }
-                    }
-
-                    message.setReplyId(replyToId);
 
                     boolean isFromMe = addrSender.mAddress.equals(mUser.getAddress().getAddress());
 
@@ -2354,7 +2332,7 @@ public class MatrixConnection extends ImConnection {
 
     private void downloadAvatarAsync (final String address, final String url)
     {
-        mExecutor.execute(() -> {
+        mStateExecutor.execute(() -> {
             boolean hasAvatar = DatabaseUtils.doesAvatarHashExist(mContext.getContentResolver(),Imps.Avatars.CONTENT_URI,address,url);
 
             if (!hasAvatar) {
@@ -2508,4 +2486,35 @@ public class MatrixConnection extends ImConnection {
         }, 0, 10000);
     }
 
+    /**
+     * Get "reply to" info from the event. Also, if the event is a reaction, return that.
+     * @param event
+     * @return a Pair<String,String> of originalEventId, reaction.
+     */
+    private Pair<String, String> getReplyToFromEvent(Event event) {
+        Event readEvent = event.getClearEvent() != null ? event.getClearEvent() : event;
+        JsonObject json = readEvent.getContent().getAsJsonObject();
+        if (json.has("m.relates_to")) {
+            JsonObject jObj = json.getAsJsonObject("m.relates_to");
+
+            String reaction = null;
+            String eventId = null;
+
+            if (jObj != null) {
+                if (jObj.has("key")) {
+                    reaction = jObj.get("key").getAsString();
+                }
+                if (jObj.has("event_id")) {
+                    eventId = jObj.get("event_id").getAsString();
+                } else if (jObj.has("m.in_reply_to")) {
+                    JsonObject jObj2 = jObj.getAsJsonObject("m.in_reply_to");
+                    if (jObj2 != null && jObj2.has("event_id")) {
+                        eventId = jObj2.get("event_id").getAsString();
+                    }
+                }
+            }
+            return new Pair<>(eventId, reaction);
+        }
+        return null;
+    }
 }

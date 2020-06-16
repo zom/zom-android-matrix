@@ -38,6 +38,7 @@ import info.guardianproject.keanuapp.ui.widgets.ImageViewActivity;
 import info.guardianproject.keanuapp.ui.widgets.LetterAvatar;
 import info.guardianproject.keanuapp.ui.widgets.MessageViewHolder;
 import info.guardianproject.keanuapp.ui.widgets.PdfViewActivity;
+import info.guardianproject.keanuapp.ui.widgets.QuickReactionsRecyclerViewAdapter;
 import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
 import info.guardianproject.keanuapp.ui.widgets.WebViewActivity;
 
@@ -94,6 +95,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.stefanosiano.powerful_libraries.imageview.PowerfulImageView;
@@ -103,7 +105,7 @@ import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 import static info.guardianproject.keanu.core.KeanuConstants.SMALL_AVATAR_HEIGHT;
 import static info.guardianproject.keanu.core.KeanuConstants.SMALL_AVATAR_WIDTH;
 
-public class MessageListItem extends FrameLayout {
+public class MessageListItem extends RelativeLayout {
 
     public enum DeliveryState {
         NEUTRAL, DELIVERED, UNDELIVERED
@@ -235,8 +237,10 @@ public class MessageListItem extends FrameLayout {
         mHolder.mAudioContainer.setVisibility(View.GONE);
         mHolder.mMediaContainer.setVisibility(View.GONE);
         mHolder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
+        mHolder.mPacketId = packetId;
 
         this.packetId = packetId;
+
 
         if (nickname.startsWith("@"))
             nickname = new MatrixAddress(userAddress).getUser();
@@ -1112,8 +1116,8 @@ public class MessageListItem extends FrameLayout {
 
             RoundedAvatarDrawable avatar = null;
 
-            try { avatar = (RoundedAvatarDrawable)DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);}
-            catch (Exception e){}
+         //   try { avatar = (RoundedAvatarDrawable)DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);}
+         //   catch (Exception e){}
 
             if (avatar != null)
             {
@@ -1415,7 +1419,12 @@ public class MessageListItem extends FrameLayout {
             else
             {
                 mHolder.mContainer.setBackgroundResource(R.drawable.message_view_rounded_light);
+            }
 
+            if (themeColorHeader != -1) {
+                QuickReactionsRecyclerViewAdapter.setThemeColor(getContext(), themeColorHeader);
+            } else {
+                QuickReactionsRecyclerViewAdapter.setThemeColor(getContext(), ContextCompat.getColor(getContext(), R.color.app_accent));
             }
         }
 

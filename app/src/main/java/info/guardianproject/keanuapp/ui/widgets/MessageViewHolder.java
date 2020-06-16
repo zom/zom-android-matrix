@@ -10,17 +10,25 @@ import android.widget.TextView;
 
 
 import com.stefanosiano.powerful_libraries.imageview.PowerfulImageView;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
 
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.conversation.MessageListItem;
+import info.guardianproject.keanuapp.ui.conversation.QuickReaction;
 
 /**
  * Created by n8fr8 on 12/11/15.
  */
-public class MessageViewHolder extends MediaViewHolder
-{
+public class MessageViewHolder extends MediaViewHolder implements QuickReactionsRecyclerViewAdapter.QuickReactionsRecyclerViewAdapterListener {
     public interface OnImageClickedListener {
         void onImageClicked(MessageViewHolder viewHolder, Uri image);
+    }
+
+    public interface OnQuickReactionClickedListener {
+        void onQuickReactionClicked(MessageViewHolder viewHolder, QuickReaction quickReaction, String messageId);
     }
 
     public TextView mTextViewForMessages;
@@ -33,6 +41,7 @@ public class MessageViewHolder extends MediaViewHolder
    public ProgressBar progress;
 
 
+    public RecyclerView mQuickReactionContainer;
    // public VisualizerView mVisualizerView;
    // public ImageView mAudioButton;
 
@@ -41,7 +50,10 @@ public class MessageViewHolder extends MediaViewHolder
     // if the holder was reused, the pair is broken
 
     private OnImageClickedListener onImageClickedListener;
+    private OnQuickReactionClickedListener onQuickReactionClickedListener;
     public AudioWife mAudioWife;
+
+    public String mPacketId; //this is the message ID
 
     public MessageViewHolder(View view) {
         super(view);
@@ -53,6 +65,7 @@ public class MessageViewHolder extends MediaViewHolder
         mAudioContainer = (ViewGroup)view.findViewById(R.id.audio_container);
         mMediaThumbnail = (PowerfulImageView)view.findViewById(R.id.media_thumbnail);
         progress  = (ProgressBar)view.findViewById(R.id.progress);
+        mQuickReactionContainer = view.findViewById(R.id.quick_reaction_container);
        // mVisualizerView = (VisualizerView) view.findViewById(R.id.audio_view);
        // mAudioButton = (ImageView) view.findViewById(R.id.audio_button);
 
@@ -67,7 +80,11 @@ public class MessageViewHolder extends MediaViewHolder
         this.onImageClickedListener = listener;
     }
 
-    public void setOnClickListenerMediaThumbnail( final String mimeType, final Uri mediaUri ) {
+    public void setOnQuickReactionClickedListener(OnQuickReactionClickedListener onQuickReactionClickedListener) {
+        this.onQuickReactionClickedListener = onQuickReactionClickedListener;
+    }
+
+    public void setOnClickListenerMediaThumbnail(final String mimeType, final Uri mediaUri ) {
 
         if (mimeType.startsWith("audio") && mAudioContainer != null)
         {
@@ -113,5 +130,24 @@ public class MessageViewHolder extends MediaViewHolder
     public void setLayoutInflater (LayoutInflater layoutInflater)
     {
         mLayoutInflater = layoutInflater;
+    }
+
+    public void setReactions(ArrayList<QuickReaction> quickReactions) {
+        if (mQuickReactionContainer != null) {
+            if (quickReactions != null && quickReactions.size() > 0) {
+                QuickReactionsRecyclerViewAdapter adapter = new QuickReactionsRecyclerViewAdapter(itemView.getContext(), quickReactions);
+                mQuickReactionContainer.setAdapter(adapter);
+                adapter.setListener(this);
+            } else {
+                mQuickReactionContainer.setAdapter(null);
+            }
+        }
+    }
+
+    @Override
+    public void onReactionClicked(QuickReaction reaction) {
+        if (onQuickReactionClickedListener != null) {
+            onQuickReactionClickedListener.onQuickReactionClicked(this, reaction, mPacketId);
+        }
     }
 }
