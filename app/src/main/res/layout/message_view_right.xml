@@ -24,16 +24,18 @@
 	android:padding="3dp"
 	android:layout_margin="6dp"
 	android:descendantFocusability="blocksDescendants"
-
+	android:gravity="end"
+	android:layout_gravity="end"
 	>
 
 	<LinearLayout
 		android:id="@+id/message_container"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_gravity="right"
-		android:gravity="right"
+		android:layout_gravity="end"
+		android:gravity="end"
 		android:orientation="vertical"
+		android:layout_marginLeft="36dp"
 		>
 		<LinearLayout
 			android:id="@+id/audio_container"
@@ -43,11 +45,7 @@
 			android:descendantFocusability="blocksDescendants"
 			android:visibility="gone"
 			android:orientation="horizontal"
-			>
-
-		</LinearLayout>
-
-
+			/>
 
 		<info.guardianproject.keanu.core.type.CustomTypefaceTextView
 			android:id="@+id/message"
@@ -56,10 +54,11 @@
 			android:fontFamily="sans-serif-light"
 			android:textAppearance="?android:attr/textAppearanceMedium"
 			android:padding="6dp"
-			android:layout_gravity="top|left"
-			android:gravity="left"
+			android:layout_gravity="top|start"
+			android:gravity="start"
 			android:textAlignment="gravity"
 			android:color="?messageTextPrimary"
+			android:text=""
 			/>
 
 
@@ -79,7 +78,6 @@
 				android:layout_height="wrap_content"
 				app:piv_shape_mode="normal"
 				app:piv_shape_scaleType="centerCrop"
-
 				/>
 			<ImageView
 				android:id="@+id/media_thumbnail_play"
