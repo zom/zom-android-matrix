@@ -1994,11 +1994,6 @@ public class MatrixConnection extends ImConnection {
 
                     csa.setContactTyping(new Contact(addrSender), false);
 
-                    if (room != null)
-                    {
-                        mExecutor.execute(() -> updateGroup(room));
-                    }
-
                     // if we send here, things go wrong
                    // sendMessageRead(event.roomId, event.eventId);
                 }
