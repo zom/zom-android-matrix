@@ -22,6 +22,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ClipboardManager;
@@ -66,6 +67,7 @@ import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.ContextMenu;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -147,6 +149,7 @@ import info.guardianproject.keanuapp.ui.stickers.StickerSelectListener;
 import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
 import info.guardianproject.keanuapp.ui.widgets.ImageViewActivity;
 import info.guardianproject.keanuapp.ui.widgets.MessageViewHolder;
+import info.guardianproject.keanuapp.ui.widgets.PopupDialog;
 import info.guardianproject.keanuapp.ui.widgets.ShareRequest;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
@@ -1769,7 +1772,6 @@ public class ConversationView {
             int nicknameCol = newCursor.getColumnIndexOrThrow(Imps.Messages.NICKNAME);
             int bodyCol = newCursor.getColumnIndexOrThrow(Imps.Messages.BODY);
 
-            ArrayList<QuickReaction> quickReactions = new ArrayList<>();
             Map<String, QuickReaction> map = new HashMap<>();
 
             while (newCursor.moveToNext())
@@ -1777,7 +1779,7 @@ public class ConversationView {
                 String reaction = newCursor.getString(bodyCol);
                 String address = newCursor.getString(nicknameCol);
 
-                if (!TextUtils.isEmpty(address)) {
+                if (!TextUtils.isEmpty(address) && reaction != null && EmojiUtils.isOnlyEmojis(reaction)) {
                     QuickReaction react = map.get(reaction);
                     if (react == null) {
                         react = new QuickReaction(reaction, null);
@@ -1787,13 +1789,10 @@ public class ConversationView {
                     if (address.equals(((ImApp) ((Activity) context).getApplication()).getDefaultUsername())) {
                         react.sentByMe = true;
                     }
-                    if (reaction != null && EmojiUtils.isOnlyEmojis(reaction)) {
-                        quickReactions.add(react);
-                    }
                 }
             }
 
-            messageViewHolder.setReactions(quickReactions);
+            messageViewHolder.setReactions(new ArrayList<>(map.values()));
             newCursor.setNotificationUri(context.getContentResolver(), mUri);
         }
 
@@ -2924,11 +2923,29 @@ public class ConversationView {
             }
 
             // Set quick reaction listener
-            viewHolder.itemView.setOnClickListener(v -> {
-                // Pick emoji as quick reaction
-                showQuickReactionsPopup(packetId, (View)mHistory.getParent());
-            });
-
+            View contextMenuView = (messageType == Imps.MessageType.INCOMING) ?
+                viewHolder.mAvatar :
+                (viewHolder.itemView.findViewById(R.id.message_container) != null) ? viewHolder.itemView.findViewById(R.id.message_container) : viewHolder.itemView;
+            if (contextMenuView != null) {
+                contextMenuView.setOnCreateContextMenuListener((menu, v, menuInfo) -> {
+                    mActivity.getMenuInflater().inflate(R.menu.menu_message_avatar, menu);
+                    menu.findItem(R.id.menu_message_add_qr).setOnMenuItemClickListener(item -> {
+                        // Pick emoji as quick reaction
+                        contextMenuView.post(() -> showQuickReactionsPopup(packetId, (View) mHistory.getParent()));
+                        return true;
+                    });
+                });
+                contextMenuView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            v.showContextMenu(v.getWidth() / 2.0f, v.getHeight() / 2.0f);
+                        } else {
+                            v.showContextMenu();
+                        }
+                    }
+                });
+            }
 
             sendMessageRead(packetId);
             loadMessageReplies(viewHolder, packetId);
