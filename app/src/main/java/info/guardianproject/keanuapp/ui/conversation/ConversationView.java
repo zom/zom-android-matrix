@@ -1682,8 +1682,17 @@ public class ConversationView {
     protected Loader<Cursor> createLoader() {
         // For now, assume Quick Reactions are only 1 char long. We don't want to show them as
         // "separate messages", so filter those out here.
-        String selection = Imps.Messages.REPLY_ID + " IS NULL OR " +
-                "LENGTH(" + Imps.Messages.BODY + ") > 1";
+        String selection =
+                Imps.Messages.REPLY_ID + " IS NULL" +
+                        " OR " +
+                "LENGTH(" + Imps.Messages.BODY + ") > 2" +
+                        " OR " +
+                        "(" +
+                            "UNICODE("+ Imps.Messages.BODY+") NOT IN (0x2b05,0x2b06,0x2b07,0x2934,0x2935,0x3297,0x3298,0x3299,0xa9,0xae,0x303d,0x3030,0x2b55,0x2b1c,0x2b1b,0x2b50) AND " +
+                            "(UNICODE("+ Imps.Messages.BODY+") > 0x1f9ff OR UNICODE("+ Imps.Messages.BODY+") < 0x1d000) AND " +
+                            "(UNICODE("+ Imps.Messages.BODY+") > 0x27ff OR UNICODE("+Imps.Messages.BODY+") < 0x2100)" +
+                        ")"
+                ;
         CursorLoader loader = new CursorLoader(mActivity, mUri, null, selection, null, Imps.Messages.DEFAULT_SORT_ORDER);
         return loader;
     }
