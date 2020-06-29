@@ -781,7 +781,7 @@ public class MatrixConnection extends ImConnection {
 
         try {
 
-            byte[] avatar = DatabaseUtils.getAvatarBytesFromAddress(mContext.getContentResolver(), mUser.getAddress().getAddress());
+            byte[] avatar = DatabaseUtils.getAvatarBytesFromAddress( mUser.getAddress().getAddress());
             if (avatar != null) {
                 InputStream stream = new ByteArrayInputStream(avatar);
                 String filename = nickname+"-avatar.jpg";
@@ -1552,6 +1552,12 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onRoomTagEvent(String s) {
             debug ("onRoomTagEvent: " + s);
+
+        }
+
+        @Override
+        public void onTaggedEventsEvent(String s) {
+            debug ("onTaggedEventsEvent: " + s);
 
         }
 
@@ -2488,27 +2494,29 @@ public class MatrixConnection extends ImConnection {
      */
     private Pair<String, String> getReplyToFromEvent(Event event) {
         Event readEvent = event.getClearEvent() != null ? event.getClearEvent() : event;
-        JsonObject json = readEvent.getContent().getAsJsonObject();
-        if (json.has("m.relates_to")) {
-            JsonObject jObj = json.getAsJsonObject("m.relates_to");
+        if (!readEvent.getContent().isJsonNull()) {
+            JsonObject json = readEvent.getContent().getAsJsonObject();
+            if (json.has("m.relates_to")) {
+                JsonObject jObj = json.getAsJsonObject("m.relates_to");
 
-            String reaction = null;
-            String eventId = null;
+                String reaction = null;
+                String eventId = null;
 
-            if (jObj != null) {
-                if (jObj.has("key")) {
-                    reaction = jObj.get("key").getAsString();
-                }
-                if (jObj.has("event_id")) {
-                    eventId = jObj.get("event_id").getAsString();
-                } else if (jObj.has("m.in_reply_to")) {
-                    JsonObject jObj2 = jObj.getAsJsonObject("m.in_reply_to");
-                    if (jObj2 != null && jObj2.has("event_id")) {
-                        eventId = jObj2.get("event_id").getAsString();
+                if (jObj != null) {
+                    if (jObj.has("key")) {
+                        reaction = jObj.get("key").getAsString();
+                    }
+                    if (jObj.has("event_id")) {
+                        eventId = jObj.get("event_id").getAsString();
+                    } else if (jObj.has("m.in_reply_to")) {
+                        JsonObject jObj2 = jObj.getAsJsonObject("m.in_reply_to");
+                        if (jObj2 != null && jObj2.has("event_id")) {
+                            eventId = jObj2.get("event_id").getAsString();
+                        }
                     }
                 }
+                return new Pair<>(eventId, reaction);
             }
-            return new Pair<>(eventId, reaction);
         }
         return null;
     }

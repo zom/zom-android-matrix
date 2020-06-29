@@ -2668,11 +2668,12 @@ public class KeanuMXFileStore extends MXMemoryStore {
         mMetaDataHasChanged = true;
     }
 
+    /**
     @Override
     public void setRoomsWithoutURLPreview(Set<String> roomIds) {
         super.setRoomsWithoutURLPreview(roomIds);
         mMetaDataHasChanged = true;
-    }
+    }**/
 
     @Override
     public void setUserWidgets(Map<String, Object> contentDict) {
