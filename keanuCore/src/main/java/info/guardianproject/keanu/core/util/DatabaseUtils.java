@@ -18,10 +18,19 @@
 package info.guardianproject.keanu.core.util;
 
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.util.Map;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.FileUtils;
+import org.w3c.dom.Text;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -35,6 +44,8 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
+import info.guardianproject.iocipher.File;
+import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.keanu.core.plugin.ImConfigNames;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.ui.RoundedAvatarDrawable;
@@ -60,6 +71,7 @@ public class DatabaseUtils {
         return c;
     }
 
+    /**
     public static RoundedAvatarDrawable getAvatarFromCursor(Cursor cursor, int dataColumn, int width, int height) throws DecoderException {
         String hexData = cursor.getString(dataColumn);
         if (hexData.equals("NULL")) {
@@ -78,15 +90,15 @@ public class DatabaseUtils {
 
         byte[] data = Hex.decodeHex(hexData.substring(2, hexData.length() - 1).toCharArray());
         return decodeSquareAvatar(data, width, height);
+    }**/
+
+    public static Drawable getAvatarFromAddress(String address, int width, int height) throws DecoderException {
+        return getAvatarFromAddress(address,width,height,true);
     }
 
-    public static Drawable getAvatarFromAddress(ContentResolver cr, String address, int width, int height) throws DecoderException {
-        return getAvatarFromAddress(cr,address,width,height,true);
-    }
+    public static Drawable getAvatarFromAddress(String address, int width, int height, boolean getRound) throws DecoderException {
 
-    public static Drawable getAvatarFromAddress(ContentResolver cr, String address, int width, int height, boolean getRound) throws DecoderException {
-
-        byte[] data = getAvatarBytesFromAddress(cr, address);
+        byte[] data = getAvatarBytesFromAddress(address);
 
         if (data != null)
             if (getRound)
@@ -98,11 +110,34 @@ public class DatabaseUtils {
 
     }
 
-    public static byte[] getAvatarBytesFromAddress(ContentResolver cr, String address) throws DecoderException {
+    private final static String ROOM_AVATAR_ACCESS = "avatarcache";
+    public static byte[] getAvatarBytesFromAddress(String address) throws DecoderException {
 
         byte[] data = null;
 
         if (!TextUtils.isEmpty(address)) {
+
+            info.guardianproject.iocipher.File fileAvatar = null;
+            try {
+                fileAvatar = openSecureStorageFile(ROOM_AVATAR_ACCESS, address);
+
+                if (fileAvatar.exists()) {
+                    try {
+                        data = new byte[(int) fileAvatar.length()];
+                        BufferedInputStream buf = new BufferedInputStream(new info.guardianproject.iocipher.FileInputStream(fileAvatar));
+                        buf.read(data, 0, data.length);
+                        buf.close();
+                        return data;
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            /**
             String[] projection = {Imps.Avatars.DATA};
             String[] args = {address};
             String query = Imps.Avatars.CONTACT + " LIKE ?";
@@ -115,36 +150,67 @@ public class DatabaseUtils {
                     data = cursor.getBlob(0);
 
                 cursor.close();
-            }
+            }**/
         }
 
         return data;
 
     }
 
+    /**
     public static Uri getAvatarUri(Uri baseUri, long providerId, long accountId) {
         Uri.Builder builder = baseUri.buildUpon();
         ContentUris.appendId(builder, providerId);
         ContentUris.appendId(builder, accountId);
         return builder.build();
-    }
+    }**/
 
     public static int updateAvatarBlob(ContentResolver resolver, Uri updateUri, byte[] data,
             String username) {
-        ContentValues values = new ContentValues(1);
-        values.put(Imps.Avatars.DATA, data);
+        /**
+         ContentValues values = new ContentValues(1);
+         values.put(Imps.Avatars.DATA, data);
 
-        StringBuilder buf = new StringBuilder(Imps.Avatars.CONTACT);
-        buf.append(" LIKE ?");
+         StringBuilder buf = new StringBuilder(Imps.Avatars.CONTACT);
+         buf.append(" LIKE ?");
 
-        String[] selectionArgs = new String[] { username };
+         String[] selectionArgs = new String[] { username };
 
-        return resolver.update(updateUri, values, buf.toString(), selectionArgs);
+         return resolver.update(updateUri, values, buf.toString(), selectionArgs);
+         **/
+        if (!TextUtils.isEmpty(username)) {
+            try {
+                info.guardianproject.iocipher.File fileAvatar = openSecureStorageFile(ROOM_AVATAR_ACCESS, username);
+                BufferedOutputStream buf = new BufferedOutputStream(new info.guardianproject.iocipher.FileOutputStream(fileAvatar));
+                buf.write(data, 0, data.length);
+                buf.close();
+                return 1;
+            } catch (Exception e) {
+                e.printStackTrace();
 
+            }
+        }
+
+        return 0;
     }
+
+    private static final String ReservedChars = "[|\\?*<\":>+/']";
+
+    private static File openSecureStorageFile(String sessionId, String filename) throws FileNotFoundException {
+//        debug( "openFile: url " + url) ;
+        String localFilename = "/" + sessionId + "/download/" + filename.replaceAll(ReservedChars, "_");
+
+        //  debug( "openFile: localFilename " + localFilename) ;
+        info.guardianproject.iocipher.File fileNew = new info.guardianproject.iocipher.File(localFilename);
+        fileNew.getParentFile().mkdirs();
+
+        return fileNew;
+    }
+
 
     public static boolean hasAvatarContact(ContentResolver resolver, Uri updateUri,
             String username) {
+        /**
         ContentValues values = new ContentValues(3);
         values.put(Imps.Avatars.CONTACT, username);
 
@@ -154,12 +220,23 @@ public class DatabaseUtils {
         String[] selectionArgs = new String[] { username };
 
         return resolver.update(updateUri, values, buf.toString(), selectionArgs) > 0;
+         **/
+        File fileAvatar = null;
+        try {
+            fileAvatar = openSecureStorageFile(ROOM_AVATAR_ACCESS,username);
+            return fileAvatar.exists();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+
 
     }
 
     public static boolean doesAvatarHashExist(ContentResolver resolver, Uri queryUri,
             String jid, String hash) {
 
+        /**
         StringBuilder buf = new StringBuilder(Imps.Avatars.CONTACT);
         buf.append("=?");
         buf.append(" AND ");
@@ -175,12 +252,14 @@ public class DatabaseUtils {
             return cursor.getCount() > 0;
         } finally {
             cursor.close();
-        }
+        }**/
+        return false;
     }
 
     public static void insertAvatarBlob(ContentResolver resolver, Uri updateUri, long providerId, long accountId, byte[] data, String hash,
             String contact) {
 
+        /**
         ContentValues values = new ContentValues(5);
         values.put(Imps.Avatars.CONTACT, contact);
         values.put(Imps.Avatars.DATA, data);
@@ -189,6 +268,8 @@ public class DatabaseUtils {
         values.put(Imps.Avatars.HASH, hash);
 
         Uri resultUri = resolver.insert(updateUri, values);
+         **/
+        updateAvatarBlob(resolver,updateUri,data,contact);
 
     }
 

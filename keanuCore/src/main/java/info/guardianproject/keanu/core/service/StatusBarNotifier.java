@@ -97,7 +97,7 @@ public class StatusBarNotifier {
         Bitmap avatar = null;
 
 
-        try { byte[] bdata = DatabaseUtils.getAvatarBytesFromAddress(mContext.getContentResolver(), username);
+        try { byte[] bdata = DatabaseUtils.getAvatarBytesFromAddress(username);
             avatar = BitmapFactory.decodeByteArray(bdata, 0, bdata.length);
         }
         catch (Exception e){}

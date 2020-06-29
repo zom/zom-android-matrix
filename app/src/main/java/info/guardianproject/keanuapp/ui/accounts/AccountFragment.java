@@ -208,7 +208,7 @@ public class AccountFragment extends Fragment {
 
             try {
 
-                Drawable avatar = DatabaseUtils.getAvatarFromAddress(mApp.getContentResolver(), mUserAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, false);
+                Drawable avatar = DatabaseUtils.getAvatarFromAddress(mUserAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, false);
 
                 if (avatar != null)
                     mIvAvatar.setImageDrawable(avatar);

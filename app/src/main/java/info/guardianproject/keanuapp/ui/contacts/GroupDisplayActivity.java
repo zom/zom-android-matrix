@@ -215,7 +215,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                     {
                         try {
 
-                            avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, false);
+                            avatar = DatabaseUtils.getAvatarFromAddress(mAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, false);
 
                             if (avatar != null)
                                 h.avatar.setImageDrawable(avatar);
@@ -410,7 +410,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                          }**/
                         if (member.avatar == null) {
                             try {
-                                member.avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), member.username, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
+                                member.avatar = DatabaseUtils.getAvatarFromAddress(member.username, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
                             } catch (DecoderException e) {
                                 e.printStackTrace();
                             }
@@ -683,7 +683,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 member.username = address.getBareAddress();
                 member.nickname = address.getUser();
                 try {
-                    member.avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), member.username, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
+                    member.avatar = DatabaseUtils.getAvatarFromAddress(member.username, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
                 } catch (DecoderException e) {
                     e.printStackTrace();
                 }

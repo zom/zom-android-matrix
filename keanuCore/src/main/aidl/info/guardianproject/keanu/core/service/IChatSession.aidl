@@ -84,6 +84,10 @@ interface IChatSession {
      */
     void sendMessage(String text, boolean isResend, boolean isEphemeral, boolean setLastMessage, String replyId);
 
+/**
+     * Sends a message to all participants in this ChatSession.
+     */
+    void sendReaction(String text, boolean isResend, String replyId);
 
 
     /**

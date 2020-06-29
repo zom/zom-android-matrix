@@ -444,6 +444,88 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     }
 
+    public void sendReaction(String text, boolean isResend, String replyId) {
+
+        if (mConnection.getState() != ImConnection.LOGGED_IN) {
+            // connection has been suspended, save the message without send it
+            long now = System.currentTimeMillis();
+            insertMessageInDb(null, text, now, Imps.MessageType.QUEUED, null, replyId);
+            return;
+        }
+
+        Message msg = new Message(text);
+        msg.setID(nextID());
+
+        msg.setFrom(mConnection.getLoginUser().getAddress());
+
+        msg.setType(Imps.MessageType.QUEUED);
+
+        msg.setReplyId(replyId);
+
+        long sendTime = System.currentTimeMillis();
+
+        if (!isResend) {
+
+            insertMessageInDb(null, text, sendTime, msg.getType(), 0, msg.getID(), null, replyId);
+        }
+
+        int newType = mChatSession.sendMessageAsync(msg, new ChatSessionListener() {
+
+            @Override
+            public void onChatSessionCreated(ChatSession session) {
+
+            }
+
+            @Override
+            public void onMessageSendSuccess(Message msg, String newMsgId) {
+
+                long sendTime = new Date().getTime();
+
+                if (msg.getDateTime() != null)
+                    sendTime = msg.getDateTime().getTime();
+
+                //  deleteMessageInDb(msg.getID());
+
+                updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, newMsgId);
+
+                msg.setID(newMsgId);
+
+               // if (setLastMessage)
+                 //   setLastMessage(text, sendTime);
+
+            }
+
+            @Override
+            public void onMessageSendFail(Message msg, String newMsgId) {
+                long sendTime = new Date().getTime();
+
+                if (msg.getDateTime() != null)
+                    sendTime = msg.getDateTime().getTime();
+
+                updateMessageInDb(msg.getID(), msg.getType(), sendTime, null, newMsgId);
+
+                msg.setID(newMsgId);
+
+            }
+
+            @Override
+            public void onMessageSendQueued(Message msg, String newMsgId) {
+                long sendTime = new Date().getTime();
+
+                if (msg.getDateTime() != null)
+                    sendTime = msg.getDateTime().getTime();
+
+                updateMessageInDb(msg.getID(), Imps.MessageType.SENDING, sendTime, null, newMsgId);
+
+                msg.setID(newMsgId);
+
+            }
+        });
+
+
+
+    }
+
     private Message storeMediaMessage(String mediaPath, String mimeType, String fileName) {
 
         String msgBody = mediaPath;

@@ -68,10 +68,8 @@ public class GlideUtils {
                 info.guardianproject.iocipher.File fileImage = new info.guardianproject.iocipher.File(uri.getPath());
                 if (fileImage.exists())
                 {
-                    FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(fileImage);
-
                     Glide.with(context)
-                            .load(fis)
+                            .load(new info.guardianproject.iocipher.FileInputStream(fileImage))
                             .apply(noDiskCacheOptions)
                             .into(imageView);
                 }

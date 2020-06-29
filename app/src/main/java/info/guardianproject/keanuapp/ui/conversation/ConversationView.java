@@ -1588,7 +1588,7 @@ public class ConversationView {
 
         if (mRemoteAvatar == null)
         {
-            try {mRemoteAvatar = DatabaseUtils.getAvatarFromCursor(c, AVATAR_COLUMN, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT);}
+             try {mRemoteAvatar = (RoundedAvatarDrawable) DatabaseUtils.getAvatarFromAddress(mRemoteAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT);}
             catch (Exception e){}
 
             if (mRemoteAvatar == null)
@@ -1603,7 +1603,7 @@ public class ConversationView {
 
         if (mRemoteHeader == null)
         {
-            try {mRemoteHeader = DatabaseUtils.getHeaderImageFromCursor(c, AVATAR_COLUMN, DEFAULT_AVATAR_WIDTH,DEFAULT_AVATAR_HEIGHT);}
+            try {mRemoteHeader = DatabaseUtils.getAvatarFromAddress(mRemoteAddress, DEFAULT_AVATAR_WIDTH,DEFAULT_AVATAR_HEIGHT);}
             catch (Exception e){}
         }
 
@@ -2155,7 +2155,7 @@ public class ConversationView {
 
             @Override
             protected Boolean doInBackground(String[] msgs) {
-                return sendMessage(msgs[0],false,replyId);
+                return sendMessage(msgs[0],false,replyId, false);
             }
 
             @Override
@@ -2173,7 +2173,7 @@ public class ConversationView {
 
     }
 
-    boolean sendMessage(String msg, boolean isResend, String replyId) {
+    boolean sendMessage(String msg, boolean isResend, String replyId, boolean isQuickReaction) {
 
         //don't send empty messages
         if (TextUtils.isEmpty(msg.trim())) {
@@ -2189,7 +2189,10 @@ public class ConversationView {
             createChatSession();
         else {
             try {
-                session.sendMessage(msg, isResend, false, true, replyId);
+                if (isQuickReaction)
+                   session.sendReaction(msg,isResend,replyId);
+                else
+                    session.sendMessage(msg, isResend, false, true, replyId);
                 return true;
                 //requeryCursor();
             } catch (RemoteException e) {
@@ -3183,7 +3186,7 @@ public class ConversationView {
     }
 
     private void sendQuickReaction(String reaction, String messageId) {
-        sendMessage(reaction,false,messageId);
+        sendMessage(reaction,false,messageId,true);
     }
     private class DownloadAudio extends AsyncTask<Object, Void, Long> {
         String storagePath = null;
