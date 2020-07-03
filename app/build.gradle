@@ -58,7 +58,17 @@ android {
 
     productFlavors {
 
+        altbrand {
+            dimension = "release"
+            applicationId "im.zom.messenger"
+            versionCode 215000100
+            versionName "2.1.5-BETA-1"
+            archivesBaseName = "Zom-$versionName"
+        }
 
+
+
+        /**
         primary {// Assigns this product flavor to the "mode" flavor dimension.
             dimension "release"
             versionCode 48000
@@ -68,15 +78,7 @@ android {
             versionNameSuffix "-altbrand"
         }
 
-        altbrand {
-            dimension = "release"
-            applicationId "im.zom.messenger"
-            versionCode 2140002
-            versionName "2.1.4-BETA-2"
-            archivesBaseName = "Zom-$versionName"
-        }
 
-        /**
         altbrandArm32 {
             dimension = "release"
             applicationId "im.zom.messenger"
@@ -197,8 +199,6 @@ dependencies {
     def lifecycle_version = "2.2.0"
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
     implementation "androidx.exifinterface:exifinterface:1.2.0"
-<<<<<<< HEAD
-
 
     implementation 'commons-codec:commons-codec:1.10'
     implementation 'commons-io:commons-io:2.6'
@@ -243,8 +243,7 @@ dependencies {
 
 
     implementation "androidx.exifinterface:exifinterface:1.1.0"
-=======
->>>>>>> 056f5d7d3ae65e717e688916c4dfed8754dcc0c8
+
     implementation 'com.gsconrad:richcontentedittext:1.0.0'
 
     //html wysiwyg editor
@@ -258,6 +257,10 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
     // Emojis
     implementation 'com.vanniktech:emoji-google:0.7.0-SNAPSHOT'
+
+    //Alerter
+    implementation 'com.tapadoo.android:alerter:5.1.2'
+
 }
 
 // Map for the version code that gives each ABI a value.
