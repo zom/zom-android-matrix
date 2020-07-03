@@ -25,17 +25,18 @@
 	android:layout_margin="6dp"
 	android:descendantFocusability="blocksDescendants"
 	android:gravity="end"
-	android:layout_gravity="end"
+	android:layout_gravity="end|right"
 	>
 
 	<LinearLayout
 		android:id="@+id/message_container"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"
-		android:layout_gravity="end"
-		android:gravity="end"
+		android:layout_gravity="end|right"
+		android:gravity="end|right"
 		android:orientation="vertical"
 		android:layout_marginLeft="36dp"
+		android:layout_alignParentEnd="true"
 		>
 		<LinearLayout
 			android:id="@+id/audio_container"

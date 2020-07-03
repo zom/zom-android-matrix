@@ -343,16 +343,7 @@
 
                 />
 
-            <info.guardianproject.keanu.core.type.CustomTypefaceTextView
-                android:layout_width="0dip"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/push_to_talk"
-                android:padding="2dp"
-                android:id="@+id/buttonHoldToTalk"
-                android:visibility="gone"
-                style="@android:style/Widget.Button"
-                />
+
             <ImageButton
                 android:id="@+id/btnAttachSticker"
                 android:src="@drawable/ic_insert_emoticon_white_36dp"
