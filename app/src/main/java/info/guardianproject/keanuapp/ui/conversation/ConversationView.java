@@ -17,11 +17,13 @@
 
 package info.guardianproject.keanuapp.ui.conversation;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.ClipboardManager;
@@ -30,6 +32,7 @@ import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.CharArrayBuffer;
 import android.database.ContentObserver;
@@ -45,11 +48,16 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.provider.Browser;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.annotation.NonNull;
 import androidx.core.view.inputmethod.InputContentInfoCompat;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
@@ -58,12 +66,14 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.ActionMode;
+import android.view.ContextMenu;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -74,6 +84,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -87,14 +98,32 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gsconrad.richcontentedittext.RichContentEditText;
+import com.stefanosiano.powerful_libraries.imageview.blur.PivBlurMode;
 import com.tougee.recorderview.AudioRecordView;
+import com.vanniktech.emoji.EmojiEditText;
+import com.vanniktech.emoji.EmojiImageView;
+import com.vanniktech.emoji.EmojiPopup;
+import com.vanniktech.emoji.EmojiUtils;
+import com.vanniktech.emoji.SingleEmojiTrait;
+import com.vanniktech.emoji.emoji.Emoji;
+import com.vanniktech.emoji.listeners.OnEmojiClickListener;
+import com.vanniktech.emoji.listeners.OnEmojiPopupDismissListener;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 
+import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.type.CustomTypefaceEditText;
@@ -135,7 +164,9 @@ import info.guardianproject.keanuapp.ui.stickers.StickerSelectListener;
 import info.guardianproject.keanuapp.ui.widgets.CursorRecyclerViewAdapter;
 import info.guardianproject.keanuapp.ui.widgets.ImageViewActivity;
 import info.guardianproject.keanuapp.ui.widgets.MessageViewHolder;
+import info.guardianproject.keanuapp.ui.widgets.PopupDialog;
 import info.guardianproject.keanuapp.ui.widgets.ShareRequest;
+import info.guardianproject.keanuapp.ui.widgets.VideoViewActivity;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
@@ -749,7 +780,6 @@ public class ConversationView {
 
         mSendButton = (ImageButton) mActivity.findViewById(R.id.btnSend);
        // mMicButton = (ImageButton) mActivity.findViewById(R.id.btnMic);
-        mButtonTalk = (TextView)mActivity.findViewById(R.id.buttonHoldToTalk);
 
         mButtonDeleteVoice = (ImageView)mActivity.findViewById(R.id.btnDeleteVoice);
         mViewDeleteVoice = mActivity.findViewById(R.id.viewDeleteVoice);
@@ -861,171 +891,39 @@ public class ConversationView {
         }
 
         mAudioRecordView = mActivity.findViewById(R.id.record_view);
-        mAudioRecordView.activity = mActivity;
-
-        mAudioRecordView.callback = new AudioRecordView.Callback() {
-            @Override
-            public void onRecordStart(boolean b) {
-                //onRecordStart
-                Log.d("AudioRecord","onRecordStart: " + b);
-                mActivity.startAudioRecording();
-            }
-
-            @Override
-            public boolean isReady() {
-                return true;
-            }
-
-            @Override
-            public void onRecordEnd() {
-                Log.d("AudioRecord","onRecordEnd");
-                if (mActivity.isAudioRecording()) {
-                    boolean send = true;//inViewInBounds(mMicButton, (int) motionEvent.getX(), (int) motionEvent.getY());
-                    mActivity.stopAudioRecording(send);
+        if(mAudioRecordView != null){
+            mAudioRecordView.setActivity(mActivity);
+            mAudioRecordView.setCallback(new AudioRecordView.Callback() {
+                @Override
+                public void onRecordStart(boolean b) {
+                    Log.d("AudioRecord","onRecordStart: " + b);
+                    mActivity.startAudioRecording();
                 }
-
-            }
-
-            @Override
-            public void onRecordCancel() {
-                Log.d("AudioRecord","onRecordCancel");
-                if (mActivity.isAudioRecording()) {
-                    boolean send = false;
-                    mActivity.stopAudioRecording(send);
-                }
-
-
-            }
-        };
-
-        /**
-        if (mMicButton != null) {
-            mMicButton.setOnClickListener(new View.OnClickListener() {
 
                 @Override
-                public void onClick(View v) {
-
-                    //this is the tap to change to hold to talk mode
-                    if (mMicButton.getVisibility() == View.VISIBLE) {
-                        mComposeMessage.setVisibility(View.GONE);
-                        mMicButton.setVisibility(View.GONE);
-
-                        // Check if no view has focus:
-                        View view = mActivity.getCurrentFocus();
-                        if (view != null) {
-                            InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                        }
-
-                        mSendButton.setImageResource(R.drawable.ic_keyboard_black_36dp);
-                        mSendButton.setVisibility(View.VISIBLE);
-                        mButtonTalk.setVisibility(View.VISIBLE);
-
-                    }
-                }
-
-            });
-        }**/
-
-
-        final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
-            public void onLongPress(MotionEvent e) {
-
-                //this is for recording audio directly from one press
-                mActivity.startAudioRecording();
-
-            }
-
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-
-
-                if (mActivity.isAudioRecording()) {
-                    boolean send = true;//inViewInBounds(mMicButton, (int) motionEvent.getX(), (int) motionEvent.getY());
-                    mActivity.stopAudioRecording(send);
-                }
-
-                return super.onSingleTapUp(e);
-            }
-        });
-
-        /**
-        if (mMicButton != null) {
-            mMicButton.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    return gestureDetector.onTouchEvent(motionEvent);
-
-                }
-            });
-        }**/
-
-        if (mButtonTalk != null) {
-            mButtonTalk.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View btnTalk, MotionEvent theMotion) {
-                    switch (theMotion.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            mActivity.startAudioRecording();
-                            mButtonTalk.setText(mActivity.getString(R.string.recording_release));
-                            mViewDeleteVoice.setVisibility(View.VISIBLE);
-
-                            break;
-                        case MotionEvent.ACTION_MOVE:
-                            boolean inBounds = inViewInBounds(btnTalk, (int) theMotion.getX(), (int) theMotion.getY());
-                            if (!inBounds)
-                                mButtonTalk.setText(mActivity.getString(R.string.recording_delete));
-                            else {
-                                mButtonTalk.setText(mActivity.getString(R.string.recording_release));
-                                mViewDeleteVoice.setVisibility(View.VISIBLE);
-                            }
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            mButtonTalk.setText(mActivity.getString(R.string.push_to_talk));
-                            boolean send = inViewInBounds(btnTalk, (int) theMotion.getX(), (int) theMotion.getY());
-                            mActivity.stopAudioRecording(send);
-                            mViewDeleteVoice.setVisibility(View.GONE);
-
-                            break;
-                    }
+                public boolean isReady() {
                     return true;
+                }
+
+                @Override
+                public void onRecordEnd() {
+                    Log.d("AudioRecord","onRecordEnd");
+                    if (mActivity.isAudioRecording()) {
+                        boolean send = true;//inViewInBounds(mMicButton, (int) motionEvent.getX(), (int) motionEvent.getY());
+                        mActivity.stopAudioRecording(send);
+                    }
+                }
+
+                @Override
+                public void onRecordCancel() {
+                    Log.d("AudioRecord","onRecordCancel");
+                    if (mActivity.isAudioRecording()) {
+                        boolean send = false;
+                        mActivity.stopAudioRecording(send);
+                    }
                 }
             });
         }
-        /**
-        mHistory.setOnItemLongClickListener(new OnItemLongClickListener ()
-        {
-
-            @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-            @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-
-
-             if (arg1 instanceof MessageView)
-             {
-
-                 String textToCopy = ((MessageView)arg1).getLastMessage();
-
-                 int sdk = android.os.Build.VERSION.SDK_INT;
-                 if(sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                     android.text.ClipboardManager clipboard = (android.text.ClipboardManager) mActivity.getSystemService(Context.CLIPBOARD_SERVICE);
-                     clipboard.setText(textToCopy); //
-                 } else {
-                     android.content.ClipboardManager clipboard = (android.content.ClipboardManager) mActivity.getSystemService(Context.CLIPBOARD_SERVICE);
-                     android.content.ClipData clip = android.content.ClipData.newPlainText("chat",textToCopy);
-                     clipboard.setPrimaryClip(clip); //
-                 }
-
-                 Toast.makeText(mActivity, mContext.getString(R.string.toast_chat_copied_to_clipboard), Toast.LENGTH_SHORT).show();
-
-                 return true;
-
-             }
-
-                return false;
-            }
-
-        });**/
 
         mComposeMessage.setOnTouchListener(new View.OnTouchListener()
         {
@@ -1125,7 +1023,10 @@ public class ConversationView {
                 mButtonTalk.setVisibility(View.GONE);
             }
             mComposeMessage.setVisibility(View.VISIBLE);
-            mAudioRecordView.setVisibility(View.VISIBLE);
+            if(mAudioRecordView != null){
+                mAudioRecordView.setVisibility(View.VISIBLE);
+            }
+
 
             //     mMicButton.setVisibility(View.VISIBLE);
         }
@@ -1443,7 +1344,11 @@ public class ConversationView {
 
     public String getTitle ()
     {
-        return mRemoteNickname;
+        if (!TextUtils.isEmpty(mRemoteNickname))
+            return mRemoteNickname;
+        else
+            return mRemoteAddress;
+
 
     }
 
@@ -1501,23 +1406,9 @@ public class ConversationView {
             }
 
             if (mRemoteNickname == null) {
-                StringBuilder buf = new StringBuilder();
-
-                int count = -1;
-
-                try {
-                    buf.append(mCurrentChatSession.getName());
-                    count = mCurrentChatSession.getParticipants().length;
-                } catch (Exception e) {
-                }
-
-                if (count > 0) {
-                    buf.append(" (");
-                    buf.append(count);
-                    buf.append(")");
-                }
-                mRemoteNickname = buf.toString();
+                mRemoteNickname = mRemoteAddress;
             }
+
             mActivity.getSupportActionBar().setTitle(mRemoteNickname);
         }
     }
@@ -1566,7 +1457,7 @@ public class ConversationView {
 
         if (mRemoteAvatar == null)
         {
-            try {mRemoteAvatar = DatabaseUtils.getAvatarFromCursor(c, AVATAR_COLUMN, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT);}
+             try {mRemoteAvatar = (RoundedAvatarDrawable) DatabaseUtils.getAvatarFromAddress(mRemoteAddress, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT);}
             catch (Exception e){}
 
             if (mRemoteAvatar == null)
@@ -1581,7 +1472,7 @@ public class ConversationView {
 
         if (mRemoteHeader == null)
         {
-            try {mRemoteHeader = DatabaseUtils.getHeaderImageFromCursor(c, AVATAR_COLUMN, DEFAULT_AVATAR_WIDTH,DEFAULT_AVATAR_HEIGHT);}
+            try {mRemoteHeader = DatabaseUtils.getAvatarFromAddress(mRemoteAddress, DEFAULT_AVATAR_WIDTH,DEFAULT_AVATAR_HEIGHT);}
             catch (Exception e){}
         }
 
@@ -1648,6 +1539,9 @@ public class ConversationView {
     private LoaderManager mLoaderManager;
     protected int loaderId = 100001;
 
+    // This will map a message id to a loader for replies to that id
+    protected Map<String,Integer> eventReplyLoaders = new HashMap<String, Integer>();
+
     private synchronized void startQuery(long chatId) {
 
         mUri = Imps.Messages.getContentUriByThreadId(chatId);
@@ -1662,7 +1556,20 @@ public class ConversationView {
     }
 
     protected Loader<Cursor> createLoader() {
-        CursorLoader loader = new CursorLoader(mActivity, mUri, null, null, null, Imps.Messages.DEFAULT_SORT_ORDER);
+        // For now, assume Quick Reactions are only 1 char long. We don't want to show them as
+        // "separate messages", so filter those out here.
+        String selection =
+                Imps.Messages.REPLY_ID + " IS NULL" +
+                        " OR " +
+                "LENGTH(" + Imps.Messages.BODY + ") > 2" +
+                        " OR " +
+                        "(" +
+                            "UNICODE("+ Imps.Messages.BODY+") NOT IN (0x2b05,0x2b06,0x2b07,0x2934,0x2935,0x3297,0x3298,0x3299,0xa9,0xae,0x303d,0x3030,0x2b55,0x2b1c,0x2b1b,0x2b50) AND " +
+                            "(UNICODE("+ Imps.Messages.BODY+") > 0x1f9ff OR UNICODE("+ Imps.Messages.BODY+") < 0x1d000) AND " +
+                            "(UNICODE("+ Imps.Messages.BODY+") > 0x27ff OR UNICODE("+Imps.Messages.BODY+") < 0x2100)" +
+                        ")"
+                ;
+        CursorLoader loader = new CursorLoader(mActivity, mUri, null, selection, null, Imps.Messages.DEFAULT_SORT_ORDER);
         return loader;
     }
 
@@ -1702,6 +1609,80 @@ public class ConversationView {
         public void onLoaderReset(Loader<Cursor> loader) {
 
             mMessageAdapter.swapCursor(null);
+
+        }
+    }
+
+    class MessageRepliesLoaderCallbacks implements LoaderManager.LoaderCallbacks<Cursor> {
+
+        private Context context;
+        private String messageId;
+        private MessageViewHolder messageViewHolder;
+
+        public final String[] MESSAGE_PROJECTION = {
+                Imps.Messages._ID,
+                Imps.Messages.NICKNAME,
+                Imps.Messages.BODY,
+                Imps.Messages.TYPE,
+                Imps.Messages.IS_DELIVERED,
+                Imps.Messages.MIME_TYPE,
+                Imps.Messages.THREAD_ID,
+                Imps.Messages.REPLY_ID,
+                Imps.Messages.DATE,
+                Imps.Messages.PACKET_ID
+        };
+
+        public MessageRepliesLoaderCallbacks (Context context, MessageViewHolder messageViewHolder, String messageId)
+        {
+            super();
+            this.context = context;
+            this.messageViewHolder = messageViewHolder;
+            this.messageId = messageId;
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            StringBuilder buf = new StringBuilder();
+            buf.append(Imps.Messages.REPLY_ID).append("=").append("\"").append(messageId).append("\"");
+            CursorLoader loader = new CursorLoader(context, mUri, MESSAGE_PROJECTION, buf.toString(), null, Imps.Messages.REVERSE_SORT_ORDER);
+            return loader;
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor newCursor) {
+
+            if (newCursor == null)
+                return; // the app was quit or something while this was working
+
+            int nicknameCol = newCursor.getColumnIndexOrThrow(Imps.Messages.NICKNAME);
+            int bodyCol = newCursor.getColumnIndexOrThrow(Imps.Messages.BODY);
+
+            Map<String, QuickReaction> map = new HashMap<>();
+
+            while (newCursor.moveToNext())
+            {
+                String reaction = newCursor.getString(bodyCol);
+                String address = newCursor.getString(nicknameCol);
+
+                if (!TextUtils.isEmpty(address) && reaction != null && EmojiUtils.isOnlyEmojis(reaction)) {
+                    QuickReaction react = map.get(reaction);
+                    if (react == null) {
+                        react = new QuickReaction(reaction, null);
+                        map.put(reaction, react);
+                    }
+                    react.senders.add(address);
+                    if (address.equals(((ImApp) ((Activity) context).getApplication()).getDefaultUsername())) {
+                        react.sentByMe = true;
+                    }
+                }
+            }
+
+            messageViewHolder.setReactions(new ArrayList<>(map.values()));
+            newCursor.setNotificationUri(context.getContentResolver(), mUri);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
 
         }
     }
@@ -1951,6 +1932,7 @@ public class ConversationView {
 
         if (mShareDraft != null)
         {
+            Log.v("ImageSend","sendMessage");
             mActivity.sendShareRequest(mShareDraft);
             mShareDraft = null;
             mActivity.findViewById(R.id.mediaPreviewContainer).setVisibility(View.GONE);
@@ -2047,7 +2029,7 @@ public class ConversationView {
 
             @Override
             protected Boolean doInBackground(String[] msgs) {
-                return sendMessage(msgs[0],false,replyId);
+                return sendMessage(msgs[0],false,replyId, false);
             }
 
             @Override
@@ -2065,7 +2047,7 @@ public class ConversationView {
 
     }
 
-    boolean sendMessage(String msg, boolean isResend, String replyId) {
+    boolean sendMessage(String msg, boolean isResend, String replyId, boolean isQuickReaction) {
 
         //don't send empty messages
         if (TextUtils.isEmpty(msg.trim())) {
@@ -2081,7 +2063,10 @@ public class ConversationView {
             createChatSession();
         else {
             try {
-                session.sendMessage(msg, isResend, false, true, replyId);
+                if (isQuickReaction)
+                   session.sendReaction(msg,isResend,replyId);
+                else
+                    session.sendMessage(msg, isResend, false, true, replyId);
                 return true;
                 //requeryCursor();
             } catch (RemoteException e) {
@@ -2207,8 +2192,10 @@ public class ConversationView {
     {
         if (mButtonTalk == null || mButtonTalk.getVisibility() == View.GONE) {
             if (mComposeMessage.getText().length() > 0 && mSendButton.getVisibility() == View.GONE) {
+                if(mAudioRecordView != null){
+                    mAudioRecordView.setVisibility(View.GONE);
+                }
 
-                mAudioRecordView.setVisibility(View.GONE);
 
                 if (mBtnAttachSticker != null)
                     mBtnAttachSticker.setVisibility(View.GONE);
@@ -2219,8 +2206,10 @@ public class ConversationView {
             } else if (mComposeMessage.getText().length() == 0) {
                 if (mBtnAttachSticker != null)
                     mBtnAttachSticker.setVisibility(View.VISIBLE);
+                if(mAudioRecordView != null){
+                    mAudioRecordView.setVisibility(View.VISIBLE);
+                }
 
-                mAudioRecordView.setVisibility(View.VISIBLE);
                 mSendButton.setVisibility(View.GONE);
 
             }
@@ -2586,7 +2575,7 @@ public class ConversationView {
     }
 
     public class ConversationRecyclerViewAdapter
-            extends CursorRecyclerViewAdapter<MessageViewHolder> implements MessageViewHolder.OnImageClickedListener {
+            extends CursorRecyclerViewAdapter<MessageViewHolder> implements MessageViewHolder.OnImageClickedListener, MessageViewHolder.OnQuickReactionClickedListener {
 
         private int mScrollState;
         private boolean mNeedRequeryCursor;
@@ -2722,6 +2711,7 @@ public class ConversationView {
             MessageViewHolder mvh = new MessageViewHolder(view);
             mvh.setLayoutInflater(inflater);
             mvh.setOnImageClickedListener(this);
+            mvh.setOnQuickReactionClickedListener(this);
             view.applyStyleColors();
             return mvh;
         }
@@ -2760,17 +2750,66 @@ public class ConversationView {
 
             if (showDelivery && !isDelivered && mExpectingDelivery) {
                 deliveryState = MessageListItem.DeliveryState.UNDELIVERED;
+
             }
             else if (isDelivered)
             {
                 deliveryState = MessageListItem.DeliveryState.DELIVERED;
+
             }
 
 
 
             if (!mExpectingDelivery && isDelivered) {
                 mExpectingDelivery = true;
+               // Log.v("ImageSend","isDelivered");
             } else if (cursor.getPosition() == cursor.getCount() - 1) {
+                //Log.v("ImageSend","isDelivered last");
+                if(messageType ==Imps.MessageType.OUTGOING){
+                    viewHolder.progress.setVisibility(View.VISIBLE);
+                    viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
+                    viewHolder.mMediaThumbnail.setBlurRadius(10);
+                    viewHolder.progress.setProgress(3);
+                    viewHolder.progress.setProgress(6);
+                    viewHolder.progress.setProgress(7);
+                    //Log.v("ImageSend","isDelivered last 1");
+                }else if(messageType ==Imps.MessageType.QUEUED){
+                    viewHolder.progress.setVisibility(View.VISIBLE);
+                    viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
+                    viewHolder.mMediaThumbnail.setBlurRadius(10);
+                    viewHolder.progress.setProgress(3);
+                    viewHolder.progress.setProgress(6);
+                    viewHolder.progress.setProgress(7);
+                   // Log.v("ImageSend","isDelivered last 2");
+                }else if(messageType == Imps.MessageType.SENDING){
+                   viewHolder.progress.setVisibility(View.VISIBLE);
+                    viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
+                    viewHolder.mMediaThumbnail.setBlurRadius(10);
+                    viewHolder.progress.setProgress(3);
+                    viewHolder.progress.setProgress(6);
+                    viewHolder.progress.setProgress(7);
+                    //Log.v("ImageSend","isDelivered last 3");
+                }else {
+                    viewHolder.progress.setVisibility(View.VISIBLE);
+                    viewHolder.progress.setProgress(8);
+                    viewHolder.progress.setProgress(9);
+                    viewHolder.progress.setProgress(10);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            viewHolder.progress.setVisibility(View.GONE);
+                            viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
+                            viewHolder.mMediaThumbnail.setBlurRadius(0);
+                        }
+                    },100);
+
+
+                  /*  viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN);
+                    viewHolder.mMediaThumbnail.setBlurRadius(0);
+                    viewHolder.mMediaThumbnail.setPivBlurDownSamplingRate(0);*/
+                  // Log.v("ImageSend","isDelivered last 4");
+                }
+
                 /*
                 // if showTimeStamp is false for the latest message, then set a timer to query the
                 // cursor again in a minute, so we can update the last message timestamp if no new
@@ -2796,6 +2835,7 @@ public class ConversationView {
             }
             else if (messageType == Imps.MessageType.OUTGOING_ENCRYPTED)
             {
+
                 messageType = Imps.MessageType.OUTGOING;
                 encState = MessageListItem.EncryptionState.ENCRYPTED;
             }
@@ -2810,11 +2850,11 @@ public class ConversationView {
             case Imps.MessageType.QUEUED:
             case Imps.MessageType.SENDING:
 
-
                 int errCode = cursor.getInt(mErrCodeColumn);
                 if (errCode != 0) {
                     messageView.bindErrorMessage(errCode);
                 } else {
+
                     messageView.bindOutgoingMessage(viewHolder, id, messageType, null, mimeType, body, date, mMarkup, false,
                             deliveryState, encState, packetId);
                 }
@@ -2822,11 +2862,51 @@ public class ConversationView {
                 break;
 
             default:
+               // Log.v("ImageSend","default in switch");
                 messageView.bindPresenceMessage(viewHolder, userAddress, nick, messageType, date, isGroupChat(), false);
+
+            }
+
+            // Set quick reaction listener
+            View contextMenuView = (messageType == Imps.MessageType.INCOMING) ?
+                viewHolder.mAvatar :
+                (viewHolder.itemView.findViewById(R.id.message_container) != null) ? viewHolder.itemView.findViewById(R.id.message_container) : viewHolder.itemView;
+            if (contextMenuView != null) {
+                contextMenuView.setOnCreateContextMenuListener((menu, v, menuInfo) -> {
+                    mActivity.getMenuInflater().inflate(R.menu.menu_message_avatar, menu);
+                    menu.findItem(R.id.menu_message_add_qr).setOnMenuItemClickListener(item -> {
+                        // Pick emoji as quick reaction
+                        contextMenuView.post(() -> showQuickReactionsPopup(packetId, (View) mHistory.getParent()));
+                        return true;
+                    });
+                });
+                contextMenuView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            v.showContextMenu(v.getWidth() / 2.0f, v.getHeight() / 2.0f);
+                        } else {
+                            v.showContextMenu();
+                        }
+                    }
+                });
             }
 
             sendMessageRead(packetId);
+            loadMessageReplies(viewHolder, packetId);
+        }
 
+        private void loadMessageReplies(MessageViewHolder messageViewHolder, String messageId) {
+            // Load all replies to the given event and populate view holder.
+            Integer loaderIdReplies = eventReplyLoaders.get(messageId);
+            if (loaderIdReplies == null || mLoaderManager.getLoader(loaderIdReplies) == null) {
+                loaderIdReplies = loaderId++;
+                eventReplyLoaders.put(messageId, loaderIdReplies);
+                mLoaderManager.initLoader(loaderIdReplies, null, new MessageRepliesLoaderCallbacks(messageViewHolder.itemView.getContext(), messageViewHolder, messageId));
+            } else {
+                // Already loading, refresh
+                mLoaderManager.restartLoader(loaderIdReplies, null, new MessageRepliesLoaderCallbacks(messageViewHolder.itemView.getContext(), messageViewHolder, messageId));
+            }
         }
 
         public void onScrollStateChanged(AbsListView viewNew, int scrollState) {
@@ -2912,7 +2992,19 @@ public class ConversationView {
                         mode.finish();
                         Toast.makeText(mActivity, R.string.action_copied,Toast.LENGTH_SHORT).show();
                         return true;
-
+                    case R.id.menu_downLoad:
+                        if (ContextCompat.checkSelfPermission(mActivity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(mActivity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                            Uri mediaUri = ((MessageListItem)mLastSelectedView).getMediaUri();
+                            File sd = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)+"/Keanu/");
+                            String extension = mediaUri.getPath().substring(mediaUri.getPath().lastIndexOf("."));
+                            String filename = "Keanu_"+getDateTime()+extension;
+                            new DownloadAudio().execute(mediaUri,filename,sd);
+                        } else {
+                            ActivityCompat.requestPermissions(mActivity,
+                                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE}, 104);
+                        }
+                        mode.finish();
+                        return true;
                     default:
                         return false;
                 }
@@ -2975,8 +3067,61 @@ public class ConversationView {
                 mContext.startActivityForResult(intent,ConversationDetailActivity.REQUEST_IMAGE_VIEW);
             }
         }
+
+        @Override
+        public void onQuickReactionClicked(MessageViewHolder viewHolder, QuickReaction quickReaction, String messageId) {
+            // TODO - Remove my own reaction, but that is just sending it twice right?
+            //if (quickReaction.sentByMe) {
+            //}
+            sendQuickReaction(quickReaction.reaction,messageId);
+        }
     }
 
+    private void sendQuickReaction(String reaction, String messageId) {
+        sendMessage(reaction,false,messageId,true);
+    }
+    private class DownloadAudio extends AsyncTask<Object, Void, Long> {
+        String storagePath = null;
+
+        @Override
+        protected Long doInBackground(Object... params) {
+            Uri audioUri = (Uri) params[0];
+            String filename = (String) params[1];
+            File sd = (File) params[2];
+            storagePath = sd.getPath();
+
+            long bytesCopied= 0;
+            if(!sd.exists()){
+                sd.mkdirs();
+            }
+            File dest = new File(sd, filename);
+            FileInputStream fis = null;
+            FileOutputStream fos = null;
+            try {
+                fis = new FileInputStream(new info.guardianproject.iocipher.File(audioUri.getPath()));
+                fos = new java.io.FileOutputStream(dest, false);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+            try {
+                bytesCopied = IOUtils.copyLarge(fis, fos);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return bytesCopied;
+        }
+
+        protected void onPostExecute(Long result) {
+            if(result > 0){
+                Toast.makeText(mActivity,"Audio Downloaded at :-"+storagePath.toString(),Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    private String getDateTime() {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+        Date date = new Date();
+        return dateFormat.format(date);
+    }
     public Cursor getMessageAtPosition(int position) {
         Object item = mMessageAdapter.getItem(position);
 
@@ -3248,4 +3393,54 @@ public class ConversationView {
 
     }
 
+    private EmojiPopup emojiPopup;
+    private void showQuickReactionsPopup(final String messageId, View rootView) {
+        try {
+            if (emojiPopup != null) {
+                return;
+            }
+            Context context = rootView.getContext();
+            final EmojiEditText editText = new EmojiEditText(context);
+            editText.setImeOptions(EditorInfo.IME_ACTION_SEND);
+            editText.setInputType(InputType.TYPE_NULL);
+            editText.setBackgroundColor(0x80000000);
+            editText.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // If tap on background, close popup!
+                    if (emojiPopup != null) {
+                        InputMethodManager imm = (InputMethodManager)v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                        emojiPopup.dismiss();
+                    }
+                }
+            });
+            SingleEmojiTrait.install(editText);
+            ((ViewGroup)rootView).addView(editText, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
+                    .setOnEmojiPopupDismissListener(new OnEmojiPopupDismissListener() {
+                        @Override
+                        public void onEmojiPopupDismiss() {
+                            emojiPopup = null;
+                            ((ViewGroup)rootView).removeView(editText);
+                        }
+                    })
+                    .setOnEmojiClickListener(new OnEmojiClickListener() {
+                        @Override
+                        public void onEmojiClick(@NonNull EmojiImageView emoji, @NonNull Emoji variant) {
+                            sendQuickReaction(variant.getUnicode(), messageId);
+                            emojiPopup.dismiss();
+                        }
+                    })
+                    .build(editText);
+            rootView.post(new Runnable() {
+                @Override
+                public void run() {
+                    emojiPopup.toggle();
+                }
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

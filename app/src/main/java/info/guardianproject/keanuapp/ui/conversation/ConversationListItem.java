@@ -141,6 +141,7 @@ public class ConversationListItem extends FrameLayout {
 
         holder.mStatusIcon.setVisibility(View.GONE);
 
+
         if (holder.mAvatar != null)
         {
             holder.mAvatar.setVisibility(View.VISIBLE);
@@ -149,9 +150,7 @@ public class ConversationListItem extends FrameLayout {
 
             try
             {
-
-                avatar = DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
-                // avatar = DatabaseUtils.getAvatarFromCursor(cursor, COLUMN_AVATAR_DATA, ImApp.SMALL_AVATAR_WIDTH, ImApp.SMALL_AVATAR_HEIGHT);
+                avatar = DatabaseUtils.getAvatarFromAddress(address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
             }
             catch (Exception e)
             {
@@ -163,9 +162,11 @@ public class ConversationListItem extends FrameLayout {
             if (avatar != null)
             {
                 holder.mAvatar.setImageDrawable(avatar);
+
             }
             else {
 
+                /**
                 if (Imps.Contacts.TYPE_GROUP == (contactType & Imps.Contacts.TYPE_MASK)) {
 
                     try {
@@ -179,13 +180,13 @@ public class ConversationListItem extends FrameLayout {
                         holder.mAvatar.setImageDrawable(AVATAR_DEFAULT_GROUP);
                     }
                 } else {
-
+                **/
                     // int color = getAvatarBorder(presence);
                     int padding = 24;
                     LetterAvatar lavatar = new LetterAvatar(getContext(), nickname, padding);
                     holder.mAvatar.setImageDrawable(lavatar);
 
-                }
+                //}
             }
         }
 

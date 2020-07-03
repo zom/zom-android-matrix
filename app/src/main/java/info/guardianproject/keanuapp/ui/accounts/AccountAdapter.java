@@ -241,7 +241,7 @@ public class AccountAdapter extends CursorAdapter implements AccountListItem.Sig
         try {
             IImConnection conn =  RemoteImService.getConnection(providerId, accountId);
             if (conn != null) {
-                conn.logout(false);
+                conn.logout(true);
             }
         } catch (Exception ex) {
         }

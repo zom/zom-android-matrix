@@ -291,7 +291,8 @@ public class RouterActivity extends AppCompatActivity implements ICacheWordSubsc
 
                         for (ResolveInfo resolveInfo : resInfoList) {
                             String packageName = resolveInfo.activityInfo.packageName;
-                            grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            if (uri != null)
+                                grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         }
 
                     }

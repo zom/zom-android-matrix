@@ -50,7 +50,6 @@ public class StoryEditorActivity extends AppCompatActivity {
 
     private RichEditor mEditor;
     private EditText mEditTitle;
-    private String imageUrl = "";
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -234,6 +233,7 @@ public class StoryEditorActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(StoryEditorActivity.this, AddUpdateMediaActivity.class);
+                intent.putExtra("title",mEditTitle.getText().toString());
                 startActivityForResult(intent,REQUEST_ADD_MEDIA);
             }
         });
@@ -337,9 +337,11 @@ public class StoryEditorActivity extends AppCompatActivity {
             }
         });**/
 
-        Intent intent = getIntent();
+        /*Intent intent = getIntent();
         if(intent != null && intent.getSerializableExtra("listMediaInfo") != null){
             ArrayList<MediaInfo> list = (ArrayList<MediaInfo>) intent.getSerializableExtra("listMediaInfo");
+            String storyTitle = intent.getStringExtra("title");
+            mEditTitle.setText(storyTitle);
             for (MediaInfo mediaInfo : list){
                 try {
                     Log.v("Download","Download 5=="+mediaInfo.uri);
@@ -350,7 +352,7 @@ public class StoryEditorActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
             }
-        }
+        }*/
     }
 
     //
@@ -373,28 +375,17 @@ public class StoryEditorActivity extends AppCompatActivity {
         String jsInsert = "(function (){ var html='" + html + "'; RE.insertHTML(html);})();";
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            mEditor.evaluateJavascript("javascript:" + jsInsert + "", new ValueCallback<String>() {
-                @Override
-                public void onReceiveValue(String value) {
-                    Log.d(getClass().getName(),"editor callback: " + value);
-                    //Log.v("mEditor","mEditorv2===="+value);
-                }
-            });
-            imageUrl += html +"\n";
-            mEditor.loadData(imageUrl, "text/html", "UTF-8");
-           // mEditor.loadUrl("javascript:" + jsInsert + "");
-            Log.v("mEditor","mEditor final===="+imageUrl);
+            mEditor.evaluateJavascript("javascript:" + jsInsert + "",null);
         } else {
-            //Log.v("mEditor","mEditor 1===="+jsInsert);
-            //mEditor.loadUrl("javascript:" + jsInsert + "");
-            mEditor.loadData(html, "text/html", "UTF-8");
+            mEditor.loadUrl("javascript:" + jsInsert + "");
         }
+
 
 
 
     }
 
-    private void insertVideo (String linkAudio) {
+    private void insertVideo (String linkVideo) {
 
         /**
          String jsInsert = "(function() {" +
@@ -408,15 +399,15 @@ public class StoryEditorActivity extends AppCompatActivity {
          "}) ();";
          **/
 
-        String html = ("<video width=\"320\" height=\"240\" controls src=\"" + linkAudio + "\"></video>");
-        String jsInsert = "(function (){     document.execCommand('insertHTML', false, '" + html + "');})();";
+        String html = ("<video width=\"320\" height=\"240\" controls src=\"" + linkVideo + "\"></video>");
+
+        String jsInsert = "(function (){ var html='" + html + "'; RE.insertHTML(html);})();";
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             mEditor.evaluateJavascript("javascript:" + jsInsert + "",null);
         } else {
             mEditor.loadUrl("javascript:" + jsInsert + "");
         }
-
 
 
     }
@@ -498,7 +489,10 @@ public class StoryEditorActivity extends AppCompatActivity {
         }
         else if (item.getItemId() == R.id.menu_send)
         {
+            Log.v("SaveStory","saveStory");
             saveStory();
+            finish();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -539,7 +533,7 @@ public class StoryEditorActivity extends AppCompatActivity {
             Intent data = new Intent();
             data.setDataAndType(vfsUri,mimeType);
             setResult(RESULT_OK, data);
-
+            Log.v("SaveStory","Convestion Detai 1");
 
 
         }
@@ -552,24 +546,44 @@ public class StoryEditorActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK){
+            if (requestCode == REQUEST_ADD_MEDIA)
+            {
+                if (data!=null && data.hasExtra("resultUris")) {
+                    String[] mediaUris = data.getStringArrayExtra("resultUris");
+                    String[] mediaTypes = data.getStringArrayExtra("resultTypes");
 
-        if (requestCode == REQUEST_ADD_MEDIA)
-        {
-            if (data!=null && data.hasExtra("resultUris")) {
-                String[] mediaUris = data.getStringArrayExtra("resultUris");
-                String[] mediaTypes = data.getStringArrayExtra("resultTypes");
+                    for (int i = 0; i < mediaUris.length; i++) {
 
-                for (int i = 0; i < mediaUris.length; i++) {
-
-                    Uri mediaUri = Uri.parse(mediaUris[i]);
-                    Log.v("onMediaItemClicked","onMediaItemClicked mediaUri=="+mediaUri.getLastPathSegment());
-                    try {
-                        uploadMediaAsync(mediaUri, mediaUri.getLastPathSegment(), mediaTypes[i]);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        Uri mediaUri = Uri.parse(mediaUris[i]);
+                        Log.v("onMediaItemClicked","onMediaItemClicked mediaUri=="+mediaUri.getLastPathSegment());
+                        try {
+                            uploadMediaAsync(mediaUri, mediaUri.getLastPathSegment(), mediaTypes[i]);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }else if(data!=null){
+                    if(data != null && data.getSerializableExtra("listMediaInfo") != null){
+                        ArrayList<MediaInfo> list = (ArrayList<MediaInfo>) data.getSerializableExtra("listMediaInfo");
+                        String storyTitle = data.getStringExtra("title");
+                        if(!TextUtils.isEmpty(storyTitle)){
+                            mEditTitle.setText(storyTitle);
+                        }
+                        for (MediaInfo mediaInfo : list){
+                            try {
+                                uploadMediaAsync(mediaInfo.uri, mediaInfo.uri.getLastPathSegment(), mediaInfo.mimeType);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
+
+            }else {
             }
+        }else {
+
 
         }
 

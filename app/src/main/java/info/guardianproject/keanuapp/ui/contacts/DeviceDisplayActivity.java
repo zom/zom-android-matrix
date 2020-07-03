@@ -29,6 +29,7 @@ import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
 import info.guardianproject.keanu.core.service.IImConnection;
 import info.guardianproject.keanu.core.service.RemoteImService;
+import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.BaseActivity;
 
@@ -63,10 +64,17 @@ public class DeviceDisplayActivity extends BaseActivity {
 
         setContentView(R.layout.activity_devices);
 
-        mName = getIntent().getStringExtra("nickname");
+        ImApp app = (ImApp)getApplication();
+
+
         mAddress = getIntent().getStringExtra("address");
-        mProviderId = getIntent().getLongExtra("provider", -1);
-        mAccountId = getIntent().getLongExtra("account", -1);
+
+        mName = getIntent().getStringExtra("nickname");
+        if (TextUtils.isEmpty(mName))
+            mName = mAddress;
+
+        mProviderId = getIntent().getLongExtra("provider", app.getDefaultProviderId());
+        mAccountId = getIntent().getLongExtra("account", app.getDefaultAccountId());
 
         Cursor cursor = getContentResolver().query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(mProviderId)}, null);
 

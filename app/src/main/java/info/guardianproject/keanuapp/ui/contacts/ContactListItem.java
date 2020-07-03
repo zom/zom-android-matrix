@@ -154,7 +154,7 @@ public class ContactListItem extends FrameLayout {
 
                 if (DatabaseUtils.hasAvatarContact(getContext().getContentResolver(),Imps.Avatars.CONTENT_URI,address)) {
                     try {
-                        avatar = DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
+                        avatar = DatabaseUtils.getAvatarFromAddress(address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
 
                     } catch (Exception e) {
                         //problem decoding avatar
@@ -335,7 +335,7 @@ public class ContactListItem extends FrameLayout {
 
                 if (!TextUtils.isEmpty(address)) {
                     try {
-                        avatar = DatabaseUtils.getAvatarFromAddress(this.getContext().getContentResolver(), address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
+                        avatar = DatabaseUtils.getAvatarFromAddress( address, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
 
                     } catch (Exception e) {
                         //problem decoding avatar

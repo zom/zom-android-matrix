@@ -796,7 +796,6 @@ public class ConversationDetailActivity extends BaseActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
 
         if (resultCode == RESULT_OK) {
-
             if (requestCode == REQUEST_PICK_CONTACTS) {
 
                 if (resultIntent == null)
@@ -816,6 +815,8 @@ public class ConversationDetailActivity extends BaseActivity {
             }
 
             if (requestCode == REQUEST_SEND_IMAGE) {
+
+                //Log.v("ImageSend","ImageSend_1");
 
 
                 if (resultIntent == null)
@@ -837,8 +838,10 @@ public class ConversationDetailActivity extends BaseActivity {
 
                 if (TextUtils.isEmpty(request.mimeType)) {
                     // import
+                    //Log.v("ImageSend","ImageSend_2");
                     SystemServices.FileInfo info = null;
                     try {
+                        //Log.v("ImageSend","ImageSend_3");
                         info = SystemServices.getFileInfoFromURI(this, request.media);
                         request.mimeType = info.type;
                         info.stream.close();
@@ -851,6 +854,7 @@ public class ConversationDetailActivity extends BaseActivity {
                 if (request.mimeType.startsWith("image"))
                 {
                     try {
+                        //Log.v("ImageSend","ImageSend_4");
                         mConvoView.setMediaDraft(request);
                     }
                     catch (Exception e){
@@ -861,7 +865,7 @@ public class ConversationDetailActivity extends BaseActivity {
                     boolean deleteFile = false;
                     boolean resizeImage = false;
                     boolean importContent = true; //let's import it!
-
+                    //Log.v("ImageSend","ImageSend_5");
                     handleSendDelete(uri, request.mimeType, deleteFile, resizeImage, importContent);
                 }
 
@@ -884,7 +888,7 @@ public class ConversationDetailActivity extends BaseActivity {
                 boolean deleteFile = false;
                 boolean resizeImage = false;
                 boolean importContent = true; //let's import it!
-
+                //Log.v("ImageSend","ImageSend_send file");
                 handleSendDelete(uri, defaultType, deleteFile, resizeImage, importContent);
             }
             else if (requestCode == REQUEST_ADD_MEDIA)
@@ -901,13 +905,14 @@ public class ConversationDetailActivity extends BaseActivity {
                     if ((!TextUtils.isEmpty(mediaTypes[i]))
                             && mediaTypes[i].startsWith("video"))
                         importContent = false;
-
+                    //Log.v("ImageSend","REQUEST_ADD_MEDIA");
                     handleSendDelete(Uri.parse(mediaUris[i]), mediaTypes[i], deleteFile, resizeImage, importContent);
                 }
 
             }
             else if (requestCode == REQUEST_TAKE_PICTURE)
             {
+
                 ShareRequest request = new ShareRequest();
 
                 request.deleteFile = false;

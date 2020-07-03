@@ -102,7 +102,7 @@ public class ContactDisplayActivity extends BaseActivity {
 
         if (!TextUtils.isEmpty(mUsername)) {
             try {
-                Drawable avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mUsername, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, false);
+                Drawable avatar = DatabaseUtils.getAvatarFromAddress( mUsername, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, false);
                 if (avatar != null) {
                     ImageView iv = (ImageView) findViewById(R.id.imageAvatar);
                     iv.setImageDrawable(avatar);
@@ -372,7 +372,7 @@ public class ContactDisplayActivity extends BaseActivity {
         ImageView avatarView = dialogAddFriend.findViewById(R.id.imageAvatar);
         avatarView.setVisibility(View.GONE);
         try {
-            Drawable avatar = DatabaseUtils.getAvatarFromAddress(getContentResolver(), mUsername, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, true);
+            Drawable avatar = DatabaseUtils.getAvatarFromAddress( mUsername, DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, true);
             if (avatar != null) {
                 avatarView.setImageDrawable(avatar);
                 avatarView.setVisibility(View.VISIBLE);

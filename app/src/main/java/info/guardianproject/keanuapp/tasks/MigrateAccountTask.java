@@ -325,7 +325,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
         try {
 
             //first copy the old avatar over to the new account
-            byte[] oldAvatar = DatabaseUtils.getAvatarBytesFromAddress(mContext.getContentResolver(),oldUsername);
+            byte[] oldAvatar = DatabaseUtils.getAvatarBytesFromAddress(oldUsername);
             if (oldAvatar != null)
             {
                 setAvatar(newUsername, oldAvatar);

@@ -4,7 +4,6 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'realm-android'
 apply plugin: 'testdroid'
 
-
 android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -20,7 +19,11 @@ android {
         multiDexEnabled true
     }
 
-
+    allprojects {
+        repositories {
+            maven { url = 'https://jitpack.io' }
+        }
+    }
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/LICENSE'
@@ -58,8 +61,8 @@ android {
 
         primary {// Assigns this product flavor to the "mode" flavor dimension.
             dimension "release"
-            versionCode 45000
-            versionName "0.0.4.5"
+            versionCode 48000
+            versionName "0.0.4.8"
             archivesBaseName = "KeanuAlt-$versionName"
             applicationIdSuffix ".altbrand"
             versionNameSuffix "-altbrand"
@@ -128,16 +131,17 @@ dependencies {
 
     /************* Matrix SDK management **************/
     // use the matrix SDK as external lib
-    implementation(name: 'matrix-sdk', ext: 'aar')
+    implementation(name: 'matrix-sdk-release-0.9.35', ext: 'aar')
     implementation(name: 'matrix-sdk-core-release', ext: 'aar')
     implementation(name: 'matrix-sdk-crypto-release', ext: 'aar')
     implementation(name: 'olm-sdk-release-3.1.4', ext: 'aar')
 
     /*********** KeanuApp components **********/
-    implementation(name: 'keanucore-0.0.1.51', ext: 'aar')
-    //implementation project(':keanuCore')
-    implementation(name: 'keanumatrix-0.0.1.51', ext: 'aar')
-    //implementation project(':keanuMatrix')
+    implementation(name: 'keanucore-0.0.1.53', ext: 'aar')
+    implementation(name: 'keanumatrix-0.0.1.53', ext: 'aar')
+
+//keanucore-0.0.1.53.aar  keanumatrix-0.0.1.53.aar  matrix-sdk-core-release.aar  matrix-sdk-crypto-release.aar  matrix-sdk-release-0.9.35.aar  olm-sdk-release-3.1.4.aar
+
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:28.0.0'
@@ -168,9 +172,16 @@ dependencies {
     //built in camera now!
     //https://github.com/natario1/CameraView
     implementation 'com.otaliastudios:cameraview:2.0.0-beta04'
+    implementation 'com.stefanosiano.powerful_libraries:imageview_rs:1.0.15'
 
     implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
-    implementation 'info.guardianproject.iocipher:IOCipher:0.4'
+    implementation 'info.guardianproject.iocipher:IOCipher:0.5'
+
+    //*********** KeanuApp components ********** /
+//    implementation project(':keanuCore')
+ //   implementation project(':keanuMatrix')
+    //  implementation 'info.guardianproject.keanuapp:keanuCore:+'
+    // implementation 'info.guardianproject.keanuapp:keanuMatrix:+'
 
     //from here: https://github.com/guardianproject/proofmode
     implementation 'org.witness:android-libproofmode:0.0.4'
@@ -186,6 +197,7 @@ dependencies {
     def lifecycle_version = "2.2.0"
     implementation "androidx.lifecycle:lifecycle-runtime:$lifecycle_version"
     implementation "androidx.exifinterface:exifinterface:1.2.0"
+<<<<<<< HEAD
 
 
     implementation 'commons-codec:commons-codec:1.10'
@@ -231,12 +243,21 @@ dependencies {
 
 
     implementation "androidx.exifinterface:exifinterface:1.1.0"
+=======
+>>>>>>> 056f5d7d3ae65e717e688916c4dfed8754dcc0c8
     implementation 'com.gsconrad:richcontentedittext:1.0.0'
+
     //html wysiwyg editor
     implementation 'jp.wasabeef:richeditor-android:1.2.2'
 
     //improved audio recorder
     implementation 'com.github.n8fr8:AudioRecorderView:228d48dbbc'
+
+    // AirShare
+    implementation 'com.github.tladesignz:AirShare-Android:master-SNAPSHOT'
+    implementation 'com.google.code.gson:gson:2.8.6'
+    // Emojis
+    implementation 'com.vanniktech:emoji-google:0.7.0-SNAPSHOT'
 }
 
 // Map for the version code that gives each ABI a value.

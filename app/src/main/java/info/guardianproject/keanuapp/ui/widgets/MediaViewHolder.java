@@ -5,6 +5,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+
+import com.stefanosiano.powerful_libraries.imageview.PowerfulImageView;
 
 import info.guardianproject.keanuapp.R;
 
@@ -13,8 +16,9 @@ import info.guardianproject.keanuapp.R;
  */
 public class MediaViewHolder extends RecyclerView.ViewHolder  {
 
-    public ImageView mMediaThumbnail;
+    public PowerfulImageView mMediaThumbnail;
     public ImageView mMediaPlay;
+    public ProgressBar progress;
 
     public ViewGroup mContainer;
 
@@ -29,6 +33,7 @@ public class MediaViewHolder extends RecyclerView.ViewHolder  {
         mMediaThumbnail = view.findViewById(R.id.media_thumbnail);
         mContainer = view.findViewById(R.id.message_container);
         mMediaPlay = view.findViewById(R.id.media_thumbnail_play);
+        progress = view.findViewById(R.id.progress);
 
     }
 }

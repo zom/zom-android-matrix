@@ -85,6 +85,7 @@ import info.guardianproject.keanu.core.util.AssetUtil;
 import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.core.util.SystemServices;
+import info.guardianproject.keanu.matrix.plugin.PopupAlertManager;
 import info.guardianproject.keanuapp.tasks.AddContactAsyncTask;
 import info.guardianproject.keanuapp.ui.BaseActivity;
 import info.guardianproject.keanuapp.ui.LockScreenActivity;
@@ -475,6 +476,7 @@ public class MainActivity extends BaseActivity {
 
         handleIntent(getIntent());
 
+        PopupAlertManager.INSTANCE.onNewActivityDisplayed(this);
 
     }
 
@@ -1170,6 +1172,8 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+        if (mNetworkConnectivityListener != null)
+            mNetworkConnectivityListener.stopListening();
 
     }
 
