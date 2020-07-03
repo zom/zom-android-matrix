@@ -780,7 +780,6 @@ public class ConversationView {
 
         mSendButton = (ImageButton) mActivity.findViewById(R.id.btnSend);
        // mMicButton = (ImageButton) mActivity.findViewById(R.id.btnMic);
-        mButtonTalk = (TextView)mActivity.findViewById(R.id.buttonHoldToTalk);
 
         mButtonDeleteVoice = (ImageView)mActivity.findViewById(R.id.btnDeleteVoice);
         mViewDeleteVoice = mActivity.findViewById(R.id.viewDeleteVoice);
@@ -903,7 +902,7 @@ public class ConversationView {
 
                 @Override
                 public boolean isReady() {
-                    return false;
+                    return true;
                 }
 
                 @Override
@@ -925,139 +924,6 @@ public class ConversationView {
                 }
             });
         }
-
-       // mAudioRecordView.activity = mActivity;
-
-
-
-        /**
-        if (mMicButton != null) {
-            mMicButton.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-
-                    //this is the tap to change to hold to talk mode
-                    if (mMicButton.getVisibility() == View.VISIBLE) {
-                        mComposeMessage.setVisibility(View.GONE);
-                        mMicButton.setVisibility(View.GONE);
-
-                        // Check if no view has focus:
-                        View view = mActivity.getCurrentFocus();
-                        if (view != null) {
-                            InputMethodManager imm = (InputMethodManager) mActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
-                            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-                        }
-
-                        mSendButton.setImageResource(R.drawable.ic_keyboard_black_36dp);
-                        mSendButton.setVisibility(View.VISIBLE);
-                        mButtonTalk.setVisibility(View.VISIBLE);
-
-                    }
-                }
-
-            });
-        }**/
-
-
-        final GestureDetector gestureDetector = new GestureDetector(new GestureDetector.SimpleOnGestureListener() {
-            public void onLongPress(MotionEvent e) {
-
-                //this is for recording audio directly from one press
-                mActivity.startAudioRecording();
-
-            }
-
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-
-
-                if (mActivity.isAudioRecording()) {
-                    boolean send = true;//inViewInBounds(mMicButton, (int) motionEvent.getX(), (int) motionEvent.getY());
-                    mActivity.stopAudioRecording(send);
-                }
-
-                return super.onSingleTapUp(e);
-            }
-        });
-
-        /**
-        if (mMicButton != null) {
-            mMicButton.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View view, MotionEvent motionEvent) {
-                    return gestureDetector.onTouchEvent(motionEvent);
-
-                }
-            });
-        }**/
-
-        if (mButtonTalk != null) {
-            mButtonTalk.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View btnTalk, MotionEvent theMotion) {
-                    switch (theMotion.getAction()) {
-                        case MotionEvent.ACTION_DOWN:
-                            mActivity.startAudioRecording();
-                            mButtonTalk.setText(mActivity.getString(R.string.recording_release));
-                            mViewDeleteVoice.setVisibility(View.VISIBLE);
-
-                            break;
-                        case MotionEvent.ACTION_MOVE:
-                            boolean inBounds = inViewInBounds(btnTalk, (int) theMotion.getX(), (int) theMotion.getY());
-                            if (!inBounds)
-                                mButtonTalk.setText(mActivity.getString(R.string.recording_delete));
-                            else {
-                                mButtonTalk.setText(mActivity.getString(R.string.recording_release));
-                                mViewDeleteVoice.setVisibility(View.VISIBLE);
-                            }
-                            break;
-                        case MotionEvent.ACTION_UP:
-                            mButtonTalk.setText(mActivity.getString(R.string.push_to_talk));
-                            boolean send = inViewInBounds(btnTalk, (int) theMotion.getX(), (int) theMotion.getY());
-                            mActivity.stopAudioRecording(send);
-                            mViewDeleteVoice.setVisibility(View.GONE);
-
-                            break;
-                    }
-                    return true;
-                }
-            });
-        }
-        /**
-        mHistory.setOnItemLongClickListener(new OnItemLongClickListener ()
-        {
-
-            @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-            @Override
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-
-
-             if (arg1 instanceof MessageView)
-             {
-
-                 String textToCopy = ((MessageView)arg1).getLastMessage();
-
-                 int sdk = android.os.Build.VERSION.SDK_INT;
-                 if(sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                     android.text.ClipboardManager clipboard = (android.text.ClipboardManager) mActivity.getSystemService(Context.CLIPBOARD_SERVICE);
-                     clipboard.setText(textToCopy); //
-                 } else {
-                     android.content.ClipboardManager clipboard = (android.content.ClipboardManager) mActivity.getSystemService(Context.CLIPBOARD_SERVICE);
-                     android.content.ClipData clip = android.content.ClipData.newPlainText("chat",textToCopy);
-                     clipboard.setPrimaryClip(clip); //
-                 }
-
-                 Toast.makeText(mActivity, mContext.getString(R.string.toast_chat_copied_to_clipboard), Toast.LENGTH_SHORT).show();
-
-                 return true;
-
-             }
-
-                return false;
-            }
-
-        });**/
 
         mComposeMessage.setOnTouchListener(new View.OnTouchListener()
         {
