@@ -183,7 +183,6 @@ class KeanuRoomMediaMessagesSender {
 
                 mDataHandler.updateEventState(roomMediaMessage.getEvent(), Event.SentState.UNSENT);
                 mRoom.storeOutgoingEvent(roomMediaMessage.getEvent());
-                mDataHandler.getStore().commit();
 
                 mUiHandler.post(new Runnable() {
                     @Override
@@ -1101,7 +1100,7 @@ class KeanuRoomMediaMessagesSender {
                             public void run() {
                                 mDataHandler.updateEventState(roomMediaMessage.getEvent(), Event.SentState.UNDELIVERED);
                                 mRoom.storeOutgoingEvent(roomMediaMessage.getEvent());
-                                mDataHandler.getStore().commit();
+                               // mDataHandler.getStore().commit();
 
                                // roomMediaMessage.onEncryptionFailed();
                             }

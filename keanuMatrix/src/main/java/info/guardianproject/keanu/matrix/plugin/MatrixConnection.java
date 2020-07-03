@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.TrafficStats;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.Process;
 import android.os.RemoteException;
 import android.text.TextUtils;
@@ -317,6 +318,15 @@ public class MatrixConnection extends ImConnection {
 
         mStore = new KeanuMXFileStore(mConfig,enableEncryption, mContext);
 
+        final int storeCommitInterval = 1000 * 60 * 5;
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            public void run() {
+                mStore.commit();
+                handler.postDelayed(this, storeCommitInterval); //now is every 2 minutes
+            }
+        }, storeCommitInterval); //Every 120000 ms (2 minutes)
+
         mStore.addMXStoreListener(new IMXStoreListener() {
             @Override
             public void postProcess(String s) {
@@ -547,6 +557,8 @@ public class MatrixConnection extends ImConnection {
                         mDataHandler.getMediaCache().clearShareDecryptedMediaCache();
                         mDataHandler.getMediaCache().clearTmpDecryptedMediaCache();
 
+                        mDataHandler.getStore().commit();
+
                     }
                 });
             }
@@ -575,8 +587,7 @@ public class MatrixConnection extends ImConnection {
     }
 
     @Override
-    public void logout(boolean fullLogout) {
-
+    public synchronized void logout(boolean fullLogout) {
 
         setState(ImConnection.LOGGING_OUT, null);
 
@@ -767,6 +778,8 @@ public class MatrixConnection extends ImConnection {
     {
         mDataHandler.getCrypto().setDeviceVerification(verified ? MXDeviceInfo.DEVICE_VERIFICATION_VERIFIED : MXDeviceInfo.DEVICE_VERIFICATION_UNVERIFIED,
                 device, address, new BasicApiCallback("setDeviceVerified"));
+
+        mDataHandler.getStore().commit();
     }
 
     @Override
