@@ -23,6 +23,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -194,7 +195,7 @@ public class DatabaseUtils {
         return 0;
     }
 
-    private static final String ReservedChars = "[|\\?*<\":>+/']";
+    private static final String ReservedChars = "[|\\?*<\":>+/!']";
 
     private static File openSecureStorageFile(String sessionId, String filename) throws FileNotFoundException {
 //        debug( "openFile: url " + url) ;
@@ -297,6 +298,23 @@ public class DatabaseUtils {
         options.inSampleSize = calculateInSampleSize(options, width, height);
         options.inJustDecodeBounds = false;
         Bitmap b = BitmapFactory.decodeByteArray(data, 0, data.length,options);
+        if (b != null)
+        {
+            RoundedAvatarDrawable avatar = new RoundedAvatarDrawable(b);
+            return avatar;
+        }
+        else
+            return null;
+    }
+
+    private static RoundedAvatarDrawable decodeRoundAvatar(InputStream data, int width, int height) {
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeStream(data, null, options);
+        options.inSampleSize = calculateInSampleSize(options, width, height);
+        options.inJustDecodeBounds = false;
+        Bitmap b = BitmapFactory.decodeStream(data);
         if (b != null)
         {
             RoundedAvatarDrawable avatar = new RoundedAvatarDrawable(b);

@@ -956,6 +956,8 @@ public class MatrixConnection extends ImConnection {
             if (group.shouldUpdate())
                updateGroupMembers(room, group, false);
 
+
+
         }
     }
 
@@ -983,6 +985,17 @@ public class MatrixConnection extends ImConnection {
             android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
         group.setLastUpdated();
+
+        mStateExecutor.execute(() -> {
+
+            String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(room.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
+
+            if (!TextUtils.isEmpty(downloadUrl)) {
+                if (!hasAvatar(room.getRoomId(), downloadUrl)) {
+                    downloadAvatar(room.getRoomId(), downloadUrl);
+                }
+            }
+        });
 
         room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
             @Override
@@ -1039,6 +1052,7 @@ public class MatrixConnection extends ImConnection {
         }
 
         public void run() {
+
 
             ArrayList<String> userList = new ArrayList<>();
 
