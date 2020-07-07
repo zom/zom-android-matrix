@@ -1663,6 +1663,9 @@ public class ConversationView {
             {
                 String reaction = newCursor.getString(bodyCol);
                 String address = newCursor.getString(nicknameCol);
+                if (address == null) {
+                    address = ((ImApp) ((Activity) context).getApplication()).getDefaultUsername();
+                }
 
                 if (!TextUtils.isEmpty(address) && reaction != null && EmojiUtils.isOnlyEmojis(reaction)) {
                     QuickReaction react = map.get(reaction);
