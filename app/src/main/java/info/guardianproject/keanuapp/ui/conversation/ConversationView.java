@@ -2883,15 +2883,18 @@ public class ConversationView {
                         return true;
                     });
                 });
-                contextMenuView.setOnClickListener(new View.OnClickListener() {
+                contextMenuView.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public boolean onLongClick(View v) {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             v.showContextMenu(v.getWidth() / 2.0f, v.getHeight() / 2.0f);
                         } else {
                             v.showContextMenu();
                         }
+                        return true;
                     }
+
+
                 });
             }
 
