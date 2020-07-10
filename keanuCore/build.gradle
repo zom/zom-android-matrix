@@ -38,8 +38,9 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
-    api 'info.guardianproject.iocipher:IOCipher:0.5'
-    //implementation(name: 'IOCipher-release', ext: 'aar')
+    //api 'info.guardianproject.iocipher:IOCipher:0.5'
+
+    api (name: 'IOCipher-release', ext: 'aar')
     api 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
     api "androidx.sqlite:sqlite:2.1.0"
 

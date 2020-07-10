@@ -153,6 +153,10 @@ public class MatrixConnection extends ImConnection {
 
     private final static long TIME_ONE_DAY_MS = 1000 * 60 * 60 * 24;
 
+
+    public final static String EVENT_TYPE_REACTION = "m.reaction";
+
+
     // Request Handler
     @Nullable
     private KeyRequestHandler mKeyRequestHandler;
@@ -169,8 +173,8 @@ public class MatrixConnection extends ImConnection {
 
         //mStateExecutor = Executors.newCachedThreadPool();
         //mStateExecutor = new ThreadPoolExecutor( 2, 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
-        mMessageExecutor = Executors.newSingleThreadExecutor();
-        mStateExecutor = Executors.newFixedThreadPool(5);
+        mMessageExecutor = Executors.newCachedThreadPool();
+        mStateExecutor = mMessageExecutor;// Executors.newCachedThreadPool();
     }
 
     @Override
@@ -1191,9 +1195,9 @@ public class MatrixConnection extends ImConnection {
 
             debug ("onLiveEvent:type=" + event.getType());
 
-            if (event.getType().equals(Event.EVENT_TYPE_MESSAGE) || event.getType().equals("m.reaction"))  // TODO - Why is this not a constant in the SDK, does it still rely on some server side hack that the IOS code mentions?
+            if (event.getType().equals(Event.EVENT_TYPE_MESSAGE) || event.getType().equals(EVENT_TYPE_REACTION))  // TODO - Why is this not a constant in the SDK, does it still rely on some server side hack that the IOS code mentions?
             {
-                mMessageExecutor.execute(() -> handleIncomingMessage(event));
+               mMessageExecutor.execute(() -> handleIncomingMessage(event));
             }
             else if (event.getType().equals(Event.EVENT_TYPE_STATE_ROOM_MEMBER))
             {
@@ -1322,8 +1326,9 @@ public class MatrixConnection extends ImConnection {
                 if (mSession != null && mSession.isCryptoEnabled())
                 {
                     if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
-                    //    if (mSession.getCrypto() != null)
-                     //       mSession.getCrypto().reRequestRoomKeyForEvent(event);
+                        if (mSession.getCrypto() != null)
+                            mSession.getCrypto().reRequestRoomKeyForEvent(event);
+
                     }
                 }
             }
@@ -1946,7 +1951,7 @@ public class MatrixConnection extends ImConnection {
 
             Pair<String,String> replyToInfo = getReplyToFromEvent(event);
 
-            boolean isQuickReaction = event.getType().equals("m.reaction");
+            boolean isQuickReaction = event.getType().equals(EVENT_TYPE_REACTION);
             if (isQuickReaction && replyToInfo != null) {
                 messageBody = replyToInfo.second;
             }
@@ -1996,6 +2001,8 @@ public class MatrixConnection extends ImConnection {
                         message.setReplyId(replyToInfo.first);
                     }
 
+                    message.setReaction(isQuickReaction);
+
                     boolean isFromMe = addrSender.mAddress.equals(mUser.getAddress().getAddress());
 
                     boolean isEncrypted = mDataHandler.getRoom(event.roomId).isEncrypted();
@@ -2008,9 +2015,9 @@ public class MatrixConnection extends ImConnection {
                             message.setType(Imps.MessageType.OUTGOING);
                     }
                     else {
-                        if (isEncrypted) {
+                        if (isEncrypted)
                             message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
-                        } else
+                        else
                             message.setType(Imps.MessageType.INCOMING);
                     }
 

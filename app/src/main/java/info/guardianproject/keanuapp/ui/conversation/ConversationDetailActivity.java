@@ -314,8 +314,26 @@ public class ConversationDetailActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        processIntent(getIntent());
-        mConvoView.setSelected(true);
+
+        new AsyncTask<Void,Void,Void>() {
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                processIntent(getIntent());
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+
+                mConvoView.setSelected(true);
+
+            }
+        }.execute();
+
+
 
     }
 

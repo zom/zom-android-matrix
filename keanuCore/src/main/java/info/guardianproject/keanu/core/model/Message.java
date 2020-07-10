@@ -34,6 +34,9 @@ public class Message implements Parcelable {
     private String mContentType;
 
     private String mReplyId;
+
+    private boolean mIsReaction;
+
     /**
      * @param msg
      * @throws NullPointerException if msg is null.
@@ -186,4 +189,11 @@ public class Message implements Parcelable {
         this.mReplyId = mReplyId;
     }
 
+    public boolean isReaction() {
+        return mIsReaction;
+    }
+
+    public void setReaction(boolean mIsReaction) {
+        this.mIsReaction = mIsReaction;
+    }
 }

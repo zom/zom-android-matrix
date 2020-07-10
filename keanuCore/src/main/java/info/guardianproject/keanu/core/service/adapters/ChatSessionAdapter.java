@@ -1399,12 +1399,16 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             else
                 messageUri = insertMessageInDb(nickname + '|' + bareUsername, body, time, msg.getType(), 0, msg.getID(), msg.getContentType(), msg.getReplyId());
             **/
-            if (msg.getID() == null)
-                messageUri = insertMessageInDb(bareUsername, body, time, msg.getType(), msg.getContentType(), msg.getReplyId());
-            else
-                messageUri = insertMessageInDb(bareUsername, body, time, msg.getType(), 0, msg.getID(), msg.getContentType(), msg.getReplyId());
 
-            setLastMessage(body, time);
+            int msgType = msg.getType();
+
+            if (msg.getID() == null)
+                messageUri = insertMessageInDb(bareUsername, body, time, msgType, msg.getContentType(), msg.getReplyId());
+            else
+                messageUri = insertMessageInDb(bareUsername, body, time, msgType, 0, msg.getID(), msg.getContentType(), msg.getReplyId());
+
+            if (!msg.isReaction())
+                setLastMessage(body, time);
 
             if (messageUri == null) {
                 Log.e(TAG,"error saving message to the db: " + msg.getID());

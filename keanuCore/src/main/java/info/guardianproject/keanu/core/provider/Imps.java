@@ -778,6 +778,8 @@ public class Imps {
         /* received message */
         int OUTGOING_ENCRYPTED = 15;
 
+
+
     }
 
     /** The common columns for messages table */
