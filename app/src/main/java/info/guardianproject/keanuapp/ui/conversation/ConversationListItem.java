@@ -165,28 +165,12 @@ public class ConversationListItem extends FrameLayout {
 
             }
             else {
-
-                /**
-                if (Imps.Contacts.TYPE_GROUP == (contactType & Imps.Contacts.TYPE_MASK)) {
-
-                    try {
-                        String groupId = address.split("@")[0];
-                        avatar = new GroupAvatar(groupId);
-                        holder.mAvatar.setImageDrawable(avatar);
-                    } catch (Exception ignored) {
-                        if (AVATAR_DEFAULT_GROUP == null)
-                            AVATAR_DEFAULT_GROUP = new RoundedAvatarDrawable(BitmapFactory.decodeResource(getResources(),
-                                    R.drawable.group_chat));
-                        holder.mAvatar.setImageDrawable(AVATAR_DEFAULT_GROUP);
-                    }
-                } else {
-                **/
                     // int color = getAvatarBorder(presence);
-                    int padding = 24;
-                    LetterAvatar lavatar = new LetterAvatar(getContext(), nickname, padding);
-                    holder.mAvatar.setImageDrawable(lavatar);
+                int padding = 24;
+                LetterAvatar lavatar = new LetterAvatar(getContext(), nickname, padding);
+                holder.mAvatar.setImageDrawable(lavatar);
 
-                //}
+
             }
         }
 
