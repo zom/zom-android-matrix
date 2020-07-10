@@ -117,10 +117,10 @@ android {
 
             // Specifies a list of ABIs that Gradle should create APKs for.
            // include "x86", "armeabi-v7a", "x86_64", "arm64-v8a"
-            include "armeabi-v7a"
+            include "armeabi-v7a"//, "arm64-v8a"
 
             // Specifies that we do not want to also generate a universal APK that includes all ABIs.
-            universalApk true
+            universalApk false
 
         }
     }
@@ -177,7 +177,7 @@ dependencies {
     implementation 'com.stefanosiano.powerful_libraries:imageview_rs:1.0.15'
 
     implementation 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
-    implementation 'info.guardianproject.iocipher:IOCipher:0.5'
+    implementation 'info.guardianproject.iocipher:IOCipher:0.4'
 
     //*********** KeanuApp components ********** /
 //    implementation project(':keanuCore')
@@ -275,7 +275,7 @@ android.applicationVariants.all { variant ->
     variant.outputs.each { output ->
         def baseVersionCode = project.ext.abiCodes.get(output.getFilter(OutputFile.ABI))
         if (baseVersionCode != null) {
-            output.versionCodeOverride = Integer.valueOf(baseVersionCode + variant.versionCode)
+            output.versionCodeOverride = Integer.valueOf(variant.versionCode) + Integer.valueOf(baseVersionCode)
         }
     }
 }
