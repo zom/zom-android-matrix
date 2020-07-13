@@ -40,11 +40,9 @@ dependencies {
 
     //api 'info.guardianproject.iocipher:IOCipher:0.5'
 
-    api (name: 'IOCipher-release', ext: 'aar')
+    api (name: 'IOCipher-debug', ext: 'aar')
     api 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
     api "androidx.sqlite:sqlite:2.1.0"
-
-    //altbrandArm32Implementation  'info.guardianproject.iocipher:IOCipher:0.4'
 
     implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.0.0'
     api 'commons-codec:commons-codec:1.10'
