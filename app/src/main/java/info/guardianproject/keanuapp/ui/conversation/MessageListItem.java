@@ -480,6 +480,9 @@ public class MessageListItem extends RelativeLayout {
             setImageThumbnail( getContext().getContentResolver(), id, holder, mediaUri );
             holder.mMediaThumbnail.setBackgroundResource(android.R.color.transparent);
 
+            if (mimeType.endsWith("gif")||mimeType.endsWith("png"))
+                holder.mMediaThumbnail.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
         }
         else if (mimeType.startsWith("video/")) {
 
