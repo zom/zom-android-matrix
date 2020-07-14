@@ -107,12 +107,12 @@ import info.guardianproject.keanu.core.service.IContactListListener;
 import info.guardianproject.keanu.core.service.adapters.ChatSessionAdapter;
 import info.guardianproject.keanu.core.util.DatabaseUtils;
 import info.guardianproject.keanu.core.util.Debug;
-import info.guardianproject.keanu.core.util.Downloader;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.matrix.R;
 
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
+import static info.guardianproject.keanu.core.util.DatabaseUtils.ROOM_AVATAR_ACCESS;
 import static org.matrix.androidsdk.rest.model.Event.EVENT_TYPE_MESSAGE_ENCRYPTED;
 
 public class MatrixConnection extends ImConnection {
@@ -2368,15 +2368,18 @@ public class MatrixConnection extends ImConnection {
     private void downloadAvatarAsync (final String address, final String url)
     {
         mStateExecutor.execute(() -> {
+
             boolean hasAvatar = DatabaseUtils.doesAvatarHashExist(mContext.getContentResolver(),Imps.Avatars.CONTENT_URI,address,url);
 
             if (!hasAvatar) {
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                try {
-                    new Downloader().get(url, baos);
 
-                    if (baos != null && baos.size() > 0)
-                        setAvatar(address, baos.toByteArray(), url);
+                try {
+                    info.guardianproject.iocipher.File fileAvatar = DatabaseUtils.openSecureStorageFile(ROOM_AVATAR_ACCESS, address);
+                    info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(fileAvatar);
+                    new MatrixDownloader().get(url, fos);
+
+                 //   if (baos != null && baos.size() > 0)
+                   //     setAvatar(address, baos.toByteArray(), url);
 
                 } catch (Exception e) {
                     debug("downloadAvatar error",e);

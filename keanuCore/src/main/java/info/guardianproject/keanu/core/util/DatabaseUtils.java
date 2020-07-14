@@ -31,6 +31,7 @@ import java.util.Map;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Text;
 
 import android.content.ContentResolver;
@@ -111,7 +112,7 @@ public class DatabaseUtils {
 
     }
 
-    private final static String ROOM_AVATAR_ACCESS = "avatarcache";
+    public final static String ROOM_AVATAR_ACCESS = "avatarcache";
     public static byte[] getAvatarBytesFromAddress(String address) throws DecoderException {
 
         byte[] data = null;
@@ -166,6 +167,33 @@ public class DatabaseUtils {
         return builder.build();
     }**/
 
+    public static int updateAvatarBlob(ContentResolver resolver, InputStream is,
+                                       String username) {
+        /**
+         ContentValues values = new ContentValues(1);
+         values.put(Imps.Avatars.DATA, data);
+
+         StringBuilder buf = new StringBuilder(Imps.Avatars.CONTACT);
+         buf.append(" LIKE ?");
+
+         String[] selectionArgs = new String[] { username };
+
+         return resolver.update(updateUri, values, buf.toString(), selectionArgs);
+         **/
+        if (!TextUtils.isEmpty(username)) {
+            try {
+                info.guardianproject.iocipher.File fileAvatar = openSecureStorageFile(ROOM_AVATAR_ACCESS, username);
+                IOUtils.copy(is,new info.guardianproject.iocipher.FileOutputStream(fileAvatar));
+                return 1;
+            } catch (Exception e) {
+                e.printStackTrace();
+
+            }
+        }
+
+        return 0;
+    }
+
     public static int updateAvatarBlob(ContentResolver resolver, Uri updateUri, byte[] data,
             String username) {
         /**
@@ -197,7 +225,7 @@ public class DatabaseUtils {
 
     private static final String ReservedChars = "[|\\?*<\":>+/!']";
 
-    private static File openSecureStorageFile(String sessionId, String filename) throws FileNotFoundException {
+    public static File openSecureStorageFile(String sessionId, String filename) throws FileNotFoundException {
 //        debug( "openFile: url " + url) ;
         String localFilename = "/" + sessionId + "/download/" + filename.replaceAll(ReservedChars, "_");
 
