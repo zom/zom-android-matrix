@@ -201,7 +201,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         // load these libs up front to shorten the delay after typing the passphrase
         SQLiteDatabase.loadLibs(getApplicationContext());
         VirtualFileSystem.get().isMounted();
- 
+
        // mConnections = new HashMap<Long, IImConnection>();
         mApplicationContext = this;
 
