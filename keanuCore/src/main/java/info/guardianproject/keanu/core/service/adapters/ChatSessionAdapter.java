@@ -646,7 +646,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
                 final Message msgMedia = storeMediaMessage(mediaPath, mimeType, fileName);
 
-
+                /**
                 UploadProgressListener listener = new UploadProgressListener() {
                     @Override
                     public void onUploadProgress(long sent, long total) {
@@ -657,7 +657,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         if (mDataHandlerListener != null)
                             mDataHandlerListener.onTransferProgress(true,"","",mediaPath,percentF);
                     }
-                };
+                };**/
 
                 int newType = mChatSession.sendMessageAsync(msgMedia, new ChatSessionListener() {
                     @Override
@@ -1443,7 +1443,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             // Due to the move to fragments, we could have listeners for ChatViews that are not visible on the screen.
             // This is for fragments adjacent to the current one.  Therefore we can't use the existence of listeners
             // as a filter on notifications.
-            if ((!wasMessageSeen) && notifyUser) {
+            if ((!wasMessageSeen) && notifyUser && (!msg.isReaction())) {
 
                 if (isGroupChatSession()) {
                     if (!isMuted()) {
