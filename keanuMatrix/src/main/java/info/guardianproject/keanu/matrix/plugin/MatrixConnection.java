@@ -82,6 +82,8 @@ import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileInputStream;
@@ -171,10 +173,9 @@ public class MatrixConnection extends ImConnection {
         mChatSessionManager = new MatrixChatSessionManager(context, this);
         mChatGroupManager = new MatrixChatGroupManager(context, this,mChatSessionManager);
 
-        //mStateExecutor = Executors.newCachedThreadPool();
-        //mStateExecutor = new ThreadPoolExecutor( 2, 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+        mStateExecutor = new ThreadPoolExecutor( 2, 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         mMessageExecutor = Executors.newCachedThreadPool();
-        mStateExecutor = mMessageExecutor;// Executors.newCachedThreadPool();
+
     }
 
     @Override
@@ -368,6 +369,7 @@ public class MatrixConnection extends ImConnection {
 
             }
         });
+
         mStore.open();
 
         mDataHandler = new MXDataHandler(mStore, mCredentials);
@@ -404,7 +406,7 @@ public class MatrixConnection extends ImConnection {
         if (password == null)
             password = Imps.Account.getPassword(mContext.getContentResolver(), mAccountId);
 
-        final String initialToken = ""; //Preferences.getValue(mUser.getAddress().getUser() + ".sync");
+        final String initialToken = Preferences.getValue(mUser.getAddress().getUser() + ".sync");
 
         File fileCredsJson = new File("/" + username + "/creds.json");
 
@@ -527,6 +529,10 @@ public class MatrixConnection extends ImConnection {
             mChatGroupManager.setSession(mSession);
             mChatSessionManager.setSession(mSession);
 
+
+            setState(LOGGED_IN, null);
+            mSession.setIsOnline(true);
+
             if (enableEncryption) {
                 mSession.enableCrypto(true, new ApiCallback<Void>() {
                     @Override
@@ -553,9 +559,6 @@ public class MatrixConnection extends ImConnection {
                         debug("getCrypto().start.onSuccess");
                         mSession.startEventStream(initialToken);
 
-                        setState(LOGGED_IN, null);
-                        mSession.setIsOnline(true);
-
                         mDataHandler.getCrypto().setWarnOnUnknownDevices(false);
 
                         mDataHandler.getMediaCache().clearShareDecryptedMediaCache();
@@ -570,9 +573,9 @@ public class MatrixConnection extends ImConnection {
             {
                 debug("getCrypto().start.onSuccess");
                 mSession.startEventStream(initialToken);
-                setState(LOGGED_IN, null);
-                mSession.setIsOnline(true);
+
             }
+
         });
     }
 
@@ -968,28 +971,28 @@ public class MatrixConnection extends ImConnection {
     protected void updateGroupMembers (final Room room, final ChatGroup group, boolean priority) {
 
 
+        mStateExecutor.execute(
+                () -> {
+                    //Room room1 = mDataHandler.getRoom(group.getAddress().getAddress());
+                    updateGroupMembersAsync(room, group, false);
+                }
+        );
+        /*
         if (priority)
         {
             updateGroupMembersAsync(room, group, priority);
         }
         else {
-            mStateExecutor.execute(
-                    () -> {
-                        //Room room1 = mDataHandler.getRoom(group.getAddress().getAddress());
-                        updateGroupMembersAsync(room, group, false);
-                    }
-            );
-        }
+
+        }**/
 
     }
 
     protected void updateGroupMembersAsync (final Room room, final ChatGroup group, boolean priority)
     {
-        if (!priority)
-            android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-
         group.setLastUpdated();
 
+        /**
         mStateExecutor.execute(() -> {
 
             String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(room.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
@@ -999,7 +1002,7 @@ public class MatrixConnection extends ImConnection {
                     downloadAvatar(room.getRoomId(), downloadUrl);
                 }
             }
-        });
+        });**/
 
         room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
             @Override
@@ -1029,13 +1032,7 @@ public class MatrixConnection extends ImConnection {
 
                 GroupMemberLoader gLoader =new GroupMemberLoader(room, group, roomMembers);
 
-                if (priority)
-                {
-                    //gLoader.run();
-                    new Thread(gLoader).start();
-                }
-                else
-                    mStateExecutor.execute(gLoader);
+                mStateExecutor.execute(gLoader);
 
             }
         });
@@ -1098,6 +1095,7 @@ public class MatrixConnection extends ImConnection {
                 {
                     group.notifyMemberRoleUpdate(contact, "member", "invited");
                 }
+
 
                 if (members.size() < 40) {
                     String avatarUrl = mDataHandler.getUser(member.getUserId()).getAvatarUrl();
@@ -1333,7 +1331,7 @@ public class MatrixConnection extends ImConnection {
                 }
             }
 
-          //  Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
+            Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
 
         }
 
@@ -1550,33 +1548,42 @@ public class MatrixConnection extends ImConnection {
 
         @Override
         public void onRoomKick(String s) {
-            Room room = mDataHandler.getRoom(s);
+         //   Room room = mDataHandler.getRoom(s);
            // if (room != null)
             //    updateGroup(room);
         }
 
         @Override
-        public void onReceiptEvent(String roomId, List<String> list) {
-            debug ("onReceiptEvent: " + roomId);
+        public void onReceiptEvent(final String roomId, final List<String> list) {
 
-            Room room = mStore.getRoom(roomId);
-            ChatSession session = mChatSessionManager.getSession(roomId);
+            mStateExecutor.execute(new Runnable (){
 
-            if (session != null) {
+                public void run ()
+                {
+                    debug ("onReceiptEvent: " + roomId);
 
-                for (String userId : list) {
-                    //userId who got the room receipt
-                    ReceiptData data = mStore.getReceipt(roomId, userId);
-                    session.onMessageReadMarker(data.eventId, session.useEncryption());
+                    Room room = mStore.getRoom(roomId);
+                    ChatSession session = mChatSessionManager.getSession(roomId);
 
-                    if (userId.equals(mSession.getMyUserId())) {
+                    if (session != null) {
 
-                        mChatSessionManager.getChatSessionAdapter(roomId).markAsRead();
+                        for (String userId : list) {
+                            //userId who got the room receipt
+                            ReceiptData data = mStore.getReceipt(roomId, userId);
+                            session.onMessageReadMarker(data.eventId, session.useEncryption());
+
+                            if (userId.equals(mSession.getMyUserId())) {
+
+                                mChatSessionManager.getChatSessionAdapter(roomId).markAsRead();
+                            }
+
+                        }
+
                     }
-
                 }
+            });
 
-            }
+
 
 
         }
@@ -2365,27 +2372,25 @@ public class MatrixConnection extends ImConnection {
         lbqAvatars.add(new Pair<>(address, url));
     }
 
-    private void downloadAvatarAsync (final String address, final String url)
+    private void downloadAvatarSync (final String address, final String url)
     {
-        mStateExecutor.execute(() -> {
 
-            boolean hasAvatar = DatabaseUtils.doesAvatarHashExist(mContext.getContentResolver(),Imps.Avatars.CONTENT_URI,address,url);
+        boolean hasAvatar = DatabaseUtils.doesAvatarHashExist(mContext.getContentResolver(),Imps.Avatars.CONTENT_URI,address,url);
 
-            if (!hasAvatar) {
+        if (!hasAvatar) {
 
-                try {
-                    info.guardianproject.iocipher.File fileAvatar = DatabaseUtils.openSecureStorageFile(ROOM_AVATAR_ACCESS, address);
-                    info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(fileAvatar);
-                    new MatrixDownloader().get(url, fos);
+            try {
+                info.guardianproject.iocipher.File fileAvatar = DatabaseUtils.openSecureStorageFile(ROOM_AVATAR_ACCESS, address);
+                info.guardianproject.iocipher.FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(fileAvatar);
+                new MatrixDownloader().get(url, fos);
 
-                 //   if (baos != null && baos.size() > 0)
-                   //     setAvatar(address, baos.toByteArray(), url);
+             //   if (baos != null && baos.size() > 0)
+               //     setAvatar(address, baos.toByteArray(), url);
 
-                } catch (Exception e) {
-                    debug("downloadAvatar error",e);
-                }
+            } catch (Exception e) {
+                debug("downloadAvatar error",e);
             }
-        });
+        }
 
 
     }
@@ -2511,17 +2516,17 @@ public class MatrixConnection extends ImConnection {
 
             public void run() {
 
-                int maxLoad = 5;
+                int maxLoad = 3;
                 int i = 0;
 
                 while (lbqAvatars.peek() != null && i++ < maxLoad) {
                     Pair<String,String> pair = lbqAvatars.poll();
-                    downloadAvatarAsync(pair.first, pair.second);
+                    downloadAvatarSync(pair.first, pair.second);
                 }
 
             }
 
-        }, 0, 10000);
+        }, 0, 20000);
     }
 
     /**
