@@ -182,7 +182,7 @@ public class ConversationListItem extends FrameLayout {
             if (holder.mLine2 != null)
             {
                 holder.mLine2.setText("");
-                String vPath = message.split(" ")[0];
+                String vPath = message;//.split(" ")[0];
 
                 if (SecureMediaStore.isVfsUri(vPath)||SecureMediaStore.isContentUri(vPath))
                 {

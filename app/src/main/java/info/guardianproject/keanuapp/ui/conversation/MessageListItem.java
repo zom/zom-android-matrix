@@ -995,8 +995,8 @@ public class MessageListItem extends RelativeLayout {
 
             String mediaPath = body;
 
-            if (body.contains(" "))
-                mediaPath = body.split(" ")[0];
+        //    if (body.contains(" "))
+          //      mediaPath = body.split(" ")[0];
 
             Uri mediaUri = Uri.parse( mediaPath ) ;
 
