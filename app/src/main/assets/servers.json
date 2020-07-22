@@ -44,7 +44,7 @@
       "country_code": "FR",
       "domain": "matrix.org",
       "server": "matrix.org",
-      "ip": "104.24.206.27",
+      "ip": "104.20.20.236",
       "port": 443,
       "requires_otr": true,
       "captcha": false,

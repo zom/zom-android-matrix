@@ -9,11 +9,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
+import com.eternitywall.ots.Hash;
 import com.stefanosiano.powerful_libraries.imageview.PowerfulImageView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.ui.conversation.MessageListItem;
@@ -132,8 +134,10 @@ public class MessageViewHolder extends MediaViewHolder implements QuickReactions
         mLayoutInflater = layoutInflater;
     }
 
-    public void setReactions(ArrayList<QuickReaction> quickReactions) {
-        if (mQuickReactionContainer != null) {
+    public void setReactions(String packetId, ArrayList<QuickReaction> quickReactions) {
+
+        if (mQuickReactionContainer != null && mPacketId != null && mPacketId.equals(packetId)) {
+
             if (quickReactions != null && quickReactions.size() > 0) {
                 QuickReactionsRecyclerViewAdapter adapter = new QuickReactionsRecyclerViewAdapter(itemView.getContext(), quickReactions);
                 mQuickReactionContainer.setAdapter(adapter);
