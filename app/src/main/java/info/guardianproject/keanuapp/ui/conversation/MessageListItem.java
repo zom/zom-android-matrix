@@ -224,7 +224,7 @@ public class MessageListItem extends RelativeLayout {
     public ProgressBar getProgressBar(){
         return mHolder.progress;
     }
-    public PowerfulImageView getPowerFullImageView(){
+    public ImageView getMediaThumbnail(){
         return mHolder.mMediaThumbnail;
     }
 
@@ -458,30 +458,30 @@ public class MessageListItem extends RelativeLayout {
         holder.mTextViewForMessages.setVisibility(View.GONE);
         holder.mMediaPlay.setVisibility(View.GONE);
 
-        holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
+       // holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
+        holder.mMediaThumbnail.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
+        /**
         if (centerCrop)
             holder.mMediaThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
         else
             holder.mMediaThumbnail.setScaleType(ImageView.ScaleType.FIT_CENTER);
+         **/
 
         if( mimeType.startsWith("image/") ) {
 
             holder.mAvatar.setVisibility(View.VISIBLE);
             holder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
-            holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
+           // holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
             setImageThumbnail( getContext().getContentResolver(), id, holder, mediaUri );
-            holder.mMediaThumbnail.setBackgroundResource(android.R.color.transparent);
-
-            if (mimeType.endsWith("gif")||mimeType.endsWith("png"))
-                holder.mMediaThumbnail.setScaleType(ImageView.ScaleType.FIT_CENTER);
+          //  holder.mMediaThumbnail.setBackgroundResource(android.R.color.transparent);
 
         }
         else if (mimeType.startsWith("video/")) {
 
             holder.mAvatar.setVisibility(View.VISIBLE);
             holder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
-            holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
+         //   holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
             setVideoThumbnail( getContext().getContentResolver(), id, holder, mediaUri );
             holder.mMediaThumbnail.setBackgroundResource(android.R.color.transparent);
             holder.mMediaPlay.setImageResource(R.drawable.media_audio_play);
@@ -494,8 +494,7 @@ public class MessageListItem extends RelativeLayout {
 
             holder.mAvatar.setVisibility(View.VISIBLE);
             holder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
-            holder.mMediaThumbnail.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
+         //   holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
        //
             String thumbUri = getImageFromContent(context,mediaUri);
 
@@ -530,7 +529,7 @@ public class MessageListItem extends RelativeLayout {
             holder.mTextViewForTimestamp.setVisibility(View.GONE);
             holder.mMediaThumbnail.setScaleType(ImageView.ScaleType.FIT_START);
             holder.mMediaThumbnail.setImageResource(R.drawable.proofmodebadge); // generic file icon
-            holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_SMALL;
+        //    holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_SMALL;
             holder.mTextViewForMessages.setVisibility(View.GONE);
         }
         else
@@ -539,7 +538,7 @@ public class MessageListItem extends RelativeLayout {
             holder.mAvatar.setVisibility(View.VISIBLE);
             holder.mTextViewForTimestamp.setVisibility(View.VISIBLE);
             holder.mMediaThumbnail.setScaleType(ImageView.ScaleType.FIT_START);
-            holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
+          //  holder.mMediaThumbnail.getLayoutParams().height = THUMB_HEIGHT_LARGE;
 
 
             if (TextUtils.isEmpty(mimeType))
@@ -1010,7 +1009,7 @@ public class MessageListItem extends RelativeLayout {
                 mHolder.mTextViewForMessages.setVisibility(View.GONE);
                 mHolder.mMediaContainer.setVisibility(View.VISIBLE);
                 String displayName = mediaUri.getLastPathSegment();
-                boolean centerCrop = mimeType.contains("jpg")||mimeType.contains("jpeg")||mimeType.contains("video")|| mimeType.contains("html");
+                boolean centerCrop = false;//mimeType.contains("jpg")||mimeType.contains("jpeg")||mimeType.contains("video")|| mimeType.contains("html");
                 showMediaThumbnail(displayName,mimeType, mediaUri, id, mHolder, centerCrop);
             }
 

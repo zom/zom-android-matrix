@@ -16,7 +16,7 @@ import info.guardianproject.keanuapp.R;
  */
 public class MediaViewHolder extends RecyclerView.ViewHolder  {
 
-    public PowerfulImageView mMediaThumbnail;
+    public ImageView mMediaThumbnail;
     public ImageView mMediaPlay;
     public ProgressBar progress;
 
