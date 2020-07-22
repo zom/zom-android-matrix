@@ -26,6 +26,8 @@ import org.json.JSONException;
 import org.matrix.androidsdk.HomeServerConnectionConfig;
 import org.matrix.androidsdk.MXDataHandler;
 import org.matrix.androidsdk.MXSession;
+import org.matrix.androidsdk.RestClientHttpClientFactory;
+import org.matrix.androidsdk.RestHttpClientFactoryProvider;
 import org.matrix.androidsdk.core.JsonUtils;
 import org.matrix.androidsdk.core.callback.ApiCallback;
 import org.matrix.androidsdk.core.callback.SimpleApiCallback;
@@ -67,9 +69,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -102,6 +107,7 @@ import info.guardianproject.keanu.core.model.ImException;
 import info.guardianproject.keanu.core.model.Invitation;
 import info.guardianproject.keanu.core.model.Message;
 import info.guardianproject.keanu.core.model.Presence;
+import info.guardianproject.keanu.core.model.Server;
 import info.guardianproject.keanu.core.model.impl.BaseAddress;
 import info.guardianproject.keanu.core.provider.Imps;
 import info.guardianproject.keanu.core.service.IChatSession;
@@ -111,6 +117,7 @@ import info.guardianproject.keanu.core.util.DatabaseUtils;
 import info.guardianproject.keanu.core.util.Debug;
 import info.guardianproject.keanu.core.util.SecureMediaStore;
 import info.guardianproject.keanu.matrix.R;
+import okhttp3.Dns;
 
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
@@ -158,6 +165,8 @@ public class MatrixConnection extends ImConnection {
 
     public final static String EVENT_TYPE_REACTION = "m.reaction";
 
+    private Server[] mServers;
+
 
     // Request Handler
     @Nullable
@@ -175,6 +184,8 @@ public class MatrixConnection extends ImConnection {
 
         mStateExecutor = new ThreadPoolExecutor( 2, 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         mMessageExecutor = Executors.newCachedThreadPool();
+
+        mServers = Server.getServers(context);
 
     }
 
@@ -307,10 +318,35 @@ public class MatrixConnection extends ImConnection {
         if (!cursor.isClosed())
             cursor.close();
 
+
         mConfig = new HomeServerConnectionConfig.Builder()
                 .withHomeServerUri(Uri.parse(HTTPS_PREPEND + server))
-                .build();
+                .withDNS(new Dns() {
+                    @Override
+                    public List<InetAddress> lookup(String hostname) throws UnknownHostException {
 
+                        if (mServers != null)
+                            for (Server server : mServers)
+                            {
+                                if (hostname.equalsIgnoreCase(server.domain)) {
+                                    if (!TextUtils.isEmpty(server.ip)) {
+                                        byte[] bAddr = InetAddress.getByName(server.ip).getAddress();
+                                        InetAddress theAddr =
+                                                InetAddress.getByAddress(hostname, bAddr);
+                                        return Collections.singletonList(theAddr);
+                                    }
+                                    else  if (!TextUtils.isEmpty(server.server)) {
+                                        return Dns.SYSTEM.lookup(server.server);
+
+                                    }
+                                }
+                            }
+
+                        return Dns.SYSTEM.lookup(hostname);
+
+                    }
+                })
+                .build();
 
         final boolean enableEncryption = true;
 
@@ -521,6 +557,9 @@ public class MatrixConnection extends ImConnection {
 
     private void initSession (boolean enableEncryption, String initialToken)
     {
+
+
+
         mStateExecutor.execute(() -> {
             mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
                     .withFileEncryption(enableEncryption)
