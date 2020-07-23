@@ -3381,6 +3381,7 @@ public class ConversationView {
                 return;
             }
             Context context = rootView.getContext();
+
             final EmojiEditText editText = new EmojiEditText(context);
             editText.setImeOptions(EditorInfo.IME_ACTION_SEND);
             editText.setInputType(InputType.TYPE_NULL);
@@ -3397,29 +3398,31 @@ public class ConversationView {
                 }
             });
             SingleEmojiTrait.install(editText);
-            ((ViewGroup)rootView).addView(editText, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
-                    .setOnEmojiPopupDismissListener(new OnEmojiPopupDismissListener() {
-                        @Override
-                        public void onEmojiPopupDismiss() {
-                            emojiPopup = null;
-                            ((ViewGroup)rootView).removeView(editText);
-                        }
-                    })
-                    .setOnEmojiClickListener(new OnEmojiClickListener() {
-                        @Override
-                        public void onEmojiClick(@NonNull EmojiImageView emoji, @NonNull Emoji variant) {
-                            sendQuickReaction(variant.getUnicode(), messageId);
-                            emojiPopup.dismiss();
-                        }
-                    })
-                    .build(editText);
-            rootView.post(new Runnable() {
+
+            ((ViewGroup)rootView).addView(editText, ViewGroup.LayoutParams.MATCH_PARENT, 1);
+
+            rootView.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
+                            .setOnEmojiPopupDismissListener(new OnEmojiPopupDismissListener() {
+                                @Override
+                                public void onEmojiPopupDismiss() {
+                                    emojiPopup = null;
+                                    ((ViewGroup)rootView).removeView(editText);
+                                }
+                            })
+                            .setOnEmojiClickListener(new OnEmojiClickListener() {
+                                @Override
+                                public void onEmojiClick(@NonNull EmojiImageView emoji, @NonNull Emoji variant) {
+                                    sendQuickReaction(variant.getUnicode(), messageId);
+                                    emojiPopup.dismiss();
+                                }
+                            })
+                            .build(editText);
                     emojiPopup.toggle();
                 }
-            });
+            },200);
         } catch (Exception e) {
             e.printStackTrace();
         }
