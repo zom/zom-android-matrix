@@ -39,7 +39,7 @@ public class MessageViewHolder extends MediaViewHolder implements QuickReactions
 
     public ViewGroup mMediaContainer;
     public ViewGroup mAudioContainer;
-   public PowerfulImageView mMediaThumbnail;
+   public ImageView mMediaThumbnail;
    public ProgressBar progress;
 
 
@@ -65,7 +65,7 @@ public class MessageViewHolder extends MediaViewHolder implements QuickReactions
         mAvatar = (ImageView) view.findViewById(R.id.avatar);
         mMediaContainer = (ViewGroup)view.findViewById(R.id.media_thumbnail_container);
         mAudioContainer = (ViewGroup)view.findViewById(R.id.audio_container);
-        mMediaThumbnail = (PowerfulImageView)view.findViewById(R.id.media_thumbnail);
+        mMediaThumbnail = (ImageView)view.findViewById(R.id.media_thumbnail);
         progress  = (ProgressBar)view.findViewById(R.id.progress);
         mQuickReactionContainer = view.findViewById(R.id.quick_reaction_container);
        // mVisualizerView = (VisualizerView) view.findViewById(R.id.audio_view);

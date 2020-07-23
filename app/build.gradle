@@ -10,11 +10,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    compileSdkVersion 28
+    compileSdkVersion 29
     defaultConfig {
         applicationId "info.guardianproject.keanuapp"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -122,7 +122,7 @@ android {
         }
     }
 
-    buildToolsVersion '28.0.3'
+    buildToolsVersion '29.0.0'
 }
 
 dependencies {
@@ -147,6 +147,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
+
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
@@ -169,6 +170,8 @@ dependencies {
     //built in camera now!
     //https://github.com/natario1/CameraView
     implementation 'com.otaliastudios:cameraview:2.0.0-beta04'
+
+  //  implementation 'com.stefanosiano.powerful_libraries:imageview:1.0.15' //Use this if you don't need renderscript
     implementation 'com.stefanosiano.powerful_libraries:imageview_rs:1.0.15'
 
     implementation (name: 'IOCipher-debug', ext: 'aar')

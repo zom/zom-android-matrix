@@ -2711,78 +2711,48 @@ public class ConversationView {
 
             }
 
-
-
-            if (!mExpectingDelivery && isDelivered) {
-                mExpectingDelivery = true;
+            if (isDelivered  || (messageType ==Imps.MessageType.OUTGOING||messageType ==Imps.MessageType.OUTGOING_ENCRYPTED)) {
+                mExpectingDelivery = false;
                 viewHolder.progress.setVisibility(View.GONE);
-                viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
-                viewHolder.mMediaThumbnail.setBlurRadius(0);
+              //  viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.DISABLED);
+             //   viewHolder.mMediaThumbnail.setBlurRadius(0);
                // Log.v("ImageSend","isDelivered");
             } else if (cursor.getPosition() == cursor.getCount() - 1) {
                 //Log.v("ImageSend","isDelivered last");
 
-                if(messageType ==Imps.MessageType.OUTGOING){
+                if(messageType ==Imps.MessageType.QUEUED){
                     viewHolder.progress.setVisibility(View.VISIBLE);
-                    viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
-                    viewHolder.mMediaThumbnail.setBlurRadius(10);
-                    viewHolder.progress.setProgress(3);
-                    viewHolder.progress.setProgress(6);
-                    viewHolder.progress.setProgress(7);
-                    //Log.v("ImageSend","isDelivered last 1");
-                }else if(messageType ==Imps.MessageType.QUEUED){
-                    viewHolder.progress.setVisibility(View.VISIBLE);
-                    viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
-                    viewHolder.mMediaThumbnail.setBlurRadius(10);
+                //    viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
+                 //   viewHolder.mMediaThumbnail.setBlurRadius(10);
                     viewHolder.progress.setProgress(3);
                     viewHolder.progress.setProgress(6);
                     viewHolder.progress.setProgress(7);
                    // Log.v("ImageSend","isDelivered last 2");
                 }else if(messageType == Imps.MessageType.SENDING){
                    viewHolder.progress.setVisibility(View.VISIBLE);
-                    viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
-                    viewHolder.mMediaThumbnail.setBlurRadius(10);
+              //      viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
+               //     viewHolder.mMediaThumbnail.setBlurRadius(10);
                     viewHolder.progress.setProgress(3);
                     viewHolder.progress.setProgress(6);
                     viewHolder.progress.setProgress(7);
                     //Log.v("ImageSend","isDelivered last 3");
-                }else {
+                }
+                else {
                     viewHolder.progress.setVisibility(View.VISIBLE);
                     viewHolder.progress.setProgress(8);
                     viewHolder.progress.setProgress(9);
                     viewHolder.progress.setProgress(10);
-                    new Handler().postDelayed(new Runnable() {
+                    mHandler.postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             viewHolder.progress.setVisibility(View.GONE);
-                            viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN5X5);
-                            viewHolder.mMediaThumbnail.setBlurRadius(0);
+                      //      viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.DISABLED);
+                    //        viewHolder.mMediaThumbnail.setBlurRadius(0);
                         }
-                    },100);
-
-
-                  /*  viewHolder.mMediaThumbnail.setPivBlurMode(PivBlurMode.GAUSSIAN);
-                    viewHolder.mMediaThumbnail.setBlurRadius(0);
-                    viewHolder.mMediaThumbnail.setPivBlurDownSamplingRate(0);*/
-                  // Log.v("ImageSend","isDelivered last 4");
+                    },500);
 
                 }
 
-                /*
-                // if showTimeStamp is false for the latest message, then set a timer to query the
-                // cursor again in a minute, so we can update the last message timestamp if no new
-                // message is received
-                if (Log.isLoggable(ImApp.LOG_TAG, Log.DEBUG)) {
-                    log("delta = " + delta + ", showTs=" + showTimeStamp);
-                }
-                *//*
-                if (!showDelivery) {
-                    scheduleRequery(SHOW_DELIVERY_INTERVAL);
-                } else if (!showTimeStamp) {
-                    scheduleRequery(SHOW_TIME_STAMP_INTERVAL);
-                } else {
-                    cancelRequery();
-                }*/
             }
 
             MessageListItem.EncryptionState encState = MessageListItem.EncryptionState.NONE;
@@ -3411,6 +3381,7 @@ public class ConversationView {
                 return;
             }
             Context context = rootView.getContext();
+
             final EmojiEditText editText = new EmojiEditText(context);
             editText.setImeOptions(EditorInfo.IME_ACTION_SEND);
             editText.setInputType(InputType.TYPE_NULL);
@@ -3427,29 +3398,31 @@ public class ConversationView {
                 }
             });
             SingleEmojiTrait.install(editText);
-            ((ViewGroup)rootView).addView(editText, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-            emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
-                    .setOnEmojiPopupDismissListener(new OnEmojiPopupDismissListener() {
-                        @Override
-                        public void onEmojiPopupDismiss() {
-                            emojiPopup = null;
-                            ((ViewGroup)rootView).removeView(editText);
-                        }
-                    })
-                    .setOnEmojiClickListener(new OnEmojiClickListener() {
-                        @Override
-                        public void onEmojiClick(@NonNull EmojiImageView emoji, @NonNull Emoji variant) {
-                            sendQuickReaction(variant.getUnicode(), messageId);
-                            emojiPopup.dismiss();
-                        }
-                    })
-                    .build(editText);
-            rootView.post(new Runnable() {
+
+            ((ViewGroup)rootView).addView(editText, ViewGroup.LayoutParams.MATCH_PARENT, 1);
+
+            rootView.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    emojiPopup = EmojiPopup.Builder.fromRootView(rootView)
+                            .setOnEmojiPopupDismissListener(new OnEmojiPopupDismissListener() {
+                                @Override
+                                public void onEmojiPopupDismiss() {
+                                    emojiPopup = null;
+                                    ((ViewGroup)rootView).removeView(editText);
+                                }
+                            })
+                            .setOnEmojiClickListener(new OnEmojiClickListener() {
+                                @Override
+                                public void onEmojiClick(@NonNull EmojiImageView emoji, @NonNull Emoji variant) {
+                                    sendQuickReaction(variant.getUnicode(), messageId);
+                                    emojiPopup.dismiss();
+                                }
+                            })
+                            .build(editText);
                     emojiPopup.toggle();
                 }
-            });
+            },200);
         } catch (Exception e) {
             e.printStackTrace();
         }
