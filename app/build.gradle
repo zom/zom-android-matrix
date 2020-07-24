@@ -5,6 +5,7 @@ apply plugin: 'realm-android'
 apply plugin: 'testdroid'
 
 android {
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -136,8 +137,8 @@ dependencies {
     implementation(name: 'olm-sdk-release-3.1.4', ext: 'aar')
 
     /*********** KeanuApp components **********/
-    implementation(name: 'keanucore-0.0.1.59', ext: 'aar')
-    implementation(name: 'keanumatrix-0.0.1.59', ext: 'aar')
+    implementation(name: 'keanucore-0.0.1.60', ext: 'aar')
+    implementation(name: 'keanumatrix-0.0.1.60', ext: 'aar')
 
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -262,6 +263,9 @@ dependencies {
     //Alerter
     implementation 'com.tapadoo.android:alerter:5.1.2'
 
+    //Crash Reports
+    implementation "ch.acra:acra-mail:5.6.1"
+    implementation "ch.acra:acra-dialog:5.6.1"
 }
 
 // Map for the version code that gives each ABI a value.
