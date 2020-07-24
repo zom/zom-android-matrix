@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -183,7 +184,9 @@ public class DatabaseUtils {
         if (!TextUtils.isEmpty(username)) {
             try {
                 info.guardianproject.iocipher.File fileAvatar = openSecureStorageFile(ROOM_AVATAR_ACCESS, username);
-                IOUtils.copy(is,new info.guardianproject.iocipher.FileOutputStream(fileAvatar));
+                OutputStream os = new info.guardianproject.iocipher.FileOutputStream(fileAvatar);
+                IOUtils.copy(is,os);
+                os.close();
                 return 1;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -210,9 +213,9 @@ public class DatabaseUtils {
         if (!TextUtils.isEmpty(username)) {
             try {
                 info.guardianproject.iocipher.File fileAvatar = openSecureStorageFile(ROOM_AVATAR_ACCESS, username);
-                BufferedOutputStream buf = new BufferedOutputStream(new info.guardianproject.iocipher.FileOutputStream(fileAvatar));
-                buf.write(data, 0, data.length);
-                buf.close();
+                OutputStream os = new info.guardianproject.iocipher.FileOutputStream(fileAvatar);
+                IOUtils.write(data,os);
+                os.close();
                 return 1;
             } catch (Exception e) {
                 e.printStackTrace();

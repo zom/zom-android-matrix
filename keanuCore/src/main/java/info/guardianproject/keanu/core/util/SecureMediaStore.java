@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Environment;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -16,9 +17,13 @@ import androidx.exifinterface.media.ExifInterface;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.util.UUID;
@@ -545,17 +550,17 @@ public class SecureMediaStore {
 
         //load lower-res bitmap
         Bitmap bmp = getThumbnailFile(context, uri, maxImageSize);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        File file = new File(targetPath);
+        if (savePNG)
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        else
+            bmp.compress(Bitmap.CompressFormat.JPEG, 90, baos);
+
+        info.guardianproject.iocipher.File file = new info.guardianproject.iocipher.File(targetPath);
         file.getParentFile().mkdirs();
         FileOutputStream out = new info.guardianproject.iocipher.FileOutputStream(file);
-        
-        if (savePNG)
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, out);
-        else
-            bmp.compress(Bitmap.CompressFormat.JPEG, 90, out);
-
-        out.flush();
+        IOUtils.write(baos.toByteArray(),out);
         out.close();        
         bmp.recycle();        
 
@@ -645,38 +650,52 @@ public class SecureMediaStore {
     }
 
     public static void copyToVfs(java.io.File sourceFile, String targetPath) throws IOException {
-        // create the target directories tree
-        mkdirs( targetPath );
-        // copy
-        InputStream fis = null;
-        fis  = new java.io.FileInputStream(sourceFile);
 
-        FileOutputStream fos = new FileOutputStream(new File(targetPath), false);
+        File fileOut = new info.guardianproject.iocipher.File(targetPath);
+        fileOut.getParentFile().mkdirs();
 
-        IOUtils.copyLarge(fis, fos);
+        InputStream fis  = new java.io.FileInputStream(sourceFile);
+
+        FileOutputStream fos = new info.guardianproject.iocipher.FileOutputStream(fileOut, false);
+
+        int read;
+        byte[] data = new byte[4096];
+        while(-1 != (read = fis.read(data))) {
+
+            byte[] dataToWrite = new byte[read];
+            System.arraycopy(data,0,dataToWrite,0,read);
+            fos.write(data);
+        }
 
         fos.close();
-        fis.close();
     }
 
 
     public static void copyToVfs(InputStream sourceIS, String targetPath) throws IOException {
         // create the target directories tree
-        mkdirs( targetPath );
-        // copy
-        FileOutputStream fos = new FileOutputStream(new File(targetPath), false);
+        File fileOut = new info.guardianproject.iocipher.File(targetPath);
+        fileOut.getParentFile().mkdirs();
 
-        IOUtils.copyLarge(sourceIS, fos);
+        // copy
+        OutputStream fos = new info.guardianproject.iocipher.FileOutputStream(fileOut, false);
+
+        int read;
+        byte[] data = new byte[4096];
+        while(-1 != (read = sourceIS.read(data))) {
+
+            byte[] dataToWrite = new byte[read];
+            System.arraycopy(data,0,dataToWrite,0,read);
+            fos.write(data);
+        }
 
         fos.close();
-        sourceIS.close();
     }
 
 
     public static void copyToVfs(byte buf[], String targetPath) throws IOException {
         File file = new File(targetPath);
         FileOutputStream out = new FileOutputStream(file);
-        out.write(buf);
+        IOUtils.write(buf,out);
         out.close();
     }
     
@@ -686,7 +705,7 @@ public class SecureMediaStore {
         FileInputStream fis = new FileInputStream(new File(sourcePath));
         java.io.FileOutputStream fos = new java.io.FileOutputStream(targetPath, false);
 
-        IOUtils.copyLarge(fis, fos);
+        IOUtils.copy(fis, fos);
 
         fos.close();
         fis.close();
