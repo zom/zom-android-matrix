@@ -56,8 +56,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import org.apache.commons.io.IOUtils;
 import org.ocpsoft.prettytime.PrettyTime;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -676,11 +678,14 @@ public class ConversationDetailActivity extends BaseActivity {
         final Snackbar sb = Snackbar.make(mConvoView.getHistoryView(), R.string.upgrade_progress_action, Snackbar.LENGTH_INDEFINITE);
         sb.show();
 
+        handleSendDeleteAsync(mConvoView.getChatSession(),contentUri,defaultType,delete,resizeImage,importContent);
+        sb.dismiss();
+
+        /**
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
 
-                handleSendDeleteAsync(mConvoView.getChatSession(),contentUri,defaultType,delete,resizeImage,importContent);
 
                 return null;
             }
@@ -691,7 +696,7 @@ public class ConversationDetailActivity extends BaseActivity {
 
                 sb.dismiss();
             }
-        }.execute();
+        }.execute();**/
     }
 
     public void handleSendDeleteAsync(IChatSession session, Uri contentUri, String defaultType, boolean delete, boolean resizeImage, boolean importContent) {
@@ -731,7 +736,10 @@ public class ConversationDetailActivity extends BaseActivity {
                        if (bitmap != null){
                            String thumbPath = sendUri.getPath() + ".thumb.jpg";
                            info.guardianproject.iocipher.File fileThumb = new info.guardianproject.iocipher.File(thumbPath);
-                           bitmap.compress(Bitmap.CompressFormat.JPEG,100,new info.guardianproject.iocipher.FileOutputStream(fileThumb));
+                           ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                           bitmap.compress(Bitmap.CompressFormat.JPEG,100,baos);
+                           IOUtils.write(baos.toByteArray(),new info.guardianproject.iocipher.FileOutputStream(fileThumb));
+
                        }
                    }
 
@@ -760,7 +768,10 @@ public class ConversationDetailActivity extends BaseActivity {
                            if (bitmap != null) {
                                String thumbPath = sendUri.getPath() + ".thumb.jpg";
                                info.guardianproject.iocipher.File fileThumb = new info.guardianproject.iocipher.File(thumbPath);
-                               bitmap.compress(Bitmap.CompressFormat.JPEG, 100, new info.guardianproject.iocipher.FileOutputStream(fileThumb));
+                               ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                               bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+                               IOUtils.write(baos.toByteArray(),new info.guardianproject.iocipher.FileOutputStream(fileThumb));
+
                            }
                        }
                    }
@@ -907,7 +918,17 @@ public class ConversationDetailActivity extends BaseActivity {
                 boolean resizeImage = false;
                 boolean importContent = true; //let's import it!
                 //Log.v("ImageSend","ImageSend_send file");
-                handleSendDelete(uri, defaultType, deleteFile, resizeImage, importContent);
+
+                new AsyncTask<Void,Void,Void>()
+                {
+
+                    @Override
+                    protected Void doInBackground(Void... voids) {
+                        handleSendDelete(uri, defaultType, deleteFile, resizeImage, importContent);
+                        return null;
+                    }
+                }.execute();
+
             }
             else if (requestCode == REQUEST_ADD_MEDIA)
             {
