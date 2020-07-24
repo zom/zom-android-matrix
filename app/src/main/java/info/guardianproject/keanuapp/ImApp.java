@@ -47,6 +47,12 @@ import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
+import org.acra.ACRA;
+import org.acra.config.CoreConfigurationBuilder;
+import org.acra.config.DialogConfigurationBuilder;
+import org.acra.config.MailSenderConfigurationBuilder;
+import org.acra.data.StringFormat;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -159,11 +165,18 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         }
     }
 
-    /**
+
     protected void attachBaseContext(Context base) {
                 super.attachBaseContext(base);
-                MultiDex.install(this);
-            }*/
+        // The following line triggers the initialization of ACRA
+
+        CoreConfigurationBuilder builder = new CoreConfigurationBuilder(this);
+        builder.setBuildConfigClass(BuildConfig.class).setReportFormat(StringFormat.KEY_VALUE_LIST);
+        builder.getPluginConfigurationBuilder(MailSenderConfigurationBuilder.class).setEnabled(true).setMailTo("support@zom.im");
+        builder.getPluginConfigurationBuilder(DialogConfigurationBuilder.class).setEnabled(true);
+        ACRA.init(this, builder);
+
+            }
 
     @Override
     public ContentResolver getContentResolver() {
