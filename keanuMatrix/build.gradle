@@ -15,6 +15,9 @@ android {
         //doesn't seem to be supported with multi dex
         //   incremental true
     }
+lintOptions {
+          abortOnError false
+      }
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 29
@@ -35,7 +38,7 @@ android {
             dir 'libs'
         }
     }
-    buildToolsVersion '29.0.0'
+    buildToolsVersion '29.0.3'
 }
 
 dependencies {

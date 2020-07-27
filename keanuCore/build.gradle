@@ -6,6 +6,9 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+lintOptions {
+          abortOnError false
+      }
     compileSdkVersion 29
     defaultConfig {
         minSdkVersion 21
@@ -22,7 +25,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    buildToolsVersion '29.0.0'
+    buildToolsVersion '29.0.3'
     repositories {
         flatDir {
             dir 'libs'
