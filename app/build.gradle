@@ -80,8 +80,8 @@ android {
         altbrand {
             dimension = "release"
             applicationId "im.zom.messenger"
-            versionCode 215001300
-            versionName "2.1.5-RC-3"
+            versionCode 215001400
+            versionName "2.1.5-RC-4"
             archivesBaseName = "Zom-$versionName"
         }
 
