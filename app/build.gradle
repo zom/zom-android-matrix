@@ -123,7 +123,7 @@ android {
         }
     }
 
-    buildToolsVersion '29.0.0'
+    buildToolsVersion '29.0.3'
 }
 
 dependencies {
@@ -255,7 +255,9 @@ dependencies {
     implementation 'com.github.n8fr8:AudioRecorderView:228d48dbbc'
 
     // AirShare
-    implementation 'com.github.tladesignz:AirShare-Android:master-SNAPSHOT'
+    //implementation 'com.github.tladesignz:AirShare-Android:master-SNAPSHOT'
+    implementation 'com.github.guardianproject:windchime-android:5313f3532a' //switch to this from airshare
+
     implementation 'com.google.code.gson:gson:2.8.6'
     // Emojis
     implementation 'com.vanniktech:emoji-google:0.7.0-SNAPSHOT'

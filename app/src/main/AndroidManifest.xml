@@ -28,6 +28,7 @@
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" /> <!-- Required for Nearby Connections -->
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -38,26 +39,29 @@
     -->
     <uses-feature
         android:name="android.hardware.touchscreen"
-        android:required="false" />
+        android:required="false" tools:replace="required" />
     <uses-feature
         android:name="android.hardware.camera"
-        android:required="false" />
+        android:required="false" tools:replace="required" />
     <uses-feature
         android:name="android.hardware.camera.autofocus"
-        android:required="false" />
+        android:required="false" tools:replace="required" />
     <uses-feature
         android:name="android.hardware.telephony"
-        android:required="false" />
+        android:required="false" tools:replace="required" />
     <uses-feature
         android:name="android.hardware.microphone"
-        android:required="false" />
+        android:required="false" tools:replace="required" />
     <!--
          Some Chromebooks don't support touch. Although not essential,
             it's a good idea to explicitly include this declaration.
     -->
     <uses-feature
         android:name="android.hardware.wifi"
-        android:required="false" />
+        android:required="false" tools:replace="required" />
+
+	<uses-feature android:name="android.hardware.bluetooth_le"
+        android:required="false" tools:replace="required"/>
 
     <permission
         android:name="${applicationId}.core.permission.IM_SERVICE"
