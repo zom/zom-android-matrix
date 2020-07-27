@@ -446,12 +446,13 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
     public void sendReaction(String text, boolean isResend, String replyId) {
 
+        /**
         if (mConnection.getState() != ImConnection.LOGGED_IN) {
             // connection has been suspended, save the message without send it
             long now = System.currentTimeMillis();
             insertMessageInDb(null, text, now, Imps.MessageType.QUEUED, null, replyId);
             return;
-        }
+        }**/
 
         Message msg = new Message(text);
         msg.setID(nextID());
@@ -465,8 +466,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         long sendTime = System.currentTimeMillis();
 
         if (!isResend) {
-
-            insertMessageInDb(null, text, sendTime, msg.getType(), 0, msg.getID(), null, replyId);
+        //    insertMessageInDb(null, text, sendTime, msg.getType(), 0, msg.getID(), null, replyId);
         }
 
         int newType = mChatSession.sendMessageAsync(msg, new ChatSessionListener() {
