@@ -10,7 +10,7 @@
       "country_code": "US",
       "domain": "nang.zom.im",
       "server": "zom-production-nang-loadbalancer-1207751385.us-east-2.elb.amazonaws.com",
-      "ip": "3.137.37.148",
+      "ip": "",
       "port": 443,
       "requires_otr": true,
       "captcha": false,
