@@ -174,6 +174,8 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
         mYou.affiliation = "none";
         mYou.role = "none";
 
+        updateMembers();
+
     }
 
     private void initRecyclerView () {
@@ -601,7 +603,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                 public void run ()
                 {
 
-                    final HashMap<String, GroupMemberDisplay> members = new HashMap<>();
+                  //  final HashMap<String, GroupMemberDisplay> members = new HashMap<>();
 
                     String[] projection = {Imps.GroupMembers.USERNAME, Imps.GroupMembers.NICKNAME, Imps.GroupMembers.ROLE, Imps.GroupMembers.AFFILIATION};
                     Uri memberUri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, mLastChatId);
@@ -627,34 +629,39 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                                 mYou = member;
                             }
 
-                            members.put(member.username, member);
+                            boolean isImportant = (member.affiliation.contentEquals("owner") || member.affiliation.contentEquals("admin"));
+
+                            if (isImportant)
+                                mMembers.add(0,member);
+                            else
+                                mMembers.add(member);
                         }
                         c.close();
                     }
 
+                    /**
                     mMembers = new ArrayList<>(members.values());
 
-                    synchronized (mMembers) {
-                        // Sort members by name, but keep owners at the top
-                        Collections.sort(mMembers, new Comparator<GroupMemberDisplay>() {
-                            @Override
-                            public int compare(GroupMemberDisplay member1, GroupMemberDisplay member2) {
-                                if (member1.affiliation == null || member2.affiliation == null)
+                    // Sort members by name, but keep owners at the top
+                    Collections.sort(mMembers, new Comparator<GroupMemberDisplay>() {
+                        @Override
+                        public int compare(GroupMemberDisplay member1, GroupMemberDisplay member2) {
+                            if (member1.affiliation == null || member2.affiliation == null)
+                                return 1;
+                            boolean member1isImportant = (member1.affiliation.contentEquals("owner") || member1.affiliation.contentEquals("admin"));
+                            boolean member2isImportant = (member2.affiliation.contentEquals("owner") || member2.affiliation.contentEquals("admin"));
+                            if (member1isImportant != member2isImportant) {
+                                if (member1isImportant) {
+                                    return -1;
+                                } else {
                                     return 1;
-                                boolean member1isImportant = (member1.affiliation.contentEquals("owner") || member1.affiliation.contentEquals("admin"));
-                                boolean member2isImportant = (member2.affiliation.contentEquals("owner") || member2.affiliation.contentEquals("admin"));
-                                if (member1isImportant != member2isImportant) {
-                                    if (member1isImportant) {
-                                        return -1;
-                                    } else {
-                                        return 1;
-                                    }
                                 }
-                                return member1.nickname.compareTo(member2.nickname);
                             }
-                        });
-                    }
-                    
+                            return member1.nickname.compareTo(member2.nickname);
+                        }
+                    });
+                     **/
+
                     runOnUiThread(() -> {
                         if (mRecyclerView != null && mRecyclerView.getAdapter() != null)
                             mRecyclerView.getAdapter().notifyDataSetChanged();
