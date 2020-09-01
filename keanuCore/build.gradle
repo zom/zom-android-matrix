@@ -39,11 +39,11 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
 
-    //api 'info.guardianproject.iocipher:IOCipher:0.5'
+    api 'info.guardianproject.iocipher:IOCipher:0.4.2'
 
-    api (name: 'IOCipher-debug', ext: 'aar')
+    //api (name: 'IOCipher-debug', ext: 'aar')
     api 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
     api "androidx.sqlite:sqlite:2.1.0"
 
