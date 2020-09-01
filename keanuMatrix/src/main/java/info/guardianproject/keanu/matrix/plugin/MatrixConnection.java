@@ -63,6 +63,8 @@ import org.matrix.androidsdk.rest.model.message.ImageMessage;
 import org.matrix.androidsdk.rest.model.message.VideoMessage;
 import org.matrix.androidsdk.rest.model.search.SearchUsersResponse;
 import org.matrix.androidsdk.rest.model.sync.AccountDataElement;
+import org.matrix.androidsdk.rest.model.sync.SyncResponse;
+import org.matrix.androidsdk.sync.EventsThreadListener;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -595,6 +597,7 @@ public class MatrixConnection extends ImConnection {
                     @Override
                     public void onSuccess(Void aVoid) {
 
+                        mSession.getDataHandler().getStore().open();
                         debug("getCrypto().start.onSuccess");
                         mSession.startEventStream(initialToken);
 
@@ -602,6 +605,7 @@ public class MatrixConnection extends ImConnection {
 
                         mDataHandler.getMediaCache().clearShareDecryptedMediaCache();
                         mDataHandler.getMediaCache().clearTmpDecryptedMediaCache();
+
 
                         mDataHandler.getStore().commit();
 
@@ -1370,7 +1374,7 @@ public class MatrixConnection extends ImConnection {
                 }
             }
 
-            Preferences.setValue(mUser.getAddress().getUser() + ".sync",event.mToken);
+            Preferences.setValue(mUser.getAddress().getUser() + ".sync",mSession.getCurrentSyncToken());
 
         }
 
@@ -1390,12 +1394,11 @@ public class MatrixConnection extends ImConnection {
                 handleRoomInvite(room, event.sender);
             }
 
-            /**
             if (!TextUtils.isEmpty(event.type)) {
                 if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
                     mSession.getCrypto().reRequestRoomKeyForEvent(event);
                 }
-            }**/
+            }
 
         }
 
@@ -1570,6 +1573,7 @@ public class MatrixConnection extends ImConnection {
             if (room != null)
             {
                 mStateExecutor.execute(() -> updateRoom(room));
+
             }
         }
 
