@@ -81,6 +81,7 @@ import info.guardianproject.keanuapp.ui.BaseActivity;
 import info.guardianproject.keanuapp.ui.camera.CameraActivity;
 import info.guardianproject.keanuapp.ui.contacts.ContactsPickerActivity;
 import info.guardianproject.keanuapp.ui.stories.StoryEditorActivity;
+import info.guardianproject.keanuapp.ui.widgets.MediaInfo;
 import info.guardianproject.keanuapp.ui.widgets.ShareRequest;
 
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
@@ -470,9 +471,11 @@ public class ConversationDetailActivity extends BaseActivity {
             }
         }
         else {
+            Intent intent = new Intent(ConversationDetailActivity.this, AddUpdateMediaActivity.class);
+            startActivityForResult(intent,REQUEST_ADD_MEDIA);
 
+            //startActivityForResult(getPickImageChooserIntent(), REQUEST_SEND_IMAGE);
 
-            startActivityForResult(getPickImageChooserIntent(), REQUEST_SEND_IMAGE);
 
         }
 
@@ -678,14 +681,12 @@ public class ConversationDetailActivity extends BaseActivity {
         final Snackbar sb = Snackbar.make(mConvoView.getHistoryView(), R.string.upgrade_progress_action, Snackbar.LENGTH_INDEFINITE);
         sb.show();
 
-        handleSendDeleteAsync(mConvoView.getChatSession(),contentUri,defaultType,delete,resizeImage,importContent);
-        sb.dismiss();
-
-        /**
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
 
+                handleSendDeleteAsync(mConvoView.getChatSession(),contentUri,defaultType,delete,resizeImage,importContent);
+                sb.dismiss();
 
                 return null;
             }
@@ -696,7 +697,7 @@ public class ConversationDetailActivity extends BaseActivity {
 
                 sb.dismiss();
             }
-        }.execute();**/
+        }.execute();
     }
 
     public void handleSendDeleteAsync(IChatSession session, Uri contentUri, String defaultType, boolean delete, boolean resizeImage, boolean importContent) {
@@ -851,51 +852,61 @@ public class ConversationDetailActivity extends BaseActivity {
                 if (resultIntent == null)
                     return;
 
+                /**
                 Uri uri = resultIntent.getData() ;
 
                 if( uri == null ) {
                     return ;
-                }
+                }**/
 
+                String[] mediaUris = resultIntent.getStringArrayExtra("resultUris");
+                String[] mediaTypes = resultIntent.getStringArrayExtra("resultTypes");
 
-                ShareRequest request = new ShareRequest();
-                request.deleteFile = false;
-                request.resizeImage = true;
-                request.importContent = true;
-                request.media = uri;
-                request.mimeType = resultIntent.getType();
+                if (mediaUris == null || mediaUris.length == 0)
+                    return;
 
-                if (TextUtils.isEmpty(request.mimeType)) {
-                    // import
-                    //Log.v("ImageSend","ImageSend_2");
-                    SystemServices.FileInfo info = null;
-                    try {
-                        //Log.v("ImageSend","ImageSend_3");
-                        info = SystemServices.getFileInfoFromURI(this, request.media);
-                        request.mimeType = info.type;
-                        info.stream.close();
-                    } catch (Exception e) {
-
-                    }
-
-                }
-
-                if (request.mimeType.startsWith("image"))
+                for (int i = 0; i < mediaUris.length; i++)
                 {
-                    try {
-                        //Log.v("ImageSend","ImageSend_4");
-                        mConvoView.setMediaDraft(request);
+                    ShareRequest request = new ShareRequest();
+                    request.deleteFile = false;
+                    request.resizeImage = true;
+                    request.importContent = true;
+                    request.media = Uri.parse(mediaUris[i]);
+                    request.mimeType = mediaTypes[i];
+
+                    if (TextUtils.isEmpty(request.mimeType)) {
+                        // import
+                        //Log.v("ImageSend","ImageSend_2");
+                        SystemServices.FileInfo info = null;
+                        try {
+                            //Log.v("ImageSend","ImageSend_3");
+                            info = SystemServices.getFileInfoFromURI(this, request.media);
+                            request.mimeType = info.type;
+                            info.stream.close();
+                        } catch (Exception e) {
+
+                        }
+
                     }
-                    catch (Exception e){
-                        Log.w(LOG_TAG,"error setting media draft",e);
+
+                    /**
+                    if (request.mimeType.startsWith("image"))
+                    {
+                        try {
+                            //Log.v("ImageSend","ImageSend_4");
+                            mConvoView.setMediaDraft(request);
+                        }
+                        catch (Exception e){
+                            Log.w(LOG_TAG,"error setting media draft",e);
+                        }
                     }
-                }
-                else {
-                    boolean deleteFile = false;
-                    boolean resizeImage = false;
-                    boolean importContent = true; //let's import it!
-                    //Log.v("ImageSend","ImageSend_5");
-                    handleSendDelete(uri, request.mimeType, deleteFile, resizeImage, importContent);
+                    else {**/
+                        boolean deleteFile = false;
+                        boolean resizeImage = false;
+                        boolean importContent = true; //let's import it!
+                        //Log.v("ImageSend","ImageSend_5");
+                        handleSendDelete(request.media, request.mimeType, deleteFile, resizeImage, importContent);
+                    //}
                 }
 
 
@@ -935,18 +946,40 @@ public class ConversationDetailActivity extends BaseActivity {
                 String[] mediaUris = resultIntent.getStringArrayExtra("resultUris");
                 String[] mediaTypes = resultIntent.getStringArrayExtra("resultTypes");
 
-                for (int i = 0; i < mediaUris.length; i++)
-                {
-                    boolean deleteFile = false;
-                    boolean resizeImage = false;
-                    boolean importContent = true; //let's import it!
+                if (mediaUris != null) {
 
-                    if ((!TextUtils.isEmpty(mediaTypes[i]))
-                            && mediaTypes[i].startsWith("video"))
-                        importContent = false;
-                    //Log.v("ImageSend","REQUEST_ADD_MEDIA");
-                    handleSendDelete(Uri.parse(mediaUris[i]), mediaTypes[i], deleteFile, resizeImage, importContent);
+                    for (int i = 0; i < mediaUris.length; i++) {
+                        boolean deleteFile = false;
+                        boolean resizeImage = false;
+                        boolean importContent = true; //let's import it!
+
+                        if ((!TextUtils.isEmpty(mediaTypes[i]))
+                                && mediaTypes[i].startsWith("video"))
+                            importContent = false;
+                        //Log.v("ImageSend","REQUEST_ADD_MEDIA");
+                        handleSendDelete(Uri.parse(mediaUris[i]), mediaTypes[i], deleteFile, resizeImage, importContent);
+                    }
                 }
+                else {
+                    ArrayList<MediaInfo> list = (ArrayList<MediaInfo>) resultIntent.getSerializableExtra("listMediaInfo");
+
+                    if (list != null)
+                    {
+
+                        for (MediaInfo mInfo : list) {
+                            boolean deleteFile = false;
+                            boolean resizeImage = false;
+                            boolean importContent = true; //let's import it!
+
+                            if ((!TextUtils.isEmpty(mInfo.mimeType))
+                                    && mInfo.mimeType.startsWith("video"))
+                                importContent = false;
+                            //Log.v("ImageSend","REQUEST_ADD_MEDIA");
+                            handleSendDelete(mInfo.uri, mInfo.mimeType, deleteFile, resizeImage, importContent);
+                        }
+                    }
+                }
+
 
             }
             else if (requestCode == REQUEST_TAKE_PICTURE)
