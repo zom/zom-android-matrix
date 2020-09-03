@@ -1188,7 +1188,7 @@ public class MainActivity extends BaseActivity {
                 String version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
 
                 //if this is a full release, without -beta -rc etc, then check the appupdater!
-                if (version.indexOf("-") == -1) {
+                if (version.indexOf("-") == -1 && (!TextUtils.isEmpty(ImApp.URL_UPDATER))) {
 
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
                     long timeNow = new Date().getTime();
