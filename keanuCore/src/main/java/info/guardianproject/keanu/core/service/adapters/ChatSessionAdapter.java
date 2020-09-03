@@ -1336,7 +1336,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         if (body != null)
             Imps.updateMessageBody(mContentResolver, id, body, null);
 
-        return Imps.updateMessageInDb(mContentResolver, id, type, time, mContactId, newPacketId);
+        return Imps.updateMessageInDb(mContentResolver, id, type, time, mContactId, body, newPacketId);
     }
 
     int deleteMessageInDb (String id) {
@@ -1350,10 +1350,6 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     class ListenerAdapter implements MessageListener, GroupMemberListener {
 
         public boolean onIncomingMessage(ChatSession ses, final Message msg, boolean notifyUser) {
-
-            //we already have an encrypted message with this idea, so don't override that
-            if (Imps.messageExists(mContentResolver,msg.getID(),-1))
-                return false;
 
             String body = msg.getBody();
        //     String username = msg.getFrom().getAddress();
@@ -1393,19 +1389,23 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             //if it wasn't a media file or we had an issue downloading, then it is chat
             Uri messageUri = null;
 
-            /**
-            if (msg.getID() == null)
-                messageUri = insertMessageInDb(nickname + '|' + bareUsername, body, time, msg.getType(), msg.getContentType(), msg.getReplyId());
-            else
-                messageUri = insertMessageInDb(nickname + '|' + bareUsername, body, time, msg.getType(), 0, msg.getID(), msg.getContentType(), msg.getReplyId());
-            **/
 
             int msgType = msg.getType();
 
-            if (msg.getID() == null)
-                messageUri = insertMessageInDb(bareUsername, body, time, msgType, msg.getContentType(), msg.getReplyId());
-            else
-                messageUri = insertMessageInDb(bareUsername, body, time, msgType, 0, msg.getID(), msg.getContentType(), msg.getReplyId());
+            if (Imps.messageExists(mContentResolver,msg.getID(),-1)) {
+
+                //update the message body
+
+                updateMessageInDb(msg.getID(),msgType,-1,body,msg.getID());
+
+                return false;
+            }
+            else {
+                if (msg.getID() == null)
+                    messageUri = insertMessageInDb(bareUsername, body, time, msgType, msg.getContentType(), msg.getReplyId());
+                else
+                    messageUri = insertMessageInDb(bareUsername, body, time, msgType, 0, msg.getID(), msg.getContentType(), msg.getReplyId());
+            }
 
             if (!msg.isReaction())
                 setLastMessage(body, time);

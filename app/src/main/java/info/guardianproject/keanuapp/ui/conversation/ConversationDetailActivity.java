@@ -678,14 +678,12 @@ public class ConversationDetailActivity extends BaseActivity {
         final Snackbar sb = Snackbar.make(mConvoView.getHistoryView(), R.string.upgrade_progress_action, Snackbar.LENGTH_INDEFINITE);
         sb.show();
 
-        handleSendDeleteAsync(mConvoView.getChatSession(),contentUri,defaultType,delete,resizeImage,importContent);
-        sb.dismiss();
-
-        /**
         new AsyncTask() {
             @Override
             protected Object doInBackground(Object[] objects) {
 
+                handleSendDeleteAsync(mConvoView.getChatSession(),contentUri,defaultType,delete,resizeImage,importContent);
+                sb.dismiss();
 
                 return null;
             }
@@ -696,7 +694,7 @@ public class ConversationDetailActivity extends BaseActivity {
 
                 sb.dismiss();
             }
-        }.execute();**/
+        }.execute();
     }
 
     public void handleSendDeleteAsync(IChatSession session, Uri contentUri, String defaultType, boolean delete, boolean resizeImage, boolean importContent) {

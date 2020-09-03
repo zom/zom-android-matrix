@@ -43,6 +43,7 @@ import org.matrix.androidsdk.data.MyUser;
 import org.matrix.androidsdk.data.Room;
 import org.matrix.androidsdk.data.RoomState;
 import org.matrix.androidsdk.data.store.IMXStoreListener;
+import org.matrix.androidsdk.data.timeline.EventTimeline;
 import org.matrix.androidsdk.listeners.IMXEventListener;
 import org.matrix.androidsdk.listeners.MXMediaUploadListener;
 import org.matrix.androidsdk.rest.client.LoginRestClient;
@@ -920,7 +921,7 @@ public class MatrixConnection extends ImConnection {
     private void loadStateAsync ()
     {
 
-        mStateExecutor.execute(() -> {
+        mMessageExecutor.execute(() -> {
 
             Collection<Room> rooms = mStore.getRooms();
 
@@ -930,6 +931,37 @@ public class MatrixConnection extends ImConnection {
                     addRoomContact(room, null);
                 }
 
+                String roomReadMarkerId = room.getReadMarkerEventId();
+                room.getTimeline().addEventTimelineListener(new EventTimeline.Listener() {
+                    @Override
+                    public void onEvent(Event event, EventTimeline.Direction direction, RoomState roomState) {
+                        mEventListener.onLiveEvent(event, roomState);
+                    }
+                });
+
+                room.getTimeline().backPaginate(new ApiCallback<Integer>() {
+                    @Override
+                    public void onNetworkError(Exception e) {
+
+                        debug("room backPaginate onNetworkError",e);
+                    }
+
+                    @Override
+                    public void onMatrixError(MatrixError matrixError) {
+                        debug("room backPaginate onMatrixError",matrixError);
+                    }
+
+                    @Override
+                    public void onUnexpectedError(Exception e) {
+                        debug("room backPaginate onUnexpectedError",e);
+
+                    }
+
+                    @Override
+                    public void onSuccess(Integer integer) {
+                        debug ("room backPaginate onSuccess: " + integer);
+                    }
+                });
             }
 
             mContactListManager.loadContactListsAsync();
@@ -1457,7 +1489,7 @@ public class MatrixConnection extends ImConnection {
                 });
             }
 
-            mStateExecutor.execute(() -> loadStateAsync());
+            loadStateAsync();
 
         }
 
@@ -1994,99 +2026,117 @@ public class MatrixConnection extends ImConnection {
 
             debug("MESSAGE: room=" + event.roomId + " from=" + event.getSender() + " event=" + event.toString());
 
-            String messageBody = null;
-
-            if (event.getContent().getAsJsonObject().has("body"))
-                messageBody = event.getContent().getAsJsonObject().get("body").getAsString();
-
-            Pair<String,String> replyToInfo = getReplyToFromEvent(event);
-
-            boolean isQuickReaction = event.getType().equals(EVENT_TYPE_REACTION);
-            if (isQuickReaction && replyToInfo != null) {
-                messageBody = replyToInfo.second;
-            }
-
-            if (TextUtils.isEmpty(messageBody)) {
-                debug("WARN: MESSAGE HAS NO BODY: " + event.toString());
-                return;
-            }
-
             Room room = mStore.getRoom(event.roomId);
 
             if (room != null && room.isMember()) {
 
                 ChatSession session = mChatSessionManager.getSession(event.roomId);
-
                 if (session == null) {
                     ImEntity participant = mChatGroupManager.getChatGroup(new MatrixAddress(event.roomId));
                     session = mChatSessionManager.createChatSession(participant, false);
                     if (session == null)
                         return;
-
-                    final List<ReceiptData> receipts = mDataHandler.getStore().getEventReceipts(event.roomId, null, true, false);
-                    for (ReceiptData data : receipts)
-                    {
-                        session.onMessageReceipt(data.eventId, session.useEncryption());
-                    }
                 }
 
                 ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(event.roomId);
+                if (room == null || TextUtils.isEmpty(event.eventId) || csa.doesMessageExist(event.eventId))
+                    return;
 
-                if (!csa.doesMessageExist(event.eventId)) {
-                    MatrixAddress addrSender = new MatrixAddress(event.sender);
+                String eventId = event.eventId;
+                String messageBody = null;
+                Pair<String, String> replyToInfo = null;
 
-                    Message message = null;
-                    if (!isQuickReaction) {
-                        message = downloadMedia(event, messageBody, addrSender);
-                    }
+                JsonObject mObj = event.getContent().getAsJsonObject();
 
-                    if (message == null) {
-                        message = new Message(messageBody);
-                        message.setID(event.eventId);
-                        message.setFrom(addrSender);
-                        message.setDateTime(new Date(event.getOriginServerTs()));
-                    }
 
-                    if (replyToInfo != null) {
-                        message.setReplyId(replyToInfo.first);
-                    }
+                if (mObj.has("body"))
+                    messageBody = mObj.get("body").getAsString();
 
-                    message.setReaction(isQuickReaction);
+                if (mObj.has("m.new_content"))
+                {
 
-                    boolean isFromMe = addrSender.mAddress.equals(mUser.getAddress().getAddress());
+                    //  "content": {
+                    //    "m.new_content": {"msgtype":"m.text","body":"yes one two threeadsasdasdsadsadadasdasdasdasasdasdsadasd"},
+                    //    "msgtype": "m.text",
+                    //    "body": " * yes one two threeadsasdasdsadsadadasdasdasdasasdasdsadasd",
+                    //    "m.relates_to": {"event_id":"$1599077041785134psDVO:matrix.org","rel_type":"m.replace"},
+                    //  },
 
-                    boolean isEncrypted = mDataHandler.getRoom(event.roomId).isEncrypted();
+                    messageBody = mObj.getAsJsonObject("m.new_content").get("body").getAsString() + " " + mContext.getString(R.string.edited);
+                    eventId = mObj.getAsJsonObject("m.relates_to").get("event_id").getAsString();
 
-                    if (isFromMe)
-                    {
-                        if (isEncrypted) {
-                            message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
-                        } else
-                            message.setType(Imps.MessageType.OUTGOING);
-                    }
-                    else {
-                        if (isEncrypted)
-                            message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
-                        else
-                            message.setType(Imps.MessageType.INCOMING);
-                    }
 
-                    boolean notifyUser = !isFromMe;
-
-                    if (notifyUser) {
-                        //only notify if received in the last day, else we get swarmed
-                        Date now = new Date();
-                        if ((now.getTime() - event.getOriginServerTs()) > TIME_ONE_DAY_MS)
-                            notifyUser = false;
-                    }
-
-                    session.onReceiveMessage(message, notifyUser);
-
-                    csa.setContactTyping(new Contact(addrSender), false);
-
-                    // if we send here, things go wrong
-                   // sendMessageRead(event.roomId, event.eventId);
                 }
+                else
+                {
+                    replyToInfo = getReplyToFromEvent(event);
+                }
+
+                boolean isQuickReaction = event.getType().equals(EVENT_TYPE_REACTION);
+                if (isQuickReaction && replyToInfo != null) {
+                    messageBody = replyToInfo.second;
+                }
+
+                if (TextUtils.isEmpty(messageBody)) {
+                    debug("WARN: MESSAGE HAS NO BODY: " + event.toString());
+                    return;
+                }
+
+                final List<ReceiptData> receipts = mDataHandler.getStore().getEventReceipts(event.roomId, null, true, false);
+                for (ReceiptData data : receipts) {
+                    session.onMessageReceipt(data.eventId, session.useEncryption());
+                }
+
+                MatrixAddress addrSender = new MatrixAddress(event.sender);
+
+                Message message = null;
+                if (!isQuickReaction) {
+                    message = downloadMedia(event, messageBody, addrSender);
+                }
+
+                if (message == null) {
+                    message = new Message(messageBody);
+                    message.setID(eventId);
+                    message.setFrom(addrSender);
+                    message.setDateTime(new Date(event.getOriginServerTs()));
+                }
+
+                if (replyToInfo != null) {
+                    message.setReplyId(replyToInfo.first);
+                }
+
+                message.setReaction(isQuickReaction);
+
+                boolean isFromMe = addrSender.mAddress.equals(mUser.getAddress().getAddress());
+
+                boolean isEncrypted = mDataHandler.getRoom(event.roomId).isEncrypted();
+
+                if (isFromMe) {
+                    if (isEncrypted) {
+                        message.setType(Imps.MessageType.OUTGOING_ENCRYPTED);
+                    } else
+                        message.setType(Imps.MessageType.OUTGOING);
+                } else {
+                    if (isEncrypted)
+                        message.setType(Imps.MessageType.INCOMING_ENCRYPTED);
+                    else
+                        message.setType(Imps.MessageType.INCOMING);
+                }
+
+                boolean notifyUser = !isFromMe;
+
+                if (notifyUser) {
+                    //only notify if received in the last day, else we get swarmed
+                    Date now = new Date();
+                    if ((now.getTime() - event.getOriginServerTs()) > TIME_ONE_DAY_MS)
+                        notifyUser = false;
+                }
+
+                session.onReceiveMessage(message, notifyUser);
+
+                csa.setContactTyping(new Contact(addrSender), false);
+
+
             }
         }
 

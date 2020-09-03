@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.net.Uri.Builder;
 import android.os.Handler;
 import android.provider.BaseColumns;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.util.HashMap;
@@ -2481,7 +2482,7 @@ public class Imps {
         return result;
     }
 
-    public static int updateMessageInDb(ContentResolver resolver, String oldPacketId, int type, long time, long contactId, String newPacketId) {
+    public static int updateMessageInDb(ContentResolver resolver, String oldPacketId, int type, long time, long contactId, String body, String newPacketId) {
 
         Builder builder = Messages.OTR_MESSAGES_CONTENT_URI_BY_PACKET_ID.buildUpon();
         builder.appendPath(oldPacketId);
@@ -2494,6 +2495,9 @@ public class Imps {
 
         if (newPacketId != null)
             values.put(Messages.PACKET_ID,newPacketId);
+
+        if (body != null)
+            values.put(Messages.BODY,body);
 
         int result = resolver.update(builder.build(), values, null, null);
 
