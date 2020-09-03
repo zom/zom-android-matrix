@@ -616,6 +616,8 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
                   //  final HashMap<String, GroupMemberDisplay> members = new HashMap<>();
 
+                    mMembers.clear();
+
                     String[] projection = {Imps.GroupMembers.USERNAME, Imps.GroupMembers.NICKNAME, Imps.GroupMembers.ROLE, Imps.GroupMembers.AFFILIATION};
                     Uri memberUri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, mLastChatId);
                     ContentResolver cr = getContentResolver();
