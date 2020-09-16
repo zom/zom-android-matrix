@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
 
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -105,7 +106,20 @@ public class AddUpdateMediaActivity extends CameraActivity implements GalleryAda
         Intent intent = getIntent();
         if(intent != null){
             storyTitle = intent.getStringExtra("title");
+
+            if (!TextUtils.isEmpty(intent.getType()))
+            {
+                if (intent.getType().startsWith("image"))
+                    openGallery(StoryGalleryActivity.GALLERY_MODE_IMAGE);
+                else if (intent.getType().startsWith("audio"))
+                    openGallery(StoryGalleryActivity.GALLERY_MODE_AUDIO);
+                else if (intent.getType().startsWith("video"))
+                    openGallery(StoryGalleryActivity.GALLERY_MODE_VIDEO);
+
+
+            }
         }
+
 
         btnAddMultipleImage.setOnClickListener(new View.OnClickListener() {
             @Override

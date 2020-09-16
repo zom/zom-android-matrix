@@ -472,6 +472,7 @@ public class ConversationDetailActivity extends BaseActivity {
         }
         else {
             Intent intent = new Intent(ConversationDetailActivity.this, AddUpdateMediaActivity.class);
+            intent.setType("image");
             startActivityForResult(intent,REQUEST_ADD_MEDIA);
 
             //startActivityForResult(getPickImageChooserIntent(), REQUEST_SEND_IMAGE);
@@ -562,9 +563,15 @@ public class ConversationDetailActivity extends BaseActivity {
         }
         else {
 
+            Intent intent = new Intent(ConversationDetailActivity.this, AddUpdateMediaActivity.class);
+            startActivityForResult(intent,REQUEST_ADD_MEDIA);
+
+            /**
             Intent intent = new Intent(this, CameraActivity.class);
+
             intent.putExtra(CameraActivity.SETTING_ONE_AND_DONE,true);
             startActivityForResult(intent, ConversationDetailActivity.REQUEST_TAKE_PICTURE);
+             **/
 
             /**
            if (Preferences.useProofMode())
