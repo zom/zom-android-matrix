@@ -1,6 +1,7 @@
 package info.guardianproject.keanu.matrix.plugin;
 
 
+import android.net.TrafficStats;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -34,6 +35,7 @@ public class MatrixDownloader {
 
 
     private String mMimeType = null;
+    private static final int DOWNLOADER_THREAD_ID = 10010;
 
     public MatrixDownloader()
     {}
@@ -41,6 +43,9 @@ public class MatrixDownloader {
     public boolean get (String urlString, OutputStream storageStream) throws IOException
     {
         try {
+
+
+            TrafficStats.setThreadStatsTag(DOWNLOADER_THREAD_ID);
 
             OkHttpClient client = new OkHttpClient.Builder()
                     .connectTimeout(30, TimeUnit.SECONDS)
