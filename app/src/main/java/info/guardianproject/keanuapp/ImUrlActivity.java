@@ -408,11 +408,15 @@ public class ImUrlActivity extends Activity {
 
     private boolean resolveIntent(Intent intent) {
         Uri data = intent.getData();
+
+        if (data == null)
+            return false;
+
         mHost = data.getHost();
 
         if (data.getScheme().equals("https"))
         {
-            //special zom.im invite link: https://zom.im/invite/<base64 encoded username?k=otrFingerprint
+            //special keanu.im invite link: https://keanu.im/invite/<base64 encoded username?k=otrFingerprint
 
             try {
                 //parse each string and if they are for a new user then add the user
@@ -921,6 +925,15 @@ public class ImUrlActivity extends Activity {
     private void doOnCreate ()
     {
         Intent intent = getIntent();
+
+        Bundle extras = intent.getExtras();
+        for (String key : extras.keySet())
+        {
+            Log.d("ImUrl","bundle extra: " + key + "=" + extras.get(key));
+        }
+
+
+
         if (Intent.ACTION_INSERT.equals(intent.getAction())) {
             if (!resolveInsertIntent(intent)) {
                 finish();

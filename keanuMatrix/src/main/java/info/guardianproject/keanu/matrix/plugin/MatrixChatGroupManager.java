@@ -385,46 +385,53 @@ public class MatrixChatGroupManager extends ChatGroupManager {
     public void joinChatGroupAsync(Address address, final IChatSessionListener listener) {
         final Room room = mDataHandler.getRoom(address.getAddress());
 
-        if (room != null && (!room.isMember()))
-            room.join(new ApiCallback<Void>() {
-                @Override
-                public void onNetworkError(Exception e) {
-                    mConn.debug("joinChatGroupAsync.join.onNetworkError");
-                    try {
-                        listener.onChatSessionCreateError(e.toString(), null);
-                    } catch (RemoteException ex) {
-                        ex.printStackTrace();
+        if (room != null)
+
+            if (room.isMember()) {
+                mConn.debug("joinChatGroupAsync.join.alreadyMember");
+                updatedJoinedRoom(room, listener);
+
+            } else {
+                room.join(new ApiCallback<Void>() {
+                    @Override
+                    public void onNetworkError(Exception e) {
+                        mConn.debug("joinChatGroupAsync.join.onNetworkError");
+                        try {
+                            listener.onChatSessionCreateError(e.toString(), null);
+                        } catch (RemoteException ex) {
+                            ex.printStackTrace();
+                        }
+
+
                     }
 
-
-                }
-
-                @Override
-                public void onMatrixError(MatrixError matrixError) {
-                    mConn.debug("joinChatGroupAsync.join.onMatrixError");
-                    try {
-                        listener.onChatSessionCreateError(matrixError.toString(), null);
-                    } catch (RemoteException ex) {
-                        ex.printStackTrace();
+                    @Override
+                    public void onMatrixError(MatrixError matrixError) {
+                        mConn.debug("joinChatGroupAsync.join.onMatrixError");
+                        try {
+                            listener.onChatSessionCreateError(matrixError.toString(), null);
+                        } catch (RemoteException ex) {
+                            ex.printStackTrace();
+                        }
                     }
-                }
 
-                @Override
-                public void onUnexpectedError(Exception e) {
-                    mConn.debug("joinChatGroupAsync.join.onUnexpectedError");
-                    try {
-                        listener.onChatSessionCreateError(e.toString(), null);
-                    } catch (RemoteException ex) {
-                        ex.printStackTrace();
+                    @Override
+                    public void onUnexpectedError(Exception e) {
+                        mConn.debug("joinChatGroupAsync.join.onUnexpectedError");
+                        try {
+                            listener.onChatSessionCreateError(e.toString(), null);
+                        } catch (RemoteException ex) {
+                            ex.printStackTrace();
+                        }
                     }
-                }
 
-                @Override
-                public void onSuccess(Void aVoid) {
-                    mConn.debug("acceptInvitationAsync.join.onSuccess");
-                    updatedJoinedRoom (room, listener);
-                }
-            });
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        mConn.debug("joinChatGroupAsync.join.onSuccess");
+                        updatedJoinedRoom(room, listener);
+                    }
+                });
+            }
     }
 
     @Override
