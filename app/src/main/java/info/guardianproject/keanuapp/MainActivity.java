@@ -473,6 +473,8 @@ public class MainActivity extends BaseActivity {
 
         PopupAlertManager.INSTANCE.onNewActivityDisplayed(this);
 
+        checkForUpdates();
+
     }
 
     private Snackbar mSbStatus;
@@ -1190,6 +1192,7 @@ public class MainActivity extends BaseActivity {
 
                     AppUpdater appUpdater = new AppUpdater(this);
                     appUpdater.setDisplay(Display.SNACKBAR);
+
                     if (hasGooglePlay())
                         appUpdater.setUpdateFrom(UpdateFrom.GOOGLE_PLAY);
                     else {
@@ -1197,7 +1200,6 @@ public class MainActivity extends BaseActivity {
                         appUpdater.setUpdateXML(ImApp.URL_UPDATER);
                     }
 
-                    appUpdater.showAppUpdated(true);
                     appUpdater.start();
 
                     prefs.edit().putLong("updatetime", timeNow).commit();

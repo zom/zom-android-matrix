@@ -90,7 +90,7 @@ import static info.guardianproject.keanu.core.service.RemoteImService.getConnect
 public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
 
 
-    public final static String URL_UPDATER = "";
+    public final static String URL_UPDATER = "https://gitlab.com/keanuapp/keanuapp-android/-/raw/master/appupdater.xml";
 
     public static ImApp sImApp;
 
