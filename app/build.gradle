@@ -131,7 +131,7 @@ android {
 }
 
 dependencies {
-    
+
 
     /************* Matrix SDK management **************/
     // use the matrix SDK as external lib
@@ -141,8 +141,8 @@ dependencies {
     implementation(name: 'olm-sdk-release-3.1.4', ext: 'aar')
 
     /*********** KeanuApp components **********/
-    implementation(name: 'keanucore-0.0.1.62', ext: 'aar')
-    implementation(name: 'keanumatrix-0.0.1.62', ext: 'aar')
+    implementation(name: 'keanucore-0.0.1.63', ext: 'aar')
+    implementation(name: 'keanumatrix-0.0.1.63', ext: 'aar')
 
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
