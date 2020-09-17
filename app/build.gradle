@@ -131,9 +131,8 @@ android {
 }
 
 dependencies {
-
-.
     
+
     /************* Matrix SDK management **************/
     // use the matrix SDK as external lib
     implementation(name: 'matrix-sdk-release-0.9.35', ext: 'aar')

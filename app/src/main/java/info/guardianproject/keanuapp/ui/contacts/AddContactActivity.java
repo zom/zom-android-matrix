@@ -544,6 +544,9 @@ public class AddContactActivity extends BaseActivity {
                         mConn = checkConnection();
 
                     if (mConn != null && mConn.getState() == ImConnection.LOGGED_IN) {
+
+                        /**
+                         //disable user search for now
                         mConn.searchForUser(searchString, new IContactListListener() {
                             @Override
                             public void onContactChange(int type, IContactList list, Contact contact) throws RemoteException {
@@ -573,7 +576,7 @@ public class AddContactActivity extends BaseActivity {
                             public IBinder asBinder() {
                                 return null;
                             }
-                        });
+                        });**/
                     }
                 }
             } catch (RemoteException e) {

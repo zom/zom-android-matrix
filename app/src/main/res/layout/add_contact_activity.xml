@@ -54,7 +54,9 @@
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@android:color/black"
                 android:textSize="17sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                android:visibility="gone"
+                />
 
             <info.guardianproject.keanu.core.type.CustomTypefaceEditText
                 android:id="@+id/email"

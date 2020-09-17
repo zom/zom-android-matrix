@@ -1,0 +1,10 @@
+<AppUpdater>
+  <update>
+    <latestVersion>0.0.4.11</latestVersion>
+    <latestVersionCode>411000</latestVersionCode>
+    <url>https://guardianproject.info/releases/Keanu-0.0.4.11-primary-universal-release.apk</url>
+    <releaseNotes>
+   - Testing app updater!
+    </releaseNotes>
+  </update>
+</AppUpdater>

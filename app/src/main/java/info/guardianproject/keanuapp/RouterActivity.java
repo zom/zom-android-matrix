@@ -264,8 +264,13 @@ public class RouterActivity extends AppCompatActivity implements ICacheWordSubsc
         if (intent != null && intent.getAction() != null && !intent.getAction().equals(Intent.ACTION_MAIN)) {
 
             Intent imUrlIntent = new Intent(this, ImUrlActivity.class);
-
             String action = intent.getAction();
+            imUrlIntent.setAction(action);
+            imUrlIntent.setType(intent.getType());
+
+            if (intent.getExtras() != null)
+                imUrlIntent.putExtras(intent.getExtras());
+
             Uri sharedData = intent.getData();
             if (sharedData != null) {
                 List<ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
@@ -300,14 +305,6 @@ public class RouterActivity extends AppCompatActivity implements ICacheWordSubsc
 
             }
 
-                imUrlIntent.setAction(action);
-                imUrlIntent.setType(intent.getType());
-
-
-
-              //  imUrlIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                if (intent.getExtras() != null)
-                    imUrlIntent.putExtras(intent.getExtras());
 
                 startActivityForResult(imUrlIntent, REQUEST_HANDLE_LINK);
                 setIntent(null);
