@@ -1182,23 +1182,17 @@ public class MainActivity extends BaseActivity {
     private void checkForUpdates() {
         // Remove this for store builds!
 
-        //only check github for updates if there is no Google Play
-
         try {
 
             String version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
 
-            //if this is a full release, without -beta -rc etc, then check the appupdater!
-            if (version.indexOf("-") == -1) {
 
-<<<<<<< HEAD
-                //if this is a full release, without -beta -rc etc, then check the appupdater!
-                if (version.indexOf("-") == -1 && (!TextUtils.isEmpty(ImApp.URL_UPDATER))) {
-=======
+            //if this is a full release, without -beta -rc etc, then check the appupdater!
+            if (version.indexOf("-") == -1 && (!TextUtils.isEmpty(ImApp.URL_UPDATER))) {
+
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
                 long timeNow = new Date().getTime();
                 long timeSinceLastCheck = prefs.getLong("updatetime", -1);
->>>>>>> 4551ac0e6253ff0449c2fead5a7e6f90938d2bf8
 
                 //only check for updates once per day
                 if (timeSinceLastCheck == -1 || (timeNow - timeSinceLastCheck) > 86400) {
