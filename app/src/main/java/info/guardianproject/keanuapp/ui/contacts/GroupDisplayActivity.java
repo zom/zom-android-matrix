@@ -125,9 +125,6 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
         mLastChatId = getIntent().getLongExtra("chat", -1);
         mSubject = getIntent().getStringExtra("subject");
 
-        if (!TextUtils.isEmpty(mSubject))
-            changeGroupSubject(mSubject);
-
         mHandler = new Handler();
         if (Debug.DEBUG_ENABLED) {
 
@@ -905,7 +902,6 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
             public void onClick(DialogInterface dialog, int whichButton) {
                 String newSubject = input.getText().toString();
                 changeGroupSubject(newSubject);
-
             }
         });
 

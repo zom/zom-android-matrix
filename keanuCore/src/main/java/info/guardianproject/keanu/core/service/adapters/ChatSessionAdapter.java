@@ -2071,7 +2071,9 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             if (isGroupChatSession()) {
                 ChatGroup group = (ChatGroup)mChatSession.getParticipant();
                 group.setName(subject);
-                getGroupManager().setGroupSubject(group, subject);
+
+                if (updateRemote)
+                    getGroupManager().setGroupSubject(group, subject);
 
                 //update the database
                 ContentValues values = new ContentValues(1);
