@@ -964,13 +964,16 @@ public class MatrixConnection extends ImConnection {
         for (Event event : roomMsgs)
         {
             if (event.getType().equals(Event.EVENT_TYPE_MESSAGE)
-                    || event.getType().equals(EVENT_TYPE_REACTION)
-                        || event.getType().equals(EVENT_TYPE_MESSAGE_ENCRYPTED))
-
-                if (event.getType().equals(EVENT_TYPE_MESSAGE_ENCRYPTED))
-                    room.getDataHandler().decryptEvent(event,room.getTimeline().getTimelineId());
-
+                    || event.getType().equals(EVENT_TYPE_REACTION))
+                         {
                 handleIncomingMessage(event);
+            }
+            else if (event.getType().equals(EVENT_TYPE_MESSAGE_ENCRYPTED))
+            {
+                room.getDataHandler().decryptEvent(event, room.getTimeline().getTimelineId());
+                handleIncomingMessage(event);
+            }
+
         }
 
     }
