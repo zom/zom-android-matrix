@@ -82,8 +82,8 @@ android {
         primary {// Assigns this product flavor to the "mode" flavor dimension.
 
             dimension "release"
-            versionCode 410000
-            versionName "0.0.4.10"
+            versionCode 411000
+            versionName "0.0.4.11"
             archivesBaseName = "Keanu-$versionName"
         }
 
