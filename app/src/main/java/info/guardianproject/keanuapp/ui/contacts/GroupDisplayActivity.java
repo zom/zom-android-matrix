@@ -383,62 +383,63 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                         int idxMember = position - 1;
                         final GroupMemberDisplay member = mMembers.get(idxMember);
 
-                        String nickname = member.nickname;
-                        if (TextUtils.isEmpty(nickname)) {
-                            nickname = member.username.split("@")[0].split("\\.")[0];
-                        } else {
-                            nickname = nickname.split("@")[0].split("\\.")[0];
-                        }
-
-                        if (mYou.username.contentEquals(member.username)) {
-                            nickname += " " + getString(R.string.group_you);
-                        }
-
-
-                        h.line2.setText(member.username);
-                        if (member.affiliation != null && (member.affiliation.contentEquals("owner") || member.affiliation.contentEquals("admin"))) {
-
-                            h.avatarCrown.setImageResource(R.drawable.ic_crown);
-                            h.avatarCrown.setVisibility(View.VISIBLE);
-                        }
-                        else if (member.affiliation != null && (member.affiliation.contentEquals("invited"))) {
-                            h.avatarCrown.setImageResource(R.drawable.ic_message_wait_grey);
-                            h.avatarCrown.setVisibility(View.VISIBLE);
-
-
-                        } else {
-                            h.avatarCrown.setVisibility(View.GONE);
-                        }
-
-                        h.line1.setText(nickname);
-
-                        boolean hasRoleNone = TextUtils.isEmpty(member.role) || "none".equalsIgnoreCase(member.role);
-                        h.line1.setTextColor(hasRoleNone ? Color.GRAY : colorTextPrimary);
-
-
-                        /**
-                         if (!member.online)
-                         {
-                         h.line1.setEnabled(false);
-                         h.line2.setEnabled(false);
-                         h.avatar.setBackgroundColor(getResources().getColor(R.color.holo_grey_light));
-                         }**/
-                        if (member.avatar == null) {
-                            try {
-                                member.avatar = DatabaseUtils.getAvatarFromAddress(member.username, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
-                            } catch (DecoderException e) {
-                                e.printStackTrace();
+                        if (member != null) {
+                            String nickname = member.nickname;
+                            if (TextUtils.isEmpty(nickname)) {
+                                nickname = member.username.split("@")[0].split("\\.")[0];
+                            } else {
+                                nickname = nickname.split("@")[0].split("\\.")[0];
                             }
-                        }
 
-                        if (member.avatar == null) {
-                            padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, getResources().getDisplayMetrics());
-                            member.avatar = new LetterAvatar(holder.itemView.getContext(), nickname, padding);
-                        }
+                            if (mYou.username.contentEquals(member.username)) {
+                                nickname += " " + getString(R.string.group_you);
+                            }
 
-                        h.avatar.setImageDrawable(member.avatar);
-                        h.avatar.setVisibility(View.VISIBLE);
-                        h.itemView.setOnClickListener(v -> showMemberInfo(member));
+
+                            h.line2.setText(member.username);
+                            if (member.affiliation != null && (member.affiliation.contentEquals("owner") || member.affiliation.contentEquals("admin"))) {
+
+                                h.avatarCrown.setImageResource(R.drawable.ic_crown);
+                                h.avatarCrown.setVisibility(View.VISIBLE);
+                            } else if (member.affiliation != null && (member.affiliation.contentEquals("invited"))) {
+                                h.avatarCrown.setImageResource(R.drawable.ic_message_wait_grey);
+                                h.avatarCrown.setVisibility(View.VISIBLE);
+
+
+                            } else {
+                                h.avatarCrown.setVisibility(View.GONE);
+                            }
+
+                            h.line1.setText(nickname);
+
+                            boolean hasRoleNone = TextUtils.isEmpty(member.role) || "none".equalsIgnoreCase(member.role);
+                            h.line1.setTextColor(hasRoleNone ? Color.GRAY : colorTextPrimary);
+
+
+                            /**
+                             if (!member.online)
+                             {
+                             h.line1.setEnabled(false);
+                             h.line2.setEnabled(false);
+                             h.avatar.setBackgroundColor(getResources().getColor(R.color.holo_grey_light));
+                             }**/
+                            if (member.avatar == null) {
+                                try {
+                                    member.avatar = DatabaseUtils.getAvatarFromAddress(member.username, SMALL_AVATAR_WIDTH, SMALL_AVATAR_HEIGHT);
+                                } catch (DecoderException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            if (member.avatar == null) {
+                                padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 12, getResources().getDisplayMetrics());
+                                member.avatar = new LetterAvatar(holder.itemView.getContext(), nickname, padding);
+                            }
+
+                            h.avatar.setImageDrawable(member.avatar);
+                            h.avatar.setVisibility(View.VISIBLE);
+                            h.itemView.setOnClickListener(v -> showMemberInfo(member));
+                        }
                     }
                 }
             }
