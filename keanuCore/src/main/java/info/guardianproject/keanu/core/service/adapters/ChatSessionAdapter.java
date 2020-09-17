@@ -2066,7 +2066,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     }
 
     @Override
-    public void setGroupChatSubject(String subject) throws RemoteException {
+    public void setGroupChatSubject(String subject, boolean updateRemote) throws RemoteException {
         try {
             if (isGroupChatSession()) {
                 ChatGroup group = (ChatGroup)mChatSession.getParticipant();
@@ -2098,9 +2098,17 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                     mGroupMan.refreshGroup(group);
                 }
             }
+
+            syncMessages();
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void syncMessages() throws RemoteException {
+        mConnection.getAdaptee().syncMessages(mChatSession);
+
     }
 
     @Override

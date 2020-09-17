@@ -921,7 +921,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     {
         try {
             IChatSession session = mConn.getChatSessionManager().getChatSession(mAddress);
-            session.setGroupChatSubject(subject);
+            session.setGroupChatSubject(subject, true);
 
             // Update the UI
             mName = subject;

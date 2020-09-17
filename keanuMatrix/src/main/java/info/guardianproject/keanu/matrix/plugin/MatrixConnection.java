@@ -887,6 +887,17 @@ public class MatrixConnection extends ImConnection {
     }
 
     @Override
+    public void syncMessages(ChatSession session) {
+
+        if (session != null)
+        {
+            Room room = mChatSessionManager.getRoom(session);
+            if (room != null)
+                loadRoomState(room);
+        }
+    }
+
+    @Override
     public void uploadContent (InputStream is, String contentTitle, String mimeType, final ConnectionListener listener)
     {
         mDataHandler.getMediaCache().uploadContent(is, contentTitle, mimeType, null,
@@ -926,47 +937,33 @@ public class MatrixConnection extends ImConnection {
             Collection<Room> rooms = mStore.getRooms();
 
             for (Room room : rooms)
-            {
-                if (room.isMember()) {
-                    addRoomContact(room, null);
-                }
-
-                String roomReadMarkerId = room.getReadMarkerEventId();
-                room.getTimeline().addEventTimelineListener(new EventTimeline.Listener() {
-                    @Override
-                    public void onEvent(Event event, EventTimeline.Direction direction, RoomState roomState) {
-                        mEventListener.onLiveEvent(event, roomState);
-                    }
-                });
-
-                room.getTimeline().backPaginate(new ApiCallback<Integer>() {
-                    @Override
-                    public void onNetworkError(Exception e) {
-
-                        debug("room backPaginate onNetworkError",e);
-                    }
-
-                    @Override
-                    public void onMatrixError(MatrixError matrixError) {
-                        debug("room backPaginate onMatrixError",matrixError);
-                    }
-
-                    @Override
-                    public void onUnexpectedError(Exception e) {
-                        debug("room backPaginate onUnexpectedError",e);
-
-                    }
-
-                    @Override
-                    public void onSuccess(Integer integer) {
-                        debug ("room backPaginate onSuccess: " + integer);
-                    }
-                });
-            }
+                loadRoomState(room);
 
             mContactListManager.loadContactListsAsync();
 
         });
+
+    }
+
+    private void loadRoomState (Room room)
+    {
+        if (room.isMember()) {
+            addRoomContact(room, null);
+        }
+
+        String roomReadMarkerId = room.getReadMarkerEventId();
+        room.getTimeline().addEventTimelineListener(new EventTimeline.Listener() {
+            @Override
+            public void onEvent(Event event, EventTimeline.Direction direction, RoomState roomState) {
+                mEventListener.onLiveEvent(event, roomState);
+            }
+        });
+
+        Collection<Event> roomMsgs = mSession.getDataHandler().getStore().getRoomMessages(room.getRoomId());
+        for (Event event : roomMsgs)
+        {
+            handleIncomingMessage(event);
+        }
 
     }
 
@@ -994,7 +991,7 @@ public class MatrixConnection extends ImConnection {
         if (csa != null && !subject.equals(mContext.getString(R.string.default_group_title)))
         {
             try {
-                csa.setGroupChatSubject(subject);
+                csa.setGroupChatSubject(subject,false);
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
@@ -1374,7 +1371,7 @@ public class MatrixConnection extends ImConnection {
                     if (csa != null) {
                         String newName = event.getContent().getAsJsonObject().get("name").getAsString();
                         try {
-                            csa.setGroupChatSubject(newName);
+                            csa.setGroupChatSubject(newName,false);
                         } catch (RemoteException e) {
                             e.printStackTrace();
                         }
@@ -1401,7 +1398,7 @@ public class MatrixConnection extends ImConnection {
                     if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
                         if (mSession.getCrypto() != null)
                             mSession.getCrypto().reRequestRoomKeyForEvent(event);
-
+                        handleIncomingMessage(event);
                     }
                 }
             }
@@ -2079,7 +2076,7 @@ public class MatrixConnection extends ImConnection {
 
                 if (TextUtils.isEmpty(messageBody)) {
                     debug("WARN: MESSAGE HAS NO BODY: " + event.toString());
-                    return;
+                    messageBody = mContext.getString(R.string.empty_message);
                 }
 
                 final List<ReceiptData> receipts = mDataHandler.getStore().getEventReceipts(event.roomId, null, true, false);
@@ -2144,134 +2141,130 @@ public class MatrixConnection extends ImConnection {
 
     private Message downloadMedia (Event event, String downloadFileName, MatrixAddress addrSender)
     {
-        String messageType = event.getContent().getAsJsonObject().get("msgtype").getAsString();
-        String messageMimeType = null;
-
+        JsonObject jObj = event.getContent().getAsJsonObject();
         Message message = null;
 
-        if (messageType.equals("m.image")
-                || messageType.equals("m.file")
-                || messageType.equals("m.video")
-                || messageType.equals("m.audio")) {
-
-            String result = null;
-            String mediaUrl = null;
-            String thumbUrl = null;
-            String localFolder = addrSender.getAddress();
-            EncryptedFileInfo encryptedFileInfo = null;
-            EncryptedFileInfo encryptedThumbInfo = null;
-
-            if (messageType.equals("m.file")) {
-                FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
-                messageMimeType = fileMessage.getMimeType();
-                mediaUrl = fileMessage.getUrl();
-                encryptedFileInfo = fileMessage.file;
-            }
-            else if (messageType.equals("m.image"))
-            {
-                ImageMessage fileMessage = JsonUtils.toImageMessage(event.getContent());
-                messageMimeType = fileMessage.getMimeType();
-                mediaUrl = fileMessage.getUrl();
-                encryptedFileInfo = fileMessage.file;
-            }
-            else if (messageType.equals("m.audio"))
-            {
-                AudioMessage fileMessage = JsonUtils.toAudioMessage(event.getContent());
-                messageMimeType = fileMessage.getMimeType();
-                mediaUrl = fileMessage.getUrl();
-                encryptedFileInfo = fileMessage.file;
-            }
-            else if (messageType.equals("m.video"))
-            {
-                VideoMessage fileMessage = JsonUtils.toVideoMessage(event.getContent());
-                messageMimeType = fileMessage.getMimeType();
-                mediaUrl = fileMessage.getUrl();
-                encryptedFileInfo = fileMessage.file;
-                thumbUrl = fileMessage.getThumbnailUrl();
-
-                if (fileMessage.info != null)
-                    encryptedThumbInfo = fileMessage.info.thumbnail_file;
-
-            }
+        if (jObj != null && jObj.has("msgtype")) {
+            String messageType = jObj.get("msgtype").getAsString();
+            String messageMimeType = null;
 
 
-            MatrixDownloader dl = new MatrixDownloader();
-            info.guardianproject.iocipher.File fileDownload = null;
+            if (messageType.equals("m.image")
+                    || messageType.equals("m.file")
+                    || messageType.equals("m.video")
+                    || messageType.equals("m.audio")) {
 
+                String result = null;
+                String mediaUrl = null;
+                String thumbUrl = null;
+                String localFolder = addrSender.getAddress();
+                EncryptedFileInfo encryptedFileInfo = null;
+                EncryptedFileInfo encryptedThumbInfo = null;
 
-            try {
-                boolean isEncrypted = null != encryptedFileInfo;
+                if (messageType.equals("m.file")) {
+                    FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
+                    messageMimeType = fileMessage.getMimeType();
+                    mediaUrl = fileMessage.getUrl();
+                    encryptedFileInfo = fileMessage.file;
+                } else if (messageType.equals("m.image")) {
+                    ImageMessage fileMessage = JsonUtils.toImageMessage(event.getContent());
+                    messageMimeType = fileMessage.getMimeType();
+                    mediaUrl = fileMessage.getUrl();
+                    encryptedFileInfo = fileMessage.file;
+                } else if (messageType.equals("m.audio")) {
+                    AudioMessage fileMessage = JsonUtils.toAudioMessage(event.getContent());
+                    messageMimeType = fileMessage.getMimeType();
+                    mediaUrl = fileMessage.getUrl();
+                    encryptedFileInfo = fileMessage.file;
+                } else if (messageType.equals("m.video")) {
+                    VideoMessage fileMessage = JsonUtils.toVideoMessage(event.getContent());
+                    messageMimeType = fileMessage.getMimeType();
+                    mediaUrl = fileMessage.getUrl();
+                    encryptedFileInfo = fileMessage.file;
+                    thumbUrl = fileMessage.getThumbnailUrl();
 
-                String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, isEncrypted);
+                    if (fileMessage.info != null)
+                        encryptedThumbInfo = fileMessage.info.thumbnail_file;
 
-                String localFileNameEsc = downloadFileName;//should check this with regex
-
-                if (isEncrypted)
-                    fileDownload = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".encrypted");
-                else
-                    fileDownload = dl.openSecureStorageFile(localFolder, localFileNameEsc);
-
-                OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
-                boolean downloaded = dl.get(downloadableUrl, storageStream);
-
-                if (downloaded) {
-
-                    if (isEncrypted) {
-                        info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileNameEsc);
-                        storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadDecrypted);
-                        boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo, storageStream);
-                        fileDownload.delete();
-                        fileDownload = fileDownloadDecrypted;
-                        result = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
-                    }
-                    else
-                    {
-                        result = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
-                    }
                 }
 
+
+                MatrixDownloader dl = new MatrixDownloader();
+                info.guardianproject.iocipher.File fileDownload = null;
+
+
                 try {
-                    downloadableUrl = mSession.getContentManager().getDownloadableUrl(thumbUrl, isEncrypted);
+                    boolean isEncrypted = null != encryptedFileInfo;
 
-                    if (!TextUtils.isEmpty(downloadableUrl)) {
-                        info.guardianproject.iocipher.File fileDownloadThumb;
+                    String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, isEncrypted);
 
-                        if (isEncrypted)
-                            fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".thumb.encrypted");
-                        else
-                            fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".thumb.jpg");
+                    String localFileNameEsc = downloadFileName;//should check this with regex
 
-                        storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadThumb);
-                        downloaded = dl.get(downloadableUrl, storageStream);
+                    if (isEncrypted)
+                        fileDownload = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".encrypted");
+                    else
+                        fileDownload = dl.openSecureStorageFile(localFolder, localFileNameEsc);
 
-                        if (downloaded) {
+                    OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
+                    boolean downloaded = dl.get(downloadableUrl, storageStream);
 
-                            if (isEncrypted) {
-                                storageStream = new info.guardianproject.iocipher.FileOutputStream(new File(fileDownload.getAbsolutePath() + ".thumb.jpg"));
+                    if (downloaded) {
 
-                                boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownloadThumb), encryptedThumbInfo, storageStream);
-                                fileDownloadThumb.delete();
-                            }
+                        if (isEncrypted) {
+                            info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileNameEsc);
+                            storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadDecrypted);
+                            boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo, storageStream);
+                            fileDownload.delete();
+                            fileDownload = fileDownloadDecrypted;
+                            result = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
+                        } else {
+                            result = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
                         }
                     }
 
+                    try {
+                        downloadableUrl = mSession.getContentManager().getDownloadableUrl(thumbUrl, isEncrypted);
+
+                        if (!TextUtils.isEmpty(downloadableUrl)) {
+                            info.guardianproject.iocipher.File fileDownloadThumb;
+
+                            if (isEncrypted)
+                                fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".thumb.encrypted");
+                            else
+                                fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".thumb.jpg");
+
+                            storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadThumb);
+                            downloaded = dl.get(downloadableUrl, storageStream);
+
+                            if (downloaded) {
+
+                                if (isEncrypted) {
+                                    storageStream = new info.guardianproject.iocipher.FileOutputStream(new File(fileDownload.getAbsolutePath() + ".thumb.jpg"));
+
+                                    boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownloadThumb), encryptedThumbInfo, storageStream);
+                                    fileDownloadThumb.delete();
+                                }
+                            }
+                        }
+
+                    } catch (Exception e) {
+                        debug("Error downloading file: " + thumbUrl, e);
+                    }
+
+                    if (result != null) {
+                        message = new Message(result);
+                        message.setID(event.eventId);
+                        message.setFrom(addrSender);
+                        message.setDateTime(new Date(event.getOriginServerTs()));
+                        message.setContentType(messageMimeType);
+                    }
+
                 } catch (Exception e) {
-                    debug("Error downloading file: " + thumbUrl, e);
+                    debug("Error downloading file: " + mediaUrl, e);
                 }
 
-                if (result != null) {
-                    message = new Message(result);
-                    message.setID(event.eventId);
-                    message.setFrom(addrSender);
-                    message.setDateTime(new Date(event.getOriginServerTs()));
-                    message.setContentType(messageMimeType);
-                }
 
-            } catch (Exception e) {
-                debug("Error downloading file: " + mediaUrl, e);
             }
-
-
         }
 
         return message;
@@ -2654,5 +2647,9 @@ public class MatrixConnection extends ImConnection {
             }
         }
         return null;
+    }
+
+    public void getMessages ()
+    {
     }
 }

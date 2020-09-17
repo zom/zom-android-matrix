@@ -96,7 +96,7 @@ public class MatrixChatSessionManager extends ChatSessionManager {
         return session;
     }
 
-    private Room getRoom (ChatSession session)
+    public Room getRoom (ChatSession session)
     {
         String userId = session.getParticipant().getAddress().getAddress();
         Room room = mRoomMap.get(userId);

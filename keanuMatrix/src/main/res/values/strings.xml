@@ -25,6 +25,7 @@
     <string name="devices_details_last_seen_title">Last seen</string>
     <string name="devices_details_last_seen_format">%1$s @ %2$s</string>
     <string name="edited">(edited)</string>
+    <string name="empty_message">(empty)</string>
 
 
 </resources>

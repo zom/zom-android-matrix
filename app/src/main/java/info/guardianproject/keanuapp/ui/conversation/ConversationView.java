@@ -1519,6 +1519,16 @@ public class ConversationView {
         mCurrentChatSession = getChatSession();
         if (mCurrentChatSession == null)
             createChatSession();
+        else
+        {
+            try {
+                mCurrentChatSession.refreshContactFromServer();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
+
+
     }
 
 

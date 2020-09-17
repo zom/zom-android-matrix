@@ -148,10 +148,12 @@ interface IChatSession {
      **/
      void refreshContactFromServer();
 
+     void syncMessages ();
+
     /**
      * Set the subject for a chat room
      **/
-     void setGroupChatSubject(String subject);
+     void setGroupChatSubject(String subject, boolean updateRemote);
 
      /**
      * Get group chat owner(s)

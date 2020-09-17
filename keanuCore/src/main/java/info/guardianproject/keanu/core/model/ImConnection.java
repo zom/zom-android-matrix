@@ -286,4 +286,6 @@ public abstract class ImConnection {
     public abstract void uploadContent (InputStream is, String contentTitle, String mimeType, ConnectionListener listener);
 
     public abstract String getDownloadUrl (String identifier);
+
+    public abstract void syncMessages (ChatSession session);
 }
