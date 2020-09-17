@@ -26,6 +26,7 @@
     <string name="devices_details_last_seen_format">%1$s @ %2$s</string>
     <string name="edited">(edited)</string>
     <string name="empty_message">(empty)</string>
+    <string name="unable_to_decrypt">(unable to decrypt)</string>
 
 
 </resources>

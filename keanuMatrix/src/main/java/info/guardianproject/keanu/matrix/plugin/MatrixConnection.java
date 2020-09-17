@@ -960,9 +960,17 @@ public class MatrixConnection extends ImConnection {
         });
 
         Collection<Event> roomMsgs = mSession.getDataHandler().getStore().getRoomMessages(room.getRoomId());
+
         for (Event event : roomMsgs)
         {
-            handleIncomingMessage(event);
+            if (event.getType().equals(Event.EVENT_TYPE_MESSAGE)
+                    || event.getType().equals(EVENT_TYPE_REACTION)
+                        || event.getType().equals(EVENT_TYPE_MESSAGE_ENCRYPTED))
+
+                if (event.getType().equals(EVENT_TYPE_MESSAGE_ENCRYPTED))
+                    room.getDataHandler().decryptEvent(event,room.getTimeline().getTimelineId());
+
+                handleIncomingMessage(event);
         }
 
     }
@@ -1396,8 +1404,18 @@ public class MatrixConnection extends ImConnection {
                 if (mSession != null && mSession.isCryptoEnabled())
                 {
                     if (event.type.equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
-                        if (mSession.getCrypto() != null)
+                        if (mSession.getCrypto() != null) {
                             mSession.getCrypto().reRequestRoomKeyForEvent(event);
+                            ArrayList<String> users = new ArrayList<>();
+                            users.add(event.sender);
+                            mSession.getCrypto().ensureOlmSessionsForUsers(users,new BasicApiCallback("ensureOlmSessionsForUsers"));
+                            if (event.getType().equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
+                                Room room = mSession.getDataHandler().getRoom(event.roomId);
+                                if (room != null)
+                                    room.getDataHandler().decryptEvent(event, room.getTimeline().getTimelineId());
+                            }
+                        }
+
                         handleIncomingMessage(event);
                     }
                 }
@@ -2077,6 +2095,8 @@ public class MatrixConnection extends ImConnection {
                 if (TextUtils.isEmpty(messageBody)) {
                     debug("WARN: MESSAGE HAS NO BODY: " + event.toString());
                     messageBody = mContext.getString(R.string.empty_message);
+                    if (event.getType().equals(EVENT_TYPE_MESSAGE_ENCRYPTED))
+                        messageBody = mContext.getString(R.string.unable_to_decrypt);
                 }
 
                 final List<ReceiptData> receipts = mDataHandler.getStore().getEventReceipts(event.roomId, null, true, false);
