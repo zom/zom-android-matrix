@@ -1,10 +1,13 @@
 <AppUpdater>
   <update>
-    <latestVersion>0.0.4.11</latestVersion>
-    <latestVersionCode>411000</latestVersionCode>
-    <url>https://guardianproject.info/releases/Keanu-0.0.4.11-primary-universal-release.apk</url>
+    <latestVersion>2.1.7-beta-1</latestVersion>
+    <latestVersionCode>217001100</latestVersionCode>
+    <url>https://github.com/zom/zom-android-matrix/releases/download/2.1.7-beta-1/Zom-2.1.7-beta-1-altbrand-universal-release.apk</ur.
     <releaseNotes>
-   - Testing app updater!
+    improved room message syncing to reduce missed messages
+    update group member loading logic and display (fast!)
+    improved photo, media gallery selector
+    improved support for displaying edited messages
     </releaseNotes>
   </update>
 </AppUpdater>
