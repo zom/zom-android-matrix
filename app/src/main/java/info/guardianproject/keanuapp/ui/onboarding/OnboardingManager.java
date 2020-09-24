@@ -1,22 +1,5 @@
 package info.guardianproject.keanuapp.ui.onboarding;
 
-import info.guardianproject.keanu.matrix.plugin.MatrixConnection;
-import info.guardianproject.keanuapp.R;
-import info.guardianproject.keanu.core.provider.Imps;
-import org.json.JSONException;
-import org.matrix.androidsdk.core.model.MatrixError;
-
-import info.guardianproject.keanu.core.util.ImPluginHelper;
-import info.guardianproject.keanu.core.util.LogCleaner;
-import info.guardianproject.keanuapp.ImApp;
-import info.guardianproject.keanuapp.nearby.NearbyAddContactActivity;
-import info.guardianproject.keanuapp.ui.qr.QrScanActivity;
-
-import java.io.IOException;
-import java.security.SecureRandom;
-import java.util.HashMap;
-import java.util.UUID;
-
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -25,80 +8,84 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Handler;
 import android.os.Looper;
+import android.os.Parcelable;
 import android.provider.Telephony;
-import android.util.Base64;
+import android.text.TextUtils;
 import android.util.Log;
+
+import org.matrix.androidsdk.core.model.MatrixError;
+import org.matrix.androidsdk.rest.model.login.LocalizedFlowDataLoginTerms;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import info.guardianproject.keanu.core.provider.Imps;
+import info.guardianproject.keanu.core.util.ImPluginHelper;
+import info.guardianproject.keanu.core.util.LogCleaner;
+import info.guardianproject.keanu.matrix.plugin.MatrixConnection;
+import info.guardianproject.keanu.matrix.plugin.RegistrationManager;
+import info.guardianproject.keanuapp.ImApp;
+import info.guardianproject.keanuapp.R;
+import info.guardianproject.keanuapp.nearby.NearbyAddContactActivity;
+import info.guardianproject.keanuapp.ui.qr.QrScanActivity;
 
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_DEVICE_NAME;
 import static info.guardianproject.keanu.core.KeanuConstants.LOG_TAG;
 
-public class OnboardingManager {
+public class OnboardingManager implements RegistrationManager.RegistrationListener {
 
     public final static int REQUEST_SCAN = 1111;
-    public final static int REQUEST_CHOOSE_AVATAR = REQUEST_SCAN+1;
+    public final static int REQUEST_CHOOSE_AVATAR = REQUEST_SCAN + 1;
 
     public static String BASE_INVITE_URL = "https://keanu.im/i/#";
 
     public final static String DEFAULT_SCHEME = "matrix";
 
-    public static void setBaseInviteUrl (String baseInvite)
-    {
-        BASE_INVITE_URL = baseInvite;
+    private final WeakReference<Activity> mActivity;
+    private final WeakReference<OnboardingListener> mListener;
+    private final MatrixConnection mConn;
+    private OnboardingAccount mAccountRegistering;
+
+    public OnboardingManager(Activity activity, OnboardingListener listener) {
+        mActivity = new WeakReference<>(activity);
+        mListener = new WeakReference<>(listener);
+        mConn = new MatrixConnection(activity);
     }
 
-    public static void inviteSMSContact (Activity context, String phoneNumber, String message)
-    {
+    public static void inviteSMSContact(Activity context, String message) {
+        String defaultSmsPackageName = Telephony.Sms.getDefaultSmsPackage(context); // Need to change the build to API 19
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) // At least KitKat
+        Intent sendIntent = new Intent(Intent.ACTION_SEND);
+        sendIntent.setType("text/plain");
+        sendIntent.putExtra(Intent.EXTRA_TEXT, message);
+
+        if (defaultSmsPackageName != null)// Can be null in case that there is no default, then the user would be able to choose
+        // any app that support this intent.
         {
-            String defaultSmsPackageName = Telephony.Sms.getDefaultSmsPackage(context); // Need to change the build to API 19
-
-            Intent sendIntent = new Intent(Intent.ACTION_SEND);
-            sendIntent.setType("text/plain");
-            sendIntent.putExtra(Intent.EXTRA_TEXT, message);
-
-            if (defaultSmsPackageName != null)// Can be null in case that there is no default, then the user would be able to choose
-            // any app that support this intent.
-            {
-                sendIntent.setPackage(defaultSmsPackageName);
-            }
-            context.startActivity(sendIntent);
-
+            sendIntent.setPackage(defaultSmsPackageName);
         }
-        else // For early versions, do what worked for you before.
-        {
-            Intent smsIntent = new Intent(Intent.ACTION_VIEW);
-            smsIntent.setType("vnd.android-dir/mms-sms");
 
-            if (phoneNumber != null)
-            smsIntent.putExtra("address",phoneNumber);
-            smsIntent.putExtra("sms_body",message);
-
-            context.startActivity(smsIntent);
-        }
+        context.startActivity(sendIntent);
     }
-    
-    public static void inviteShare (Activity context, String message)
-    {
+
+    public static void inviteShare(Activity context, String message) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT, message);
         intent.setType("text/plain");
         context.startActivity(intent);
     }
 
-    public static void inviteNearby(Activity context, String message)
-    {
+    public static void inviteNearby(Activity context, String message) {
         Intent intent = new Intent(context, NearbyAddContactActivity.class);
         intent.putExtra(Intent.EXTRA_TEXT, message);
         intent.setType("text/plain");
         context.startActivity(intent);
     }
 
-    public static void inviteShareToPackage (Activity context, String message, String packageName)
-    {
+    public static void inviteShareToPackage(Activity context, String message, String packageName) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.putExtra(Intent.EXTRA_TEXT, message);
         intent.setType("text/plain");
@@ -106,46 +93,34 @@ public class OnboardingManager {
         context.startActivity(intent);
     }
 
-    public static void inviteScan (Activity context, String message)
-    {
+    public static void inviteScan(Activity context, String message) {
         Intent intent = new Intent(context, QrScanActivity.class);
-        intent.putExtra(Intent.EXTRA_TEXT,message);
+        intent.putExtra(Intent.EXTRA_TEXT, message);
         intent.setType("text/plain");
         context.startActivityForResult(intent, REQUEST_SCAN);
 
     }
-    
-    public static String generateInviteMessage (Context context, String nickname, String username, String fingerprint)
-    {
-        try
-        {
-            StringBuffer resp = new StringBuffer();
 
-            resp.append(nickname)
-                    .append(' ')
-                    .append(context.getString(R.string.is_inviting_you))
-                    .append(" ")
-                    .append(generateInviteLink(context,username,fingerprint,nickname));
-            
-            return resp.toString();
-        } catch (Exception e)
-        { 
-            Log.d(LOG_TAG,"error with link",e);
+    public static String generateInviteMessage(Context context, String nickname, String username) {
+        try {
+            return nickname + ' ' + context.getString(R.string.is_inviting_you) + " "
+                    + generateInviteLink(username);
+        } catch (Exception e) {
+            Log.d(LOG_TAG, "error with link", e);
             return null;
         }
     }
 
-    public static DecodedInviteLink decodeInviteLink (String link)
-    {
+    public static DecodedInviteLink decodeInviteLink(String link) {
         DecodedInviteLink diLink = null;
 
-        if (link.contains("/i/#")){
+        if (link.contains("/i/#")) {
 
             //this is an invite link
 
             //this is an invite link like this: https://zom.im/i/#@earthmouse:matrix.org
 
-            if (link.indexOf("@")!=-1) {
+            if (link.contains("@")) {
                 try {
                     String matrixContact = link.substring(link.lastIndexOf("@"));
 
@@ -156,7 +131,8 @@ public class OnboardingManager {
                     Log.e(LOG_TAG, "bad link decode", iae);
                 }
             }
-            if (link.indexOf("!")!=-1) {
+
+            if (link.contains("!")) {
                 try {
                     String matrixContact = link.substring(link.lastIndexOf("!"));
 
@@ -169,7 +145,7 @@ public class OnboardingManager {
             }
 
 
-            /**
+            /*
             try {
                 String out = new String(Base64.decode(code[1], Base64.URL_SAFE | Base64.NO_WRAP | Base64.NO_PADDING));
 
@@ -216,9 +192,8 @@ public class OnboardingManager {
             catch (IllegalArgumentException iae)
             {
              Log.e(LOG_TAG,"bad link decode",iae);
-            }**/
-        }
-        else if (link.contains("matrix.to")){
+            }*/
+        } else if (link.contains("matrix.to")) {
 
             //this is an invite link like this: https://matrix.to/#/@n8fr8:matrix.org
             try {
@@ -227,24 +202,19 @@ public class OnboardingManager {
                 diLink = new DecodedInviteLink();
                 diLink.username = matrixContact;
 
+            } catch (IllegalArgumentException iae) {
+                Log.e(LOG_TAG, "bad link decode", iae);
             }
-            catch (IllegalArgumentException iae)
-            {
-                Log.e(LOG_TAG,"bad link decode",iae);
-            }
-        }
-        else if (link.startsWith(DEFAULT_SCHEME)){
+        } else if (link.startsWith(DEFAULT_SCHEME)) {
 
             //this is an invite link like this: https://matrix.to/#/@n8fr8:matrix.org
             try {
-                String matrixContact = link.substring(link.lastIndexOf("id=")+3);
+                String matrixContact = link.substring(link.lastIndexOf("id=") + 3);
                 diLink = new DecodedInviteLink();
                 diLink.username = matrixContact;
 
-            }
-            catch (IllegalArgumentException iae)
-            {
-                Log.e(LOG_TAG,"bad link decode",iae);
+            } catch (IllegalArgumentException iae) {
+                Log.e(LOG_TAG, "bad link decode", iae);
             }
         }
 
@@ -252,22 +222,11 @@ public class OnboardingManager {
 
     }
 
-    public static String generateMatrixLink (String username, String fingerprint) throws IOException
-    {
-        StringBuffer inviteUrl = new StringBuffer();
-        inviteUrl.append(DEFAULT_SCHEME);
-        inviteUrl.append("://invite?id=");
-        inviteUrl.append(username);
-
-        return inviteUrl.toString();
+    public static String generateMatrixLink(String username) {
+        return DEFAULT_SCHEME + "://invite?id=" + username;
     }
 
-    public static String generateInviteLink (Context context, String username, String fingerprint, String nickname) throws IOException
-    {
-        return generateInviteLink(context, username);
-    }
-
-    /**
+    /*
     public static String generateInviteLink (Context context, String username) throws IOException
     {
         StringBuffer inviteUrl = new StringBuffer();
@@ -288,18 +247,13 @@ public class OnboardingManager {
 
       //  inviteUrl.append(Base64.encodeToString(code.toString().getBytes(), Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING));
         return inviteUrl.toString();
-    }**/
+    }*/
 
-    public static String generateInviteLink(Context context, String username) throws IOException
-    {
-        StringBuffer inviteUrl = new StringBuffer();
-        inviteUrl.append(BASE_INVITE_URL);
-        inviteUrl.append(username);
-       // inviteUrl.append(Base64.encodeToString(code.toString().getBytes(), Base64.URL_SAFE|Base64.NO_WRAP|Base64.NO_PADDING));
-        return inviteUrl.toString();
+    public static String generateInviteLink(String username) {
+        return BASE_INVITE_URL + username;
     }
 
-    /**
+    /*
     private final static String PASSWORD_LETTERS = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789+@!#";
     private final static int PASSWORD_LENGTH = 12;
 
@@ -316,144 +270,78 @@ public class OnboardingManager {
             pw.append(PASSWORD_LETTERS.substring(index, index+1));
         }
         return pw.toString();
-    }**/
+    }*/
 
+    public void registerAccount(final String nickname, final String username,
+                                final String password, final String domain,
+                                final String server, final int port) {
 
+        Activity activity = mActivity.get();
+        if (activity == null) return;
 
-    public static boolean changeLocalPassword (Activity context, long providerId, long accountId, String password)
-    {
-        try {
-            final ContentResolver cr = context.getContentResolver();
-            ImPluginHelper helper = ImPluginHelper.getInstance(context);
-            ImApp.insertOrUpdateAccount(cr, providerId, accountId, null, null, password);
+        ImPluginHelper helper = ImPluginHelper.getInstance(activity);
+        final ContentResolver cr = activity.getContentResolver();
 
-            /**
-            XmppConnection xmppConn = new XmppConnection(context);
-            xmppConn.initUser(providerId, accountId);
-            boolean success = xmppConn.changeServerPassword(providerId, accountId, oldPassword, newPassword);
-            **/
-            return false;
+        mAccountRegistering = new OnboardingAccount();
+        mAccountRegistering.username = username;
+        mAccountRegistering.domain = domain;
+        mAccountRegistering.password = password;
+        mAccountRegistering.nickname = nickname;
+        mAccountRegistering.providerId = helper.createAdditionalProvider(helper.getProviderNames().get(0)); //xmpp FIXME
+        mAccountRegistering.accountId = ImApp.insertOrUpdateAccount(cr, mAccountRegistering.providerId, -1, nickname, username, password);
 
-            //return success;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
-    }
-
-    public static void registerAccount (final Context context, final String nickname, final String username, final String password, final String domain,
-                                        final String server, final int port, final OnboardingListener oListener) throws JSONException {
-
-
-
-        final ContentResolver cr = context.getContentResolver();
-        ImPluginHelper helper = ImPluginHelper.getInstance(context);
-
-        final long providerId = helper.createAdditionalProvider(helper.getProviderNames().get(0)); //xmpp FIXME
-        final long accountId = ImApp.insertOrUpdateAccount(cr, providerId, -1, nickname, username, password);
-
-        final Uri accountUri = ContentUris.withAppendedId(Imps.Account.CONTENT_URI, accountId);
-
-        Cursor pCursor = cr.query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(providerId)}, null);
+        Cursor pCursor = cr.query(Imps.ProviderSettings.CONTENT_URI,
+                new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE},
+                Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(mAccountRegistering.providerId)},
+                null);
 
         Imps.ProviderSettings.QueryMap settings = new Imps.ProviderSettings.QueryMap(
-                pCursor, cr, providerId, false /* don't keep updated */, null /* no handler */);
+                pCursor, cr, mAccountRegistering.providerId, false /* don't keep updated */,
+                null /* no handler */);
 
         settings.setRequireTls(true);
         settings.setTlsCertVerify(true);
         settings.setAllowPlainAuth(false);
 
-        String newDeviceId =  DEFAULT_DEVICE_NAME + "-"
+        String newDeviceId = DEFAULT_DEVICE_NAME + "-"
                 + UUID.randomUUID().toString().substring(0, 8);
 
         settings.setDeviceName(newDeviceId);
 
-        try
-        {
+        try {
             settings.setDomain(domain);
             settings.setPort(port);
-
-            if (server != null) {
-                settings.setServer(server); //if we have a host, then we should use it
-                settings.setDoDnsSrv(false);
-
-            }
-            else
-            {
-                settings.setServer(null);
-                settings.setDoDnsSrv(true);
-
-            }
-
+            settings.setServer(server); // If we have a host, then we should use it.
+            settings.setDoDnsSrv(server == null);
             settings.requery();
             settings.close();
 
             if (Looper.myLooper() == null)
                 Looper.prepare();
 
-            MatrixConnection conn = new MatrixConnection(context);
-            conn.initUser(providerId, accountId);
-
-            final OnboardingAccount result = new OnboardingAccount();
-            result.username = username;
-            result.domain = domain;
-            result.password = password;
-            result.providerId = providerId;
-            result.accountId = accountId;
-            result.nickname = nickname;
-
-            conn.register(context, username, password, new MatrixConnection.RegistrationListener() {
-                @Override
-                public void onRegistrationSuccess() {
-
-                    //now keep this account signed-in
-                    ContentValues values = new ContentValues();
-                    values.put(Imps.AccountColumns.KEEP_SIGNED_IN, 1);
-                    cr.update(accountUri, values, null, null);
-
-                    if (oListener != null)
-                        oListener.registrationSuccessful(result);
-                }
-
-                @Override
-                public void onRegistrationFailed(String message) {
-                    ImApp.deleteAccount(context.getContentResolver(),accountId, providerId);
-
-                    if (oListener != null)
-                        oListener.registrationFailed(message);
-                }
-
-
-                @Override
-                public void onResourceLimitExceeded(MatrixError e) {
-                    ImApp.deleteAccount(context.getContentResolver(),accountId, providerId);
-
-                }
-            });
-
-
-        } catch (Exception e) {
-            LogCleaner.error(LOG_TAG, "error registering new account", e);
-
-
+            mConn.initUser(mAccountRegistering.providerId, mAccountRegistering.accountId);
+            mConn.register(username, password, this);
         }
-
-
-
+        catch (Exception e) {
+            LogCleaner.error(LOG_TAG, "error registering new account", e);
+        }
     }
 
+    public void continueRegister(String captchaResponse, boolean termsApproved) {
+        mConn.continueRegister(captchaResponse, termsApproved);
+    }
 
+    public void addExistingAccount(String username, String domain, String password) {
 
-    public static void addExistingAccount (Activity context, Handler handler, String username, String domain, String password, OnboardingListener onboardingListener) {
+        Activity activity = mActivity.get();
+        if (activity == null) return;
 
         final OnboardingAccount result = new OnboardingAccount();
 
-
         int port = 5222;
 
-        ContentResolver cr = context.getContentResolver();
-        ImPluginHelper helper = ImPluginHelper.getInstance(context);
+        ContentResolver cr = activity.getContentResolver();
+        ImPluginHelper helper = ImPluginHelper.getInstance(activity);
 
         long providerId = helper.createAdditionalProvider(helper.getProviderNames().get(0)); //xmpp FIXME
 
@@ -464,12 +352,13 @@ public class OnboardingManager {
 
         Uri accountUri = ContentUris.withAppendedId(Imps.Account.CONTENT_URI, accountId);
 
-        Cursor pCursor = cr.query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE}, Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(providerId)}, null);
+        Cursor pCursor = cr.query(Imps.ProviderSettings.CONTENT_URI, new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE},
+                Imps.ProviderSettings.PROVIDER + "=?", new String[]{Long.toString(providerId)}, null);
 
         Imps.ProviderSettings.QueryMap settings = new Imps.ProviderSettings.QueryMap(
                 pCursor, cr, providerId, false /* don't keep updated */, null /* no handler */);
 
-        //should check to see if Orbot is installed and running
+        // Should check to see if Orbot is installed and running.
         boolean doDnsSrvLookup = true;
 
         settings.setRequireTls(true);
@@ -478,7 +367,7 @@ public class OnboardingManager {
 
         settings.setDoDnsSrv(doDnsSrvLookup);
 
-        String newDeviceId =  DEFAULT_DEVICE_NAME + "-"
+        String newDeviceId = DEFAULT_DEVICE_NAME + "-"
                 + UUID.randomUUID().toString().substring(0, 8);
 
         settings.setDeviceName(newDeviceId);
@@ -505,20 +394,19 @@ public class OnboardingManager {
             if (Looper.myLooper() == null)
                 Looper.prepare();
 
-            final MatrixConnection conn = new MatrixConnection(context);
-            conn.initUser(providerId, accountId);
+            mConn.initUser(providerId, accountId);
 
-            conn.checkAccount(accountId, password, providerId, new MatrixConnection.LoginListener() {
+            mConn.checkAccount(accountId, password, providerId, new MatrixConnection.LoginListener() {
                 @Override
                 public void onLoginSuccess() {
-
-                    onboardingListener.registrationSuccessful(result);
-
+                    OnboardingListener listener = mListener.get();
+                    if (listener != null) listener.registrationSuccessful(result);
                 }
 
                 @Override
                 public void onLoginFailed(String message) {
-                    onboardingListener.registrationFailed(message);
+                    OnboardingListener listener = mListener.get();
+                    if (listener != null) listener.registrationFailed(message);
                 }
             });
 
@@ -527,20 +415,115 @@ public class OnboardingManager {
         } catch (Exception e) {
             LogCleaner.error(LOG_TAG, "error registering new account", e);
 
-            onboardingListener.registrationFailed(e.getMessage());
+            OnboardingListener listener = mListener.get();
+            if (listener != null) listener.registrationFailed(e.getMessage());
         }
 
-
         settings.close();
-
     }
-
 
     public static class DecodedInviteLink {
         public String username;
-        public boolean isMigration = false;
         public String fingerprint;
         public String nickname;
     }
 
+    @Override
+    public void onRegistrationSuccess(String warningMessage) {
+        // Now keep this account signed-in.
+        ContentValues values = new ContentValues();
+        values.put(Imps.AccountColumns.KEEP_SIGNED_IN, 1);
+
+        Activity activity = mActivity.get();
+        if (activity != null) activity.getContentResolver().update(
+                ContentUris.withAppendedId(Imps.Account.CONTENT_URI, mAccountRegistering.accountId),
+                values, null, null);
+
+        OnboardingListener listener = mListener.get();
+        if (listener != null) listener.registrationSuccessful(mAccountRegistering);
+    }
+
+    @Override
+    public void onRegistrationFailed(String message) {
+        Activity activity = mActivity.get();
+        if (activity != null) ImApp.deleteAccount(activity.getContentResolver(),
+                mAccountRegistering.accountId, mAccountRegistering.providerId);
+
+        mAccountRegistering = null;
+
+        OnboardingListener listener = mListener.get();
+        if (listener != null) listener.registrationFailed(message);
+    }
+
+    @Override
+    public void onWaitingEmailValidation() {
+        // We don't support this, currently, so should not happen.
+
+        Activity activity = mActivity.get();
+        if (activity == null) return;
+
+        OnboardingListener listener = mListener.get();
+        if (listener != null) listener.registrationFailed(activity.getString(R.string.account_setup_error_server));
+    }
+
+    @Override
+    public void onIdentityServerMissing() {
+        Activity activity = mActivity.get();
+        if (activity == null) return;
+
+        OnboardingListener listener = mListener.get();
+        if (listener != null) listener.registrationFailed(activity.getString(R.string.account_setup_error_server));
+    }
+
+    @Override
+    public void onWaitingCaptcha(String publicKey) {
+        Activity activity = mActivity.get();
+        if (activity == null) return;
+
+        if (!TextUtils.isEmpty(publicKey)) {
+            Intent intent = new Intent(activity, CaptchaActivity.class);
+            intent.putExtra(CaptchaActivity.EXTRA_HOME_SERVER_URL, mConn.getHomeServer().toString());
+            intent.putExtra(CaptchaActivity.EXTRA_SITE_KEY, publicKey);
+
+            activity.startActivityForResult(intent, CaptchaActivity.REQUEST_CODE);
+        }
+        else {
+            OnboardingListener listener = mListener.get();
+            if (listener != null) listener.registrationFailed(activity.getString(R.string.account_setup_error_server));
+        }
+    }
+
+    @Override
+    public void onWaitingTerms(List<LocalizedFlowDataLoginTerms> localizedFlowDataLoginTerms) {
+        Activity activity = mActivity.get();
+        if (activity == null) return;
+
+        if (!localizedFlowDataLoginTerms.isEmpty()) {
+            Intent intent = new Intent(activity, TermsActivity.class);
+            intent.putParcelableArrayListExtra(TermsActivity.EXTRA_TERMS, (ArrayList<? extends Parcelable>) localizedFlowDataLoginTerms);
+            activity.startActivityForResult(intent, TermsActivity.REQUEST_CODE);
+        }
+        else {
+            OnboardingListener listener = mListener.get();
+            if (listener != null) listener.registrationFailed(activity.getString(R.string.account_setup_error_server));
+        }
+    }
+
+    @Override
+    public void onThreePidRequestFailed(String message) {
+        OnboardingListener listener = mListener.get();
+        if (listener != null) listener.registrationFailed(message);
+    }
+
+    @Override
+    public void onResourceLimitExceeded(MatrixError e) {
+        Activity activity = mActivity.get();
+        if (activity != null) ImApp.deleteAccount(activity.getContentResolver(),
+                mAccountRegistering.accountId, mAccountRegistering.providerId);
+
+        mAccountRegistering = null;
+
+        OnboardingListener listener = mListener.get();
+        if (listener != null) listener.registrationFailed(e.getLocalizedMessage());
+    }
 }

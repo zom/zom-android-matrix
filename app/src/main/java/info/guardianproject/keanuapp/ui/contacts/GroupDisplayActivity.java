@@ -237,7 +237,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                         public void onClick(View v) {
                             String inviteString;
                             try {
-                                inviteString = OnboardingManager.generateInviteLink(GroupDisplayActivity.this, mAddress, "", mName);
+                                inviteString = OnboardingManager.generateInviteLink(mAddress);
                                 OnboardingManager.inviteScan(GroupDisplayActivity.this, inviteString);
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -259,7 +259,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                                     }
                                 }
                                 catch (Exception ignored){}
-                                String inviteLink = OnboardingManager.generateInviteLink(GroupDisplayActivity.this, mAddress, "", mName);
+                                String inviteLink = OnboardingManager.generateInviteLink(mAddress);
                                 new QrShareAsyncTask(GroupDisplayActivity.this).execute(inviteLink, mName);
                             } catch (Exception e) {
                                 Log.e(LOG_TAG, "couldn't generate QR code", e);
@@ -814,6 +814,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
+        super.onActivityResult(requestCode, resultCode, resultIntent);
 
         if (resultCode == RESULT_OK) {
 
@@ -830,7 +831,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
                 inviteContacts(invitees);
 
-                mHandler.postDelayed(() -> updateSession(),3000);
+                mHandler.postDelayed(() -> updateSession(), 3000);
             }
         }
     }

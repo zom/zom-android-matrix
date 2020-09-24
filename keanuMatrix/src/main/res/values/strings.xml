@@ -28,5 +28,20 @@
     <string name="empty_message">(empty)</string>
     <string name="unable_to_decrypt">(unable to decrypt)</string>
 
+    <!-- RegistrationManager -->
+    <string name="resources_language">en</string>
+
+    <string name="auth_threepid_warning_message">Registration with email and phone number at once is not supported yet until the api exists. Only the phone number will be taken into account.\n\nYou may add your email to your profile in settings.</string>
+    <string name="auth_add_email_and_phone_message_2">"Set an email for account recovery. Use later email or phone to be optionally discoverable by people who know you."</string>
+    <string name="auth_add_email_phone_message_2">"Set an email for account recovery. Use later email or phone to be optionally discoverable by people who know you."</string>
+    <string name="auth_add_email_message_2">"Set an email for account recovery, and later to be optionally discoverable by people who know you."</string>
+    <string name="auth_add_phone_message_2">"Set a phone, and later to be optionally discoverable by people who know you."</string>
+    <string name="account_email_error">An error occurred while verifying your email address.</string>
+    <string name="account_email_already_used_error">This email address is already in use.</string>
+    <string name="account_phone_number_error">An error occurred while verifying your phone number.</string>
+    <string name="account_phone_number_already_used_error">This phone number is already in use.</string>
+    <string name="account_additional_info">Additional info: %s</string>
+    <string name="login_mobile_device">Mobile</string>
+
 
 </resources>

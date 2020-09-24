@@ -18,8 +18,6 @@
 package info.guardianproject.keanu.core.model;
 
 import android.content.Context;
-import android.net.Uri;
-import android.os.Handler;
 
 import java.io.InputStream;
 import java.util.List;
@@ -27,8 +25,6 @@ import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import info.guardianproject.keanu.core.service.IContactListListener;
-import info.guardianproject.keanu.core.service.adapters.ChatSessionAdapter;
-import info.guardianproject.keanu.core.util.UploadProgressListener;
 
 
 /**
@@ -60,7 +56,7 @@ public abstract class ImConnection {
     public static final int CAPABILITY_SESSION_REESTABLISHMENT = 2;
 
     /** The current state of the connection. */
-    protected int mState = DISCONNECTED;
+    protected int mState;
 
     protected CopyOnWriteArrayList<ConnectionListener> mConnectionListeners;
     protected Presence mUserPresence;
@@ -68,9 +64,9 @@ public abstract class ImConnection {
     protected Context mContext;
 
     protected ImConnection(Context context) {
-        mConnectionListeners = new CopyOnWriteArrayList<ConnectionListener>();
+        mConnectionListeners = new CopyOnWriteArrayList<>();
         mState = DISCONNECTED;
-        mContext = context;
+        mContext = context.getApplicationContext();
     }
 
     public void addConnectionListener(ConnectionListener listener) {
@@ -271,7 +267,7 @@ public abstract class ImConnection {
 
     public abstract void sendMessageRead (String to, String msgId);
 
-    public abstract List getFingerprints (String address);
+    public abstract List<String> getFingerprints(String address);
 
     public abstract void setDeviceVerified (String address, String device, boolean verified);
 

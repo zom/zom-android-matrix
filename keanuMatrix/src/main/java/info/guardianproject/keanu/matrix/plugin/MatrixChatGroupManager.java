@@ -319,7 +319,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         chatGroup.notifyMemberRoleUpdate(mConn.getLoginUser(), "moderator", "owner");
         chatGroup.endMemberUpdates();
 
-        mConn.updateGroupMembersAsync(room,chatGroup, true);
+        mConn.updateGroupMembersAsync(room,chatGroup);
 
         if (listener != null) {
 
@@ -477,8 +477,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
                 @Override
                 public void onSuccess(Void aVoid) {
-                    mConn.updateGroupMembers(room, group, false);
-
+                    mConn.updateGroupMembers(room, group);
                 }
             });
 
@@ -562,7 +561,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
             RoomMember member = room.getMember(contact.getAddress().getAddress());
             room.getState().getPowerLevels().setUserPowerLevel(member.getUserId(),100);
 
-            mConn.updateGroupMembers(room, group, true);
+            mConn.updateGroupMembers(room, group);
         }
     }
 
@@ -571,6 +570,6 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
         Room room = mDataHandler.getRoom(group.getAddress().getAddress());
         group.setName(room.getRoomDisplayName(mContext));
-        mConn.updateGroupMembers(room, group, true);
+        mConn.updateGroupMembers(room, group);
     }
 }
