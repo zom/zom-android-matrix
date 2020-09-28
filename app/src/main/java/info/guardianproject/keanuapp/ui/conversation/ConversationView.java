@@ -1951,6 +1951,24 @@ public class ConversationView {
         requeryCursor();
     }
 
+    void refreshMessage (final String packetId) {
+
+        try {
+            mCurrentChatSession.refreshMessage(packetId);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void checkReceipt (final String packetId) {
+
+        try {
+            mCurrentChatSession.checkReceipt(packetId);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     void resendMessage (final String resendMsg, final String mimeType) {
 
         if (!TextUtils.isEmpty(resendMsg))
@@ -2655,11 +2673,15 @@ public class ConversationView {
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 // Called when the user long-clicks on someView
                 public boolean onLongClick(View view) {
+
+                    mLastSelectedView = view;
+
+                    if (((MessageListItem)mLastSelectedView).isNotDecrypted())
+                        refreshMessage(((MessageListItem)mLastSelectedView).getPacketId());
+
                     if (mActionMode != null) {
                         return false;
                     }
-
-                    mLastSelectedView = view;
 
                     // Start the CAB using the ActionMode.Callback defined above
                     mActionMode = ((Activity) mContext).startActionMode(mActionModeCallback);
@@ -2780,7 +2802,13 @@ public class ConversationView {
 
             switch (messageType) {
             case Imps.MessageType.INCOMING:
+
                 messageView.bindIncomingMessage(viewHolder,id, messageType, roomAddress, nick, mimeType, body, date, mMarkup, false, encState, showContactName, mPresenceStatus, mCurrentChatSession, packetId, replyId);
+
+                if (messageView.isNotDecrypted())
+                    refreshMessage(messageView.getPacketId());
+
+
 
                 break;
 
@@ -2795,6 +2823,11 @@ public class ConversationView {
 
                     messageView.bindOutgoingMessage(viewHolder, id, messageType, null, mimeType, body, date, mMarkup, false,
                             deliveryState, encState, packetId);
+
+                    if (!messageView.isDelivered())
+                    {
+                        checkReceipt(messageView.getPacketId());
+                    }
                 }
 
                 break;
@@ -2845,6 +2878,8 @@ public class ConversationView {
                 }
             });
 
+            if (messageView.isSelected())
+                viewHolder.mContainer.setBackgroundColor(mContext.getColor(R.color.holo_blue_bright));
 
         }
 
@@ -3008,11 +3043,10 @@ public class ConversationView {
             public void onDestroyActionMode(ActionMode mode) {
                 mActionMode = null;
 
-
                 if (mLastSelectedView != null)
                     mLastSelectedView.setSelected(false);
 
-
+                mLastSelectedView = null;
             }
         };
 

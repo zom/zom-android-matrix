@@ -150,6 +150,9 @@ interface IChatSession {
 
      void syncMessages ();
 
+     void refreshMessage (String msgId);
+
+     void checkReceipt (String msgId);
     /**
      * Set the subject for a chat room
      **/

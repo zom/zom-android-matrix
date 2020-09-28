@@ -1322,32 +1322,34 @@ public class ChatSessionAdapter extends IChatSession.Stub {
         return prefix + Long.toString(id++);
     }
 
-    public boolean doesMessageExist (String msgId)
+    public boolean doesMessageExist (String msgId, String body)
     {
-        return Imps.messageExists(mContentResolver,msgId,-1);
+        return Imps.messageExists(mContentResolver,msgId,-1,body);
     }
 
     Uri insertMessageInDb(String contact, String body, long time, int type, int errCode, String id, String mimeType, String replyId) {
         return Imps.insertMessageInDb(mContentResolver, mIsGroupChat, mContactId, false, contact, body, time, type, errCode, id, mimeType, replyId);
     }
 
-    int updateMessageInDb(String id, int type, long time, String body, String newPacketId) {
+    int updateMessageInDb(String packetId, int type, long time, String body, String newPacketId) {
 
-        if (body != null)
-            Imps.updateMessageBody(mContentResolver, id, body, null);
-
-        return Imps.updateMessageInDb(mContentResolver, id, type, time, mContactId, body, newPacketId);
+        return Imps.updateMessageInDb(mContentResolver, packetId, type, time, mContactId, body, newPacketId);
     }
 
-    int deleteMessageInDb (String id) {
+    int deleteMessageInDb (String packetId) {
 
         return mContentResolver.delete(mMessageURI, Imps.Messages.PACKET_ID + "=?",
-                new String[] { id });
+                new String[] { packetId });
 
     }
 
 
     class ListenerAdapter implements MessageListener, GroupMemberListener {
+
+        public void onMessageRedacted (String msgId)
+        {
+            Imps.updateMessageInDb(mContentResolver,msgId,-1,-1,-1,service.getString(R.string.message_deleted),null);
+        }
 
         public boolean onIncomingMessage(ChatSession ses, final Message msg, boolean notifyUser) {
 
@@ -1392,11 +1394,11 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
             int msgType = msg.getType();
 
-            if (Imps.messageExists(mContentResolver,msg.getID(),-1)) {
+            if (Imps.messageExists(mContentResolver,msg.getID(),-1,null)) {
 
                 //update the message body
-
-                updateMessageInDb(msg.getID(),msgType,-1,body,msg.getID());
+                if (!Imps.messageExists(mContentResolver,msg.getID(),-1,body))
+                    updateMessageInDb(msg.getID(),msgType,-1,body,msg.getID());
 
                 return false;
             }
@@ -2111,6 +2113,17 @@ public class ChatSessionAdapter extends IChatSession.Stub {
     public void syncMessages() throws RemoteException {
         mConnection.getAdaptee().syncMessages(mChatSession);
 
+    }
+
+
+    @Override
+    public void refreshMessage(String msgId) throws RemoteException {
+        mConnection.getAdaptee().refreshMessage(mChatSession, msgId);
+    }
+
+    @Override
+    public void checkReceipt(String msgId) throws RemoteException {
+        mConnection.getAdaptee().refreshMessage(mChatSession, msgId);
     }
 
     @Override

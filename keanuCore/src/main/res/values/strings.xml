@@ -635,4 +635,5 @@
 
     <string name="create_session">Create Session</string>
     <string name="quick_reaction">Quick Reaction</string>
+    <string name="message_deleted">Message deleted</string>
 </resources>

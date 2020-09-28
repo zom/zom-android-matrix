@@ -762,6 +762,11 @@ public class SecureMediaStore {
         }
     }
 
+    public static File checkDownloadExists(String sessionId, String filenameFromUrl) {
+        String filename = "/" + sessionId + "/download/" + filenameFromUrl.replaceAll(ReservedChars, "_");
+        return new File(filename);
+    }
+
     public static String getDownloadFilename(String sessionId, String filenameFromUrl) {
         String filename = "/" + sessionId + "/download/" + filenameFromUrl.replaceAll(ReservedChars, "_");
         String uniqueFilename = createUniqueFilename(filename);

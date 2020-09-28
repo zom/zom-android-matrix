@@ -2453,10 +2453,11 @@ public class Imps {
 
     }
 
-    public static int updateMessageBody(ContentResolver resolver, String id, String body, String mimeType) {
+    /**
+    public static int updateMessageBody(ContentResolver resolver, String packetId, String body, String mimeType) {
 
-        Builder builder = Messages.OTR_MESSAGES_CONTENT_URI.buildUpon();
-        builder.appendPath(id);
+        Builder builder = Messages.OTR_MESSAGES_CONTENT_URI_BY_PACKET_ID.buildUpon();
+        builder.appendPath(packetId);
 
         ContentValues values = new ContentValues();
         values.put(Messages.BODY, body);
@@ -2464,8 +2465,16 @@ public class Imps {
         if (mimeType != null)
             values.put(Messages.MIME_TYPE, mimeType);
 
-        return resolver.update(builder.build(), values, null, null);
-    }
+        int result = resolver.update(builder.build(), values, null, null);
+        if (result <= 0)
+        {
+            builder = Messages.CONTENT_URI_MESSAGES_BY_PACKET_ID.buildUpon();
+            builder.appendPath(packetId);
+            result = resolver.update(builder.build(), values, null, null);
+        }
+
+        return result;
+    }**/
 
     public static int deleteMessageInDb(ContentResolver resolver, String id) {
 
@@ -2488,8 +2497,13 @@ public class Imps {
         builder.appendPath(oldPacketId);
 
         ContentValues values = new ContentValues();
-        values.put(Messages.TYPE, type);
-        values.put(Messages.THREAD_ID, contactId);
+
+        if (type != -1)
+            values.put(Messages.TYPE, type);
+
+        if (contactId != -1)
+            values.put(Messages.THREAD_ID, contactId);
+
         if (time != -1)
             values.put(Messages.DATE, time);
 
@@ -2521,7 +2535,7 @@ public class Imps {
         values.put(Messages.IS_DELIVERED, isDelivered);
         values.put(Messages.THREAD_ID,chatId);
 
-        if (Imps.messageExists(resolver,msgId, MessageType.QUEUED)) {
+        if (Imps.messageExists(resolver,msgId, MessageType.QUEUED, null)) {
             if (wasEncrypted)
                 values.put(Messages.TYPE, MessageType.OUTGOING_ENCRYPTED);
             else
@@ -2612,7 +2626,7 @@ public class Imps {
         return result;
     }
 
-    public static boolean messageExists (ContentResolver resolver, String id, int messageType)
+    public static boolean messageExists (ContentResolver resolver, String id, int messageType, String body)
     {
         boolean result = false;
 
@@ -2626,6 +2640,11 @@ public class Imps {
         {
             args[0] = messageType+"";
             selection = Messages.TYPE + "=?";
+        }
+        else if (body != null)
+        {
+            args[0] = body;
+            selection = Messages.BODY + "=?";
         }
         else
         {

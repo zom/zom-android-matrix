@@ -288,4 +288,8 @@ public abstract class ImConnection {
     public abstract String getDownloadUrl (String identifier);
 
     public abstract void syncMessages (ChatSession session);
+
+    public abstract void refreshMessage (ChatSession session, String msgId);
+
+    public abstract void checkReceipt (ChatSession session, String msgId);
 }

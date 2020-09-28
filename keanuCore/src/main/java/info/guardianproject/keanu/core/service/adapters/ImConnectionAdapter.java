@@ -637,6 +637,7 @@ public class ImConnectionAdapter extends IImConnection.Stub {
 
     }
 
+
     public String getDownloadUrl (String identifier)
     {
         if (mConnection != null)

@@ -28,6 +28,7 @@
         app:showAsAction="ifRoom"
         />
 
+    <!--
     <item
         android:id="@+id/menu_message_nearby"
         android:icon="@drawable/ic_nearby_menu"
@@ -35,6 +36,14 @@
         app:showAsAction="ifRoom"
         />
 
+
+    <item
+        android:id="@+id/menu_message_refreh"
+        android:icon="@drawable/ic_message_wait_grey"
+        android:title="Refresh Message"
+        app:showAsAction="ifRoom"
+        />
+        -->
     <item
         android:id="@+id/menu_message_share"
         android:icon="@drawable/ic_share_white_24dp"

@@ -75,4 +75,6 @@ public interface MessageListener {
      * @param ses the {@link ChatSession}.
      */
     public void onReceiptsExpected(ChatSession ses, boolean isExpected);
+
+    public void onMessageRedacted (String id);
 }

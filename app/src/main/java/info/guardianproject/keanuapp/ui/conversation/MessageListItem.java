@@ -117,6 +117,7 @@ public class MessageListItem extends RelativeLayout {
     }
 
     private String lastMessage = null;
+    private DeliveryState delivered = null;
     private Uri mediaUri = null;
     private String mimeType = null;
     private String packetId = null;
@@ -217,6 +218,14 @@ public class MessageListItem extends RelativeLayout {
     public String getMimeType () { return mimeType; }
     public String getLastMessage () {
         return lastMessage;
+    }
+
+    public boolean isNotDecrypted () {
+        return lastMessage == null || lastMessage.equals(context.getString(R.string.unable_to_decrypt));
+    }
+
+    public boolean isDelivered () {
+        return delivered == DeliveryState.DELIVERED;
     }
 
     public String getPacketId () { return packetId; }
@@ -390,8 +399,6 @@ public class MessageListItem extends RelativeLayout {
         if (linkify)
            LinkifyHelper.addLinks(mHolder.mTextViewForMessages, new URLSpanConverter());
 
-        if (isSelected())
-            mHolder.mContainer.setBackgroundColor(getResources().getColor(R.color.holo_blue_bright));
 
     }
 
@@ -982,6 +989,7 @@ public class MessageListItem extends RelativeLayout {
 
         this.packetId = packetId;
         lastMessage = body;
+        delivered = delivery;
 
         if( mimeType != null ) {
 
@@ -1085,8 +1093,6 @@ public class MessageListItem extends RelativeLayout {
             mHolder.mTextViewForMessages.setText(new SpannableString(lastMessage));
         }
 
-        if (isSelected())
-           mHolder.mContainer.setBackgroundColor(getResources().getColor(R.color.holo_blue_bright));
 
         if (date != null)
         {
