@@ -672,7 +672,12 @@ public class AudioWife {
             e.printStackTrace();
         }
 
-        mMediaPlayer.setOnCompletionListener(mOnCompletion);
+        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                mMediaPlayer.setOnCompletionListener(mOnCompletion);
+            }
+        });
     }
 
     private OnCompletionListener mOnCompletion = new OnCompletionListener() {
