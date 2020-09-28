@@ -595,78 +595,48 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
     private synchronized void updateMembers() {
 
-            new Thread ()
-            {
-                public void run ()
-                {
+        mMembers.clear();
 
-                  //  final HashMap<String, GroupMemberDisplay> members = new HashMap<>();
+        String[] projection = {Imps.GroupMembers.USERNAME, Imps.GroupMembers.NICKNAME, Imps.GroupMembers.ROLE, Imps.GroupMembers.AFFILIATION};
+        Uri memberUri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, mLastChatId);
+        ContentResolver cr = getContentResolver();
 
-                    String[] projection = {Imps.GroupMembers.USERNAME, Imps.GroupMembers.NICKNAME, Imps.GroupMembers.ROLE, Imps.GroupMembers.AFFILIATION};
-                    Uri memberUri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, mLastChatId);
-                    ContentResolver cr = getContentResolver();
+        StringBuilder buf = new StringBuilder();
+        buf.append(Imps.Messages.NICKNAME).append(" IS NOT NULL ");
 
-                    StringBuilder buf = new StringBuilder();
-                    buf.append(Imps.Messages.NICKNAME).append(" IS NOT NULL ");
+        Cursor c = cr.query(memberUri, projection, buf.toString(), null, Imps.GroupMembers.ROLE+","+Imps.GroupMembers.AFFILIATION);
+        if (c != null) {
+            int colUsername = c.getColumnIndex(Imps.GroupMembers.USERNAME);
+            int colNickname = c.getColumnIndex(Imps.GroupMembers.NICKNAME);
+            int colRole = c.getColumnIndex(Imps.GroupMembers.ROLE);
+            int colAffiliation = c.getColumnIndex(Imps.GroupMembers.AFFILIATION);
 
-                    Cursor c = cr.query(memberUri, projection, buf.toString(), null, Imps.GroupMembers.ROLE+","+Imps.GroupMembers.AFFILIATION);
-                    if (c != null) {
-                        int colUsername = c.getColumnIndex(Imps.GroupMembers.USERNAME);
-                        int colNickname = c.getColumnIndex(Imps.GroupMembers.NICKNAME);
-                        int colRole = c.getColumnIndex(Imps.GroupMembers.ROLE);
-                        int colAffiliation = c.getColumnIndex(Imps.GroupMembers.AFFILIATION);
-
-                        while (c.moveToNext()) {
-                            GroupMemberDisplay member = new GroupMemberDisplay();
-                            member.username = c.getString(colUsername);
-                            member.nickname = c.getString(colNickname);
-                            member.role = c.getString(colRole);
-                            member.affiliation = c.getString(colAffiliation);
-                            if (mLocalAddress.contentEquals(member.username)) {
-                                mYou = member;
-                            }
-
-                            boolean isImportant = (member.affiliation.contentEquals("owner") || member.affiliation.contentEquals("admin"));
-
-                            if (isImportant)
-                                mMembers.add(0,member);
-                            else
-                                mMembers.add(member);
-                        }
-                        c.close();
-                    }
-
-                    /**
-                    mMembers = new ArrayList<>(members.values());
-
-                    // Sort members by name, but keep owners at the top
-                    Collections.sort(mMembers, new Comparator<GroupMemberDisplay>() {
-                        @Override
-                        public int compare(GroupMemberDisplay member1, GroupMemberDisplay member2) {
-                            if (member1.affiliation == null || member2.affiliation == null)
-                                return 1;
-                            boolean member1isImportant = (member1.affiliation.contentEquals("owner") || member1.affiliation.contentEquals("admin"));
-                            boolean member2isImportant = (member2.affiliation.contentEquals("owner") || member2.affiliation.contentEquals("admin"));
-                            if (member1isImportant != member2isImportant) {
-                                if (member1isImportant) {
-                                    return -1;
-                                } else {
-                                    return 1;
-                                }
-                            }
-                            return member1.nickname.compareTo(member2.nickname);
-                        }
-                    });
-                     **/
-
-                    runOnUiThread(() -> {
-                        if (mRecyclerView != null && mRecyclerView.getAdapter() != null)
-                            mRecyclerView.getAdapter().notifyDataSetChanged();
-                    });
-
-
+            while (c.moveToNext()) {
+                GroupMemberDisplay member = new GroupMemberDisplay();
+                member.username = c.getString(colUsername);
+                member.nickname = c.getString(colNickname);
+                member.role = c.getString(colRole);
+                member.affiliation = c.getString(colAffiliation);
+                if (mLocalAddress.contentEquals(member.username)) {
+                    mYou = member;
                 }
-            }.start();
+
+                boolean isImportant = (member.affiliation.contentEquals("owner") || member.affiliation.contentEquals("admin"));
+
+                if (isImportant)
+                    mMembers.add(0,member);
+                else
+                    mMembers.add(member);
+            }
+            c.close();
+        }
+
+
+        if (mRecyclerView != null && mRecyclerView.getAdapter() != null)
+            mRecyclerView.getAdapter().notifyDataSetChanged();
+
+
+
 
 
     }
