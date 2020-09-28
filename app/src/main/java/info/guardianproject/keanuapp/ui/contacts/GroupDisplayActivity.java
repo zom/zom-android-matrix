@@ -45,6 +45,7 @@ import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.service.IChatSessionManager;
 import info.guardianproject.keanu.core.service.IImConnection;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -237,8 +238,14 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                         public void onClick(View v) {
                             String inviteString;
                             try {
-                                inviteString = OnboardingManager.generateInviteLink(mAddress);
-                                OnboardingManager.inviteScan(GroupDisplayActivity.this, inviteString);
+                                if (mSession != null) {
+                                    mSession.setPublic(true);
+                                    String publicAddress = mSession.getPublicAddress();
+                                    if (!TextUtils.isEmpty(publicAddress)) {
+                                        inviteString = OnboardingManager.generateInviteLink(URLEncoder.encode(publicAddress,"UTF-8"));
+                                        OnboardingManager.inviteScan(GroupDisplayActivity.this, inviteString);
+                                    }
+                                }
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -256,11 +263,19 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                                 try {
                                     if (mSession != null) {
                                         mSession.setPublic(true);
+
+                                        String publicAddress = mSession.getPublicAddress();
+
+                                        if (!TextUtils.isEmpty(publicAddress)) {
+                                            String inviteLink = OnboardingManager.generateInviteLink(URLEncoder.encode(publicAddress,"UTF-8"));
+                                            new QrShareAsyncTask(GroupDisplayActivity.this).execute(inviteLink, mName);
+                                        }
+
                                     }
                                 }
                                 catch (Exception ignored){}
-                                String inviteLink = OnboardingManager.generateInviteLink(mAddress);
-                                new QrShareAsyncTask(GroupDisplayActivity.this).execute(inviteLink, mName);
+
+
                             } catch (Exception e) {
                                 Log.e(LOG_TAG, "couldn't generate QR code", e);
                             }
