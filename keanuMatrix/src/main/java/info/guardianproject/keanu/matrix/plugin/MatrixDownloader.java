@@ -85,12 +85,16 @@ public class MatrixDownloader {
     public File openSecureStorageFile(String sessionId, String filename) throws FileNotFoundException {
 //        debug( "openFile: url " + url) ;
 
-        String localFilename = SecureMediaStore.getDownloadFilename(sessionId, filename);
-        //  debug( "openFile: localFilename " + localFilename) ;
-        info.guardianproject.iocipher.File fileNew = new info.guardianproject.iocipher.File(localFilename);
-        fileNew.getParentFile().mkdirs();
+        File fileMedia = SecureMediaStore.checkDownloadExists(sessionId, filename);
+        if (fileMedia == null || fileMedia.length() == 0)
+        {
+            String localFilename = SecureMediaStore.getDownloadFilename(sessionId, filename);
+            //  debug( "openFile: localFilename " + localFilename) ;
+            fileMedia = new info.guardianproject.iocipher.File(localFilename);
+            fileMedia.getParentFile().mkdirs();
+        }
 
-        return fileNew;
+        return fileMedia;
     }
 
     private String getFilenameFromUrl(String urlString) {

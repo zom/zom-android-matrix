@@ -22,6 +22,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import org.apache.commons.io.IOUtils;
+import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.matrix.androidsdk.HomeServerConnectionConfig;
 import org.matrix.androidsdk.MXDataHandler;
@@ -34,6 +35,8 @@ import org.matrix.androidsdk.core.callback.SimpleApiCallback;
 import org.matrix.androidsdk.core.model.MatrixError;
 import org.matrix.androidsdk.crypto.IncomingRoomKeyRequest;
 import org.matrix.androidsdk.crypto.IncomingRoomKeyRequestCancellation;
+import org.matrix.androidsdk.crypto.MXDecryptionException;
+import org.matrix.androidsdk.crypto.MXEventDecryptionResult;
 import org.matrix.androidsdk.crypto.RoomKeysRequestListener;
 import org.matrix.androidsdk.crypto.data.MXDeviceInfo;
 import org.matrix.androidsdk.crypto.data.MXOlmSessionResult;
@@ -160,8 +163,7 @@ public class MatrixConnection extends ImConnection {
 
     private final static String HTTPS_PREPEND = "https://";
 
-    private ExecutorService mMessageExecutor = null;
-    private ExecutorService mStateExecutor = null;
+    private ExecutorService mExecutor = null;
 
     private final static long TIME_ONE_DAY_MS = 1000 * 60 * 60 * 24;
 
@@ -185,8 +187,7 @@ public class MatrixConnection extends ImConnection {
         mChatSessionManager = new MatrixChatSessionManager(context, this);
         mChatGroupManager = new MatrixChatGroupManager(context, this,mChatSessionManager);
 
-        mStateExecutor = new ThreadPoolExecutor( 2, 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
-        mMessageExecutor = Executors.newCachedThreadPool();
+        mExecutor = new ThreadPoolExecutor( 2, 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
 
         mServers = Server.getServers(context);
 
@@ -227,6 +228,7 @@ public class MatrixConnection extends ImConnection {
         initMatrix();
 
         initAvatarLoader();
+        initMessageLoader();
     }
 
     @Override
@@ -264,7 +266,7 @@ public class MatrixConnection extends ImConnection {
         mProviderId = providerId;
         mAccountId = accountId;
 
-        mStateExecutor.execute(() -> loginAsync (password, new LoginListener() {
+        mExecutor.execute(() -> loginAsync (password, new LoginListener() {
 
             @Override
             public void onLoginSuccess() {
@@ -286,7 +288,7 @@ public class MatrixConnection extends ImConnection {
         mProviderId = providerId;
         mAccountId = accountId;
 
-        mStateExecutor.execute(() -> loginAsync (password, listener));
+        mExecutor.execute(() -> loginAsync (password, listener));
 
     }
 
@@ -297,7 +299,7 @@ public class MatrixConnection extends ImConnection {
         mProviderId = providerId;
         mAccountId = accountId;
 
-        mStateExecutor.execute(() -> checkAccount (password, listener));
+        mExecutor.execute(() -> checkAccount (password, listener));
 
     }
 
@@ -428,12 +430,12 @@ public class MatrixConnection extends ImConnection {
 
     private void checkAccount (final String password, LoginListener listener)
     {
-        mStateExecutor.execute(() -> loginSync(password, false, listener));
+        mExecutor.execute(() -> loginSync(password, false, listener));
     }
 
     private void loginAsync (final String password, final LoginListener listener) {
 
-        mStateExecutor.execute(() -> loginSync(password, true, listener));
+        mExecutor.execute(() -> loginSync(password, true, listener));
 
     }
 
@@ -526,7 +528,7 @@ public class MatrixConnection extends ImConnection {
                     if (listener != null)
                         listener.onLoginFailed(e.getMessage());
 
-                    mStateExecutor.execute(new Runnable() {
+                    mExecutor.execute(new Runnable() {
                         public void run() {
                             loginAsync(null, listener);
                         }
@@ -563,7 +565,7 @@ public class MatrixConnection extends ImConnection {
 
 
 
-        mStateExecutor.execute(() -> {
+        mExecutor.execute(() -> {
             mSession = new MXSession.Builder(mConfig, mDataHandler, mContext.getApplicationContext())
                     .withFileEncryption(enableEncryption)
                     .build();
@@ -653,7 +655,7 @@ public class MatrixConnection extends ImConnection {
             File fileCredsJson = new File("/" + username + "/creds.json");
             if (fileCredsJson.exists())
                 fileCredsJson.delete();
-            
+
 
         }
         else if (mSession.isAlive()) {
@@ -892,9 +894,98 @@ public class MatrixConnection extends ImConnection {
         if (session != null)
         {
             Room room = mChatSessionManager.getRoom(session);
-            if (room != null)
+            if (room != null) {
                 loadRoomState(room);
+
+                /**
+                 final List<ReceiptData> receipts = mDataHandler.getStore().getEventReceipts(room.getRoomId(), null, true, false);
+                 for (ReceiptData data : receipts) {
+                    session.onMessageReceipt(data.eventId, session.useEncryption());
+                 }**/
+            }
         }
+    }
+
+    private void redactMessage (String roomId, String redactId)
+    {
+        ChatSession session = mChatSessionManager.getSession(roomId);
+        session.getMessageListener().onMessageRedacted(redactId);
+
+
+    }
+
+    @Override
+    public void refreshMessage(ChatSession session,String eventId) {
+        if (session != null)
+        {
+            Room room = mChatSessionManager.getRoom(session);
+            if (room != null) {
+                mSession.getEventsApiClient().getEventFromEventId(eventId, new ApiCallback<Event>() {
+                    @Override
+                    public void onNetworkError(Exception e) {
+
+                    }
+
+                    @Override
+                    public void onMatrixError(MatrixError matrixError) {
+
+                    }
+
+                    @Override
+                    public void onUnexpectedError(Exception e) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Event event) {
+
+                        requestSessionKeyForMessage(event, room);
+
+                        if (!event.isUndelivered())
+                            session.onMessageReceipt(eventId, session.useEncryption());
+                    }
+                });
+
+
+            }
+        }
+
+    }
+
+    @Override
+    public void checkReceipt(ChatSession session,String eventId) {
+        if (session != null)
+        {
+            Room room = mChatSessionManager.getRoom(session);
+            if (room != null) {
+                mSession.getEventsApiClient().getEventFromEventId(eventId, new ApiCallback<Event>() {
+                    @Override
+                    public void onNetworkError(Exception e) {
+
+                    }
+
+                    @Override
+                    public void onMatrixError(MatrixError matrixError) {
+
+                    }
+
+                    @Override
+                    public void onUnexpectedError(Exception e) {
+
+                    }
+
+                    @Override
+                    public void onSuccess(Event event) {
+
+                         if (!event.isUndelivered())
+                            session.onMessageReceipt(eventId, session.useEncryption());
+                    }
+                });
+
+
+            }
+        }
+
     }
 
     @Override
@@ -932,7 +1023,7 @@ public class MatrixConnection extends ImConnection {
     private void loadStateAsync ()
     {
 
-        mMessageExecutor.execute(() -> {
+        mExecutor.execute(() -> {
 
             Collection<Room> rooms = mStore.getRooms();
 
@@ -951,29 +1042,50 @@ public class MatrixConnection extends ImConnection {
             addRoomContact(room, null);
         }
 
+        /**
         String roomReadMarkerId = room.getReadMarkerEventId();
         room.getTimeline().addEventTimelineListener(new EventTimeline.Listener() {
             @Override
             public void onEvent(Event event, EventTimeline.Direction direction, RoomState roomState) {
                 mEventListener.onLiveEvent(event, roomState);
             }
-        });
+        });**/
 
-        Collection<Event> roomMsgs = mSession.getDataHandler().getStore().getRoomMessages(room.getRoomId());
+    }
 
-        for (Event event : roomMsgs)
-        {
-            if (event.getType().equals(Event.EVENT_TYPE_MESSAGE)
-                    || event.getType().equals(EVENT_TYPE_REACTION))
-                         {
-                handleIncomingMessage(event);
+    public void requestSessionKeyForMessage (Event eventEnc, Room room)
+    {
+        if (eventEnc != null) {
+
+            mSession.getCrypto().reRequestRoomKeyForEvent(eventEnc);
+
+            try {
+                MXEventDecryptionResult result = mSession.getCrypto().decryptEvent(eventEnc, room.getTimeline().getTimelineId());
+                eventEnc.setClearData(result);
+                lbqMessages.add(eventEnc);
+                //handleIncomingMessage(eventEnc);
+
+            } catch (MXDecryptionException e) {
+                e.printStackTrace();
             }
-            else if (event.getType().equals(EVENT_TYPE_MESSAGE_ENCRYPTED))
-            {
-                room.getDataHandler().decryptEvent(event, room.getTimeline().getTimelineId());
-                handleIncomingMessage(event);
-            }
+        }
 
+    }
+
+    public void requestSessionKeyForMessage (String eventId, String roomId)
+    {
+        Room room = mSession.getDataHandler().getRoom(roomId);
+        Event eventEnc = mSession.getDataHandler().getStore().getEvent(eventId, roomId);
+
+        if (eventEnc != null) {
+            mSession.getCrypto().reRequestRoomKeyForEvent(eventEnc);
+
+            try {
+                MXEventDecryptionResult result = mSession.getCrypto().decryptEvent(eventEnc, room.getTimeline().getTimelineId());
+
+            } catch (MXDecryptionException e) {
+                e.printStackTrace();
+            }
         }
 
     }
@@ -1054,7 +1166,7 @@ public class MatrixConnection extends ImConnection {
     protected void updateGroupMembers (final Room room, final ChatGroup group, boolean priority) {
 
 
-        mStateExecutor.execute(
+        mExecutor.execute(
                 () -> {
                     //Room room1 = mDataHandler.getRoom(group.getAddress().getAddress());
                     updateGroupMembersAsync(room, group, false);
@@ -1074,18 +1186,6 @@ public class MatrixConnection extends ImConnection {
     protected void updateGroupMembersAsync (final Room room, final ChatGroup group, boolean priority)
     {
         group.setLastUpdated();
-
-        /**
-        mStateExecutor.execute(() -> {
-
-            String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(room.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
-
-            if (!TextUtils.isEmpty(downloadUrl)) {
-                if (!hasAvatar(room.getRoomId(), downloadUrl)) {
-                    downloadAvatar(room.getRoomId(), downloadUrl);
-                }
-            }
-        });**/
 
         room.getMembersAsync(new ApiCallback<List<RoomMember>>() {
             @Override
@@ -1115,7 +1215,7 @@ public class MatrixConnection extends ImConnection {
 
                 GroupMemberLoader gLoader =new GroupMemberLoader(room, group, roomMembers);
 
-                mStateExecutor.execute(gLoader);
+                mExecutor.execute(gLoader);
 
             }
         });
@@ -1250,7 +1350,7 @@ public class MatrixConnection extends ImConnection {
         public void onPresenceUpdate(Event event, User user) {
 
             debug ("PRESENCE: from=" + event.getSender() + ": " + event.getContent());
-            mStateExecutor.execute(() -> handlePresence(event));
+            mExecutor.execute(() -> handlePresence(event));
 
         }
 
@@ -1272,23 +1372,30 @@ public class MatrixConnection extends ImConnection {
         }
 
         @Override
-        public void onLiveEvent(final Event event, RoomState roomState) {
+        public void onLiveEvent(final Event event, RoomState roomStateInfo) {
 
             debug ("onLiveEvent:type=" + event.getType());
 
             if (event.getType().equals(Event.EVENT_TYPE_MESSAGE) || event.getType().equals(EVENT_TYPE_REACTION))  // TODO - Why is this not a constant in the SDK, does it still rely on some server side hack that the IOS code mentions?
             {
-               mMessageExecutor.execute(() -> handleIncomingMessage(event));
+                //handleIncomingMessage(event);
+                lbqMessages.add(event);
+
+            }
+            else if (event.getType().equals(Event.EVENT_TYPE_REDACTION))
+            {
+                Event eventRedaction = event.getClearEvent();
+                redactMessage(event.roomId, event.redacts);
             }
             else if (event.getType().equals(Event.EVENT_TYPE_STATE_ROOM_MEMBER))
             {
-                mStateExecutor.execute(() -> handleRoomMemberEvent(event));
+                mExecutor.execute(() -> handleRoomMemberEvent(event));
 
             }
             else if (event.getType().equals(Event.EVENT_TYPE_PRESENCE))
             {
                 debug ("PRESENCE: from=" + event.getSender() + ": " + event.getContent());
-                mStateExecutor.execute(() -> handlePresence(event));
+                mExecutor.execute(() -> handlePresence(event));
 
             }
             else if (event.getType().equals(Event.EVENT_TYPE_READ_MARKER))
@@ -1362,7 +1469,7 @@ public class MatrixConnection extends ImConnection {
             else if (event.getType().equals(Event.EVENT_TYPE_TYPING))
             {
                 debug ("TYPING: from=" + event.getSender() + ": " + event.getContent());
-                mStateExecutor.execute(() -> handleTyping(event));
+                mExecutor.execute(() -> handleTyping(event));
             }
             else if (event.getType().equals(Event.EVENT_TYPE_FORWARDED_ROOM_KEY))
             {
@@ -1372,12 +1479,11 @@ public class MatrixConnection extends ImConnection {
             else if (event.getType().equals(Event.EVENT_TYPE_STICKER))
             {
                 debug ("STICKER: from=" + event.getSender() + ": " + event.getContent());
-                mStateExecutor.execute(() -> handleIncomingSticker(event));
-
+                mExecutor.execute(() -> { handleIncomingSticker(event);});
 
             }
             else if (event.getType().equals(Event.EVENT_TYPE_STATE_ROOM_NAME)) {
-                mStateExecutor.execute(() -> {
+                mExecutor.execute(() -> {
                     ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(event.roomId);
                     if (csa != null) {
                         String newName = event.getContent().getAsJsonObject().get("name").getAsString();
@@ -1391,7 +1497,7 @@ public class MatrixConnection extends ImConnection {
                 });
             }
             else if (event.getType().equals(Event.EVENT_TYPE_STATE_ROOM_AVATAR)) {
-                mStateExecutor.execute(() -> {
+                mExecutor.execute(() -> {
                     Room room = mStore.getRoom(event.roomId);
                     String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(room.getAvatarUrl(), DEFAULT_AVATAR_HEIGHT, DEFAULT_AVATAR_HEIGHT, "scale");
 
@@ -1412,14 +1518,15 @@ public class MatrixConnection extends ImConnection {
                             ArrayList<String> users = new ArrayList<>();
                             users.add(event.sender);
                             mSession.getCrypto().ensureOlmSessionsForUsers(users,new BasicApiCallback("ensureOlmSessionsForUsers"));
-                            if (event.getType().equals(EVENT_TYPE_MESSAGE_ENCRYPTED)) {
-                                Room room = mSession.getDataHandler().getRoom(event.roomId);
-                                if (room != null)
-                                    room.getDataHandler().decryptEvent(event, room.getTimeline().getTimelineId());
-                            }
+                            Room room = mSession.getDataHandler().getRoom(event.roomId);
+                            if (room != null)
+                                requestSessionKeyForMessage(event, room);
+
+
                         }
 
-                        handleIncomingMessage(event);
+
+
                     }
                 }
             }
@@ -1468,6 +1575,27 @@ public class MatrixConnection extends ImConnection {
         public void onEventDecrypted(String s, String s1) {
             debug ("onEventDecrypted: " + s + ":" + s1);
 
+            mSession.getEventsApiClient().getEventFromEventId(s, new ApiCallback<Event>() {
+                @Override
+                public void onNetworkError(Exception e) {
+
+                }
+
+                @Override
+                public void onMatrixError(MatrixError matrixError) {
+
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+
+                }
+
+                @Override
+                public void onSuccess(Event event) {
+                        onLiveEvent(event, null);
+                }
+            });
         }
 
 
@@ -1600,7 +1728,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mStore.getRoom(s);
             if (room != null) {
 
-                mStateExecutor.execute(() -> addRoomContact(room, null));
+                mExecutor.execute(() -> addRoomContact(room, null));
             }
 
         }
@@ -1612,7 +1740,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mDataHandler.getRoom(s);
             if (room != null)
             {
-                mStateExecutor.execute(() -> updateRoom(room));
+                mExecutor.execute(() -> updateRoom(room));
             }
         }
 
@@ -1622,7 +1750,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mDataHandler.getRoom(s);
             if (room != null)
             {
-                mStateExecutor.execute(() -> updateRoom(room));
+                mExecutor.execute(() -> updateRoom(room));
 
             }
         }
@@ -1649,7 +1777,7 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onReceiptEvent(final String roomId, final List<String> list) {
 
-            mStateExecutor.execute(new Runnable (){
+            mExecutor.execute(new Runnable (){
 
                 public void run ()
                 {
@@ -1719,7 +1847,7 @@ public class MatrixConnection extends ImConnection {
         @Override
         public void onJoinGroup(String s) {
 
-            mStateExecutor.execute(new Runnable ()
+            mExecutor.execute(new Runnable ()
             {
                 public void run ()
                 {
@@ -1743,7 +1871,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mDataHandler.getRoom(s);
             if (room != null)
             {
-                mStateExecutor.execute(() -> updateRoom(room));
+                mExecutor.execute(() -> updateRoom(room));
             }
         }
 
@@ -1760,7 +1888,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mDataHandler.getRoom(s);
             if (room != null)
             {
-                mStateExecutor.execute(() -> updateRoom(room));
+                mExecutor.execute(() -> updateRoom(room));
             }
         }
 
@@ -1769,7 +1897,7 @@ public class MatrixConnection extends ImConnection {
             Room room = mDataHandler.getRoom(s);
             if (room != null)
             {
-                mStateExecutor.execute(() -> updateRoom(room));
+                mExecutor.execute(() -> updateRoom(room));
             }
         }
 
@@ -2037,6 +2165,26 @@ public class MatrixConnection extends ImConnection {
 
     }
 
+    LinkedBlockingQueue<Event> lbqMessages = new LinkedBlockingQueue<>();
+    Timer mTimerMessageLoader;
+
+    private void initMessageLoader () {
+        mTimerMessageLoader = new Timer();
+
+        mTimerMessageLoader.schedule(new TimerTask() {
+
+            public void run() {
+
+                while (lbqMessages.peek() != null) {
+                    Event event = lbqMessages.poll();
+                    handleIncomingMessage(event);
+                }
+
+            }
+
+        }, 0, 2000);
+    }
+
     private void handleIncomingMessage (Event event)
     {
 
@@ -2056,9 +2204,10 @@ public class MatrixConnection extends ImConnection {
                         return;
                 }
 
-                ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(event.roomId);
-                if (room == null || TextUtils.isEmpty(event.eventId) || csa.doesMessageExist(event.eventId))
+                if (room == null || TextUtils.isEmpty(event.eventId))
                     return;
+
+                ChatSessionAdapter csa = mChatSessionManager.getChatSessionAdapter(event.roomId);
 
                 String eventId = event.eventId;
                 String messageBody = null;
@@ -2102,16 +2251,12 @@ public class MatrixConnection extends ImConnection {
                         messageBody = mContext.getString(R.string.unable_to_decrypt);
                 }
 
-                final List<ReceiptData> receipts = mDataHandler.getStore().getEventReceipts(event.roomId, null, true, false);
-                for (ReceiptData data : receipts) {
-                    session.onMessageReceipt(data.eventId, session.useEncryption());
-                }
 
                 MatrixAddress addrSender = new MatrixAddress(event.sender);
 
                 Message message = null;
                 if (!isQuickReaction) {
-                    message = downloadMedia(event, messageBody, addrSender);
+                    message = downloadMedia(session, event, messageBody, addrSender);
                 }
 
                 if (message == null) {
@@ -2162,22 +2307,39 @@ public class MatrixConnection extends ImConnection {
 
     }
 
-    private Message downloadMedia (Event event, String downloadFileName, MatrixAddress addrSender)
+    private Message downloadMedia (ChatSession session, Event event, String downloadFileName, MatrixAddress addrSender)
     {
         JsonObject jObj = event.getContent().getAsJsonObject();
-        Message message = null;
 
         if (jObj != null && jObj.has("msgtype")) {
             String messageType = jObj.get("msgtype").getAsString();
             String messageMimeType = null;
-
 
             if (messageType.equals("m.image")
                     || messageType.equals("m.file")
                     || messageType.equals("m.video")
                     || messageType.equals("m.audio")) {
 
-                String result = null;
+                if (messageType.equals("m.file")) {
+                    FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
+                    messageMimeType = fileMessage.getMimeType();
+                } else if (messageType.equals("m.image")) {
+                    ImageMessage fileMessage = JsonUtils.toImageMessage(event.getContent());
+                    messageMimeType = fileMessage.getMimeType();
+                } else if (messageType.equals("m.audio")) {
+                    AudioMessage fileMessage = JsonUtils.toAudioMessage(event.getContent());
+                    messageMimeType = fileMessage.getMimeType();
+                } else if (messageType.equals("m.video")) {
+                    VideoMessage fileMessage = JsonUtils.toVideoMessage(event.getContent());
+                    messageMimeType = fileMessage.getMimeType();
+                }
+
+                final Message message = new Message(mContext.getString(R.string.loading));
+                message.setID(event.eventId);
+                message.setFrom(addrSender);
+                message.setDateTime(new Date(event.getOriginServerTs()));
+                message.setContentType(messageMimeType);
+
                 String mediaUrl = null;
                 String thumbUrl = null;
                 String localFolder = addrSender.getAddress();
@@ -2186,22 +2348,18 @@ public class MatrixConnection extends ImConnection {
 
                 if (messageType.equals("m.file")) {
                     FileMessage fileMessage = JsonUtils.toFileMessage(event.getContent());
-                    messageMimeType = fileMessage.getMimeType();
                     mediaUrl = fileMessage.getUrl();
                     encryptedFileInfo = fileMessage.file;
                 } else if (messageType.equals("m.image")) {
                     ImageMessage fileMessage = JsonUtils.toImageMessage(event.getContent());
-                    messageMimeType = fileMessage.getMimeType();
                     mediaUrl = fileMessage.getUrl();
                     encryptedFileInfo = fileMessage.file;
                 } else if (messageType.equals("m.audio")) {
                     AudioMessage fileMessage = JsonUtils.toAudioMessage(event.getContent());
-                    messageMimeType = fileMessage.getMimeType();
                     mediaUrl = fileMessage.getUrl();
                     encryptedFileInfo = fileMessage.file;
                 } else if (messageType.equals("m.video")) {
                     VideoMessage fileMessage = JsonUtils.toVideoMessage(event.getContent());
-                    messageMimeType = fileMessage.getMimeType();
                     mediaUrl = fileMessage.getUrl();
                     encryptedFileInfo = fileMessage.file;
                     thumbUrl = fileMessage.getThumbnailUrl();
@@ -2211,86 +2369,113 @@ public class MatrixConnection extends ImConnection {
 
                 }
 
+                if (!TextUtils.isEmpty(mediaUrl)) {
+                    String result = downloadMediaAsync(event, encryptedFileInfo, encryptedThumbInfo,
+                            mediaUrl, thumbUrl, downloadFileName, localFolder);
 
-                MatrixDownloader dl = new MatrixDownloader();
-                info.guardianproject.iocipher.File fileDownload = null;
-
-
-                try {
-                    boolean isEncrypted = null != encryptedFileInfo;
-
-                    String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, isEncrypted);
-
-                    String localFileNameEsc = downloadFileName;//should check this with regex
-
-                    if (isEncrypted)
-                        fileDownload = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".encrypted");
-                    else
-                        fileDownload = dl.openSecureStorageFile(localFolder, localFileNameEsc);
-
-                    OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
-                    boolean downloaded = dl.get(downloadableUrl, storageStream);
-
-                    if (downloaded) {
-
-                        if (isEncrypted) {
-                            info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileNameEsc);
-                            storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadDecrypted);
-                            boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo, storageStream);
-                            fileDownload.delete();
-                            fileDownload = fileDownloadDecrypted;
-                            result = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
-                        } else {
-                            result = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
-                        }
+                    if (!TextUtils.isEmpty(result)) {
+                        message.setBody(result);
                     }
-
-                    try {
-                        downloadableUrl = mSession.getContentManager().getDownloadableUrl(thumbUrl, isEncrypted);
-
-                        if (!TextUtils.isEmpty(downloadableUrl)) {
-                            info.guardianproject.iocipher.File fileDownloadThumb;
-
-                            if (isEncrypted)
-                                fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".thumb.encrypted");
-                            else
-                                fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".thumb.jpg");
-
-                            storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadThumb);
-                            downloaded = dl.get(downloadableUrl, storageStream);
-
-                            if (downloaded) {
-
-                                if (isEncrypted) {
-                                    storageStream = new info.guardianproject.iocipher.FileOutputStream(new File(fileDownload.getAbsolutePath() + ".thumb.jpg"));
-
-                                    boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownloadThumb), encryptedThumbInfo, storageStream);
-                                    fileDownloadThumb.delete();
-                                }
-                            }
-                        }
-
-                    } catch (Exception e) {
-                        debug("Error downloading file: " + thumbUrl, e);
-                    }
-
-                    if (result != null) {
-                        message = new Message(result);
-                        message.setID(event.eventId);
-                        message.setFrom(addrSender);
-                        message.setDateTime(new Date(event.getOriginServerTs()));
-                        message.setContentType(messageMimeType);
-                    }
-
-                } catch (Exception e) {
-                    debug("Error downloading file: " + mediaUrl, e);
                 }
+
+
+                return message;
 
 
             }
         }
 
-        return message;
+        return null;
+    }
+
+    private String downloadMediaAsync (Event event, EncryptedFileInfo encryptedFileInfo, EncryptedFileInfo encryptedThumbInfo,
+                                       String mediaUrl, String thumbUrl, String downloadFileName, String localFolder)
+    {
+        MatrixDownloader dl = new MatrixDownloader();
+        info.guardianproject.iocipher.File fileDownload = null;
+        String result = null;
+
+        try {
+            boolean isEncrypted = null != encryptedFileInfo;
+
+            String downloadableUrl = mSession.getContentManager().getDownloadableUrl(mediaUrl, isEncrypted);
+
+            String localFileNameEsc = downloadFileName;//should check this with regex
+            info.guardianproject.iocipher.File fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileNameEsc);
+
+            if (fileDownloadDecrypted.exists() && fileDownloadDecrypted.length() > 0)
+            {
+                //all set
+                result = SecureMediaStore.vfsUri(fileDownloadDecrypted.getAbsolutePath()).toString();
+
+            }
+            else {
+                if (isEncrypted)
+                    fileDownload = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".encrypted");
+                else
+                    fileDownload = dl.openSecureStorageFile(localFolder, localFileNameEsc);
+
+                boolean downloaded = fileDownload.exists();
+
+                if (!downloaded) {
+                    OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownload);
+                    downloaded = dl.get(downloadableUrl, storageStream);
+                }
+
+                if (downloaded) {
+
+                    if (isEncrypted) {
+                        fileDownloadDecrypted = dl.openSecureStorageFile(localFolder, localFileNameEsc);
+                        if (!fileDownloadDecrypted.exists()) {
+                            OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadDecrypted);
+                            boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownload), encryptedFileInfo, storageStream);
+                        }
+
+                        fileDownload.delete();
+                        fileDownload = fileDownloadDecrypted;
+                        result = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
+                    } else {
+                        result = SecureMediaStore.vfsUri(fileDownload.getAbsolutePath()).toString();
+                    }
+                }
+
+
+                try {
+                    downloadableUrl = mSession.getContentManager().getDownloadableUrl(thumbUrl, isEncrypted);
+
+                    if (!TextUtils.isEmpty(downloadableUrl)) {
+                        info.guardianproject.iocipher.File fileDownloadThumb;
+
+                        if (isEncrypted)
+                            fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".thumb.encrypted");
+                        else
+                            fileDownloadThumb = dl.openSecureStorageFile(localFolder, localFileNameEsc + ".thumb.jpg");
+
+                        OutputStream storageStream = new info.guardianproject.iocipher.FileOutputStream(fileDownloadThumb);
+                        downloaded = dl.get(downloadableUrl, storageStream);
+
+                        if (downloaded) {
+
+                            if (isEncrypted) {
+                                storageStream = new info.guardianproject.iocipher.FileOutputStream(new File(fileDownload.getAbsolutePath() + ".thumb.jpg"));
+
+                                boolean success = MatrixDownloader.decryptAttachment(new FileInputStream(fileDownloadThumb), encryptedThumbInfo, storageStream);
+                                fileDownloadThumb.delete();
+                            }
+                        }
+                    }
+
+                } catch (Exception e) {
+                    debug("Error downloading file: " + thumbUrl, e);
+                }
+            }
+
+
+        } catch (Exception e) {
+            debug("Error downloading file: " + mediaUrl, e);
+        }
+
+        return result;
     }
     /**
      * Send a registration request with the given parameters
