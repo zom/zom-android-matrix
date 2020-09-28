@@ -173,8 +173,7 @@ public class AddContactActivity extends BaseActivity {
         if (nickname == null)
             nickname = new MatrixAddress(app.getDefaultUsername()).getUser();
 
-        String fingerprint = "";
-        return OnboardingManager.generateInviteMessage(AddContactActivity.this, nickname, app.getDefaultUsername(), fingerprint);
+        return OnboardingManager.generateInviteMessage(AddContactActivity.this, nickname, app.getDefaultUsername());
     }
 
     private void setupActions ()
@@ -263,7 +262,7 @@ public class AddContactActivity extends BaseActivity {
 
             @Override
             public void onClick(View v) {
-                OnboardingManager.inviteSMSContact(AddContactActivity.this, null, getInviteMessage());
+                OnboardingManager.inviteSMSContact(AddContactActivity.this, null);
             }
 
         });
@@ -279,8 +278,6 @@ public class AddContactActivity extends BaseActivity {
 
         });
 
-        final String fingerprint = "";
-
         View btnInviteQR = findViewById(R.id.btnInviteScan);
         btnInviteQR.setOnClickListener(new View.OnClickListener() {
 
@@ -290,14 +287,8 @@ public class AddContactActivity extends BaseActivity {
                 if (hasCameraPermission()) {
                     ImApp app = ((ImApp) getApplication());
 
-                    try {
-                        String xmppLink = OnboardingManager.generateMatrixLink(app.getDefaultUsername(), fingerprint);
-                        OnboardingManager.inviteScan(AddContactActivity.this, xmppLink);
-                    } catch (IOException e) {
-                        // TODO Auto-generated catch block
-                        Log.v("FingerPrint","FingerPrint=="+e.getMessage());
-                        e.printStackTrace();
-                    }
+                    String xmppLink = OnboardingManager.generateMatrixLink(app.getDefaultUsername());
+                    OnboardingManager.inviteScan(AddContactActivity.this, xmppLink);
                 }
             }
 
@@ -309,15 +300,9 @@ public class AddContactActivity extends BaseActivity {
 
             @Override
             public void onClick(View v) {
-                try {
-                    ImApp app = ((ImApp) getApplication());
-                    String xmppLink = OnboardingManager.generateMatrixLink(app.getDefaultUsername(), fingerprint);
-                    OnboardingManager.inviteNearby(AddContactActivity.this, xmppLink);
-                }
-                catch (IOException ioe)
-                {
-                    ioe.printStackTrace();
-                }
+                ImApp app = ((ImApp) getApplication());
+                String xmppLink = OnboardingManager.generateMatrixLink(app.getDefaultUsername());
+                OnboardingManager.inviteNearby(AddContactActivity.this, xmppLink);
             }
 
         });
@@ -600,18 +585,17 @@ public class AddContactActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
+        super.onActivityResult(requestCode, resultCode, resultIntent);
 
         if (resultCode == RESULT_OK) {
             if (requestCode == OnboardingManager.REQUEST_SCAN) {
 
                 ArrayList<String> resultScans = resultIntent.getStringArrayListExtra("result");
-                for (String resultScan : resultScans)
-                {
-                    Log.v("ScannerDon","Result--"+resultScan);
+                for (String resultScan : resultScans) {
+                    Log.v("ScannerDon", "Result--" + resultScan);
 
                     try {
-                        if (resultScan.startsWith("keanu://"))
-                        {
+                        if (resultScan.startsWith("keanu://")) {
                             List<String> params = Uri.parse(resultScan).getQueryParameters("id");
 
                             if (params.size() > 0) {
@@ -624,30 +608,27 @@ public class AddContactActivity extends BaseActivity {
                                 intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, address);
                                 intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER, mApp.getDefaultProviderId());
                                 intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT, mApp.getDefaultAccountId());
-                                Log.v("ScannerDon","Result 1--"+address);
+                                Log.v("ScannerDon", "Result 1--" + address);
                                 setResult(RESULT_OK, intent);
                             }
-                        }
-                        else {
+                        } else {
                             //parse each string and if they are for a new user then add the user
                             OnboardingManager.DecodedInviteLink diLink = OnboardingManager.decodeInviteLink(resultScan);
 
                             if (mAddLocalContact)
                                 new AddContactAsyncTask(mApp.getDefaultProviderId(), mApp.getDefaultAccountId()).execute(diLink.username, diLink.fingerprint, diLink.nickname);
 
-                            Intent intent=new Intent();
+                            Intent intent = new Intent();
                             intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_USERNAME, diLink.username);
                             intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_PROVIDER, mApp.getDefaultProviderId());
                             intent.putExtra(ContactsPickerActivity.EXTRA_RESULT_ACCOUNT, mApp.getDefaultAccountId());
-                            Log.v("ScannerDon","Result 2--"+diLink.username);
+                            Log.v("ScannerDon", "Result 2--" + diLink.username);
                             setResult(RESULT_OK, intent);
                         }
 
                         //if they are for a group chat, then add the group
-                    }
-                    catch (Exception e)
-                    {
-                        Log.v("ScannerDon","Result 3--"+e.getMessage());
+                    } catch (Exception e) {
+                        Log.v("ScannerDon", "Result 3--" + e.getMessage());
                         Log.w(LOG_TAG, "error parsing QR invite link", e);
                     }
                 }
