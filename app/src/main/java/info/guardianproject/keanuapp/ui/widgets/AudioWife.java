@@ -141,7 +141,10 @@ public class AudioWife {
                 updatePlaytime(currentTime);
                 updateRuntime(currentTime);
                 // repeat the process
-                mProgressUpdateHandler.postDelayed(this, AUDIO_PROGRESS_UPDATE_TIME);
+
+                if (mMediaPlayer.isPlaying())
+                    mProgressUpdateHandler.postDelayed(this, AUDIO_PROGRESS_UPDATE_TIME);
+
             } else {
                 // DO NOT update UI if the player is paused
             }
@@ -256,9 +259,9 @@ public class AudioWife {
             try {
                 totalDuration = mMediaPlayer.getDuration();
             } catch (IllegalStateException e) {
-                e.printStackTrace();
+               // e.printStackTrace();
             } catch (Exception e) {
-                e.printStackTrace();
+               // e.printStackTrace();
             }
         }
 
@@ -669,7 +672,12 @@ public class AudioWife {
             e.printStackTrace();
         }
 
-        mMediaPlayer.setOnCompletionListener(mOnCompletion);
+        mMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mediaPlayer) {
+                mMediaPlayer.setOnCompletionListener(mOnCompletion);
+            }
+        });
     }
 
     private OnCompletionListener mOnCompletion = new OnCompletionListener() {

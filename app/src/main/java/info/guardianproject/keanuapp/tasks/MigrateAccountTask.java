@@ -103,22 +103,8 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
             //register account on new domain with same password
             //mNewAccount = registerNewAccount(nickname, username, password, newServer.domain, newServer.server);
 
-            try {
-                OnboardingManager.registerAccount(mContext, nickname, username, password, newServer.domain, newServer.server, newServer.port, new OnboardingListener() {
-                    @Override
-                    public void registrationSuccessful(OnboardingAccount account) {
-
-                    }
-
-                    @Override
-                    public void registrationFailed(String err) {
-
-                    }
-                });
-            } catch (JSONException e) {
-                e.printStackTrace();
-                continue;
-            }
+            OnboardingManager om = new OnboardingManager(mContext, null);
+            om.registerAccount(nickname, username, password, newServer.domain, newServer.server, newServer.port);
 
             String newAccountId = '@' + username + ':' + mNewAccount.domain;
 
@@ -142,7 +128,7 @@ public class MigrateAccountTask extends AsyncTask<Server, Void, OnboardingAccoun
                 }
 
                 String fingerprint = "";
-                String inviteLink = OnboardingManager.generateInviteLink(mContext, newAccountId);
+                String inviteLink = OnboardingManager.generateInviteLink(newAccountId);
 
                 String migrateMessage = mContext.getString(R.string.migrate_message) + ' ' + inviteLink;
                 IChatSessionManager sessionMgr = mConn.getChatSessionManager();

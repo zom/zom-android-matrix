@@ -35,6 +35,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.apache.commons.codec.DecoderException;
+import org.bouncycastle.crypto.tls.TlsExtensionsUtils;
+
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.model.Contact;
 import info.guardianproject.keanu.core.model.ImErrorInfo;
@@ -241,18 +243,24 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                         @Override
                         public void onClick(View v) {
                             try {
+
                                 try {
                                     if (mSession != null) {
                                         mSession.setPublic(true);
                                     }
                                 } catch (Exception ignored) {
                                 }
-                                String publicAddress = URLEncoder.encode(mSession.getPublicAddress(), "UTF-8");
-                                String inviteLink = OnboardingManager.generateInviteLink(GroupDisplayActivity.this, publicAddress, "", mName);
 
-                                Intent intent = new Intent(GroupDisplayActivity.this, QrDisplayActivity.class);
-                                intent.putExtra(Intent.EXTRA_TEXT, inviteLink);
-                                startActivity(intent);
+
+                                String publicAddress = mSession.getPublicAddress();
+
+                                if (!TextUtils.isEmpty(publicAddress)) {
+                                    String inviteLink = OnboardingManager.generateInviteLink(URLEncoder.encode(publicAddress, "UTF-8"));
+                                    Intent intent = new Intent(GroupDisplayActivity.this, QrDisplayActivity.class);
+                                    intent.putExtra(Intent.EXTRA_TEXT, inviteLink);
+                                    startActivity(intent);
+                                }
+
 
                             } catch (Exception e) {
                                 Log.e(LOG_TAG, "couldn't generate QR code", e);
@@ -271,12 +279,19 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                                 try {
                                     if (mSession != null) {
                                         mSession.setPublic(true);
+
+                                        String publicAddress = mSession.getPublicAddress();
+
+                                        if (!TextUtils.isEmpty(publicAddress)) {
+                                            String inviteLink = OnboardingManager.generateInviteLink(URLEncoder.encode(publicAddress, "UTF-8"));
+                                            new QrShareAsyncTask(GroupDisplayActivity.this).execute(inviteLink, mName);
+                                        }
+
                                     }
                                 } catch (Exception ignored) {
                                 }
-                                String publicAddress = URLEncoder.encode(mSession.getPublicAddress(), "UTF-8");
-                                String inviteLink = OnboardingManager.generateInviteLink(GroupDisplayActivity.this, publicAddress, "", mName);
-                                new QrShareAsyncTask(GroupDisplayActivity.this).execute(inviteLink, mName);
+
+
                             } catch (Exception e) {
                                 Log.e(LOG_TAG, "couldn't generate QR code", e);
                             }
@@ -608,47 +623,45 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
     private synchronized void updateMembers() {
 
 
-                  //  final HashMap<String, GroupMemberDisplay> members = new HashMap<>();
+        mMembers.clear();
 
-                    mMembers.clear();
+        String[] projection = {Imps.GroupMembers.USERNAME, Imps.GroupMembers.NICKNAME, Imps.GroupMembers.ROLE, Imps.GroupMembers.AFFILIATION};
+        Uri memberUri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, mLastChatId);
+        ContentResolver cr = getContentResolver();
 
-                    String[] projection = {Imps.GroupMembers.USERNAME, Imps.GroupMembers.NICKNAME, Imps.GroupMembers.ROLE, Imps.GroupMembers.AFFILIATION};
-                    Uri memberUri = ContentUris.withAppendedId(Imps.GroupMembers.CONTENT_URI, mLastChatId);
-                    ContentResolver cr = getContentResolver();
+        StringBuilder buf = new StringBuilder();
+        buf.append(Imps.Messages.NICKNAME).append(" IS NOT NULL ");
 
-                    StringBuilder buf = new StringBuilder();
-                    buf.append(Imps.Messages.NICKNAME).append(" IS NOT NULL ");
+        Cursor c = cr.query(memberUri, projection, buf.toString(), null, Imps.GroupMembers.ROLE+","+Imps.GroupMembers.AFFILIATION);
+        if (c != null) {
+            int colUsername = c.getColumnIndex(Imps.GroupMembers.USERNAME);
+            int colNickname = c.getColumnIndex(Imps.GroupMembers.NICKNAME);
+            int colRole = c.getColumnIndex(Imps.GroupMembers.ROLE);
+            int colAffiliation = c.getColumnIndex(Imps.GroupMembers.AFFILIATION);
 
-                    Cursor c = cr.query(memberUri, projection, buf.toString(), null, Imps.GroupMembers.ROLE+","+Imps.GroupMembers.AFFILIATION);
-                    if (c != null) {
-                        int colUsername = c.getColumnIndex(Imps.GroupMembers.USERNAME);
-                        int colNickname = c.getColumnIndex(Imps.GroupMembers.NICKNAME);
-                        int colRole = c.getColumnIndex(Imps.GroupMembers.ROLE);
-                        int colAffiliation = c.getColumnIndex(Imps.GroupMembers.AFFILIATION);
+            while (c.moveToNext()) {
+                GroupMemberDisplay member = new GroupMemberDisplay();
+                member.username = c.getString(colUsername);
+                member.nickname = c.getString(colNickname);
+                member.role = c.getString(colRole);
+                member.affiliation = c.getString(colAffiliation);
+                if (mLocalAddress.contentEquals(member.username)) {
+                    mYou = member;
+                }
 
-                        while (c.moveToNext()) {
-                            GroupMemberDisplay member = new GroupMemberDisplay();
-                            member.username = c.getString(colUsername);
-                            member.nickname = c.getString(colNickname);
-                            member.role = c.getString(colRole);
-                            member.affiliation = c.getString(colAffiliation);
-                            if (mLocalAddress.contentEquals(member.username)) {
-                                mYou = member;
-                            }
+                boolean isImportant = (member.affiliation.contentEquals("owner") || member.affiliation.contentEquals("admin"));
 
-                            boolean isImportant = (member.affiliation.contentEquals("owner") || member.affiliation.contentEquals("admin"));
+                if (isImportant)
+                    mMembers.add(0,member);
+                else
+                    mMembers.add(member);
+            }
+            c.close();
+        }
 
-                            if (isImportant)
-                                mMembers.add(0,member);
-                            else
-                                mMembers.add(member);
-                        }
-                        c.close();
-                    }
 
-            if (mRecyclerView != null && mRecyclerView.getAdapter() != null)
-                mRecyclerView.getAdapter().notifyDataSetChanged();
-
+        if (mRecyclerView != null && mRecyclerView.getAdapter() != null)
+            mRecyclerView.getAdapter().notifyDataSetChanged();
 
 
 
@@ -797,6 +810,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
+        super.onActivityResult(requestCode, resultCode, resultIntent);
 
         if (resultCode == RESULT_OK) {
 
@@ -813,7 +827,7 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
 
                 inviteContacts(invitees);
 
-                mHandler.postDelayed(() -> updateSession(),3000);
+                mHandler.postDelayed(() -> updateSession(), 3000);
             }
         }
     }
