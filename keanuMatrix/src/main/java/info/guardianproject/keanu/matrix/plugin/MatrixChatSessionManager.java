@@ -657,19 +657,20 @@ public class MatrixChatSessionManager extends ChatSessionManager {
 
     }
 
-    public String getPublicAddress (ChatSession session)
-    {
+    public String getPublicAddress (ChatSession session) {
 
         Room room = getRoom(session);
 
-        List<String> listAlias = room.getAliases();
+        String publicAddress = room.getState().getCanonicalAlias();
 
-        if (listAlias != null && (!listAlias.isEmpty()))
-        {
-            return listAlias.get(0);
+        if (publicAddress == null) {
+            List<String> listAlias = room.getState().getAliases();
+            if (listAlias != null && (!listAlias.isEmpty())) {
+                publicAddress = listAlias.get(0);
+            }
         }
 
-        return null;
+        return publicAddress;
     }
 
     public void setPublic (ChatSession session, boolean isPublic)
