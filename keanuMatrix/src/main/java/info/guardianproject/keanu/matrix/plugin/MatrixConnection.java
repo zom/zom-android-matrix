@@ -1102,27 +1102,9 @@ public class MatrixConnection extends ImConnection {
                 csa.presenceChanged(Presence.AVAILABLE);
 
             if (group.shouldUpdate())
-                updateGroupMembers(room, group);
+                updateGroupMembersAsync(room, group);
+
         }
-    }
-
-    protected void updateGroupMembers (final Room room, final ChatGroup group, boolean priority) {
-
-
-        mExecutor.execute(
-                () -> {
-                    //Room room1 = mDataHandler.getRoom(group.getAddress().getAddress());
-                    updateGroupMembersAsync(room, group);
-                }
-        );
-        /*
-        if (priority)
-        {
-            updateGroupMembersAsync(room, group, priority);
-        }
-        else {
-
-        }*/
     }
 
     protected void updateGroupMembersAsync(final Room room, final ChatGroup group) {
@@ -1629,22 +1611,22 @@ public class MatrixConnection extends ImConnection {
 
             mExecutor.execute(new Runnable (){
 
-                public void run ()
-                {
-                    debug ("onReceiptEvent: " + roomId);
+                public void run () {
+                    debug("onReceiptEvent: " + roomId);
 
                     Room room = mStore.getRoom(roomId);
                     ChatSession session = mChatSessionManager.getSession(roomId);
 
 
-                if (session != null) {
-                    for (String userId : list) {
-                        //userId who got the room receipt
-                        ReceiptData data = mStore.getReceipt(roomId, userId);
-                        session.onMessageReadMarker(data.eventId, session.useEncryption());
+                    if (session != null) {
+                        for (String userId : list) {
+                            //userId who got the room receipt
+                            ReceiptData data = mStore.getReceipt(roomId, userId);
+                            session.onMessageReadMarker(data.eventId, session.useEncryption());
 
-                        if (userId.equals(mSession.getMyUserId())) {
-                            mChatSessionManager.getChatSessionAdapter(roomId).markAsRead();
+                            if (userId.equals(mSession.getMyUserId())) {
+                                mChatSessionManager.getChatSessionAdapter(roomId).markAsRead();
+                            }
                         }
                     }
                 }

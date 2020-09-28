@@ -24,6 +24,7 @@ import info.guardianproject.keanu.core.model.Invitation;
 import info.guardianproject.keanu.core.service.IChatSessionListener;
 import info.guardianproject.keanu.core.service.adapters.ChatSessionAdapter;
 
+import static info.guardianproject.keanu.core.service.RemoteImService.debug;
 import static org.matrix.androidsdk.crypto.CryptoConstantsKt.MXCRYPTO_ALGORITHM_MEGOLM;
 
 public class MatrixChatGroupManager extends ChatGroupManager {
@@ -477,7 +478,7 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
                 @Override
                 public void onSuccess(Void aVoid) {
-                    mConn.updateGroupMembers(room, group);
+                    mConn.updateGroupMembersAsync(room, group);
                 }
             });
 
@@ -559,9 +560,31 @@ public class MatrixChatGroupManager extends ChatGroupManager {
         if (room != null)
         {
             RoomMember member = room.getMember(contact.getAddress().getAddress());
-            room.getState().getPowerLevels().setUserPowerLevel(member.getUserId(),100);
+            final PowerLevels powerLevels = room.getState().getPowerLevels();
+            powerLevels.setUserPowerLevel(member.getUserId(),100);
 
-            mConn.updateGroupMembers(room, group);
+            room.updateUserPowerLevels(member.getUserId(), 100, new ApiCallback<Void>() {
+                @Override
+                public void onNetworkError(Exception e) {
+                    debug("updateUserPowerLevels.onNetworkError",e);
+                }
+
+                @Override
+                public void onMatrixError(MatrixError matrixError) {
+                    debug("updateUserPowerLevels.onMatrixError: " + matrixError);
+                }
+
+                @Override
+                public void onUnexpectedError(Exception e) {
+                        debug("updateUserPowerLevels.onUnexpectedError",e);
+                }
+
+                @Override
+                public void onSuccess(Void aVoid) {
+
+                    mConn.updateGroupMembersAsync(room, group);
+                }
+            });
         }
     }
 
@@ -570,6 +593,6 @@ public class MatrixChatGroupManager extends ChatGroupManager {
 
         Room room = mDataHandler.getRoom(group.getAddress().getAddress());
         group.setName(room.getRoomDisplayName(mContext));
-        mConn.updateGroupMembers(room, group);
+        mConn.updateGroupMembersAsync(room, group);
     }
 }
