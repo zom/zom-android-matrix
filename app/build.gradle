@@ -84,8 +84,8 @@ android {
         altbrand {
             dimension = "release"
             applicationId "im.zom.messenger"
-            versionCode 218001100
-            versionName "2.1.8-BETA-1"
+            versionCode 218001200
+            versionName "2.1.8-BETA-2"
             archivesBaseName = "Zom-$versionName"
         }
 
@@ -178,7 +178,7 @@ dependencies {
   //  implementation 'com.stefanosiano.powerful_libraries:imageview:1.0.15' //Use this if you don't need renderscript
     implementation 'com.stefanosiano.powerful_libraries:imageview_rs:1.0.15'
 
-    implementation (name: 'IOCipher-debug', ext: 'aar')
+    implementation (name: 'IOCipher-release', ext: 'aar')
     api 'net.zetetic:android-database-sqlcipher:3.5.9@aar'
 
     //*********** KeanuApp components ********** /
