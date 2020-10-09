@@ -549,7 +549,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
 
     @Override
-    public boolean offerData(String offerId, final String mediaPath, final String mimeType) {
+    public boolean offerData(String offerId, String replyToId, final String mediaPath, final String mimeType) {
 
         if (TextUtils.isEmpty(mimeType))
             return false;
@@ -626,14 +626,14 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             }
         }
 
-        sendMediaMessageAsync(mediaPath, mimeType, fileName, fileLength);
+        sendMediaMessageAsync(replyToId, mediaPath, mimeType, fileName, fileLength);
 
 
         return true;
 
     }
 
-    private void sendMediaMessageAsync (final String mediaPath, final String mimeType, final String fileName, final long fileLength)
+    private void sendMediaMessageAsync (final String replyToId, final String mediaPath, final String mimeType, final String fileName, final long fileLength)
     {
 
         //TODO do HTTP Upload XEP 363
@@ -644,9 +644,10 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             public void run ()
             {
 
-                final Message msgMedia = storeMediaMessage(mediaPath, mimeType, fileName);
+                final Message msgMedia = storeMediaMessage(mediaPath, mimeType, replyToId);
 
-                /**
+                msgMedia.setReplyId(replyToId);
+
                 UploadProgressListener listener = new UploadProgressListener() {
                     @Override
                     public void onUploadProgress(long sent, long total) {
@@ -657,7 +658,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         if (mDataHandlerListener != null)
                             mDataHandlerListener.onTransferProgress(true,"","",mediaPath,percentF);
                     }
-                };**/
+                };
 
                 int newType = mChatSession.sendMessageAsync(msgMedia, new ChatSessionListener() {
                     @Override
@@ -685,7 +686,8 @@ public class ChatSessionAdapter extends IChatSession.Stub {
                         if (msg.getDateTime() != null)
                             sendTime = msg.getDateTime().getTime();
 
-                        updateMessageInDb(msg.getID(),Imps.MessageType.QUEUED,sendTime, null, newPacketId);
+                        updateMessageInDb(msg.getID(),msg.getType(),sendTime, null, newPacketId);
+
 
                         msg.setID(newPacketId);
                     }
@@ -705,63 +707,64 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
 
                 /**
-                String resultUrl = mConnection.sendMediaMessage(mChatSession.getParticipant().getAddress().getAddress(), Uri.parse(mediaPath), sendFileName, mimeType, fileLength, doEncryption, listener);
+                 String resultUrl = mConnection.sendMediaMessage(mChatSession.getParticipant().getAddress().getAddress(), Uri.parse(mediaPath), sendFileName, mimeType, fileLength, doEncryption, listener);
 
-                int newType = Imps.MessageType.OUTGOING_ENCRYPTED;
+                 int newType = Imps.MessageType.OUTGOING_ENCRYPTED;
 
-                if (TextUtils.isEmpty(resultUrl))
-                    newType = Imps.MessageType.QUEUED;
+                 if (TextUtils.isEmpty(resultUrl))
+                 newType = Imps.MessageType.QUEUED;
 
-                long sendTime = System.currentTimeMillis();
-                msgMedia.setBody(resultUrl);
-                if (msgMedia.getDateTime() != null)
-                    sendTime = msgMedia.getDateTime().getTime();
+                 long sendTime = System.currentTimeMillis();
+                 msgMedia.setBody(resultUrl);
+                 if (msgMedia.getDateTime() != null)
+                 sendTime = msgMedia.getDateTime().getTime();
 
-                updateMessageInDb(msgMedia.getID(),newType,sendTime,mediaPath + ' ' + resultUrl, null);
-                **/
+                 updateMessageInDb(msgMedia.getID(),newType,sendTime,mediaPath + ' ' + resultUrl, null);
+                 **/
 
 
                 /**
-                String mediaPath = localUrl + ' ' + publishUrl;
+                 String mediaPath = localUrl + ' ' + publishUrl;
 
-                long sendTime = System.currentTimeMillis();
+                 long sendTime = System.currentTimeMillis();
 
-                msg.setBody(publishUrl);
-                // insertOrUpdateChat(mediaPath);
+                 msg.setBody(publishUrl);
+                 // insertOrUpdateChat(mediaPath);
 
-                int newType = mChatSession.sendMessageAsync(msg, mEnableOmemoGroups);
+                 int newType = mChatSession.sendMessageAsync(msg, mEnableOmemoGroups);
 
-                if (msg.getDateTime() != null)
-                    sendTime = msg.getDateTime().getTime();
+                 if (msg.getDateTime() != null)
+                 sendTime = msg.getDateTime().getTime();
 
-                updateMessageInDb(msg.getID(),newType,sendTime,mediaPath);
-                */
+                 updateMessageInDb(msg.getID(),newType,sendTime,mediaPath);
+                 */
 
                 //make sure result is valid and starts with https, if so, send it!
                 /**
-                if (!TextUtils.isEmpty(resultUrl)) {
+                 if (!TextUtils.isEmpty(resultUrl)) {
 
-                    if (Preferences.useProofMode()) {
-                        Uri proofUri = Uri.parse(mediaPath + PROOF_FILE_TAG);
-                        File fileProof = new info.guardianproject.iocipher.File(proofUri.getPath());
-                        if (fileProof.exists()) {
-                            String proofUrl = null;
-                            try {
-                                proofUrl = mConnection.publishFile(sendFileName + ProofMode.PROOF_FILE_TAG, ProofMode.PROOF_MIME_TYPE, fileProof.length(), new info.guardianproject.iocipher.FileInputStream(fileProof), doEncryption, null);
-                            } catch (FileNotFoundException e) {
-                                e.printStackTrace();
-                            }
-                            resultUrl += ' ' + proofUrl;
-                        }
-                    }
+                 if (Preferences.useProofMode()) {
+                 Uri proofUri = Uri.parse(mediaPath + PROOF_FILE_TAG);
+                 File fileProof = new info.guardianproject.iocipher.File(proofUri.getPath());
+                 if (fileProof.exists()) {
+                 String proofUrl = null;
+                 try {
+                 proofUrl = mConnection.publishFile(sendFileName + ProofMode.PROOF_FILE_TAG, ProofMode.PROOF_MIME_TYPE, fileProof.length(), new info.guardianproject.iocipher.FileInputStream(fileProof), doEncryption, null);
+                 } catch (FileNotFoundException e) {
+                 e.printStackTrace();
+                 }
+                 resultUrl += ' ' + proofUrl;
+                 }
+                 }
 
-                    sendMediaMessage(mediaPath, resultUrl, msgMedia);
-                }**/
+                 sendMediaMessage(mediaPath, resultUrl, msgMedia);
+                 }**/
             }
         }.start();
 
 
     }
+
 
     /**
      * Sends a message to other participant(s) in this session without adding it
@@ -811,7 +814,7 @@ public class ChatSessionAdapter extends IChatSession.Stub {
 
             String[] projection = new String[]{BaseColumns._ID, Imps.Messages.BODY,
                     Imps.Messages.PACKET_ID,
-                    Imps.Messages.DATE, Imps.Messages.TYPE, Imps.Messages.IS_DELIVERED};
+                    Imps.Messages.DATE, Imps.Messages.TYPE, Imps.Messages.IS_DELIVERED,Imps.Messages.REPLY_ID};
             String selection = Imps.Messages.TYPE + "=?";
 
             Cursor c = mContentResolver.query(mMessageURI, projection, selection,
@@ -822,31 +825,36 @@ public class ChatSessionAdapter extends IChatSession.Stub {
             }
 
             if (c.getCount() > 0) {
-                ArrayList<String> messages = new ArrayList<String>();
+                ArrayList<Message> messages = new ArrayList<Message>();
 
-                while (c.moveToNext())
-                    messages.add(c.getString(1));
+                while (c.moveToNext()) {
+                    Message msg = new Message(c.getString(1));
+                    msg.setReplyId(c.getString(6));
+                    messages.add(msg);
+                }
+
 
                 removeMessageInDb(Imps.MessageType.QUEUED);
 
-                for (String body : messages) {
+                for (Message msg : messages) {
 
-                    if (body.startsWith("vfs:/") && (body.split(" ").length == 1))
+                    if (msg.getBody().startsWith("vfs:/") && (msg.getBody().split(" ").length == 1))
                     {
                         String offerId = UUID.randomUUID().toString();
-                        String mimeType = URLConnection.guessContentTypeFromName(body);
+                        String mimeType = URLConnection.guessContentTypeFromName(msg.getBody());
                         if (mimeType != null) {
 
                             if (mimeType.startsWith("text"))
                                 mimeType = "text/plain";
 
-                            offerData(offerId, body, mimeType);
+                            offerData(offerId, msg.getReplyId(), msg.getBody(), mimeType);
                         }
                     }
                     else {
-                        sendMessage(body, false, false, false, null);
+                        sendMessage(msg.getBody(), false, false, false, null);
                     }
                 }
+
             }
 
             c.close();

@@ -1226,6 +1226,7 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                 "messages.mime_type AS mime_type");
         // contacts columns
         sMessagesProjectionMap.put(Imps.Messages.CONTACT, "contacts.username AS contact");
+        sMessagesProjectionMap.put(Imps.Messages.CONTACT_NAME, "contacts.nickname AS contact_name");
         sMessagesProjectionMap.put(Imps.Contacts.PROVIDER, "contacts.provider AS provider");
         sMessagesProjectionMap.put(Imps.Contacts.ACCOUNT, "contacts.account AS account");
         sMessagesProjectionMap.put("contact_type", "contacts.type AS contact_type");
@@ -1256,6 +1257,7 @@ public class ImpsProvider extends ContentProvider implements ICacheWordSubscribe
                 "inMemoryMessages.mime_type AS mime_type");
         // contacts columns
         sInMemoryMessagesProjectionMap.put(Imps.Messages.CONTACT, "contacts.username AS contact");
+        sInMemoryMessagesProjectionMap.put(Imps.Messages.CONTACT_NAME, "contacts.nickname AS contact_name");
         sInMemoryMessagesProjectionMap.put(Imps.Contacts.PROVIDER, "contacts.provider AS provider");
         sInMemoryMessagesProjectionMap.put(Imps.Contacts.ACCOUNT, "contacts.account AS account");
         sInMemoryMessagesProjectionMap.put("contact_type", "contacts.type AS contact_type");

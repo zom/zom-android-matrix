@@ -93,7 +93,7 @@ interface IChatSession {
     /**
      * Sends data to all participants in this ChatSession.
      */
-    boolean offerData(String offerId, String localUri, String type);
+    boolean offerData(String offerId, String replyId, String localUri, String type);
 
     /**
      * Mark this chat session as read.

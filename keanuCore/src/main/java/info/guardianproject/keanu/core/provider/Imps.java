@@ -1029,6 +1029,7 @@ public class Imps {
          * (joined with the contacts table)
          */
         public static final String CONTACT = "contact";
+        public static final String CONTACT_NAME = "contact_name";
     }
 
     /** Columns for the GroupMember table. */
