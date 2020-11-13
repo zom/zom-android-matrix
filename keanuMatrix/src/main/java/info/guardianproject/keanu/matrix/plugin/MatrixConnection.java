@@ -404,7 +404,7 @@ public class MatrixConnection extends ImConnection {
 
     }
 
-    private void loginSync(String password, boolean enableEncryption, LoginListener listener) {
+    private synchronized void loginSync(String password, boolean enableEncryption, LoginListener listener) {
 
         String username = mUser.getAddress().getUser();
         setState(ImConnection.LOGGING_IN, null);
@@ -861,8 +861,10 @@ public class MatrixConnection extends ImConnection {
     private void redactMessage (String roomId, String redactId)
     {
         ChatSession session = mChatSessionManager.getSession(roomId);
-        session.getMessageListener().onMessageRedacted(redactId);
 
+        if (session != null
+            && session.getMessageListener() != null)
+        session.getMessageListener().onMessageRedacted(redactId);
 
     }
 
@@ -1216,6 +1218,7 @@ public class MatrixConnection extends ImConnection {
             group.endMemberUpdates();
 
             if (room.isEncrypted())
+                if (mDataHandler != null && mDataHandler.getCrypto() != null && (!userList.isEmpty()))
                 mDataHandler.getCrypto().ensureOlmSessionsForUsers(userList, new BasicApiCallback<>("ensureOlmSessions"));
         }
     }
@@ -2530,6 +2533,7 @@ public class MatrixConnection extends ImConnection {
     }
 
     @SuppressWarnings({"unused", "RedundantSuppression"})
-    public void getMessages() {
+    public Collection<Event> getMessages(String roomId) {
+        return mStore.getRoomMessages(roomId);
     }
 }
