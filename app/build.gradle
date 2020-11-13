@@ -182,7 +182,7 @@ dependencies {
     implementation 'com.github.tladesignz:AirShare-Android:master-SNAPSHOT'
     implementation 'com.google.code.gson:gson:2.8.6'
     // Emojis
-    implementation 'com.vanniktech:emoji-google:0.7.0-SNAPSHOT'
+    implementation 'com.vanniktech:emoji-google:0.7.0'
 }
 
 // Map for the version code that gives each ABI a value.
