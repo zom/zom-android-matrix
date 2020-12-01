@@ -42,6 +42,7 @@
     <string name="account_phone_number_already_used_error">This phone number is already in use.</string>
     <string name="account_additional_info">Additional info: %s</string>
     <string name="login_mobile_device">Mobile</string>
+    <string name="login_error">Login Error</string>
 
 
 </resources>

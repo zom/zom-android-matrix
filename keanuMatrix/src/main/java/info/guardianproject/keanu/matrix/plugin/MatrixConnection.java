@@ -1,7 +1,9 @@
 package info.guardianproject.keanu.matrix.plugin;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.TrafficStats;
 import android.net.Uri;
@@ -67,6 +69,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -240,7 +243,7 @@ public class MatrixConnection extends ImConnection {
     }
 
     @Override
-    public void loginAsync(long accountId, final String password, long providerId, boolean retry) {
+    public void loginAsync(final long accountId, final String password, final long providerId, boolean retry) {
 
         if (mDataHandler == null || (!mDataHandler.isAlive()))
             return;
@@ -260,6 +263,27 @@ public class MatrixConnection extends ImConnection {
             @Override
             public void onLoginFailed(String message) {
 
+                PopupAlertManager.VectorAlert alert = new PopupAlertManager.VectorAlert("000",mContext.getString(R.string.login_error),message,R.drawable.alerts_and_states_error);
+
+                alert.addButton(mContext.getString(R.string.ok),new Runnable(){
+                    @Override
+                    public void run() {
+
+                        Activity act = alert.getWeakCurrentActivity().get();
+                        try {
+                            Intent intent = new Intent(act,Class.forName("info.guardianproject.keanuapp.ui.onboarding.OnboardingActivity"));
+                            intent.putExtra("account",accountId);
+                            intent.putExtra("provider",providerId);
+                            act.startActivity(intent);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+
+                    }
+                },false);
+
+                PopupAlertManager.INSTANCE.postVectorAlert(alert);
             }
         }));
 
@@ -404,7 +428,7 @@ public class MatrixConnection extends ImConnection {
 
     }
 
-    private synchronized void loginSync(String password, boolean enableEncryption, LoginListener listener) {
+    private void loginSync(String password, boolean enableEncryption, LoginListener listener) {
 
         String username = mUser.getAddress().getUser();
         setState(ImConnection.LOGGING_IN, null);
@@ -494,11 +518,12 @@ public class MatrixConnection extends ImConnection {
                     if (listener != null)
                         listener.onLoginFailed(e.getMessage());
 
+                    /**
                     mExecutor.execute(new Runnable() {
                         public void run() {
                             loginAsync(null, listener);
                         }
-                    });
+                    });**/
                 }
 
                 @Override
@@ -608,7 +633,8 @@ public class MatrixConnection extends ImConnection {
         if (fullLogout) {
             if (mSession.isOnline() && mDataHandler.isAlive()) {
                 mSession.stopEventStream();
-                mSession.logout(mContext, new BasicApiCallback<>("loggout full"));
+                if (mSession.isAlive())
+                    mSession.logout(mContext, new BasicApiCallback<>("loggout full"));
             }
 
             String username = mUser.getAddress().getUser();
@@ -1203,13 +1229,17 @@ public class MatrixConnection extends ImConnection {
 
 
                 if (members.size() < 40) {
-                    String avatarUrl = mDataHandler.getUser(member.getUserId()).getAvatarUrl();
-                    String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(avatarUrl,
-                            DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, "scale");
+                    User aUser = mDataHandler.getUser(member.getUserId());
 
-                    if (!TextUtils.isEmpty(downloadUrl)) {
-                        if (!hasAvatar(member.getUserId(), downloadUrl)) {
-                            downloadAvatar(member.getUserId(), downloadUrl);
+                    if (aUser != null) {
+                        String avatarUrl = aUser.getAvatarUrl();
+                        String downloadUrl = mSession.getContentManager().getDownloadableThumbnailUrl(avatarUrl,
+                                DEFAULT_AVATAR_WIDTH, DEFAULT_AVATAR_HEIGHT, "scale");
+
+                        if (!TextUtils.isEmpty(downloadUrl)) {
+                            if (!hasAvatar(member.getUserId(), downloadUrl)) {
+                                downloadAvatar(member.getUserId(), downloadUrl);
+                            }
                         }
                     }
                 }
