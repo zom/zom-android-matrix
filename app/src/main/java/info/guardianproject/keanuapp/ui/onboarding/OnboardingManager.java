@@ -53,6 +53,7 @@ public class OnboardingManager implements RegistrationManager.RegistrationListen
         mActivity = new WeakReference<>(activity);
         mListener = new WeakReference<>(listener);
         mConn = new MatrixConnection(activity);
+
     }
 
     public static void inviteSMSContact(Activity context, String message) {
@@ -331,7 +332,7 @@ public class OnboardingManager implements RegistrationManager.RegistrationListen
         mConn.continueRegister(captchaResponse, termsApproved);
     }
 
-    public void addExistingAccount(String username, String domain, String password) {
+    public void addExistingAccount(String username, String domain, String password, long accountId, long providerId) {
 
         Activity activity = mActivity.get();
         if (activity == null) return;
@@ -343,9 +344,10 @@ public class OnboardingManager implements RegistrationManager.RegistrationListen
         ContentResolver cr = activity.getContentResolver();
         ImPluginHelper helper = ImPluginHelper.getInstance(activity);
 
-        long providerId = helper.createAdditionalProvider(helper.getProviderNames().get(0)); //xmpp FIXME
+        if (providerId == -1)
+            providerId = helper.createAdditionalProvider(helper.getProviderNames().get(0)); //xmpp FIXME
 
-        long accountId = ImApp.insertOrUpdateAccount(cr, providerId, -1, username, username, password);
+        accountId = ImApp.insertOrUpdateAccount(cr, providerId, accountId, username, username, password);
 
         if (accountId == -1)
             return;
@@ -394,6 +396,10 @@ public class OnboardingManager implements RegistrationManager.RegistrationListen
             if (Looper.myLooper() == null)
                 Looper.prepare();
 
+            OnboardingListener listener = mListener.get();
+            if (listener != null) listener.registrationSuccessful(result);
+
+            /**
             mConn.initUser(providerId, accountId);
 
             mConn.checkAccount(accountId, password, providerId, new MatrixConnection.LoginListener() {
@@ -409,7 +415,7 @@ public class OnboardingManager implements RegistrationManager.RegistrationListen
                     if (listener != null) listener.registrationFailed(message);
                 }
             });
-
+            **/
 
             // settings closed in registerAccount
         } catch (Exception e) {
