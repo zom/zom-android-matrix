@@ -141,8 +141,8 @@ dependencies {
     implementation(name: 'olm-sdk-release-3.1.4', ext: 'aar')
 
     /*********** KeanuApp components **********/
-    implementation(name: 'keanucore-0.0.1.65', ext: 'aar')
-    implementation(name: 'keanumatrix-0.0.1.65', ext: 'aar')
+    implementation(name: 'keanucore-0.0.1.67', ext: 'aar')
+    implementation(name: 'keanumatrix-0.0.1.67', ext: 'aar')
 
 
     implementation fileTree(include: ['*.jar'], dir: 'libs')
@@ -264,7 +264,7 @@ dependencies {
 
     implementation 'com.google.code.gson:gson:2.8.6'
     // Emojis
-    implementation 'com.vanniktech:emoji-google:0.7.0-SNAPSHOT'
+    implementation 'com.vanniktech:emoji-google:0.7.0'
 
     //Alerter
     implementation 'com.tapadoo.android:alerter:5.1.2'
