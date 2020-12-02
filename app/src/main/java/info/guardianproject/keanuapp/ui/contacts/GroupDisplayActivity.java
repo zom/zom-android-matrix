@@ -289,8 +289,6 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                                     }
                                 } catch (Exception ignored) {
                                 }
-                                catch (Exception ignored){}
-
 
                             } catch (Exception e) {
                                 Log.e(LOG_TAG, "couldn't generate QR code", e);
