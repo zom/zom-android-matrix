@@ -261,7 +261,6 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                                     startActivity(intent);
                                 }
 
-
                             } catch (Exception e) {
                                 Log.e(LOG_TAG, "couldn't generate QR code", e);
                             }
@@ -283,13 +282,14 @@ public class GroupDisplayActivity extends BaseActivity implements IChatSessionLi
                                         String publicAddress = mSession.getPublicAddress();
 
                                         if (!TextUtils.isEmpty(publicAddress)) {
-                                            String inviteLink = OnboardingManager.generateInviteLink(URLEncoder.encode(publicAddress, "UTF-8"));
+                                            String inviteLink = OnboardingManager.generateInviteLink(URLEncoder.encode(publicAddress,"UTF-8"));
                                             new QrShareAsyncTask(GroupDisplayActivity.this).execute(inviteLink, mName);
                                         }
 
                                     }
                                 } catch (Exception ignored) {
                                 }
+                                catch (Exception ignored){}
 
 
                             } catch (Exception e) {

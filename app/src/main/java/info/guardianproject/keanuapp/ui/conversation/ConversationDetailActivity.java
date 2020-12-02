@@ -1058,7 +1058,7 @@ public class ConversationDetailActivity extends BaseActivity {
             if (session != null) {
 
                 String offerId = UUID.randomUUID().toString();
-                return session.offerData(offerId, uri.toString(), mimeType );
+                return session.offerData(offerId, null, uri.toString(), mimeType );
             }
 
         } catch (RemoteException e) {

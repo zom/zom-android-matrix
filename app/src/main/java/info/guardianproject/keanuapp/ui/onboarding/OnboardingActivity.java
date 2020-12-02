@@ -95,11 +95,17 @@ public class OnboardingActivity extends BaseActivity implements OnboardingListen
 
     private OnboardingManager mManager;
 
+    private long mProviderId = -1;
+    private long mAccountId = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mShowSplash = getIntent().getBooleanExtra("showSplash",true);
+
+        mProviderId = getIntent().getLongExtra("provider",-1L);
+        mAccountId = getIntent().getLongExtra("account",-1L);
 
         setContentView(R.layout.awesome_onboarding);
 
@@ -310,7 +316,8 @@ public class OnboardingActivity extends BaseActivity implements OnboardingListen
             showOnboarding();
         }
 
-        //showUpgradeMessage();
+        if (mAccountId != -1 && mProviderId != -1)
+            showLoginScreen();
     }
 
     private void setAnimLeft ()
@@ -618,7 +625,7 @@ public class OnboardingActivity extends BaseActivity implements OnboardingListen
 
             if (mManager == null) mManager = new OnboardingManager(this, this);
 
-            mManager.addExistingAccount(username, server, password);
+            mManager.addExistingAccount(username, server, password, mAccountId, mProviderId);
         }
     }
 

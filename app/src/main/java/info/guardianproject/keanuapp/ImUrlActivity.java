@@ -751,7 +751,7 @@ public class ImUrlActivity extends Activity {
                     if (SecureMediaStore.isVfsUri(mSendUri)) {
 
 
-                        boolean sent = session.offerData(offerId, mSendUri.toString(), mSendType);
+                        boolean sent = session.offerData(offerId, null, mSendUri.toString(), mSendType);
 
                         if (sent)
                             return;
@@ -768,7 +768,7 @@ public class ImUrlActivity extends Activity {
                                 mSendUri = importedMediaUri;
                             }
 
-                            boolean sent = session.offerData(offerId, mSendUri.toString(), importInfo.type);
+                            boolean sent = session.offerData(offerId, null, mSendUri.toString(), importInfo.type);
                             if (sent)
                                 return;
                         }

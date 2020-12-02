@@ -292,15 +292,20 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
                 case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO: {
                     Context context = _context.get();
                     if (context != null) {
-                        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-                        byte[] rawArt;
-                        BitmapFactory.Options bfo = new BitmapFactory.Options();
 
-                        mmr.setDataSource(context, uri);
-                        rawArt = mmr.getEmbeddedPicture();
-                        if (null != rawArt) {
-                            return BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+                        if (uri.getScheme().equals("content")) {
+                            MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+
+                            byte[] rawArt;
+                            BitmapFactory.Options bfo = new BitmapFactory.Options();
+
+                            mmr.setDataSource(context, uri);
+                            rawArt = mmr.getEmbeddedPicture();
+                            if (null != rawArt) {
+                                return BitmapFactory.decodeByteArray(rawArt, 0, rawArt.length, bfo);
+                            }
                         }
+
                     }
                 }
                 break;
