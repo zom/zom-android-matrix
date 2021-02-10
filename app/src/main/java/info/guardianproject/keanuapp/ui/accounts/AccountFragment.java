@@ -57,6 +57,7 @@ import info.guardianproject.keanuapp.ImApp;
 import info.guardianproject.keanuapp.R;
 import info.guardianproject.keanuapp.tasks.SignInHelper;
 import info.guardianproject.keanuapp.ui.contacts.DeviceDisplayActivity;
+import info.guardianproject.keanuapp.ui.onboarding.OnboardingManager;
 
 import static android.content.Context.CLIPBOARD_SERVICE;
 import static info.guardianproject.keanu.core.KeanuConstants.DEFAULT_AVATAR_HEIGHT;
@@ -156,12 +157,14 @@ public class AccountFragment extends Fragment {
         });
 
         View btnEditAccountPassword = mView.findViewById(R.id.edit_account_password);
+        btnEditAccountPassword.setVisibility(View.GONE);
+        /**
         btnEditAccountPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showChangePassword();
             }
-        });
+        });**/
 
 
         mIvAvatar = (ImageView) mView.findViewById(R.id.imageAvatar);
@@ -272,7 +275,7 @@ public class AccountFragment extends Fragment {
 
                 if (!TextUtils.isEmpty(newPassword)) {
 
-                    new ChangePasswordTask().execute(getAccountPassword(mProviderId),newPassword);
+                 //   new ChangePasswordTask().execute(getAccountPassword(mProviderId),newPassword);
                 }
             }
         });
@@ -656,6 +659,7 @@ public class AccountFragment extends Fragment {
         }
     }
 
+    /**
     private class ChangePasswordTask extends AsyncTask<String, Void, Boolean> {
 
         String newPassword = null;
@@ -667,15 +671,13 @@ public class AccountFragment extends Fragment {
                 String oldPassword = setupValues[0];
                 newPassword = setupValues[1];
 
-                /**
                 if (!oldPassword.equals(newPassword)) {
                     boolean result = OnboardingManager.changePassword(getActivity(), mProviderId, mAccountId, oldPassword, newPassword);
                     return result;
                 }
                 else
                     return false;
-                 **/
-                return true;//just change locally
+
             }
             catch (Exception e)
             {
@@ -694,7 +696,7 @@ public class AccountFragment extends Fragment {
             }
 
         }
-    }
+    }**/
 
     public void viewDevicesClicked ()
     {
