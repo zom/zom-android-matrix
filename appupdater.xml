@@ -1,13 +1,10 @@
 <AppUpdater>
   <update>
-    <latestVersion>2.1.9-RC-1</latestVersion>
-    <latestVersionCode>219002202</latestVersionCode>
-    <url>https://github.com/zom/zom-android-matrix/releases/download/2.1.9-RC-1/Zom-2.1.9-RC-1-altbrand-universal-release.apk</url>
+    <latestVersion>2.2.0-RC-1</latestVersion>
+    <latestVersionCode>220002200</latestVersionCode>
+    <url>https://github.com/zom/zom-android-matrix/releases/download/2.2.0-RC-1/Zom-2.2.0-RC-1-altbrand-universal-release.apk</url>
     <releaseNotes>
-    improved room message syncing to reduce missed messages
-    update group member loading logic and display (fast!)
-    improved photo, media gallery selector
-    improved support for displaying edited messages
+	New stickers for Losar!
     </releaseNotes>
   </update>
 </AppUpdater>
