@@ -82,7 +82,6 @@ public class GalleryAdapter extends CursorRecyclerViewAdapter<GalleryViewHolder>
             int titleColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.TITLE);
             int displayColumn = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
 
-
             if (uriColumn >= 0 && typeColumn >= 0) {
                 String data = cursor.getString(uriColumn);
 

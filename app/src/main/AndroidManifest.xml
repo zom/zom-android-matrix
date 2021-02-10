@@ -91,6 +91,7 @@
         android:label="@string/ic_launcher_name"
         android:largeHeap="true"
         android:theme="@style/AppTheme"
+        android:requestLegacyExternalStorage="true"
         tools:replace="android:allowBackup,android:label">
         <activity android:name=".ui.onboarding.TermsActivity"></activity>
         <activity android:name=".ui.onboarding.CaptchaActivity" />
