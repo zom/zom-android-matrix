@@ -20,6 +20,7 @@ import android.app.SearchManager;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -53,12 +54,15 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+
+import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -313,6 +317,7 @@ public class MainActivity extends BaseActivity {
         NetworkConnectivityReceiver.registerHandler(mServiceHandler, EVENT_NETWORK_STATE_CHANGED);
         mNetworkConnectivityListener.startListening(this);
 
+        showSdk2MigrationPrompt();
 
     }
     private final class ServiceHandler extends Handler {
@@ -1404,5 +1409,62 @@ public class MainActivity extends BaseActivity {
 
     }**/
 
+    private void showSdk2MigrationPrompt ()
+    {
+        // Set up the input
+        final EditText input = new EditText(this);
+// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(getString(R.string.sdk2_dialog_title))
+                .setMessage(getString(R.string.sdk2_dialog_message))
+                .setView(input)
+                .setPositiveButton(R.string.ok, (dialog1, whichButton) -> {
+
+                    String checkPass = input.getText().toString();
+
+                    boolean passMatches = checkPass.equals(getAccountPassword());
+
+                    if (!passMatches)
+                    {
+
+                        AlertDialog dialog2 = new AlertDialog.Builder(this)
+                                .setTitle(R.string.sdk2_dialog_password_fail_title)
+                                .setMessage(R.string.sdk2_dialog_password_fail_message)
+                                .setPositiveButton(R.string.ok, (dialog3, whichButton2) -> {
+
+                                })
+                                .create();
+                        dialog2.show();
+
+
+                    }
+
+                })
+                .setNegativeButton(R.string.cancel, (dialog12, whichButton) -> dialog12.dismiss())
+                .create();
+        dialog.show();
+    }
+
+    private String getAccountPassword() {
+
+        String result = "";
+        long providerId = mApp.getDefaultProviderId();
+
+        Cursor c = getContentResolver().query(Imps.Provider.CONTENT_URI_WITH_ACCOUNT,
+                new String[]{Imps.Provider.ACTIVE_ACCOUNT_PW}, Imps.Provider.CATEGORY + "=? AND providers." + Imps.Provider._ID + "=?" /* selection */,
+                new String[]{IMPS_CATEGORY, providerId + ""} /* selection args */,
+                Imps.Provider.DEFAULT_SORT_ORDER);
+
+        if (c != null) {
+            c.moveToFirst();
+            result = c.getString(0);
+            c.close();
+        }
+
+        return result;
+
+    }
 
 }

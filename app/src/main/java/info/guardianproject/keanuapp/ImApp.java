@@ -54,8 +54,10 @@ import org.acra.config.MailSenderConfigurationBuilder;
 import org.acra.data.StringFormat;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executor;
@@ -813,6 +815,8 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         if (cursorProviders != null)
             cursorProviders.close();
 
+        exportCredentialsForUpgrade();
+
         return false;
     }
 
@@ -883,6 +887,8 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
             if (cursorProviders != null)
                 cursorProviders.close();
         }
+
+        exportCredentialsForUpgrade();
 
         return true;
 
@@ -1073,6 +1079,41 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
                 Log.d("KeanuFiles",file.getAbsolutePath() + " (" + file.length()/1000000 + ")");
             }
         }
+    }
+
+    private void exportCredentialsForUpgrade ()
+    {
+
+        if (getDefaultUsername() == null)
+            return;
+
+        String userAddress = getDefaultUsername().trim();
+        long providerId = getDefaultProviderId();
+
+        String password = "";
+
+        Cursor c = getContentResolver().query(Imps.Provider.CONTENT_URI_WITH_ACCOUNT,
+                new String[]{Imps.Provider.ACTIVE_ACCOUNT_PW}, Imps.Provider.CATEGORY + "=? AND providers." + Imps.Provider._ID + "=?" /* selection */,
+                new String[]{IMPS_CATEGORY, providerId + ""} /* selection args */,
+                Imps.Provider.DEFAULT_SORT_ORDER);
+
+        if (c != null) {
+            c.moveToFirst();
+            password = c.getString(0);
+            c.close();
+        }
+
+        Properties props = new Properties();
+        props.put("u",userAddress);
+        props.put("p",password);
+
+        File fileCreds = new File(getFilesDir(),"migrate.props");
+        try {
+            props.store(new FileOutputStream(fileCreds),"");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 }

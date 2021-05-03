@@ -303,6 +303,13 @@ public class AccountFragment extends Fragment {
 
     }
 
+    public boolean checkAccountPassword (String checkPass)
+    {
+        return (getAccountPassword(mProviderId).equals(checkPass));
+
+    }
+
+
     private String getAccountPassword(long providerId) {
 
         String result = "";

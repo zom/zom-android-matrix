@@ -14,5 +14,10 @@
     <string name="menu_live_mode">Live Mode</string>
     <string name="add_link_info">https://...</string>
     <string name="error_server_down">App server is down %s</string>
+    <string name="sdk2_dialog_title">We have a big update coming!</string>
+    <string name="sdk2_dialog_message">You may need to log back in.\n\nEnter your password below to make sure you remember it.</string>
+    <string name="sdk2_dialog_password_fail">That didn\'t match your passowrd</string>
+    <string name="sdk2_dialog_password_fail_title">Password Check Failed!</string>
+    <string name="sdk2_dialog_password_fail_message">You can find your password in the fourth \'Me\' tab on this screen. Please write it down, so you won\'t forget it again!</string>
 
 </resources>
