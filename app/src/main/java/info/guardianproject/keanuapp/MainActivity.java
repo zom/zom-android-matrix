@@ -317,7 +317,6 @@ public class MainActivity extends BaseActivity {
         NetworkConnectivityReceiver.registerHandler(mServiceHandler, EVENT_NETWORK_STATE_CHANGED);
         mNetworkConnectivityListener.startListening(this);
 
-        showSdk2MigrationPrompt();
 
     }
     private final class ServiceHandler extends Handler {
@@ -484,6 +483,9 @@ public class MainActivity extends BaseActivity {
         PopupAlertManager.INSTANCE.onNewActivityDisplayed(this);
 
         checkForUpdates();
+
+
+        showSdk2MigrationPrompt();
 
     }
 
@@ -1409,8 +1411,13 @@ public class MainActivity extends BaseActivity {
 
     }**/
 
+    private boolean showSdk2Migration = true;
+
     private void showSdk2MigrationPrompt ()
     {
+        if (!showSdk2Migration)
+            return;
+
         // Set up the input
         final EditText input = new EditText(this);
 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
@@ -1418,7 +1425,7 @@ public class MainActivity extends BaseActivity {
 
         AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(getString(R.string.sdk2_dialog_title))
-                .setMessage(getString(R.string.sdk2_dialog_message))
+                .setMessage(getString(R.string.sdk2_dialog_message,mApp.getDefaultUsername()))
                 .setView(input)
                 .setPositiveButton(R.string.ok, (dialog1, whichButton) -> {
 
@@ -1440,9 +1447,15 @@ public class MainActivity extends BaseActivity {
 
 
                     }
-
+                    else
+                    {
+                        showSdk2Migration = false;
+                    }
                 })
-                .setNegativeButton(R.string.cancel, (dialog12, whichButton) -> dialog12.dismiss())
+                .setNegativeButton(R.string.cancel, (dialog12, whichButton) -> {
+                    dialog12.dismiss();
+                    showSdk2Migration = false;
+                })
                 .create();
         dialog.show();
     }
