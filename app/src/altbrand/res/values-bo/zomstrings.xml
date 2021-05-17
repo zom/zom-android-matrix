@@ -104,4 +104,11 @@
   <string name="bot_quiz_desc">ངའི་དྲི་བ་ལ་ལན་རྒྱབས་</string>
   <string name="bot_topgyal_name">སྟོབས་རྒྱལ་</string>
   <string name="bot_topgyal_desc">ང་ལ་དྲི་བ་གང་ཡིན་ན་དྲིས་རོགས།</string>
+
+  <string name="sdk2_dialog_title">འཛོམས་ཀྱི་བཀོལ་ཆས་ཐོན་གསར་པ་ཞིག་སླེབས་ཀྱི་ཡོད་སྟབས།</string>
+  <string name="sdk2_dialog_message">ཁྱེད་རང་བསྐྱར་དུ་ནང་འཛུལ་བྱེད་དགོས་སྲིད།\n\nཁྱེད་ཀྱི་ཐོ་འགོད་མིང་ནི། %s\n\nཡིན།གཤམ་དུ་རང་ཉིད་ཀྱི་གསང་ཚིག་གཏགས་ཏེ། ཁྱེད་ཀྱིས་སོ་སོའི་གསང་ཚིག་དྲན་གྱི་ཡོད་པ་ཁག་ཐེག་བྱོས།</string>
+  <string name="sdk2_dialog_password_fail">ཁྱེད་ཀྱིས་ནང་འཇུག་བྱས་བའི་གསང་ཚིག་དེ་ཚད་ལྡན་རེད་མི་འདུག</string>
+  <string name="sdk2_dialog_password_fail_title">གསང་ཚིག་ཞིབ་བཤེར་བྱེད་ཐུབ་མ་སོང་།</string>
+  <string name="sdk2_dialog_password_fail_message">འཆར་ངོས་སུ་མིའི་མགོ་རྟགས་ཡོད་པའི་གདམ་ག་བཞི་པ་དེའི་ནང་ནས་རང་ཉིད་ཀྱི་གསང་ཚིག་རྙེད་ཐུབ། གསང་ཚིག་དེ་མར་ཕྲིས་དང་། རྗེས་སུ་མི་བརྗེད་པར་ཕན། </string>
+
 </resources>

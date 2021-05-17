@@ -616,4 +616,11 @@
     <string name="story_gallery_all">所有</string>
 
     <string name="create_session">建立会话</string>
+
+    <string name="sdk2_dialog_title">我们即将进行重大更新!</string>
+    <string name="sdk2_dialog_message">您可能需要重新登录。\n\n您的用户名是 %s\n\n在下面输入密码，以确保您记得该密码。</string>
+    <string name="sdk2_dialog_password_fail">与您的密码不匹配</string>
+    <string name="sdk2_dialog_password_fail_title">密码检查失败！</string>
+    <string name="sdk2_dialog_password_fail_message">在屏幕上的第四个“我”标签中，你能找到您的密码。 请写下来，这样您就再也不会忘记它了！</string>
+
 </resources>

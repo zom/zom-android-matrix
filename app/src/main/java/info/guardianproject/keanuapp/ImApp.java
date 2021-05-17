@@ -46,6 +46,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
+import com.yariksoffice.lingver.Lingver;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
@@ -208,8 +209,10 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         Preferences.setup(this);
         initChannel();
 
+
         Languages.setup(MainActivity.class, R.string.use_system_default);
-        Languages.setLanguage(this, Preferences.getLanguage(), false);
+        Lingver.init(this, Preferences.getLanguage());
+
 
         sImApp = this;
 
@@ -322,7 +325,9 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
              * the preferences, otherwise this will be stuck in a crash loop. */
             Languages.setLanguage(activity, language, true);
             Preferences.setLanguage(language);
-            Languages.forceChangeLanguage(activity);
+            Lingver.getInstance().setLocale(activity, language);
+
+//            Languages.forceChangeLanguage(activity);
 
 
         }

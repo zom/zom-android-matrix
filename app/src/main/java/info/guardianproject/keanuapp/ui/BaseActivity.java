@@ -10,8 +10,10 @@ import androidx.appcompat.widget.Toolbar;
 import android.view.WindowManager;
 
 import info.guardianproject.keanu.core.Preferences;
+import info.guardianproject.keanuapp.MainActivity;
 import info.guardianproject.keanuapp.R;
 
+import info.guardianproject.keanu.core.util.Languages;
 
 /**
  * Created by n8fr8 on 5/7/16.
@@ -47,6 +49,8 @@ public class BaseActivity extends AppCompatActivity {
         {
             getWindow().getDecorView().setBackgroundColor(themeColorBg);
         }
+
+
     }
 
 
