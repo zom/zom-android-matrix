@@ -318,6 +318,7 @@ public class MainActivity extends BaseActivity {
         mNetworkConnectivityListener.startListening(this);
 
 
+
     }
     private final class ServiceHandler extends Handler {
         public ServiceHandler() {

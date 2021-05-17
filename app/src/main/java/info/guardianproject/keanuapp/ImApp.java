@@ -42,6 +42,8 @@ import androidx.appcompat.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.google.GoogleEmojiProvider;
 
@@ -52,9 +54,14 @@ import org.acra.config.CoreConfigurationBuilder;
 import org.acra.config.DialogConfigurationBuilder;
 import org.acra.config.MailSenderConfigurationBuilder;
 import org.acra.data.StringFormat;
+import org.apache.commons.io.IOUtils;
+import org.matrix.android.sdk.internal.legacy.riot.Credentials;
+import org.matrix.android.sdk.internal.legacy.riot.HomeServerConnectionConfig;
+import org.matrix.android.sdk.internal.legacy.riot.LoginStorage;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Properties;
@@ -65,6 +72,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.iocipher.VirtualFileSystem;
 import info.guardianproject.keanu.core.Preferences;
 import info.guardianproject.keanu.core.cacheword.CacheWordHandler;
@@ -815,7 +823,6 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         if (cursorProviders != null)
             cursorProviders.close();
 
-        exportCredentialsForUpgrade();
 
         return false;
     }
@@ -1081,8 +1088,7 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         }
     }
 
-    private void exportCredentialsForUpgrade ()
-    {
+    public void exportCredentialsForUpgrade () {
 
         if (getDefaultUsername() == null)
             return;
@@ -1104,16 +1110,87 @@ public class ImApp extends MultiDexApplication implements ICacheWordSubscriber {
         }
 
         Properties props = new Properties();
-        props.put("u",userAddress);
-        props.put("p",password);
+        props.put("u", userAddress);
+        props.put("p", password);
 
-        File fileCreds = new File(getFilesDir(),"migrate.props");
+        File fileCreds = new File(getFilesDir(), "migrate.props");
         try {
-            props.store(new FileOutputStream(fileCreds),"");
+            props.store(new FileOutputStream(fileCreds), "");
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        storeConfig(providerId,userAddress.split(":")[0].substring(1));
+    }
+
+    private void storeConfig (long providerId, String username) {
+
+        Cursor cursor = getContentResolver().query(Imps.ProviderSettings.CONTENT_URI,
+                new String[]{Imps.ProviderSettings.NAME, Imps.ProviderSettings.VALUE},
+                Imps.ProviderSettings.PROVIDER + "=?",
+                new String[]{Long.toString(providerId)}, null);
+
+        if (cursor == null)
+            return; //not going to work
+
+        Imps.ProviderSettings.QueryMap providerSettings = new Imps.ProviderSettings.QueryMap(
+                cursor, getContentResolver(), providerId, false, null);
+
+        String server = providerSettings.getServer();
+        if (TextUtils.isEmpty(server))
+            server = providerSettings.getDomain();
+
+        providerSettings.close();
+        if (!cursor.isClosed())
+            cursor.close();
+
+
+        HomeServerConnectionConfig config = new HomeServerConnectionConfig.Builder()
+                .withHomeServerUri(Uri.parse("https://" + server))
+                .build();
+
+        Credentials creds = null;
+
+        info.guardianproject.iocipher.File fileCredsJson =
+                new info.guardianproject.iocipher.File("/" + username + "/creds.json");
+
+        if (fileCredsJson.exists() & fileCredsJson.length() > 0) {
+            try {
+                String json = IOUtils.toString(new FileInputStream(fileCredsJson), Charset.defaultCharset());
+                JsonObject jCreds = JsonParser.parseString(json).getAsJsonObject();
+
+                creds = new Credentials();
+                creds.accessToken = jCreds.get("access_token").getAsString();
+                creds.deviceId = jCreds.get("device_id").getAsString();
+                //noinspection deprecation
+                creds.homeServer = jCreds.get("home_server").getAsString();
+                if (jCreds.has("refresh_token"))
+                    if (!jCreds.get("refresh_token").isJsonNull())
+                        creds.refreshToken = jCreds.get("refresh_token").getAsString();
+
+                creds.userId = jCreds.get("user_id").getAsString();
+
+            } catch (Exception e) {
+
+                if (creds == null)
+                    creds = new Credentials();
+
+                creds.userId = username;
+                creds.homeServer = "https://" + server;
+            }
+        }
+        else {
+            creds = new Credentials();
+            creds.userId = username;
+            creds.homeServer = "https://" + server;
+        }
+
+        config.setCredentials(creds);
+        config.forceUsageOfTlsVersions();
+
+        LoginStorage lStore = new LoginStorage(this);
+        lStore.clear();
+        lStore.addCredentials(config);
     }
 
 }
