@@ -1,10 +1,11 @@
 <AppUpdater>
   <update>
-    <latestVersion>2.2.0-RC-1</latestVersion>
-    <latestVersionCode>220002200</latestVersionCode>
-    <url>https://github.com/zom/zom-android-matrix/releases/download/2.2.0-RC-1/Zom-2.2.0-RC-1-altbrand-universal-release.apk</url>
+    <latestVersion>2.2.2-RC-3</latestVersion>
+    <latestVersionCode>222002300</latestVersionCode>
+    <url>https://github.com/zom/zom-android-matrix/releases/download/2.2.2-RC-3/Zom-2.2.2-RC-3-altbrand-universal-release.apk</url>
     <releaseNotes>
-	New stickers for Losar!
+	    Updated language support
+	    Preparation for update to Zom3
     </releaseNotes>
   </update>
 </AppUpdater>
